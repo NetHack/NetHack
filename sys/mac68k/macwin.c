@@ -3960,6 +3960,20 @@ HandleUpdate(EventRecord *theEvent)
         existing_update_region =
             (get_invalid_region(theWindow, &rect) == noErr);
     }
+    /* Message window: scrollPos/save_lin can advance between paints
+       (prompt and --more-- paths), so repainting only the damaged
+       region leaves the undamaged part showing the old frame -- most
+       visibly the dotted last-message divider, which then appears at
+       two different heights.  Widen any damage to the whole window so
+       the repaint is coherent. */
+    if (aWin && theWindow != _mt_window
+        && GetWindowKind(theWindow) - WIN_BASE_KIND == NHW_MESSAGE) {
+        Rect fr;
+
+        GetWindowPortBounds(theWindow, &fr);
+        OffsetRect(&fr, -fr.left, -fr.top);
+        InvalWindowRect(theWindow, &fr);
+    }
     BeginUpdate(theWindow);
     SetPortWindowPort(theWindow);
     GetWindowPortBounds(theWindow, &r);
