@@ -3205,7 +3205,7 @@ MenwClick(NhWindow *wind, Point pt)
     if (inSelect != WIN_ERR && wind->how != PICK_NONE) {
         short currentRow = -1, previousRow = -1;
         short previousItem = -1, item = -1;
-        Boolean majorSelectState, firstRow = TRUE;
+        Boolean majorSelectState = FALSE, firstRow = TRUE;
 
         do {
             SystemTask();
