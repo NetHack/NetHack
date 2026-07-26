@@ -1540,10 +1540,11 @@ topl_resp_key_body(char ch)
             }
         }
 
-        if (loc) {
+        /* --more-- (CHAR_ANY) continues on any key: no button flash,
+           and nothing typed into the message line */
+        if (loc && *loc != CHAR_ANY) {
             topl_flash_resp(loc - topl_resp);
-            if (*loc != CHAR_ANY)
-                ch = *loc;
+            ch = *loc;
             TEKey(ch, top_line);
         }
     }
@@ -1656,7 +1657,9 @@ mac_display_nhwindow(winid win, boolean f)
         inSelect = win;
         do {
             ch = mac_nhgetch();
-        } while (!ClosingWindowChar(ch));
+            /* --more-- accepts any key; text/menu windows keep the
+               explicit dismiss keys */
+        } while (win == WIN_MESSAGE ? !ch : !ClosingWindowChar(ch));
         inSelect = WIN_ERR;
         UndimMenuBar();
 
