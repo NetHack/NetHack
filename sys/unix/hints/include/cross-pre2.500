@@ -644,6 +644,7 @@ override SYSSRC = ../sys/mac68k/macmain.c ../sys/mac68k/macwin.c \
 		../sys/mac68k/macmap.c \
 		../sys/mac68k/macalloc.c \
 		../sys/mac68k/macstat.c \
+		../sys/mac68k/macprefs.c \
 		../win/tty/wintty.c ../win/tty/topl.c \
 		../win/tty/getline.c
 override SYSOBJ = $(TARGETPFX)macmain.o $(TARGETPFX)macwin.o \
@@ -657,6 +658,7 @@ override SYSOBJ = $(TARGETPFX)macmain.o $(TARGETPFX)macwin.o \
 		$(TARGETPFX)macmap.o \
 		$(TARGETPFX)macalloc.o \
 		$(TARGETPFX)macstat.o \
+		$(TARGETPFX)macprefs.o \
 		$(TARGETPFX)tile.o \
 		$(TARGETPFX)wintty.o $(TARGETPFX)topl.o \
 		$(TARGETPFX)getline.o
@@ -725,6 +727,7 @@ override SYSSRC = ../sys/mac68k/macmain.c ../sys/mac68k/macwin.c \
 		../sys/mac68k/macmap.c \
 		../sys/mac68k/macalloc.c \
 		../sys/mac68k/macstat.c \
+		../sys/mac68k/macprefs.c \
 		../win/tty/wintty.c ../win/tty/topl.c \
 		../win/tty/getline.c
 override SYSOBJ = $(TARGETPFX)macmain.o $(TARGETPFX)macwin.o \
@@ -738,6 +741,7 @@ override SYSOBJ = $(TARGETPFX)macmain.o $(TARGETPFX)macwin.o \
 		$(TARGETPFX)macmap.o \
 		$(TARGETPFX)macalloc.o \
 		$(TARGETPFX)macstat.o \
+		$(TARGETPFX)macprefs.o \
 		$(TARGETPFX)tile.o \
 		$(TARGETPFX)wintty.o $(TARGETPFX)topl.o \
 		$(TARGETPFX)getline.o

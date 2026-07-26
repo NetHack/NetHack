@@ -152,6 +152,33 @@ extern Boolean RetrieveSize(short, short, short, short *, short *);
 extern void SaveWindowPos(WindowPtr);
 extern void SaveWindowSize(WindowPtr);
 extern void SaveSizeForKind(short kind, short height, short width);
+
+/* UI settings persisted in the "NetHack Preferences" file after the
+   window-position records; written by the Preferences dialog (macprefs.c)
+   and applied at startup AFTER initoptions(), so they override the
+   NetHack Defaults file.  valid==0 (never saved / "Forget Settings")
+   leaves the config-file values alone. */
+#define UIPREFS_VERSION 1
+enum uiprefs_fonts {
+    uiFontMap = 0, uiFontStatus, uiFontMessage, uiFontMenu, uiFontText,
+    UIPREFS_NFONTS
+};
+typedef struct UiPrefs {
+    short version;               /* UIPREFS_VERSION */
+    char valid;                  /* 0 => record unused */
+    char tiled_map;              /* startup map display mode */
+    char hitpointbar;
+    char statuslines;            /* 2 or 3 */
+    Str31 fonts[UIPREFS_NFONTS]; /* fonts[i][0]==0 => port default */
+    short sizes[UIPREFS_NFONTS]; /* 0 => port default */
+} UiPrefs;
+extern Boolean RetrieveUiPrefs(UiPrefs *);
+extern void StoreUiPrefs(const UiPrefs *);
+
+/* ### macprefs.c ### */
+
+extern void macprefs_dialog(void);
+extern void macprefs_apply_startup(void);
 extern Boolean RetrieveWinPos(WindowPtr, short *, short *);
 
 /* ### macerrs.c ### */

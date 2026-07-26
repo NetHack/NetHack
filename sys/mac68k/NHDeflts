@@ -4,6 +4,11 @@
 
 
 ### Display ###
+# NOTE: once the Preferences dialog (File menu) has been used, its saved
+# settings override the UI options in this file (tiled_map, fonts and
+# sizes, hitpointbar, statuslines). "Forget Settings" in the dialog
+# makes this file authoritative again.
+
 # Boulder symbol
 #OPTIONS=boulder:0
 

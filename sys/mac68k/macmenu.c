@@ -87,6 +87,8 @@ enum {
     /* File */
     menuFileSave = 1,
     ____File___1,
+    menuFilePrefs,
+    ____File___2,
     menuFileQuit,
 
     /* standard minimum Edit menu items */
@@ -927,6 +929,10 @@ DoMenuEvt(long menuEntry)
         switch (menuItem) {
         case menuFileSave:
             askSave();
+            break;
+
+        case menuFilePrefs:
+            macprefs_dialog();
             break;
 
         case menuFileQuit:

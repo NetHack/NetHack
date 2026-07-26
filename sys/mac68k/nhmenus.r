@@ -37,6 +37,8 @@ resource 'MENU' (129) {
     {
         "Save", noIcon, "S", noMark, plain,
         "-", noIcon, noKey, noMark, plain,
+        "Preferences\0xC9", noIcon, noKey, noMark, plain,
+        "-", noIcon, noKey, noMark, plain,
         "Quit", noIcon, "Q", noMark, plain
     }
 };
@@ -424,5 +426,49 @@ resource 'STR#' (201, "current") {
         "(",
         "$",
         "+"
+    }
+};
+
+/* Preferences dialog (macprefs.c).  Item numbers are load-bearing --
+ * they must match the prefSave..prefSizeLast enum in macprefs.c: the
+ * font popups (8-12) and size fields (13-17) are contiguous runs in
+ * uiprefs_fonts order (map, status, message, menu, text). */
+resource 'DLOG' (6100, "Preferences") {
+    {24, 56, 320, 456},
+    dBoxProc,
+    visible,
+    noGoAway,
+    0x0,
+    6100,
+    "Preferences",
+    centerMainScreen
+};
+
+resource 'DITL' (6100) {
+    {
+        {264, 310, 284, 384}, Button { enabled, "Save" },          /* 1 */
+        {264, 228, 284, 292}, Button { enabled, "Cancel" },        /* 2 */
+        {264, 16, 284, 140},  Button { enabled, "Forget Settings" }, /* 3 */
+        {12, 16, 30, 190},    CheckBox { enabled, "Tiled map" },   /* 4 */
+        {36, 16, 54, 190},    CheckBox { enabled, "Hit-point bar" }, /* 5 */
+        {12, 210, 30, 384},   RadioButton { enabled, "2 status lines" }, /* 6 */
+        {36, 210, 54, 384},   RadioButton { enabled, "3 status lines" }, /* 7 */
+        {78, 100, 98, 300},   UserItem { enabled },                /* 8 map font */
+        {106, 100, 126, 300}, UserItem { enabled },                /* 9 status */
+        {134, 100, 154, 300}, UserItem { enabled },                /* 10 message */
+        {162, 100, 182, 300}, UserItem { enabled },                /* 11 menu */
+        {190, 100, 210, 300}, UserItem { enabled },                /* 12 text */
+        {80, 316, 96, 356},   EditText { enabled, "" },            /* 13 map size */
+        {108, 316, 124, 356}, EditText { enabled, "" },            /* 14 status */
+        {136, 316, 152, 356}, EditText { enabled, "" },            /* 15 message */
+        {164, 316, 180, 356}, EditText { enabled, "" },            /* 16 menu */
+        {192, 316, 208, 356}, EditText { enabled, "" },            /* 17 text */
+        {80, 16, 96, 96},     StaticText { disabled, "Map:" },     /* 18 */
+        {108, 16, 124, 96},   StaticText { disabled, "Status:" },  /* 19 */
+        {136, 16, 152, 96},   StaticText { disabled, "Message:" }, /* 20 */
+        {164, 16, 180, 96},   StaticText { disabled, "Menu:" },    /* 21 */
+        {192, 16, 208, 96},   StaticText { disabled, "Text:" },    /* 22 */
+        {222, 16, 254, 384},  StaticText { disabled,
+            "Changes take effect at the next launch." }            /* 23 */
     }
 };

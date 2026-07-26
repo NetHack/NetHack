@@ -46,6 +46,8 @@ main(void)
     init_nhwindows(&argc, (char **) &gh.hname);
 
     initoptions();
+    macprefs_apply_startup(); /* Preferences-file UI settings override the
+                                 config file; game windows don't exist yet */
     macalloc_stats("initoptions");
     iflags.bgcolors = TRUE;
     iflags.use_background_glyph = TRUE;
