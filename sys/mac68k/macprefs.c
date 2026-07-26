@@ -96,6 +96,43 @@ menu_item_for_font(const unsigned char *name)
     return 1;
 }
 
+/* point size a row currently resolves to: config value, else the live
+   window's font size, else the port fallback -- used to seed the size
+   popups so they show the real size instead of "(default)" */
+static short
+effective_size(short row)
+{
+    short sz = 0;
+    winid w = WIN_ERR;
+
+    switch (row) {
+    case uiFontMap:
+        sz = iflags.wc_fontsiz_map;
+        w = WIN_MAP;
+        break;
+    case uiFontStatus:
+        sz = iflags.wc_fontsiz_status;
+        w = WIN_STATUS;
+        break;
+    case uiFontMessage:
+        sz = iflags.wc_fontsiz_message;
+        w = WIN_MESSAGE;
+        break;
+    case uiFontMenu:
+        sz = iflags.wc_fontsiz_menu;
+        break;
+    case uiFontText:
+        sz = iflags.wc_fontsiz_text;
+        break;
+    }
+    if (!sz && w != WIN_ERR && w >= 0 && w < NUM_MACWINDOWS
+        && theWindows && theWindows[w].its_window)
+        sz = theWindows[w].font_size;
+    if (!sz) /* cre_win's fallbacks: 9pt menus/text, 12pt elsewhere */
+        sz = (row == uiFontMenu || row == uiFontText) ? 9 : 12;
+    return sz;
+}
+
 /* font number a row currently resolves to (explicit choice, else the
    port default in win_fonts[]); drives RealFont in the size popup */
 static short
@@ -312,7 +349,9 @@ macprefs_dialog(void)
             GetFontName(win_fonts[uifont_nhw[i]], cur);
             fontSel[i] = menu_item_for_font(cur);
         }
-        sizeVal[i] = up.sizes[i];
+        /* no explicit choice: show the currently effective size (saving
+           then pins it; picking "(default)" reverts, same as fonts) */
+        sizeVal[i] = up.sizes[i] ? up.sizes[i] : effective_size(i);
         GetDialogItem(dlog, prefFontFirst + i, &type, &h, &r);
         SetDialogItem(dlog, prefFontFirst + i, type, (Handle) redraw, &r);
         GetDialogItem(dlog, prefSizeFirst + i, &type, &h, &r);
