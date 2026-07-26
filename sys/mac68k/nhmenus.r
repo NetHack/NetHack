@@ -496,11 +496,8 @@ resource 'DITL' (6200) {
         {176, 292, 196, 356}, Button { enabled, "OK" },        /* 1 */
         {8, 12, 96, 368},     UserItem { disabled },           /* 2 art */
         {104, 20, 120, 360},  StaticText { disabled, "" },     /* 3 version */
-        {124, 20, 156, 360},  StaticText { disabled,
-            "\0xA9 Stichting Mathematisch Centrum, Amsterdam, "
-            "and the NetHack DevTeam." },                      /* 4 */
-        {158, 20, 174, 360},  StaticText { disabled,
-            "www.nethack.org \0xA5 Macintosh 68k port" },      /* 5 */
+        {124, 20, 156, 360},  StaticText { disabled, "" },     /* 4 copyright */
+        {158, 20, 174, 360},  StaticText { disabled, "" },     /* 5 build info */
         {172, 288, 200, 360}, UserItem { disabled }            /* 6 ring */
     }
 };

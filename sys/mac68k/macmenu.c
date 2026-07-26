@@ -1152,11 +1152,42 @@ aboutNetHack()
     GetPort(&oldport);
     SetPortDialogPort(dlog);
 
-    snprintf(tmp, sizeof tmp, "Version %d.%d.%d for the Macintosh",
-             VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL);
+/* which slice of the fat binary this object was compiled into */
+#ifdef CROSS_TO_MACPPC
+#define ABOUT_ARCH "PowerPC"
+#else
+#define ABOUT_ARCH "68k"
+#endif
+    snprintf(tmp, sizeof tmp, "Version %d.%d.%d for the Macintosh (%s)",
+             VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL, ABOUT_ARCH);
     C2P(tmp, vers);
     GetDialogItem(dlog, abtVersion, &type, &h, &r);
     SetDialogItemText(h, vers);
+
+    {
+        char big[128];
+        /* years from the authoritative banner ("NetHack, Copyright
+           1985-20xx"), so this line tracks upstream updates;
+           \251 = Mac Roman copyright sign */
+        const char *yrs = strstr(COPYRIGHT_BANNER_A, "1985");
+
+        snprintf(big, sizeof big,
+                 "\251 %s Stichting Mathematisch Centrum, Amsterdam,"
+                 " and the NetHack DevTeam.",
+                 yrs ? yrs : "1985");
+        C2P(big, vers);
+        GetDialogItem(dlog, abtCredits, &type, &h, &r);
+        SetDialogItemText(h, vers);
+
+        /* \245 = Mac Roman bullet */
+        snprintf(big, sizeof big, "Built %s \245 %s",
+                 nomakedefs.build_date ? nomakedefs.build_date : "?",
+                 nomakedefs.git_branch ? nomakedefs.git_branch
+                                       : "unknown branch");
+        C2P(big, vers);
+        GetDialogItem(dlog, abtContact, &type, &h, &r);
+        SetDialogItemText(h, vers);
+    }
 
     GetDialogItem(dlog, abtArt, &type, &h, &r);
     SetDialogItem(dlog, abtArt, type, (Handle) redraw, &r);
