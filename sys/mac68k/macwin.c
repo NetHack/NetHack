@@ -4020,6 +4020,16 @@ DoOsEvt(EventRecord *theEvent)
     }
 }
 
+/* Service an update event for a game window from OUTSIDE the main event
+   loop: ModalDialog only redraws its own dialog, so a movable-modal
+   filter (macprefs.c) routes other windows' updates here or they stay
+   white while the dialog is dragged around. */
+void
+mac_handle_update_event(EventRecord *theEvent)
+{
+    HandleUpdate(theEvent);
+}
+
 void
 HandleEvent(EventRecord *theEvent)
 {

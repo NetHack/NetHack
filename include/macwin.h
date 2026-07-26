@@ -181,6 +181,9 @@ extern void StoreUiPrefs(const UiPrefs *);
 
 extern void macprefs_dialog(void);
 extern void macprefs_apply_startup(void);
+
+/* macwin.c: update-event dispatch for movable-modal dialog filters */
+extern void mac_handle_update_event(EventRecord *);
 extern Boolean RetrieveWinPos(WindowPtr, short *, short *);
 
 /* ### macerrs.c ### */

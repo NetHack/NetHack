@@ -250,6 +250,14 @@ pref_filter(DialogRef wind, EventRecord *event, DialogItemIndex *item)
 {
     char ch;
 
+    /* movable modal: ModalDialog only redraws its own window; route
+       update events for the game windows behind us to the app handler
+       or dragging the dialog leaves white holes over them */
+    if (event->what == updateEvt
+        && (WindowPtr) event->message != GetDialogWindow(wind)) {
+        mac_handle_update_event(event);
+        return FALSE; /* BeginUpdate/EndUpdate ran; nothing left to do */
+    }
     /* movable modal: ModalDialog doesn't track the title bar itself */
     if (event->what == mouseDown) {
         WindowPtr w;
