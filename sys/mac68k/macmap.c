@@ -1189,11 +1189,8 @@ macmap_grow_event(NhWindow *map, long newSize)
     gMap.vis_rows = (cr.bottom - cr.top) / gMap.cell_h;
     if (gMap.vis_cols < 1) gMap.vis_cols = 1;
     if (gMap.vis_rows < 1) gMap.vis_rows = 1;
-    /* persist per display mode in the prefs file (text and tile sizes
-       are independent) */
-    SaveSizeForKind(gMap.tile_mode ? kMapTileWindow : kMapWindow,
-                    (short)(full.bottom - full.top),
-                    (short)(full.right - full.left));
+    /* not persisted here: Game > Save Window Positions snapshots the
+       per-mode size (text and tile sizes are independent there) */
     if (!allocate_backing()) {
         mac_dprintf("macmap: backing realloc failed on grow\n");
     }

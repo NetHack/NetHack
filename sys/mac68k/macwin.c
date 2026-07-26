@@ -2437,11 +2437,9 @@ mac_curs(winid win, int x, int y)
     aWin->y_curs = y;
 }
 
-/* Game > Save Window Positions: snapshot the position and size of
-   every standing game window into the preferences file.  Dragging
-   and growing save as you go; this is the explicit "keep this whole
-   arrangement", including layouts produced by Reposition, which
-   moves windows programmatically and saves nothing itself. */
+/* Game > Save Window Positions: snapshot the position and size of every
+   standing game window into the preferences file.  This is the only
+   thing that writes them; dragging and growing do not. */
 void
 mac_save_window_positions(void)
 {
@@ -4097,7 +4095,7 @@ HandleClick(EventRecord *theEvent)
         if (not_inSelect) {
             SetCursor(&qdarrow);
             DragWindow(theWindow, theEvent->where, &r);
-            SaveWindowPos(theWindow); /* into the prefs file */
+            /* position persists via Save Window Positions only */
         } else {
             nhbell();
         }
@@ -4119,7 +4117,7 @@ HandleClick(EventRecord *theEvent)
                 l = GrowWindow(theWindow, theEvent->where, &r);
                 if (l) { /* 0 = no size change; don't collapse to 0x0 */
                     SizeWindow(theWindow, l & 0xffff, l >> 16, FALSE);
-                    SaveWindowSize(theWindow);
+                    /* size persists via Save Window Positions only */
                     SetPortWindowPort(theWindow);
                     GetWindowPortBounds(theWindow, &r);
                     OffsetRect(&r, -r.left, -r.top);
