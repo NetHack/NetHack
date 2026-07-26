@@ -17,8 +17,8 @@
 extern int maxothtile;
 extern glyph_map glyphmap[MAX_GLYPH];
 
-static short
-remap_tile_idx(int idx)
+short
+remap_tile_idx(int idx) /* also used by macwin.c for menu tiles */
 {
     if (idx <= maxothtile) return (short) idx;
     static short statue_tile = -1;

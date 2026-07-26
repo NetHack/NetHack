@@ -79,6 +79,7 @@ typedef struct {
     char groupAcc;
     Boolean preselected;      /* MENU_ITEMFLAGS_SELECTED at build time */
     short line;
+    short tileidx;            /* sheet tile for the row; -1 = none */
 } MacMHMenuItem;
 
 typedef struct NhWindow {
@@ -110,6 +111,9 @@ typedef struct NhWindow {
     short miSelLen;           /* number of items selected */
     short how;                /* menu mode */
     Handle menuStyle;         /* per-line {attr,color} bytes for styled menu draw */
+    char menuTiles;           /* nonzero: rows carry item tiles (taller rows,
+                                 text indented by MACTILE_DIM+2); decided in
+                                 mac_end_menu */
 
     char drawn;
     Handle windowText;
