@@ -27,6 +27,11 @@ OPTIONS=color
 # Don't make dark corridors look like lit corridors
 OPTIONS=!lit_corridor
 
+# Draw the title field ("Brunhilda the Valkyrie") as a hit-point bar: the
+# bracketed name fills with inverse video proportional to current HP, colored
+# by the hitpoints hilite rules below. Works on 1-bit screens too (black bar).
+OPTIONS=hitpointbar
+
 # Sound (handled separately in 3.7)
 #OPTIONS=soundlib:macsound
 
