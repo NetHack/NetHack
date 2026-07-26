@@ -12,9 +12,7 @@
 #include <Resources.h>
 
 static Boolean winFileInit = 0;
-static unsigned char winFileName[32]; /* Pascal string; set in InitWinFile */
-static long winFileDir;
-static short winFileVol;
+static FSSpec winFileSpec; /* set in InitWinFile; name[0]==0 => unusable */
 
 typedef struct WinPosSave {
     char validPos;
@@ -33,24 +31,35 @@ InitWinFile(void)
     StringHandle sh;
     long len;
     short ref = 0;
+    OSErr err;
+    unsigned char name[32]; /* Pascal string */
+    long dir;
+    short vol;
 
     if (winFileInit) {
         return;
     }
     /* We trust the glue. If there's an error, store in game dir. */
     if (FindFolder(kOnSystemDisk, kPreferencesFolderType, kCreateFolder,
-                   &winFileVol, &winFileDir)) {
-        winFileVol = 0;
-        winFileDir = 0;
+                   &vol, &dir)) {
+        vol = 0;
+        dir = 0;
     }
-    C2P("NetHack Preferences", winFileName); /* default; STR 128 overrides */
+    C2P("NetHack Preferences", name); /* default; STR 128 overrides */
     sh = GetString(128);
     if (sh) {
-        if (*sh && **sh < sizeof(winFileName))
-            BlockMove(*sh, winFileName, **sh + 1);
+        if (*sh && **sh < sizeof(name))
+            BlockMove(*sh, name, **sh + 1);
         ReleaseResource((Handle) sh);
     }
-    if (HOpen(winFileVol, winFileDir, winFileName, fsRdPerm, &ref)) {
+    /* fnfErr just means no prefs file yet; the spec is still good for
+       the create in FlushWinFile */
+    err = FSMakeFSSpec(vol, dir, name, &winFileSpec);
+    if (err != noErr && err != fnfErr) {
+        winFileSpec.name[0] = 0;
+        return;
+    }
+    if (FSpOpenDF(&winFileSpec, fsRdPerm, &ref)) {
         return;
     }
     len = sizeof(savePos);
@@ -71,12 +80,12 @@ FlushWinFile(void)
 
     if (!winFileInit) {
         InitWinFile();
-        if (!winFileName[0]) {
+        if (!winFileSpec.name[0]) {
             return;
         }
-        HCreate(winFileVol, winFileDir, winFileName, MAC_CREATOR, PREF_TYPE);
+        FSpCreate(&winFileSpec, MAC_CREATOR, PREF_TYPE, smSystemScript);
     }
-    if (HOpen(winFileVol, winFileDir, winFileName, fsWrPerm, &ref)) {
+    if (FSpOpenDF(&winFileSpec, fsWrPerm, &ref)) {
         return;
     }
     winFileInit = 1;
