@@ -32,6 +32,10 @@ OPTIONS=!lit_corridor
 # by the hitpoints hilite rules below. Works on 1-bit screens too (black bar).
 OPTIONS=hitpointbar
 
+# Spread the status over 3 lines instead of 2 (roomier on big screens;
+# costs a status row of screen space, so leave at 2 on an SE/30):
+#OPTIONS=statuslines:3
+
 # Sound (handled separately in 3.7)
 #OPTIONS=soundlib:macsound
 

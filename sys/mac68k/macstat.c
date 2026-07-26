@@ -31,15 +31,36 @@ static void stat_draw_conds(short, short);
 static int stat_condcolor(unsigned long, unsigned long *);
 static int stat_condattr(unsigned long, unsigned long *);
 
-/* same two-line layout as genl_status_update's default fieldorder */
-static const enum statusfields fieldorder[2][15] = {
+/* two-line layout matches genl_status_update's default fieldorder;
+   three-line follows wintty's threelineorder split (Align to line 2,
+   Leveldesc/Time/Conditions to line 3), minus the fields the mac port
+   doesn't show (weapon/armor/terrain/version) */
+#define blPAD BL_FLUSH
+static const enum statusfields twolineorder[3][15] = {
     { BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, BL_ALIGN,
-      BL_SCORE, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH,
-      BL_FLUSH },
+      BL_SCORE, BL_FLUSH, blPAD, blPAD, blPAD, blPAD, blPAD },
     { BL_LEVELDESC, BL_GOLD, BL_HP, BL_HPMAX, BL_ENE, BL_ENEMAX, BL_AC,
       BL_XP, BL_EXP, BL_HD, BL_TIME, BL_HUNGER, BL_CAP, BL_CONDITION,
       BL_FLUSH },
+    { BL_FLUSH, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD,
+      blPAD, blPAD, blPAD, blPAD, blPAD, blPAD },
 };
+static const enum statusfields threelineorder[3][15] = {
+    { BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, BL_SCORE,
+      BL_FLUSH, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD },
+    { BL_ALIGN, BL_GOLD, BL_HP, BL_HPMAX, BL_ENE, BL_ENEMAX, BL_AC,
+      BL_XP, BL_EXP, BL_HD, BL_HUNGER, BL_CAP, BL_FLUSH, blPAD, blPAD },
+    { BL_LEVELDESC, BL_TIME, BL_CONDITION, BL_FLUSH, blPAD, blPAD, blPAD,
+      blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD },
+};
+#undef blPAD
+
+/* 2 unless statuslines:3; also the clamp tty_create_nhwindow applies */
+static int
+macstat_rows(void)
+{
+    return (iflags.wc2_statuslines == 3) ? 3 : 2;
+}
 
 
 /* TRUE once mac_status_init has run and WIN_STATUS is bound to _mt_window;
@@ -135,11 +156,14 @@ macstat_redraw(void)
     GrafPtr savePort;
     FontInfo fi;
     Rect content;
-    short line, ascent, row_h;
+    short line, ascent, row_h, rows;
+    const enum statusfields (*fieldorder)[15];
 
     if (!macstat_active() || !_mt_window)
         return;
     aWin = &theWindows[WIN_STATUS];
+    rows = (short) macstat_rows();
+    fieldorder = (rows == 3) ? threelineorder : twolineorder;
 
     GetPort(&savePort);
     SetPortWindowPort(_mt_window);
@@ -154,13 +178,24 @@ macstat_redraw(void)
     if (row_h <= 0)
         row_h = fi.ascent + fi.descent + fi.leading;
 
+    /* a runtime statuslines 2<->3 change only sets opt_need_redraw, so the
+       window still has its creation-time height; resize it here (+2 keeps
+       the 1px frame inset on each side) */
+    GetWindowPortBounds(_mt_window, &content);
+    if ((content.bottom - content.top) != rows * row_h + 2) {
+        SizeWindow(_mt_window, content.right - content.left,
+                   rows * row_h + 2, 1);
+        SetOrigin(-1, -1);
+        GetWindowPortBounds(_mt_window, &content);
+        InvalWindowRect(_mt_window, &content);
+    }
+
     /* SetOrigin(-1,-1) puts content rows at local (0,0); content.right
        then spans the full width plus a harmless 1px inset */
-    GetWindowPortBounds(_mt_window, &content);
-    SetRect(&content, 0, 0, content.right, 2 * row_h);
+    SetRect(&content, 0, 0, content.right, rows * row_h);
     EraseRect(&content);
 
-    for (line = 0; line < 2; line++) {
+    for (line = 0; line < rows; line++) {
         short top = line * row_h;
         int i;
 
