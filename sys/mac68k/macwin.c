@@ -92,6 +92,17 @@ static short gLastTransientLines = 0; /* rows the last transient stored */
  */
 static winid inSelect = WIN_ERR;
 
+/* Persistent inventory windoid: the core creates WIN_INVEN at startup
+   and repopulate_perminvent() refills it through the normal menu
+   windowprocs (start/add/end/select with PICK_NONE, no destroy).  The
+   port treats WIN_INVEN specially everywhere: start_menu doesn't hide
+   it, select_menu shows it non-modally and returns at once, the close
+   box just hides it.  Its visibility is the whole state: #perminv
+   (bound to 'i' in the shipped NetHack Defaults) opens it, inventory
+   changes refresh it only while it's showing, closing it stops the
+   updates.  Display-only: clicks don't select (PICK_NONE outside
+   inSelect is already inert). */
+
 /*
  * The key queue ring buffer where Read is where to take from,
  * Write is where next char goes and count is queue depth.
@@ -1958,7 +1969,10 @@ WindowGoAway(EventRecord *theEvent, WindowPtr theWindow)
             AddToKeyQueue('\033', 1);
         } else {
             HideWindow(theWindow);
-            if (aWin - theWindows != inSelect)
+            if (WIN_INVEN != WIN_ERR && aWin - theWindows == WIN_INVEN) {
+                ; /* inventory windoid: hidden is all -- updates stop
+                     while it's closed; 'i' (#perminv) reopens it */
+            } else if (aWin - theWindows != inSelect)
                 mac_destroy_nhwindow(aWin - theWindows);
             else /* if this IS the inSelect window put a close char */
                 AddToKeyQueue(CHAR_CR,
@@ -2365,7 +2379,9 @@ mac_nh_poskey(coordxy *a, coordxy *b, int *c)
 void
 mac_start_menu(winid win, unsigned long mbehavior)
 {
-    HideWindow(theWindows[win].its_window);
+    if (win != WIN_INVEN)
+        HideWindow(theWindows[win].its_window); /* the inventory windoid
+                                                   stays up through refills */
     mac_clear_nhwindow(win);
 }
 
@@ -2491,6 +2507,8 @@ mac_end_menu(winid win, const char *morestr)
     Str255 buf;
     NhWindow *aWin = &theWindows[win];
 
+    if (win == WIN_INVEN && (!morestr || !*morestr))
+        morestr = "Inventory"; /* windoid gets a proper title */
     buf[0] = 0;
     if (morestr)
         C2P(morestr, buf);
@@ -2543,6 +2561,32 @@ mac_select_menu(winid win, int how, menu_item **selected_list)
     int c;
     NhWindow *aWin = &theWindows[win];
     WindowPtr theWin = aWin->its_window;
+
+    /* inventory windoid: show/refresh and return immediately -- no
+       modal loop, no SelectWindow (it must not steal the focus) */
+    if (win == WIN_INVEN && how == PICK_NONE) {
+        *selected_list = (menu_item *) 0;
+        if (theWin) {
+            Rect rr;
+
+            if (!IsWindowVisible(theWin))
+                adjust_window_pos(aWin, aWin->x_size + SBARWIDTH + 1,
+                                  aWin->y_size * aWin->row_height);
+            ShowWindow(theWin);
+            SetPortWindowPort(theWin);
+            GetWindowPortBounds(theWin, &rr);
+            OffsetRect(&rr, -rr.left, -rr.top);
+            InvalWindowRect(theWin, &rr);
+            if (aWin->scrollBar) {
+                short vis = (rr.bottom - rr.top) / aWin->row_height;
+                short max = aWin->y_size - vis;
+
+                SetControlMaximum(aWin->scrollBar, max > 0 ? max : 0);
+                SetControlValue(aWin->scrollBar, aWin->scrollPos);
+            }
+        }
+        return 0;
+    }
 
     inSelect = win;
     aWin->how = (short) how;
@@ -2737,9 +2781,22 @@ mac_print_glyph(winid win, coordxy x, coordxy y,
 }
 
 static void
-mac_update_inventory(int arg UNUSED)
+mac_update_inventory(int arg)
 {
-    /* stub - could trigger inventory window redraw */
+    if (WIN_INVEN == WIN_ERR || !theWindows[WIN_INVEN].its_window)
+        return;
+    /* skip inventory updating during character initialization */
+    if (!program_state.in_moveloop && !program_state.gameover)
+        return;
+    /* arg != 0: explicit #perminv ('|') -- open the windoid; arg == 0:
+       inventory changed -- refresh only while it's visible (closed
+       window = no updates, that's the toggle) */
+    if (!arg && !IsWindowVisible(theWindows[WIN_INVEN].its_window))
+        return;
+    repopulate_perminvent();
+    if (arg && IsWindowVisible(theWindows[WIN_INVEN].its_window))
+        SelectWindow(theWindows[WIN_INVEN].its_window); /* an explicit
+            open must come up in FRONT of the map, not behind it */
 }
 
 static win_request_info *
@@ -4119,7 +4176,7 @@ struct window_procs mac_procs = {
     WC_COLOR | WC_HILITE_PET | WC_FONT_MAP | WC_FONT_MENU | WC_FONT_MESSAGE
         | WC_FONT_STATUS | WC_FONT_TEXT | WC_FONTSIZ_MAP | WC_FONTSIZ_MENU
         | WC_FONTSIZ_MESSAGE | WC_FONTSIZ_STATUS | WC_FONTSIZ_TEXT
-        | WC_TILED_MAP,
+        | WC_TILED_MAP | WC_PERM_INVENT,
     WC2_SUPPRESS_HIST    /* honor ATR_NOHISTORY: transient msgs (e.g. farlook
                             descriptions) replace the line instead of logging */
         | WC2_HILITE_STATUS | WC2_FLUSH_STATUS | WC2_HITPOINTBAR

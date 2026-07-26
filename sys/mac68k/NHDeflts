@@ -41,6 +41,11 @@ OPTIONS=hitpointbar
 # costs a status row of screen space, so leave at 2 on an SE/30):
 #OPTIONS=statuslines:3
 
+# The persistent inventory window: '|' (or #perminv) opens it, it stays
+# open and updates itself while you play, and its close box puts it away.
+# 'i' remains the normal inventory (pick an item for its action menu).
+OPTIONS=perm_invent
+
 # Sound (handled separately in 3.7)
 #OPTIONS=soundlib:macsound
 
