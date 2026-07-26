@@ -36,8 +36,14 @@ enum {
     prefSizeLast = prefSizeFirst + UIPREFS_NFONTS - 1
 };
 
+#define PREFS_SIZE_MENU 6101 /* transient size popup, built per click */
+
 static MenuHandle fontMenu; /* "(default)" + AppendResMenu('FONT') */
 static short fontSel[UIPREFS_NFONTS]; /* 1-based menu item; 1 = default */
+static short sizeVal[UIPREFS_NFONTS]; /* point size; 0 = default */
+
+static const short std_sizes[] = { 9, 10, 12, 14, 18, 24, 36, 48 };
+#define NUM_STD_SIZES (short) (sizeof std_sizes / sizeof std_sizes[0])
 
 /* window kind each font row configures (win_fonts[] index) */
 static const short uifont_nhw[UIPREFS_NFONTS] = {
@@ -68,44 +74,6 @@ get_check(DialogRef dlog, short item)
     return GetControlValue((ControlHandle) h) != 0;
 }
 
-static void
-set_size_field(DialogRef dlog, short item, short val)
-{
-    short type;
-    Handle h;
-    Rect r;
-    Str255 s;
-
-    GetDialogItem(dlog, item, &type, &h, &r);
-    if (val > 0)
-        NumToString((long) val, s);
-    else
-        s[0] = 0;
-    SetDialogItemText(h, s);
-}
-
-static short
-get_size_field(DialogRef dlog, short item)
-{
-    short type;
-    Handle h;
-    Rect r;
-    Str255 s;
-    long val = 0;
-
-    GetDialogItem(dlog, item, &type, &h, &r);
-    GetDialogItemText(h, s);
-    if (s[0])
-        StringToNum(s, &val);
-    if (val <= 0)
-        return 0; /* empty/garbage => port default */
-    if (val < 6)
-        val = 6;
-    if (val > 48)
-        val = 48;
-    return (short) val;
-}
-
 /* menu item matching a stored font name; 1 = "(default)" on no match */
 static short
 menu_item_for_font(const unsigned char *name)
@@ -124,7 +92,24 @@ menu_item_for_font(const unsigned char *name)
     return 1;
 }
 
-/* draw a font popup user item: framed box + drop shadow + selection */
+/* font number a row currently resolves to (explicit choice, else the
+   port default in win_fonts[]); drives RealFont in the size popup */
+static short
+row_font_number(short row)
+{
+    Str255 s;
+    short fnum = 0;
+
+    if (fontSel[row] > 1) {
+        GetMenuItemText(fontMenu, fontSel[row], s);
+        GetFNum(s, &fnum);
+    }
+    if (!fnum)
+        fnum = win_fonts[uifont_nhw[row]];
+    return fnum;
+}
+
+/* draw a font/size popup user item: framed box + drop shadow + selection */
 static pascal void
 pref_redraw(DialogRef dlog, DialogItemIndex item)
 {
@@ -133,7 +118,16 @@ pref_redraw(DialogRef dlog, DialogItemIndex item)
     Rect r;
     Str255 s;
 
-    if (item < prefFontFirst || item > prefFontLast)
+    if (item >= prefFontFirst && item <= prefFontLast) {
+        GetMenuItemText(fontMenu, fontSel[item - prefFontFirst], s);
+    } else if (item >= prefSizeFirst && item <= prefSizeLast) {
+        short val = sizeVal[item - prefSizeFirst];
+
+        if (val > 0)
+            NumToString((long) val, s);
+        else
+            BlockMove(P_STRING_CONV("(default)"), s, 10);
+    } else
         return;
     GetDialogItem(dlog, item, &type, &h, &r);
     EraseRect(&r);
@@ -141,9 +135,50 @@ pref_redraw(DialogRef dlog, DialogItemIndex item)
     MoveTo(r.left + 3, r.bottom);
     LineTo(r.right, r.bottom);
     LineTo(r.right, r.top + 3);
-    GetMenuItemText(fontMenu, fontSel[item - prefFontFirst], s);
     MoveTo(r.left + 6, r.bottom - 6);
     DrawString(s);
+}
+
+/* size popup: "(default)" + the standard sizes, bitmap-available sizes
+   for the row's font in outline style (the classic Size-menu cue) */
+static short
+pick_size(short row, Rect *r)
+{
+    MenuHandle m;
+    Str255 s;
+    Point pt;
+    long sel;
+    short i, fnum, curitem = 1, val = sizeVal[row];
+
+    m = NewMenu(PREFS_SIZE_MENU, P_STRING_CONV("Sizes"));
+    if (!m)
+        return val;
+    /* AppendMenu treats '(' as a disable metacharacter;
+       SetMenuItemText stores the text verbatim */
+    AppendMenu(m, P_STRING_CONV("x"));
+    SetMenuItemText(m, 1, P_STRING_CONV("(default)"));
+    fnum = row_font_number(row);
+    for (i = 0; i < NUM_STD_SIZES; i++) {
+        NumToString((long) std_sizes[i], s);
+        AppendMenu(m, s);
+        if (RealFont(fnum, std_sizes[i]))
+            SetItemStyle(m, i + 2, outline);
+        if (std_sizes[i] == val)
+            curitem = i + 2;
+    }
+    InsertMenu(m, hierMenu);
+    pt.v = r->top;
+    pt.h = r->left;
+    LocalToGlobal(&pt);
+    CheckMenuItem(m, curitem, true);
+    sel = PopUpMenuSelect(m, pt.v, pt.h, curitem);
+    DeleteMenu(PREFS_SIZE_MENU);
+    DisposeMenu(m);
+    if (sel) {
+        i = LoWord(sel);
+        val = (i <= 1) ? 0 : std_sizes[i - 2];
+    }
+    return val;
 }
 
 static pascal Boolean
@@ -198,7 +233,10 @@ macprefs_dialog(void)
     fontMenu = NewMenu(PREFS_FONT_MENU, P_STRING_CONV("Fonts"));
     if (!fontMenu)
         return;
-    AppendMenu(fontMenu, P_STRING_CONV("(default)"));
+    /* AppendMenu treats '(' as a disable metacharacter;
+       SetMenuItemText stores the text verbatim */
+    AppendMenu(fontMenu, P_STRING_CONV("x"));
+    SetMenuItemText(fontMenu, 1, P_STRING_CONV("(default)"));
     AppendResMenu(fontMenu, 'FONT');
     InsertMenu(fontMenu, hierMenu);
 
@@ -221,10 +259,21 @@ macprefs_dialog(void)
     set_check(dlog, prefLines2, up.statuslines != 3);
     set_check(dlog, prefLines3, up.statuslines == 3);
     for (i = 0; i < UIPREFS_NFONTS; i++) {
-        fontSel[i] = menu_item_for_font(up.fonts[i]);
+        if (up.fonts[i][0]) {
+            fontSel[i] = menu_item_for_font(up.fonts[i]);
+        } else {
+            /* no explicit choice: show the currently effective font
+               (saving then pins it; "(default)" reverts) */
+            Str255 cur;
+
+            GetFontName(win_fonts[uifont_nhw[i]], cur);
+            fontSel[i] = menu_item_for_font(cur);
+        }
+        sizeVal[i] = up.sizes[i];
         GetDialogItem(dlog, prefFontFirst + i, &type, &h, &r);
         SetDialogItem(dlog, prefFontFirst + i, type, (Handle) redraw, &r);
-        set_size_field(dlog, prefSizeFirst + i, up.sizes[i]);
+        GetDialogItem(dlog, prefSizeFirst + i, &type, &h, &r);
+        SetDialogItem(dlog, prefSizeFirst + i, type, (Handle) redraw, &r);
     }
     /* the initial GetNewDialog draw ran before the user-item procs were
        installed; repaint so the font popups aren't blank */
@@ -250,6 +299,11 @@ macprefs_dialog(void)
             if (sel)
                 fontSel[i] = LoWord(sel);
             InvalWindowRect(GetDialogWindow(dlog), &r);
+        } else if (item >= prefSizeFirst && item <= prefSizeLast) {
+            i = item - prefSizeFirst;
+            GetDialogItem(dlog, item, &type, &h, &r);
+            sizeVal[i] = pick_size(i, &r);
+            InvalWindowRect(GetDialogWindow(dlog), &r);
         }
     } while (item != prefSave && item != prefCancel && item != prefForget);
 
@@ -260,11 +314,17 @@ macprefs_dialog(void)
         up.hitpointbar = get_check(dlog, prefHPbar) ? 1 : 0;
         up.statuslines = get_check(dlog, prefLines3) ? 3 : 2;
         for (i = 0; i < UIPREFS_NFONTS; i++) {
-            if (fontSel[i] > 1)
-                GetMenuItemText(fontMenu, fontSel[i], up.fonts[i]);
-            else
+            if (fontSel[i] > 1) {
+                Str255 fname; /* Str31 in UiPrefs; don't let
+                                 GetMenuItemText overrun it */
+
+                GetMenuItemText(fontMenu, fontSel[i], fname);
+                if (fname[0] > 31)
+                    fname[0] = 31;
+                BlockMove(fname, up.fonts[i], (long) fname[0] + 1);
+            } else
                 up.fonts[i][0] = 0;
-            up.sizes[i] = get_size_field(dlog, prefSizeFirst + i);
+            up.sizes[i] = sizeVal[i];
         }
         StoreUiPrefs(&up);
     } else if (item == prefForget) {

@@ -431,7 +431,7 @@ resource 'STR#' (201, "current") {
 
 /* Preferences dialog (macprefs.c).  Item numbers are load-bearing --
  * they must match the prefSave..prefSizeLast enum in macprefs.c: the
- * font popups (8-12) and size fields (13-17) are contiguous runs in
+ * font popups (8-12) and size popups (13-17) are contiguous runs in
  * uiprefs_fonts order (map, status, message, menu, text). */
 resource 'DLOG' (6100, "Preferences") {
     {24, 56, 320, 456},
@@ -458,11 +458,11 @@ resource 'DITL' (6100) {
         {134, 100, 154, 300}, UserItem { enabled },                /* 10 message */
         {162, 100, 182, 300}, UserItem { enabled },                /* 11 menu */
         {190, 100, 210, 300}, UserItem { enabled },                /* 12 text */
-        {80, 316, 96, 356},   EditText { enabled, "" },            /* 13 map size */
-        {108, 316, 124, 356}, EditText { enabled, "" },            /* 14 status */
-        {136, 316, 152, 356}, EditText { enabled, "" },            /* 15 message */
-        {164, 316, 180, 356}, EditText { enabled, "" },            /* 16 menu */
-        {192, 316, 208, 356}, EditText { enabled, "" },            /* 17 text */
+        {78, 312, 98, 388},   UserItem { enabled },                /* 13 map size */
+        {106, 312, 126, 388}, UserItem { enabled },                /* 14 status */
+        {134, 312, 154, 388}, UserItem { enabled },                /* 15 message */
+        {162, 312, 182, 388}, UserItem { enabled },                /* 16 menu */
+        {190, 312, 210, 388}, UserItem { enabled },                /* 17 text */
         {80, 16, 96, 96},     StaticText { disabled, "Map:" },     /* 18 */
         {108, 16, 124, 96},   StaticText { disabled, "Status:" },  /* 19 */
         {136, 16, 152, 96},   StaticText { disabled, "Message:" }, /* 20 */
