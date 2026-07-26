@@ -1047,25 +1047,133 @@ DoMenuEvt(long menuEntry)
     HiliteMenu(0);
 }
 
+/* About dialog (DLOG/DITL 6200 in nhmenus.r): big title, a row of
+   tiles when the sheet is usable, version and credits -- the shape the
+   Atari/GEM port's about box has (graphic + text + OK). */
+extern glyph_map glyphmap[MAX_GLYPH]; /* src/glyphs.c */
+
+#define RSRC_ABOUT 6200
+enum {
+    abtOK = 1,
+    abtArt,     /* user item: title lettering + tile row */
+    abtVersion, /* static text filled at runtime */
+    abtCredits,
+    abtContact,
+    abtRing     /* bold outline around OK */
+};
+
+static pascal void
+about_redraw(DialogRef dlog, DialogItemIndex item)
+{
+    short type;
+    Handle h;
+    Rect r;
+
+    GetDialogItem(dlog, item, &type, &h, &r);
+    if (item == abtRing) {
+        PenSize(3, 3);
+        FrameRoundRect(&r, 16, 16);
+        PenSize(1, 1);
+        return;
+    }
+    if (item != abtArt)
+        return;
+    TextFont(kFontIDGeneva);
+    TextSize(36);
+    TextFace(bold | shadow);
+    {
+        unsigned char *title = P_STRING_CONV("NetHack");
+        short w = StringWidth(title);
+
+        MoveTo((short) (r.left + (r.right - r.left - w) / 2),
+               (short) (r.top + 42));
+        DrawString(title);
+    }
+    TextFont(systemFont);
+    TextSize(0);
+    TextFace(normal);
+    /* a little parade under the lettering (color screens only) */
+    if (mactile_available() && mactile_init()) {
+        static const short pms[] = {
+            PM_GRID_BUG,     PM_LITTLE_DOG, PM_KITTEN,
+            PM_FLOATING_EYE, PM_RED_DRAGON, PM_WIZARD_OF_YENDOR
+        };
+        short n = (short) (sizeof pms / sizeof pms[0]);
+        short x = (short) (r.left
+                           + (r.right - r.left - n * (MACTILE_DIM + 4)) / 2);
+        short y = (short) (r.bottom - MACTILE_DIM - 2);
+        short i;
+
+        for (i = 0; i < n; i++) {
+            mactile_blit_to_window(
+                GetDialogWindow(dlog),
+                remap_tile_idx(glyphmap[GLYPH_MON_OFF + pms[i]].tileidx),
+                x, y);
+            x += MACTILE_DIM + 4;
+        }
+    }
+}
+
+static pascal Boolean
+about_filter(DialogRef wind, EventRecord *event, DialogItemIndex *item)
+{
+    char ch;
+
+    if (event->what == keyDown || event->what == autoKey) {
+        ch = (char) (event->message & CH_MASK);
+        if (ch == CH_RETURN || ch == CH_ENTER || ch == CH_ESCAPE) {
+            FlashButton(wind, abtOK);
+            *item = abtOK;
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
 static void
 aboutNetHack()
 {
-    if (theMenubar >= mbarRegular) {
-        (void) doversion();
-    } else {
-        unsigned char aboutStr[32];
-        char tmp[32];
+    GrafPtr oldport;
+    DialogRef dlog;
+    short item, type;
+    Handle h;
+    Rect r;
+    char tmp[64];
+    Str255 vers;
+    UserItemUPP redraw = NewUserItemUPP(about_redraw);
+    ModalFilterUPP filter = NewModalFilterUPP(about_filter);
 
-        /* snprintf truncates to 31 chars + NUL, so C2P's 1 + strlen(tmp)
-           bytes always fit aboutStr */
-        snprintf(tmp, sizeof tmp, "NetHack %d.%d.%d",
-                 VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL);
-        C2P(tmp, aboutStr);
-
-        ParamText(aboutStr, P_STRING_CONV("\rdevteam@www.nethack.org"), P_EMPTY_STRING, P_EMPTY_STRING);
-        (void) Alert(alrtMenuNote, (ModalFilterUPP) 0L);
-        ResetAlertStage();
+    dlog = GetNewDialog(RSRC_ABOUT, NULL, (WindowRef) -1);
+    if (!dlog) {
+        DisposeUserItemUPP(redraw);
+        DisposeModalFilterUPP(filter);
+        return;
     }
+    GetPort(&oldport);
+    SetPortDialogPort(dlog);
+
+    snprintf(tmp, sizeof tmp, "Version %d.%d.%d for the Macintosh",
+             VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL);
+    C2P(tmp, vers);
+    GetDialogItem(dlog, abtVersion, &type, &h, &r);
+    SetDialogItemText(h, vers);
+
+    GetDialogItem(dlog, abtArt, &type, &h, &r);
+    SetDialogItem(dlog, abtArt, type, (Handle) redraw, &r);
+    GetDialogItem(dlog, abtRing, &type, &h, &r);
+    SetDialogItem(dlog, abtRing, type, (Handle) redraw, &r);
+    /* the initial draw ran before the user-item procs were installed */
+    GetWindowPortBounds(GetDialogWindow(dlog), &r);
+    InvalWindowRect(GetDialogWindow(dlog), &r);
+
+    do {
+        ModalDialog(filter, &item);
+    } while (item != abtOK);
+
+    DisposeDialog(dlog);
+    SetPort(oldport);
+    DisposeUserItemUPP(redraw);
+    DisposeModalFilterUPP(filter);
 }
 
 static void

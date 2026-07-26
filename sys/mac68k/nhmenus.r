@@ -476,3 +476,31 @@ resource 'DITL' (6100) {
         {257, 16, 258, 388},  UserItem { disabled }   /* 26 separator */
     }
 };
+
+/* About dialog (macmenu.c aboutNetHack).  Item numbers must match the
+ * abtOK..abtRing enum there.  The version StaticText (3) is filled at
+ * runtime; the art UserItem (2) draws the big title and a tile row. */
+resource 'DLOG' (6200, "About NetHack") {
+    {40, 50, 246, 430},
+    dBoxProc,
+    visible,
+    noGoAway,
+    0x0,
+    6200,
+    "About NetHack",
+    centerMainScreen
+};
+
+resource 'DITL' (6200) {
+    {
+        {176, 292, 196, 356}, Button { enabled, "OK" },        /* 1 */
+        {8, 12, 96, 368},     UserItem { disabled },           /* 2 art */
+        {104, 20, 120, 360},  StaticText { disabled, "" },     /* 3 version */
+        {124, 20, 156, 360},  StaticText { disabled,
+            "\0xA9 Stichting Mathematisch Centrum, Amsterdam, "
+            "and the NetHack DevTeam." },                      /* 4 */
+        {158, 20, 174, 360},  StaticText { disabled,
+            "www.nethack.org \0xA5 Macintosh 68k port" },      /* 5 */
+        {172, 288, 200, 360}, UserItem { disabled }            /* 6 ring */
+    }
+};
