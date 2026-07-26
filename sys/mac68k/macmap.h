@@ -1,7 +1,7 @@
 /* NetHack 5.0	macmap.h	*/
 /* Copyright (c) Ingo Paschke, 2026. */
 /* NetHack may be freely redistributed.  See license for details. */
-/* macmap.h — separate map window for the Mac 68k port. */
+/* macmap.h: separate map window for the Mac 68k port. */
 #ifndef MACMAP_H
 #define MACMAP_H
 

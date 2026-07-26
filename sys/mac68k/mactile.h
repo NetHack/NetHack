@@ -1,7 +1,7 @@
 /* NetHack 5.0	mactile.h	*/
 /* Copyright (c) Ingo Paschke, 2026. */
 /* NetHack may be freely redistributed.  See license for details. */
-/* mactile.h — tile sheet asset + per-tile blit. See macmap.h for the
+/* mactile.h: tile sheet asset + per-tile blit. See macmap.h for the
    map window owner. */
 #ifndef MACTILE_H
 #define MACTILE_H
@@ -22,7 +22,7 @@
 extern Boolean mactile_available(void);    /* depth >= 4bpp */
 extern Boolean mactile_init(void);         /* load PICT 1000/1001 into GWorld */
 
-/* Where the tilesheet was loaded — needed by macmap to attach a Palette. */
+/* Where the tilesheet was loaded; needed by macmap to attach a Palette. */
 extern short      mactile_sheet_depth(void);
 extern CTabHandle mactile_sheet_ctable(void);
 

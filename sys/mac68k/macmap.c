@@ -1,7 +1,7 @@
 /* NetHack 5.0	macmap.c	*/
 /* Copyright (c) Ingo Paschke, 2026. */
 /* NetHack may be freely redistributed.  See license for details. */
-/* macmap.c — separate map window for the Mac 68k port. See macmap.h. */
+/* macmap.c: separate map window for the Mac 68k port. See macmap.h. */
 #include "hack.h"
 #include "macwin.h"
 #include "mactty.h"
@@ -204,7 +204,7 @@ allocate_backing(void)
     SetGWorld(gMap.backing, NULL);
     PixMapHandle pm = GetGWorldPixMap(gMap.backing);
     if (!LockPixels(pm)) {
-        /* pixels purged — tear down and fail rather than draw into bad memory */
+        /* pixels purged: tear down and fail rather than draw into bad memory */
         mac_dprintf("macmap: LockPixels failed in allocate_backing\n");
         SetGWorld(saveW, saveD);
         DisposeGWorld(gMap.backing);
@@ -243,7 +243,7 @@ blit_backing_to_window(const Rect *src_rect, const Rect *dst_rect)
     if (!gMap.backing || !gMap.owner || !gMap.owner->its_window) return;
     PixMapHandle pm = GetGWorldPixMap(gMap.backing);
     if (!LockPixels(pm)) {
-        /* pixels purged — skip the blit */
+        /* pixels purged: skip the blit */
         mac_dprintf("macmap: blit_backing_to_window: LockPixels failed\n");
         return;
     }
@@ -448,7 +448,7 @@ macmap_set_mode(NhWindow *map, Boolean tile_mode)
         }
     }
     /* repopulate the backing and invalidate; the update event does the blit
-       (a synchronous blit here gets clipped — port not settled in menu context) */
+       (a synchronous blit here gets clipped; port not settled in menu context) */
     repaint_full_viewport();
     if (map->its_window) {
         Rect b; GetWindowPortBounds(map->its_window, &b);
@@ -678,7 +678,7 @@ draw_cell_tile(int col, int row, int tile_idx)
 }
 
 /* Cell cursor for getpos/farlook. TILE mode: a bright inner ring via PmForeColor
-   by INDEX (index-direct — avoids the Palette Manager recoloring the map) plus a
+   by INDEX (index-direct, avoids the Palette Manager recoloring the map) plus a
    black outer ring for light tiles. TEXT mode: a white frame (the map bg is black). */
 static void
 draw_cursor_border(int col, int row)
@@ -784,7 +784,7 @@ macmap_print_glyph(NhWindow *map, int x, int y,
        cliparound() between turns from moveloop; the very first frame
        (and the frame after a resize) doesn't get one, so without this
        the viewport stays at (0,0) and the visible area is unexplored
-       stone tiles — looks like a black window. */
+       stone tiles, which looks like a black window. */
     if ((int) x == (int) u.ux && (int) y == (int) u.uy) {
         macmap_cliparound(map, x, y);
     }
@@ -981,7 +981,7 @@ backing_self_scroll(int dx_cells, int dy_cells)
     if (!gMap.backing) return;
     PixMapHandle pm = GetGWorldPixMap(gMap.backing);
     if (!LockPixels(pm)) {
-        /* pixels purged — skip; CopyBits here reads and writes the backing */
+        /* pixels purged: skip; CopyBits here reads and writes the backing */
         mac_dprintf("macmap: backing_self_scroll: LockPixels failed\n");
         return;
     }

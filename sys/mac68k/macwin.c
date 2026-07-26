@@ -2646,9 +2646,9 @@ mac_print_glyph(winid win, coordxy x, coordxy y,
 
     /* tty path for non-map windows; once macstat owns _mt_window, tty
        writes would corrupt the shared offscreen (and the blit would paint
-       stale content over the native status rows), so skip entirely —
-       nothing legitimately glyph-prints to a _mt_window-backed window
-       after status takeover */
+       stale content over the native status rows), so skip entirely.
+       Nothing legitimately glyph-prints to a _mt_window-backed window
+       after status takeover. */
     if (macstat_active())
         return;
     int ch;
@@ -3875,7 +3875,7 @@ HandleUpdate(EventRecord *theEvent)
     {
         int kind = GetWindowKind(theWindow) - WIN_BASE_KIND;
         /* Distinguish the macmap window (its own Mac WindowPtr) from
-           _mt_window — both share kind=NHW_MAP for legacy reasons. */
+           _mt_window; both share kind=NHW_MAP for legacy reasons. */
         if (GetWRefCon(theWindow) == MACMAP_REFCON && WIN_MAP != WIN_ERR) {
             /* no erase: the backing blit covers the content (a full
                erase here was a visible white flash the blit then
