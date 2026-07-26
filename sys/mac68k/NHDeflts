@@ -192,6 +192,9 @@ OPTIONS=hilite_status:carrying-capacity/Stressed/orange
 OPTIONS=hilite_status:carrying-capacity/Strained/red&bold
 OPTIONS=hilite_status:carrying-capacity/Overtaxed/red&inverse
 OPTIONS=hilite_status:carrying-capacity/Overloaded/red&inverse
+# Conditions: deadly ones inverse red, nuisances yellow.
+OPTIONS=hilite_status:condition/major_troubles/red&inverse
+OPTIONS=hilite_status:condition/minor_troubles/yellow
 
 # Hunger: flag both dangerous ends.
 OPTIONS=hilite_status:hunger/Satiated/brown
