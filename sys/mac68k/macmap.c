@@ -82,6 +82,7 @@ static void flush_pending_cells(void);
 #define OV_SCALE 3
 #define OV_COLS (COLNO - 1) /* col 0 is unused, so it gets no pixels */
 static WindowPtr gOvWindow = NULL;
+static Boolean gOvHasPalette = false; /* tile palette attached to it */
 static void ov_draw_cell(short x, short y);
 static void ov_repaint_range(short c0, short r0, short c1, short r1);
 static void ov_repaint_all(void);
@@ -177,14 +178,62 @@ static const RGBColor gNhColorRGB[16] = {
     {R16(0xFF), R16(0xFF), R16(0xFF)}    /* 15 CLR_WHITE   */
 };
 
+/* The effective RGB set_nh_color draws a NetHack color in: color 0
+   (black) would be invisible on the black map bg, so it shows as dark
+   gray. */
+static void
+nh_color_rgb(int color, RGBColor *out)
+{
+    *out = gNhColorRGB[color];
+    if (color == 0)
+        out->red = out->green = out->blue = R16(0x55);
+}
+
 static void
 set_nh_color(int color)
 {
+    RGBColor c;
+
     if (color < 0 || color >= 16) color = 8;   /* NO_COLOR */
-    RGBColor c = gNhColorRGB[color];
-    /* color 0 (black) would be invisible on the black map bg; show it as dark gray */
-    if (color == 0) { c.red = c.green = c.blue = R16(0x55); }
+    nh_color_rgb(color, &c);
     RGBForeColor(&c);
+}
+
+/* Nearest tile-palette entry for each NetHack color, resolved once when
+   the palette is built.  Drawing by index (PmForeColor) never asks the
+   Palette Manager to match an RGB, so it can never reassign a
+   pmTolerant entry out from under the tiles. */
+static short gNhColorIdx[16];
+
+static void
+build_nh_color_index(PaletteHandle pal)
+{
+    int c, j;
+
+    for (c = 0; c < 16; c++) {
+        RGBColor want;
+        long best = 0x7FFFFFFFL;
+        short bestj = 0;
+
+        nh_color_rgb(c, &want);
+        for (j = 0; j < TILE_PALETTE_ENTRIES; j++) {
+            RGBColor e;
+            long dr, dg, db, d;
+
+            GetEntryColor(pal, (short) j, &e);
+            /* compare at 8-bit precision: squaring three full 16-bit
+               deltas would overflow a signed long */
+            dr = ((long) e.red - want.red) / 256;
+            dg = ((long) e.green - want.green) / 256;
+            db = ((long) e.blue - want.blue) / 256;
+            d = dr * dr + dg * dg + db * db;
+            if (d < best) {
+                best = d;
+                bestj = (short) j;
+            }
+        }
+        gNhColorIdx[c] = bestj;
+    }
 }
 
 static Boolean
@@ -384,6 +433,7 @@ macmap_destroy(NhWindow *map)
         SetPalette(gOvWindow, (PaletteHandle) 0, false);
         DisposeWindow(gOvWindow);
         gOvWindow = NULL;
+        gOvHasPalette = false;
     }
     if (gMap.backing) { DisposeGWorld(gMap.backing); gMap.backing = NULL; }
     if (gMap.palette) { DisposePalette(gMap.palette); gMap.palette = NULL; }
@@ -441,6 +491,8 @@ macmap_set_mode(NhWindow *map, Boolean tile_mode)
                     gMap.palette = NewPalette(TILE_PALETTE_ENTRIES, ct,
                                               pmTolerant,
                                               TILE_PALETTE_TOLERANCE);
+                if (gMap.palette)
+                    build_nh_color_index(gMap.palette);
             }
             if (gMap.palette) {
                 SetPalette(map->its_window, gMap.palette, true);
@@ -1373,6 +1425,36 @@ macmap_pixel_to_cell(NhWindow *map, Point pt, int *col, int *row)
    at the start of every repaint pass. */
 static Boolean gOvUseColor = false;
 
+/* The tile palette outlives any one display mode, but it may not exist
+   yet when the overview is first shown (text mode builds none).  Attach
+   it on the first repaint pass that finds one, so PmForeColor below
+   always indexes a palette this window owns. */
+static void
+ov_sync_palette(void)
+{
+    if (gOvHasPalette || !gOvWindow || !gMap.palette || !macFlags.color)
+        return;
+    NSetPalette(gOvWindow, gMap.palette, pmNoUpdates);
+    gOvHasPalette = true;
+}
+
+/* Color select for the overview, which unlike the map draws straight
+   into an on-screen window carrying the tile palette.  Name the entry
+   by index so the Palette Manager is never asked to match an RGB and
+   can never reassign a pmTolerant slot.  Without a palette (text mode,
+   or a sheet that isn't 8bpp) there is nothing to protect and the RGB
+   path applies. */
+static void
+ov_set_color(int color)
+{
+    if (color < 0 || color >= 16)
+        color = 8; /* NO_COLOR, same fallback as set_nh_color */
+    if (gOvHasPalette)
+        PmForeColor(gNhColorIdx[color]);
+    else
+        set_nh_color(color);
+}
+
 /* caller has set the port to gOvWindow */
 static void
 ov_draw_cell(short x, short y)
@@ -1389,7 +1471,7 @@ ov_draw_cell(short x, short y)
         } else if (is_hero) {
             ForeColor(whiteColor);
         } else {
-            set_nh_color(gMap.text_color[y][x]);
+            ov_set_color(gMap.text_color[y][x]);
         }
         PaintRect(&r);
         ForeColor(blackColor);
@@ -1408,6 +1490,7 @@ ov_repaint_range(short c0, short r0, short c1, short r1)
 {
     short x, y;
 
+    ov_sync_palette();
     gOvUseColor = macFlags.color && mac_main_depth() >= 4;
     if (c0 < 1) c0 = 1; /* col 0 unused, and not part of the content */
     if (r0 < 0) r0 = 0;
@@ -1441,6 +1524,7 @@ ov_mirror_pending(void)
     } else {
         short i;
 
+        ov_sync_palette();
         gOvUseColor = macFlags.color && mac_main_depth() >= 4;
         for (i = 0; i < gMap.pend_n; i++)
             ov_draw_cell(gMap.pend_x[i], gMap.pend_y[i]);
@@ -1475,8 +1559,7 @@ macmap_overview_show(void)
                         (WindowPtr) -1L, true, MACOVERVIEW_REFCON);
         if (!gOvWindow)
             return;
-        if (macFlags.color && gMap.palette)
-            NSetPalette(gOvWindow, gMap.palette, pmNoUpdates);
+        ov_sync_palette();
     }
     ShowWindow(gOvWindow);
     {
