@@ -481,8 +481,9 @@ resource 'DITL' (6100) {
  * abtOK..abtRing enum there.  The version StaticText (3) is filled at
  * runtime; the art UserItem (2) draws the big title and a tile row. */
 resource 'DLOG' (6200, "About NetHack") {
-    {40, 50, 246, 430},
-    dBoxProc,
+    {40, 30, 322, 510},
+    movableDBoxProc, /* System 7 movable modal; drag handled in
+                        about_filter (ModalDialog won't track it) */
     visible,
     noGoAway,
     0x0,
@@ -493,11 +494,12 @@ resource 'DLOG' (6200, "About NetHack") {
 
 resource 'DITL' (6200) {
     {
-        {176, 292, 196, 356}, Button { enabled, "OK" },        /* 1 */
-        {8, 12, 96, 368},     UserItem { disabled },           /* 2 art */
-        {104, 20, 120, 360},  StaticText { disabled, "" },     /* 3 version */
-        {124, 20, 156, 360},  StaticText { disabled, "" },     /* 4 copyright */
-        {158, 20, 174, 360},  StaticText { disabled, "" },     /* 5 build info */
-        {172, 288, 200, 360}, UserItem { disabled }            /* 6 ring */
+        {248, 396, 268, 460}, Button { enabled, "OK" },        /* 1 */
+        {8, 10, 162, 470},    UserItem { disabled },           /* 2 art:
+            title PICT aspect-fit at the top, tile parade below */
+        {170, 20, 186, 460},  StaticText { disabled, "" },     /* 3 version */
+        {190, 20, 222, 460},  StaticText { disabled, "" },     /* 4 copyright */
+        {224, 20, 240, 460},  StaticText { disabled, "" },     /* 5 build info */
+        {244, 392, 272, 464}, UserItem { disabled }            /* 6 ring */
     }
 };

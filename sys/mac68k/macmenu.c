@@ -1050,9 +1050,8 @@ DoMenuEvt(long menuEntry)
 /* About dialog (DLOG/DITL 6200 in nhmenus.r): big title, a row of
    tiles when the sheet is usable, version and credits -- the shape the
    Atari/GEM port's about box has (graphic + text + OK). */
-extern glyph_map glyphmap[MAX_GLYPH]; /* src/glyphs.c */
-
 #define RSRC_ABOUT 6200
+#define RSRC_ABOUT_PICT 6201 /* NETHACK sword title (nhtitle.r) */
 enum {
     abtOK = 1,
     abtArt,     /* user item: title lettering + tile row */
@@ -1078,38 +1077,49 @@ about_redraw(DialogRef dlog, DialogItemIndex item)
     }
     if (item != abtArt)
         return;
-    TextFont(kFontIDGeneva);
-    TextSize(36);
-    TextFace(bold | shadow);
     {
-        unsigned char *title = P_STRING_CONV("NetHack");
-        short w = StringWidth(title);
+        /* the Atari port's NETHACK sword title ('PICT' 6201),
+           aspect-fit into the art area.  1-bit screens get the
+           lettering instead (the dithered logo is mush there). */
+        PicHandle pic = (mac_main_depth() >= 4)
+                            ? GetPicture(RSRC_ABOUT_PICT) : (PicHandle) 0;
 
-        MoveTo((short) (r.left + (r.right - r.left - w) / 2),
-               (short) (r.top + 42));
-        DrawString(title);
-    }
-    TextFont(systemFont);
-    TextSize(0);
-    TextFace(normal);
-    /* a little parade under the lettering (color screens only) */
-    if (mactile_available() && mactile_init()) {
-        static const short pms[] = {
-            PM_GRID_BUG,     PM_LITTLE_DOG, PM_KITTEN,
-            PM_FLOATING_EYE, PM_RED_DRAGON, PM_WIZARD_OF_YENDOR
-        };
-        short n = (short) (sizeof pms / sizeof pms[0]);
-        short x = (short) (r.left
-                           + (r.right - r.left - n * (MACTILE_DIM + 4)) / 2);
-        short y = (short) (r.bottom - MACTILE_DIM - 2);
-        short i;
+        if (pic) {
+            Rect pf = (**pic).picFrame;
+            Rect dst;
+            long pw = pf.right - pf.left, ph = pf.bottom - pf.top;
+            long aw = r.right - r.left, ah = r.bottom - r.top;
+            long w, h;
 
-        for (i = 0; i < n; i++) {
-            mactile_blit_to_window(
-                GetDialogWindow(dlog),
-                remap_tile_idx(glyphmap[GLYPH_MON_OFF + pms[i]].tileidx),
-                x, y);
-            x += MACTILE_DIM + 4;
+            if (pw > 0 && ph > 0 && aw > 0 && ah > 0) {
+                w = aw;
+                h = ph * aw / pw;
+                if (h > ah) {
+                    h = ah;
+                    w = pw * ah / ph;
+                }
+                dst.left = (short) (r.left + (aw - w) / 2);
+                dst.top = r.top;
+                dst.right = (short) (dst.left + w);
+                dst.bottom = (short) (dst.top + h);
+                DrawPicture(pic, &dst);
+            }
+            ReleaseResource((Handle) pic);
+        } else {
+            TextFont(kFontIDGeneva);
+            TextSize(36);
+            TextFace(bold | shadow);
+            {
+                unsigned char *title = P_STRING_CONV("NetHack");
+                short w = StringWidth(title);
+
+                MoveTo((short) (r.left + (r.right - r.left - w) / 2),
+                       (short) (r.top + 56));
+                DrawString(title);
+            }
+            TextFont(systemFont);
+            TextSize(0);
+            TextFace(normal);
         }
     }
 }
@@ -1119,6 +1129,26 @@ about_filter(DialogRef wind, EventRecord *event, DialogItemIndex *item)
 {
     char ch;
 
+    /* movable modal: route background updates and track the title bar
+       drag ourselves -- ModalDialog does neither */
+    if (event->what == updateEvt
+        && (WindowPtr) event->message != GetDialogWindow(wind)) {
+        mac_handle_update_event(event);
+        return FALSE;
+    }
+    if (event->what == mouseDown) {
+        WindowPtr w;
+        short part = FindWindow(event->where, &w);
+
+        if (part == inDrag && w == GetDialogWindow(wind)) {
+            Rect limits = qd.screenBits.bounds;
+
+            InsetRect(&limits, 4, 4);
+            DragWindow(w, event->where, &limits);
+            *item = 0;
+            return TRUE;
+        }
+    }
     if (event->what == keyDown || event->what == autoKey) {
         ch = (char) (event->message & CH_MASK);
         if (ch == CH_RETURN || ch == CH_ENTER || ch == CH_ESCAPE) {

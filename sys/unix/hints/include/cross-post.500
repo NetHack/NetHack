@@ -405,9 +405,9 @@ $(TARGETPFX)nhmapwind.rsrc : ../sys/mac68k/nhmapwind.r
 	@mkdir -p $(dir $@)
 	$(RETRO68)/bin/Rez ../sys/mac68k/nhmapwind.r \
 		-I $(RETRO68)/multiversal/RIncludes -o $@
-$(TARGETPFX)nhmenus.rsrc : ../sys/mac68k/nhmenus.r
+$(TARGETPFX)nhmenus.rsrc : ../sys/mac68k/nhmenus.r ../sys/mac68k/nhtitle.r
 	@mkdir -p $(dir $@)
-	$(RETRO68)/bin/Rez ../sys/mac68k/nhmenus.r \
+	$(RETRO68)/bin/Rez ../sys/mac68k/nhmenus.r ../sys/mac68k/nhtitle.r \
 		-I $(RETRO68)/multiversal/RIncludes -o $@
 #
 .PHONY: mac68kpkg
@@ -569,9 +569,9 @@ $(TARGETPFX)nhsize.rsrc : ../sys/mac68k/nhsize.r
 $(TARGETPFX)nhmapwind.rsrc : ../sys/mac68k/nhmapwind.r
 	@mkdir -p $(dir $@)
 	$(RETRO68)/bin/Rez ../sys/mac68k/nhmapwind.r -I $(RETRO68)/multiversal/RIncludes -o $@
-$(TARGETPFX)nhmenus.rsrc : ../sys/mac68k/nhmenus.r
+$(TARGETPFX)nhmenus.rsrc : ../sys/mac68k/nhmenus.r ../sys/mac68k/nhtitle.r
 	@mkdir -p $(dir $@)
-	$(RETRO68)/bin/Rez ../sys/mac68k/nhmenus.r -I $(RETRO68)/multiversal/RIncludes -o $@
+	$(RETRO68)/bin/Rez ../sys/mac68k/nhmenus.r ../sys/mac68k/nhtitle.r -I $(RETRO68)/multiversal/RIncludes -o $@
 $(TARGETPFX)nhcfrg.rsrc : ../sys/mac68k/nhcfrg.r
 	@mkdir -p $(dir $@)
 	$(RETRO68)/bin/Rez ../sys/mac68k/nhcfrg.r -I $(RETRO68)/multiversal/RIncludes -o $@
