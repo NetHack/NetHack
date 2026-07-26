@@ -21,21 +21,46 @@ static Boolean stat_inited = false;
 static int stat_colors[MAXBLSTATS];     /* CLR_* | (HL_* << 8) per field */
 static unsigned long stat_cond_bits = 0UL;
 static unsigned long *stat_colormasks = (unsigned long *) 0;
+static int stat_hpbar_percent = 0;      /* captured from BL_HP updates */
+static int stat_hpbar_color = NO_COLOR; /* packed like stat_colors[] */
+static int stat_hpbar_crit = 0;
 
 static void stat_draw_str(const char *, int, short, short);
+static void stat_draw_hpbar(short, short);
 static void stat_draw_conds(short, short);
 static int stat_condcolor(unsigned long, unsigned long *);
 static int stat_condattr(unsigned long, unsigned long *);
 
-/* same two-line layout as genl_status_update's default fieldorder */
-static const enum statusfields fieldorder[2][15] = {
+/* two-line layout matches genl_status_update's default fieldorder;
+   three-line follows wintty's threelineorder split (Align to line 2,
+   Leveldesc/Time/Conditions to line 3), minus the fields the mac port
+   doesn't show (weapon/armor/terrain/version) */
+#define blPAD BL_FLUSH
+static const enum statusfields twolineorder[3][15] = {
     { BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, BL_ALIGN,
-      BL_SCORE, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH,
-      BL_FLUSH },
+      BL_SCORE, BL_FLUSH, blPAD, blPAD, blPAD, blPAD, blPAD },
     { BL_LEVELDESC, BL_GOLD, BL_HP, BL_HPMAX, BL_ENE, BL_ENEMAX, BL_AC,
       BL_XP, BL_EXP, BL_HD, BL_TIME, BL_HUNGER, BL_CAP, BL_CONDITION,
       BL_FLUSH },
+    { BL_FLUSH, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD,
+      blPAD, blPAD, blPAD, blPAD, blPAD, blPAD },
 };
+static const enum statusfields threelineorder[3][15] = {
+    { BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, BL_SCORE,
+      BL_FLUSH, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD },
+    { BL_ALIGN, BL_GOLD, BL_HP, BL_HPMAX, BL_ENE, BL_ENEMAX, BL_AC,
+      BL_XP, BL_EXP, BL_HD, BL_HUNGER, BL_CAP, BL_FLUSH, blPAD, blPAD },
+    { BL_LEVELDESC, BL_TIME, BL_CONDITION, BL_FLUSH, blPAD, blPAD, blPAD,
+      blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD },
+};
+#undef blPAD
+
+/* 2 unless statuslines:3; also the clamp tty_create_nhwindow applies */
+static int
+macstat_rows(void)
+{
+    return (iflags.wc2_statuslines == 3) ? 3 : 2;
+}
 
 
 /* TRUE once mac_status_init has run and WIN_STATUS is bound to _mt_window;
@@ -57,6 +82,8 @@ mac_status_init(void)
         stat_colors[i] = NO_COLOR;
     stat_cond_bits = 0UL;
     stat_colormasks = (unsigned long *) 0;
+    stat_hpbar_percent = stat_hpbar_crit = 0;
+    stat_hpbar_color = NO_COLOR;
     /* genl_status_init allocates the field tables and creates+displays
        WIN_STATUS (the mac create path binds it to _mt_window) */
     genl_status_init();
@@ -82,7 +109,7 @@ mac_status_enablefield(
    CLR_* | (HL_* attrmask << 8), per the status_update contract */
 void
 mac_status_update(
-    int idx, genericptr_t ptr, int chg UNUSED, int percent UNUSED,
+    int idx, genericptr_t ptr, int chg UNUSED, int percent,
     int color, unsigned long *colormasks)
 {
     char *text = (char *) ptr;
@@ -108,8 +135,15 @@ mac_status_update(
         (void) decode_mixed(&status_vals[BL_GOLD][1], text ? text : "");
     } else {
         Snprintf(status_vals[idx], MAXCO,
-                 status_fieldfmt[idx] ? status_fieldfmt[idx] : "%s",
+                 (idx == BL_TITLE && iflags.wc2_hitpointbar)
+                     ? "%-30.30s" /* fixed bar width, like curses/tty */
+                     : status_fieldfmt[idx] ? status_fieldfmt[idx] : "%s",
                  text ? text : "");
+        if (idx == BL_HP && iflags.wc2_hitpointbar) {
+            stat_hpbar_percent = percent;
+            stat_hpbar_crit = critically_low_hp(TRUE) ? 1 : 0;
+            stat_hpbar_color = (color & 0x00FF) | (HL_INVERSE << 8);
+        }
     }
 }
 
@@ -122,11 +156,14 @@ macstat_redraw(void)
     GrafPtr savePort;
     FontInfo fi;
     Rect content;
-    short line, ascent, row_h;
+    short line, ascent, row_h, rows;
+    const enum statusfields (*fieldorder)[15];
 
     if (!macstat_active() || !_mt_window)
         return;
     aWin = &theWindows[WIN_STATUS];
+    rows = (short) macstat_rows();
+    fieldorder = (rows == 3) ? threelineorder : twolineorder;
 
     GetPort(&savePort);
     SetPortWindowPort(_mt_window);
@@ -141,13 +178,24 @@ macstat_redraw(void)
     if (row_h <= 0)
         row_h = fi.ascent + fi.descent + fi.leading;
 
+    /* a runtime statuslines 2<->3 change only sets opt_need_redraw, so the
+       window still has its creation-time height; resize it here (+2 keeps
+       the 1px frame inset on each side) */
+    GetWindowPortBounds(_mt_window, &content);
+    if ((content.bottom - content.top) != rows * row_h + 2) {
+        SizeWindow(_mt_window, content.right - content.left,
+                   rows * row_h + 2, 1);
+        SetOrigin(-1, -1);
+        GetWindowPortBounds(_mt_window, &content);
+        InvalWindowRect(_mt_window, &content);
+    }
+
     /* SetOrigin(-1,-1) puts content rows at local (0,0); content.right
        then spans the full width plus a harmless 1px inset */
-    GetWindowPortBounds(_mt_window, &content);
-    SetRect(&content, 0, 0, content.right, 2 * row_h);
+    SetRect(&content, 0, 0, content.right, rows * row_h);
     EraseRect(&content);
 
-    for (line = 0; line < 2; line++) {
+    for (line = 0; line < rows; line++) {
         short top = line * row_h;
         int i;
 
@@ -159,6 +207,9 @@ macstat_redraw(void)
                 continue;
             if (f == BL_CONDITION)
                 stat_draw_conds(top, ascent);
+            else if (f == BL_TITLE && iflags.wc2_hitpointbar
+                     && status_vals[f] && *status_vals[f])
+                stat_draw_hpbar(top, ascent);
             else if (status_vals[f] && *status_vals[f])
                 stat_draw_str(status_vals[f], stat_colors[f], top, ascent);
         }
@@ -217,6 +268,47 @@ stat_draw_str(const char *str, int packed, short top, short ascent)
         ForeColor(blackColor);
     }
     TextFace(normal);
+}
+
+/* hitpointbar: title in brackets, split at hpbar_percent; left part drawn
+   inverse in the HP field color, right part plain (curses curs_HPbar
+   layout; stat_draw_str's HL_INVERSE box does the pixel work) */
+static void
+stat_draw_hpbar(short top, short ascent)
+{
+    char bar[MAXCO], *bar2 = (char *) 0, savedch = '\0';
+    int bar_len, bar_pos;
+    boolean twoparts = (stat_hpbar_percent < 100);
+
+    /* title was formatted "%-30.30s", so bar_len is 30 */
+    bar_len = (int) strlen(status_vals[BL_TITLE]);
+    if (bar_len > 30)
+        bar_len = 30;
+    (void) strncpy(bar, status_vals[BL_TITLE], bar_len);
+    bar[bar_len] = '\0';
+    if (stat_hpbar_crit)
+        repad_with_dashes(bar); /* HL_BLINK isn't renderable here; dashes
+                                   flag critically low HP instead */
+
+    bar_pos = (bar_len * stat_hpbar_percent) / 100;
+    if (bar_pos < 1 && stat_hpbar_percent > 0)
+        bar_pos = 1;
+    if (bar_pos >= bar_len && stat_hpbar_percent < 100)
+        bar_pos = bar_len - 1;
+    if (twoparts) {
+        bar2 = &bar[bar_pos];
+        savedch = *bar2;
+        *bar2 = '\0';
+    }
+
+    stat_draw_str("[", NO_COLOR, top, ascent);
+    if (*bar) /* empty when dead (0 HP => bar_pos 0) */
+        stat_draw_str(bar, stat_hpbar_color, top, ascent);
+    if (twoparts) {
+        *bar2 = savedch;
+        stat_draw_str(bar2, NO_COLOR, top, ascent);
+    }
+    stat_draw_str("]", NO_COLOR, top, ascent);
 }
 
 /* per-condition color/attr from colormasks; iterate the core conditions[]

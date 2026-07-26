@@ -50,6 +50,20 @@ typedef struct {
        of one CopyBits per cell. Coords are backing/window-local. */
     Rect           dirty;
     Boolean        has_dirty;
+    /* print_glyph doesn't paint; it queues cells and macmap_flush
+       repaints them from cache in one batch, so the per-call
+       LockPixels/SetGWorld/GetFontInfo/color setup is paid once a frame.
+       Exact cells are kept up to PEND_MAX; past that (bulk redraws like
+       ^R/level entry) only the bounding box is kept and the whole strip
+       repaints.  Tracking the box alone would repaint thousands of
+       unchanged cells on an ordinary turn, since a hero step plus a
+       far-away monster update already span most of the map. */
+#define PEND_MAX 256
+    Boolean        cells_pending;
+    Boolean        pend_overflow;
+    short          pend_n;
+    unsigned char  pend_x[PEND_MAX], pend_y[PEND_MAX];
+    short          pend_c0, pend_r0, pend_c1, pend_r1; /* end exclusive */
 } MacMapState;
 
 static MacMapState gMap = {0};
@@ -60,6 +74,8 @@ static ControlActionUPP gMapScrollUPP = NULL;
 static void repaint_full_viewport(void);
 static void scroll_viewport_to(short new_col, short new_row);
 static void draw_cursor_border(int col, int row);
+static void queue_cell(int x, int y);
+static void flush_pending_cells(void);
 
 /* Union a backing-local cell rect into the pending dirty region. */
 static void
@@ -473,6 +489,9 @@ static struct {
     GWorldPtr saveW;
     GDHandle  saveD;
     short     ascent;     /* text mode: cached GetFontInfo */
+    short     last_fg;    /* text mode: fg color already set on the backing
+                             port; -1 = unknown (skips a Color Manager
+                             round-trip per unchanged-color cell) */
 } gBatch;
 
 static Boolean
@@ -487,9 +506,14 @@ begin_cell_batch(void)
     SetGWorld(gMap.backing, NULL);
     if (!gMap.tile_mode) {
         FontInfo fi;
+        RGBColor black = { 0, 0, 0 };
+
         GetFontInfo(&fi);
         gBatch.ascent = fi.ascent;
+        RGBBackColor(&black); /* every text cell wants the dark bg; set
+                                 once, not per cell */
     }
+    gBatch.last_fg = -1;
     gBatch.active = true;
     return true;
 }
@@ -550,14 +574,19 @@ draw_cell_text(int col, int row, char ch, int color)
         }
 
         Rect cell = { dy, dx, dy + gMap.cell_h, dx + gMap.cell_w };
-        RGBBackColor(&black);          /* NetHack's colors want a dark bg */
+        if (own)                       /* a batch sets the dark bg once */
+            RGBBackColor(&black);      /* NetHack's colors want a dark bg */
         EraseRect(&cell);
-        set_nh_color(color);
+        if (own || color != gBatch.last_fg) {
+            set_nh_color(color);
+            gBatch.last_fg = (short) color;
+        }
         MoveTo(dx, dy + ascent);       /* baseline = top + ascent (no top clip) */
         DrawChar(ch);
         if (iflags.hilite_pet && gMap.pet_cache[row][col]) {
             RGBForeColor(&white);      /* pet ring; map bg is black */
             FrameRect(&cell);
+            gBatch.last_fg = -1;       /* fg no longer matches the cache */
         }
         if (own) {
             RGBForeColor(&black);      /* restore fg=black/bg=white so a */
@@ -744,6 +773,7 @@ void
 macmap_flush(void)
 {
     if (!gMap.owner || !gMap.owner->its_window) return;
+    flush_pending_cells(); /* paint queued print_glyph cells (batched) */
     if (gMap.has_dirty && gMap.backing) {
         Rect r = gMap.dirty, b;
         SetRect(&b, 0, 0, gMap.vis_cols * gMap.cell_w, gMap.vis_rows * gMap.cell_h);
@@ -762,7 +792,7 @@ macmap_curs(NhWindow *map, int x, int y)
     /* repaint the old cursor cell from cache so the flush erases its border */
     if (gMap.cursor_on
         && (gMap.cursor_x != x || gMap.cursor_y != y)) {
-        redraw_cell_from_cache(gMap.cursor_x, gMap.cursor_y);
+        queue_cell(gMap.cursor_x, gMap.cursor_y);
     }
     gMap.cursor_x  = (short) x;
     gMap.cursor_y  = (short) y;
@@ -799,10 +829,8 @@ macmap_print_glyph(NhWindow *map, int x, int y,
     gMap.tile_cache[y][x] = (short) idx;
     gMap.pet_cache[y][x] = (gi->gm.glyphflags & MG_PET) ? 1 : 0;
 
-    if (gMap.tile_mode)
-        draw_cell_tile(x, y, idx);
-    else
-        draw_cell_text(x, y, ch, color);
+    /* cache only; macmap_flush paints the whole pending range batched */
+    queue_cell(x, y);
 }
 
 void
@@ -812,6 +840,7 @@ macmap_update_event(NhWindow *map)
        here or the second call empties the visRgn and clips out every draw. */
     if (!map || gMap.owner != map || !map->its_window) return;
 
+    flush_pending_cells(); /* the full-backing blit below must be current */
     gMap.cursor_on = false;   /* the repaint wipes the software cursor */
 
     GrafPtr saveP; GetPort(&saveP);
@@ -891,15 +920,15 @@ macmap_clear(NhWindow *map)
     gMap.scroll_col = 1;
     gMap.scroll_row = 0;
     gMap.cursor_on  = false;
-    gMap.has_dirty  = false;
-    if (map->its_window) {
-        GrafPtr saveP; GetPort(&saveP);
-        SetPort(map->its_window);
-        Rect content; map_content_bounds(&content);
-        EraseRect(&content);
-        SetPort(saveP);
-    }
-    /* clear the backing too, or the next damage event blits stale pixels */
+    gMap.cells_pending = false;
+    /* Deliberately no erase: the old frame stays up while the core
+       reprints the level, and the next flush blits the complete new
+       frame in one step, so there is no white gap in between.  Marking
+       everything dirty guarantees that blit covers the full viewport
+       even if the core repaints only part of it after the clear. */
+    mark_dirty_all();
+    /* clear the backing, or that blit shows stale pixels where the new
+       level has nothing */
     if (gMap.backing) {
         PixMapHandle pm = GetGWorldPixMap(gMap.backing);
         if (LockPixels(pm)) {
@@ -939,6 +968,8 @@ repaint_full_viewport(void)
 {
     if (!gMap.owner) return;
     gMap.cursor_on = false;   /* full repaint wipes the inverted-cell cursor */
+    gMap.cells_pending = false; /* every visible cell repaints below;
+                                   off-viewport cells are cache-only */
     Boolean batched = begin_cell_batch();
     if (gMap.backing) {
         /* erase happens while bg is still white (the cells set a black
@@ -1013,6 +1044,63 @@ repaint_strip(int col_start, int row_start, int col_end, int row_end)
             redraw_cell_from_cache(c, r);
     if (batched) /* close only a batch this scope opened */
         end_cell_batch();
+}
+
+/* Accumulate a print_glyph cell: exact list while it fits, bounding box
+   after overflow. */
+static void
+queue_cell(int x, int y)
+{
+    if (!gMap.cells_pending) {
+        gMap.cells_pending = true;
+        gMap.pend_overflow = false;
+        gMap.pend_n = 0;
+        gMap.pend_c0 = (short) x;
+        gMap.pend_c1 = (short) (x + 1);
+        gMap.pend_r0 = (short) y;
+        gMap.pend_r1 = (short) (y + 1);
+    } else {
+        if (x < gMap.pend_c0)
+            gMap.pend_c0 = (short) x;
+        if (x + 1 > gMap.pend_c1)
+            gMap.pend_c1 = (short) (x + 1);
+        if (y < gMap.pend_r0)
+            gMap.pend_r0 = (short) y;
+        if (y + 1 > gMap.pend_r1)
+            gMap.pend_r1 = (short) (y + 1);
+    }
+    if (!gMap.pend_overflow) {
+        if (gMap.pend_n >= PEND_MAX) {
+            gMap.pend_overflow = true; /* bulk redraw: box takes over */
+        } else {
+            gMap.pend_x[gMap.pend_n] = (unsigned char) x;
+            gMap.pend_y[gMap.pend_n] = (unsigned char) y;
+            gMap.pend_n++;
+        }
+    }
+}
+
+/* Repaint the queued cells from cache in one batch: exactly the listed
+   cells on a normal turn, the whole bounding box after an overflow
+   (bulk redraws repaint most of it anyway). */
+static void
+flush_pending_cells(void)
+{
+    if (!gMap.cells_pending)
+        return;
+    gMap.cells_pending = false;
+    if (gMap.pend_overflow) {
+        repaint_strip(gMap.pend_c0, gMap.pend_r0, gMap.pend_c1,
+                      gMap.pend_r1);
+    } else {
+        short i;
+        Boolean batched = begin_cell_batch();
+
+        for (i = 0; i < gMap.pend_n; i++)
+            redraw_cell_from_cache(gMap.pend_x[i], gMap.pend_y[i]);
+        if (batched)
+            end_cell_batch();
+    }
 }
 
 /* Move the viewport to (new_col,new_row), clamped, repainting via soft-scroll

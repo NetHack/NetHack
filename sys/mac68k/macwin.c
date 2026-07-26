@@ -4005,7 +4005,8 @@ struct window_procs mac_procs = {
         | WC_TILED_MAP,
     WC2_SUPPRESS_HIST    /* honor ATR_NOHISTORY: transient msgs (e.g. farlook
                             descriptions) replace the line instead of logging */
-        | WC2_HILITE_STATUS | WC2_FLUSH_STATUS,
+        | WC2_HILITE_STATUS | WC2_FLUSH_STATUS | WC2_HITPOINTBAR
+        | WC2_STATUSLINES,
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
     mac_init_nhwindows,
     mac_player_selection,
