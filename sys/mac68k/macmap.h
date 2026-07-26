@@ -33,7 +33,7 @@ extern short   remap_tile_idx(int idx);
 /* Mac event callbacks. */
 extern void    macmap_update_event(NhWindow *map);
 extern void    macmap_grow_event(NhWindow *map, long newSize);
-extern void    macmap_fit(short avail_w, short avail_h);
+extern void    macmap_fit(short avail_w, short avail_h, Boolean honor_saved);
 extern Boolean macmap_click(NhWindow *map, Point pt, UInt32 modifiers);
 
 /* Viewport queries. */

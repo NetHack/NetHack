@@ -580,7 +580,7 @@ SanePositions(void)
         map_top = msg_top + msg_h + 2 + title_h;
         avail_map_h = screenArea.bottom - map_top - (title_h + stat_h + 2);
         avail_map_w = screenArea.right - 4;
-        macmap_fit(avail_map_w, avail_map_h);
+        macmap_fit(avail_map_w, avail_map_h, honor);
 
         /* Re-read the fitted map size; center the stack on its width. */
         GetWindowPortBounds(mapw, &mr);

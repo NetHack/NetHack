@@ -1212,15 +1212,26 @@ macmap_grow_event(NhWindow *map, long newSize)
 
 /* Size the map window to fit as much map as fits in avail_w x avail_h, snapped
    to whole cells and never larger than the full map. Placement stays with
-   SanePositions(). */
+   SanePositions(). honor_saved caps the fit at the size saved in the prefs
+   file (per display mode), so a manual resize survives a restart; reset and
+   small screens pass false for the plain max-fit. */
 void
-macmap_fit(short avail_w, short avail_h)
+macmap_fit(short avail_w, short avail_h, Boolean honor_saved)
 {
     long full_w, full_h;
     short w, h, cols, rows;
     short map_cols = COLNO - 1;   /* col 0 unused */
     if (!gMap.owner || !gMap.owner->its_window) return;
     if (gMap.cell_w < 1 || gMap.cell_h < 1) return;
+    if (honor_saved) {
+        Rect b; short sh, sw;
+        GetWindowPortBounds(gMap.owner->its_window, &b);
+        if (RetrieveSize(gMap.tile_mode ? kMapTileWindow : kMapWindow,
+                         b.top, b.left, &sh, &sw)) {
+            if (sw < avail_w) avail_w = sw;
+            if (sh < avail_h) avail_h = sh;
+        }
+    }
     if (avail_w < gMap.cell_w + gMap.inset_r) avail_w = gMap.cell_w + gMap.inset_r;
     if (avail_h < gMap.cell_h + gMap.inset_b) avail_h = gMap.cell_h + gMap.inset_b;
     full_w = (long) map_cols * gMap.cell_w + gMap.inset_r;
