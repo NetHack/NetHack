@@ -188,6 +188,20 @@ unsigned char lock[256];          /* pascal string */
 int hpid;         /* NetHack (unix-style) process i.d. */
 short saveRefNum; /* save file descriptor */
 short gameRefNum; /* level 0 file descriptor */
+
+/* Bundle the SFGetFile location + a Pascal name into an FSSpec; HFS names
+   are <= 31 chars so Str63 always fits.  (vRefNum may be a working-directory
+   refnum -- the FSp calls accept those just like the H* calls did.) */
+static void
+make_spec(const unsigned char *name, FSSpec *spec)
+{
+    short len = name[0] > 63 ? 63 : name[0];
+
+    spec->vRefNum = vRefNum;
+    spec->parID = dirID;
+    BlockMove(name, spec->name, (long) len + 1);
+    spec->name[0] = (unsigned char) len;
+}
 short levRefNum;  /* level n file descriptor */
 
 /**** Prototypes ****/
@@ -984,10 +998,13 @@ endRecover()
         (void) FSClose(levRefNum);
 
     if (saveRefNum >= 0) {
+        FSSpec spec;
+
         (void) FSClose(saveRefNum);
         (void) FlushVol((StringPtr) 0L, vRefNum);
         /* its corrupted so trash it ... */
-        (void) HDelete(vRefNum, dirID, savename);
+        make_spec(savename, &spec);
+        (void) FSpDelete(&spec);
     }
 
     saveRefNum = gameRefNum = levRefNum = -1;
@@ -1009,10 +1026,12 @@ saveRezStrings()
     unsigned char plName[256];
     short skip;
     int pid = hpid;
+    FSSpec spec;
 
-    HCreateResFile(vRefNum, dirID, savename);
+    make_spec(savename, &spec);
+    FSpCreateResFile(&spec, MAC_CREATOR, SAVE_TYPE, smSystemScript);
 
-    sRefNum = HOpenResFile(vRefNum, dirID, savename, fsRdWrPerm);
+    sRefNum = FSpOpenResFile(&spec, fsRdWrPerm);
     if (sRefNum == -1) {
         note(noErr, alidNote, P_STRING_CONV("OK: Minor resource map error"));
         return 1;
@@ -1087,12 +1106,14 @@ open_levelfile(long lev)
 {
     OSErr openErr;
     short fRefNum;
+    FSSpec spec;
 
     set_levelfile_name(lev);
     if (!in.Recover)
         return (-1);
 
-    if ((openErr = HOpen(vRefNum, dirID, lock, fsRdWrPerm, &fRefNum))
+    make_spec(lock, &spec);
+    if ((openErr = FSpOpenDF(&spec, fsRdWrPerm, &fRefNum))
         && (openErr != fnfErr)) {
         endRecover();
         note(noErr, alidNote, P_STRING_CONV("Sorry: File Open Error"));
@@ -1106,6 +1127,7 @@ static short
 create_savefile(unsigned char *savename)
 {
     short fRefNum;
+    FSSpec spec;
 
     /* translate savename to a pascal string (in place) */
     {
@@ -1123,8 +1145,9 @@ create_savefile(unsigned char *savename)
         *savename = nameLen;
     }
 
-    if (HCreate(vRefNum, dirID, savename, MAC_CREATOR, SAVE_TYPE)
-        || HOpen(vRefNum, dirID, savename, fsRdWrPerm, &fRefNum)) {
+    make_spec(savename, &spec);
+    if (FSpCreate(&spec, MAC_CREATOR, SAVE_TYPE, smSystemScript)
+        || FSpOpenDF(&spec, fsRdWrPerm, &fRefNum)) {
         endRecover();
         note(noErr, alidNote, P_STRING_CONV("Sorry: File Create Error"));
         return (-1);
@@ -1318,7 +1341,10 @@ close_file(short *pFRefNum)
 static void
 unlink_file(unsigned char *filename)
 {
-    if (HDelete(vRefNum, dirID, filename)) {
+    FSSpec spec;
+
+    make_spec(filename, &spec);
+    if (FSpDelete(&spec)) {
         endRecover();
         note(noErr, alidNote, P_STRING_CONV("Sorry: File Delete Error"));
         return;
