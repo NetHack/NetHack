@@ -1970,8 +1970,9 @@ WindowGoAway(EventRecord *theEvent, WindowPtr theWindow)
         } else {
             HideWindow(theWindow);
             if (WIN_INVEN != WIN_ERR && aWin - theWindows == WIN_INVEN) {
-                ; /* inventory windoid: hidden is all -- updates stop
-                     while it's closed; 'i' (#perminv) reopens it */
+                /* inventory windoid: hidden is all -- updates stop
+                   while it's closed; '|' (#perminv) reopens it */
+                macprefs_note_perminv(FALSE);
             } else if (aWin - theWindows != inSelect)
                 mac_destroy_nhwindow(aWin - theWindows);
             else /* if this IS the inSelect window put a close char */
@@ -2382,6 +2383,11 @@ mac_start_menu(winid win, unsigned long mbehavior)
     if (win != WIN_INVEN)
         HideWindow(theWindows[win].its_window); /* the inventory windoid
                                                    stays up through refills */
+    else
+        theWindows[win].drawn = TRUE; /* multi-item pickups refill
+            back-to-back with no update event between; drawn would still
+            be FALSE and mac_clear_nhwindow's early-out would skip the
+            menu-state reset, so add_menu APPENDS duplicate items */
     mac_clear_nhwindow(win);
 }
 
@@ -2569,9 +2575,21 @@ mac_select_menu(winid win, int how, menu_item **selected_list)
         if (theWin) {
             Rect rr;
 
-            if (!IsWindowVisible(theWin))
+            if (!IsWindowVisible(theWin)) {
+                short top, left, sh, sw;
+
                 adjust_window_pos(aWin, aWin->x_size + SBARWIDTH + 1,
                                   aWin->y_size * aWin->row_height);
+                /* adjust_window_pos treats the current width as a
+                   MINIMUM and sizes from the content; a size the user
+                   gave the windoid must win over that */
+                if (RetrievePosition(kInvenWindow, &top, &left)
+                    && RetrieveSize(kInvenWindow, top, left, &sh, &sw)) {
+                    SizeWindow(theWin, sw, sh, 1);
+                    if (aWin->scrollBar)
+                        DrawScrollbar(aWin); /* follow the new right edge */
+                }
+            }
             ShowWindow(theWin);
             SetPortWindowPort(theWin);
             GetWindowPortBounds(theWin, &rr);
@@ -2791,12 +2809,28 @@ mac_update_inventory(int arg)
     /* arg != 0: explicit #perminv ('|') -- open the windoid; arg == 0:
        inventory changed -- refresh only while it's visible (closed
        window = no updates, that's the toggle) */
-    if (!arg && !IsWindowVisible(theWindows[WIN_INVEN].its_window))
+    if (!arg && !IsWindowVisible(theWindows[WIN_INVEN].its_window)) {
+        /* one-shot: reopen at launch if it was open last session (the
+           first update fires right after the game enters the moveloop);
+           shown without SelectWindow so the map keeps the focus */
+        static Boolean perminv_restored = false;
+        UiPrefs up;
+
+        if (!perminv_restored) {
+            perminv_restored = true;
+            if (RetrieveUiPrefs(&up) && up.perminv_open) {
+                repopulate_perminvent();
+                return;
+            }
+        }
         return;
+    }
     repopulate_perminvent();
-    if (arg && IsWindowVisible(theWindows[WIN_INVEN].its_window))
+    if (arg && IsWindowVisible(theWindows[WIN_INVEN].its_window)) {
         SelectWindow(theWindows[WIN_INVEN].its_window); /* an explicit
             open must come up in FRONT of the map, not behind it */
+        macprefs_note_perminv(TRUE);
+    }
 }
 
 static win_request_info *

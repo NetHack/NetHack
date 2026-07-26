@@ -96,6 +96,42 @@ menu_item_for_font(const unsigned char *name)
     return 1;
 }
 
+/* fill a zeroed UiPrefs from the currently effective settings (dialog
+   opened with no saved record, or a windoid open/close needs a record
+   to write its flag into) */
+static void
+seed_current(UiPrefs *up)
+{
+    memset(up, 0, sizeof *up);
+    up->tiled_map = iflags.wc_tiled_map ? 1 : 0;
+    up->hitpointbar = iflags.wc2_hitpointbar ? 1 : 0;
+    up->statuslines = (iflags.wc2_statuslines == 3) ? 3 : 2;
+    up->menutiles = iflags.use_menu_glyphs ? 1 : 0;
+    up->sizes[uiFontMap] = iflags.wc_fontsiz_map;
+    up->sizes[uiFontStatus] = iflags.wc_fontsiz_status;
+    up->sizes[uiFontMessage] = iflags.wc_fontsiz_message;
+    up->sizes[uiFontMenu] = iflags.wc_fontsiz_menu;
+    up->sizes[uiFontText] = iflags.wc_fontsiz_text;
+}
+
+/* persist the windoid's open/closed state so the next launch can
+   restore it; creates the settings record on first use (seeded from
+   the effective values, so nothing else changes) */
+void
+macprefs_note_perminv(Boolean open)
+{
+    UiPrefs up;
+
+    if (!RetrieveUiPrefs(&up)) {
+        seed_current(&up);
+        up.valid = 1;
+    }
+    if (up.perminv_open == (open ? 1 : 0))
+        return; /* unchanged; skip the file write */
+    up.perminv_open = open ? 1 : 0;
+    StoreUiPrefs(&up);
+}
+
 /* point size a row currently resolves to: config value, else the live
    window's font size, else the port fallback -- used to seed the size
    popups so they show the real size instead of "(default)" */
@@ -303,19 +339,8 @@ macprefs_dialog(void)
     UserItemUPP redraw;
     ModalFilterUPP filter;
 
-    if (!RetrieveUiPrefs(&up)) {
-        /* no saved record: seed from the currently effective settings */
-        memset(&up, 0, sizeof up);
-        up.tiled_map = iflags.wc_tiled_map ? 1 : 0;
-        up.hitpointbar = iflags.wc2_hitpointbar ? 1 : 0;
-        up.statuslines = (iflags.wc2_statuslines == 3) ? 3 : 2;
-        up.menutiles = iflags.use_menu_glyphs ? 1 : 0;
-        up.sizes[uiFontMap] = iflags.wc_fontsiz_map;
-        up.sizes[uiFontStatus] = iflags.wc_fontsiz_status;
-        up.sizes[uiFontMessage] = iflags.wc_fontsiz_message;
-        up.sizes[uiFontMenu] = iflags.wc_fontsiz_menu;
-        up.sizes[uiFontText] = iflags.wc_fontsiz_text;
-    }
+    if (!RetrieveUiPrefs(&up))
+        seed_current(&up); /* no saved record: current effective values */
 
     fontMenu = NewMenu(PREFS_FONT_MENU, P_STRING_CONV("Fonts"));
     if (!fontMenu)

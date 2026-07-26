@@ -212,6 +212,8 @@ GetWinKind(WindowPtr win)
         return kMapWindow;
     if (win == _mt_window)                  /* shared base/status tty window */
         return kStatusWindow;
+    if (WIN_INVEN != WIN_ERR && win == theWindows[WIN_INVEN].its_window)
+        return kInvenWindow;                /* perm-invent windoid */
     kind = GetWindowKind(win) - WIN_BASE_KIND;
     if (kind < 0 || kind > NHW_TEXT) {
         return -1;

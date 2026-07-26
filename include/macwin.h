@@ -57,7 +57,9 @@ extern MacFlags macFlags;
 #define kTextWindow 3
 #define kMenuWindow 4
 #define kMapTileWindow 5
-#define kLastWindowKind kMapTileWindow
+#define kInvenWindow 6 /* perm-invent windoid; separate from kMenuWindow
+                          so dragging it doesn't move future menus */
+#define kLastWindowKind kInvenWindow
 
 /* WIND resource IDs (templates in sys/mac68k/nhmapwind.r) */
 #define kWindMapDocument      200 /* map, decorated (scrollbars + grow box) */
@@ -158,7 +160,8 @@ extern void SaveSizeForKind(short kind, short height, short width);
    and applied at startup AFTER initoptions(), so they override the
    NetHack Defaults file.  valid==0 (never saved / "Forget Settings")
    leaves the config-file values alone. */
-#define UIPREFS_VERSION 2 /* v2: added menutiles */
+#define UIPREFS_VERSION 3 /* v2: menutiles; v3: perminv_open + the
+                             kInvenWindow position slot */
 enum uiprefs_fonts {
     uiFontMap = 0, uiFontStatus, uiFontMessage, uiFontMenu, uiFontText,
     UIPREFS_NFONTS
@@ -170,7 +173,7 @@ typedef struct UiPrefs {
     char hitpointbar;
     char statuslines;            /* 2 or 3 */
     char menutiles;              /* item tiles in menu rows */
-    char pad_;                   /* keep the shorts word-aligned */
+    char perminv_open;           /* windoid was open at last save */
     Str31 fonts[UIPREFS_NFONTS]; /* fonts[i][0]==0 => port default */
     short sizes[UIPREFS_NFONTS]; /* 0 => port default */
 } UiPrefs;
@@ -181,6 +184,7 @@ extern void StoreUiPrefs(const UiPrefs *);
 
 extern void macprefs_dialog(void);
 extern void macprefs_apply_startup(void);
+extern void macprefs_note_perminv(Boolean); /* persist windoid open/closed */
 
 /* macwin.c: update-event dispatch for movable-modal dialog filters */
 extern void mac_handle_update_event(EventRecord *);
