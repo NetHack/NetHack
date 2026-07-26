@@ -992,9 +992,9 @@ DoMenuEvt(long menuEntry)
             SetItemMark(MHND_GAME, menuGameTileMode,
                         newOn ? checkMark : noMark);
             iflags.wc_tiled_map = newOn;
-            /* queue ^R: synchronous redraw from menu-handler context doesn't
-               take; command-loop redraw re-emits print_glyph for the new mode */
-            AddToKeyQueue('R' & 0x1f, 1);
+            /* no ^R needed: print_glyph keeps both caches, so set_mode's
+               repaint_full_viewport + InvalWindowRect already redrew the
+               map; a queued redraw would repaint every cell a second time */
             break;
         }
         }
