@@ -89,7 +89,16 @@ enum {
     ____File___1,
     menuFileQuit,
 
-    /* standard minimum Edit menu items */
+    /* Edit: the standard items are for desk accessories only;
+       Preferences... is ours (HIG home for it) */
+    menuEditUndo = 1,
+    ____Edit___1,
+    menuEditCut,
+    menuEditCopy,
+    menuEditPaste,
+    menuEditClear,
+    ____Edit___2,
+    menuEditPrefs,
 
     /* Game */
     menuGameRedraw = 1,
@@ -854,8 +863,16 @@ AdjustMenus(short dimMenubar)
             for (i = menuEdit; i < NUM_MBAR; i++)
                 DisableItem(MBARHND(i), 0);
 
-            if (theMenubar == mbarDA)
-                EnableItem(MHND_EDIT, 0);
+            /* Edit stays up for Preferences...; the standard items only
+               work while a desk accessory is in front */
+            EnableItem(MHND_EDIT, 0);
+            for (i = menuEditUndo; i <= menuEditClear; i++) {
+                if (theMenubar == mbarDA)
+                    EnableItem(MHND_EDIT, i);
+                else
+                    DisableItem(MHND_EDIT, i);
+            }
+            EnableItem(MHND_EDIT, menuEditPrefs);
 
             break;
 
@@ -865,8 +882,11 @@ AdjustMenus(short dimMenubar)
             for (i = menuFile; i < NUM_MBAR; i++)
                 EnableItem(MBARHND(i), 0);
 
-            /* ... except the unused Edit menu */
-            DisableItem(MHND_EDIT, 0);
+            /* ... Edit included, for Preferences...; its standard items
+               stay dim outside desk accessories */
+            for (i = menuEditUndo; i <= menuEditClear; i++)
+                DisableItem(MHND_EDIT, i);
+            EnableItem(MHND_EDIT, menuEditPrefs);
 
             /* Game menu: Tile Mode enabled iff tiles available; checkmark
                tracks live state (AdjustMenus(0) runs before MenuSelect, so
@@ -936,7 +956,10 @@ DoMenuEvt(long menuEntry)
         break;
 
     case menuEdit:
-        (void) SystemEdit(menuItem - 1);
+        if (menuItem == menuEditPrefs)
+            macprefs_dialog();
+        else
+            (void) SystemEdit(menuItem - 1);
         break;
 
     case menuGame:
@@ -1024,25 +1047,194 @@ DoMenuEvt(long menuEntry)
     HiliteMenu(0);
 }
 
+/* About dialog (DLOG/DITL 6200 in nhmenus.r): big title, a row of
+   tiles when the sheet is usable, version and credits -- the shape the
+   Atari/GEM port's about box has (graphic + text + OK). */
+#define RSRC_ABOUT 6200
+#define RSRC_ABOUT_PICT 6201 /* NETHACK sword title (nhtitle.r) */
+enum {
+    abtOK = 1,
+    abtArt,     /* user item: title lettering + tile row */
+    abtVersion, /* static text filled at runtime */
+    abtCredits,
+    abtContact,
+    abtRing     /* bold outline around OK */
+};
+
+static pascal void
+about_redraw(DialogRef dlog, DialogItemIndex item)
+{
+    short type;
+    Handle h;
+    Rect r;
+
+    GetDialogItem(dlog, item, &type, &h, &r);
+    if (item == abtRing) {
+        PenSize(3, 3);
+        FrameRoundRect(&r, 16, 16);
+        PenSize(1, 1);
+        return;
+    }
+    if (item != abtArt)
+        return;
+    {
+        /* the Atari port's NETHACK sword title ('PICT' 6201),
+           aspect-fit into the art area.  1-bit screens get the
+           lettering instead (the dithered logo is mush there). */
+        PicHandle pic = (mac_main_depth() >= 4)
+                            ? GetPicture(RSRC_ABOUT_PICT) : (PicHandle) 0;
+
+        if (pic) {
+            Rect pf = (**pic).picFrame;
+            Rect dst;
+            long pw = pf.right - pf.left, ph = pf.bottom - pf.top;
+            long aw = r.right - r.left, ah = r.bottom - r.top;
+            long w, h;
+
+            if (pw > 0 && ph > 0 && aw > 0 && ah > 0) {
+                w = aw;
+                h = ph * aw / pw;
+                if (h > ah) {
+                    h = ah;
+                    w = pw * ah / ph;
+                }
+                dst.left = (short) (r.left + (aw - w) / 2);
+                dst.top = r.top;
+                dst.right = (short) (dst.left + w);
+                dst.bottom = (short) (dst.top + h);
+                DrawPicture(pic, &dst);
+            }
+            ReleaseResource((Handle) pic);
+        } else {
+            TextFont(kFontIDGeneva);
+            TextSize(36);
+            TextFace(bold | shadow);
+            {
+                unsigned char *title = P_STRING_CONV("NetHack");
+                short w = StringWidth(title);
+
+                MoveTo((short) (r.left + (r.right - r.left - w) / 2),
+                       (short) (r.top + 56));
+                DrawString(title);
+            }
+            TextFont(systemFont);
+            TextSize(0);
+            TextFace(normal);
+        }
+    }
+}
+
+static pascal Boolean
+about_filter(DialogRef wind, EventRecord *event, DialogItemIndex *item)
+{
+    char ch;
+
+    /* movable modal: route background updates and track the title bar
+       drag ourselves -- ModalDialog does neither */
+    if (event->what == updateEvt
+        && (WindowPtr) event->message != GetDialogWindow(wind)) {
+        mac_handle_update_event(event);
+        return FALSE;
+    }
+    if (event->what == mouseDown) {
+        WindowPtr w;
+        short part = FindWindow(event->where, &w);
+
+        if (part == inDrag && w == GetDialogWindow(wind)) {
+            Rect limits = qd.screenBits.bounds;
+
+            InsetRect(&limits, 4, 4);
+            DragWindow(w, event->where, &limits);
+            *item = 0;
+            return TRUE;
+        }
+    }
+    if (event->what == keyDown || event->what == autoKey) {
+        ch = (char) (event->message & CH_MASK);
+        if (ch == CH_RETURN || ch == CH_ENTER || ch == CH_ESCAPE) {
+            FlashButton(wind, abtOK);
+            *item = abtOK;
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
 static void
 aboutNetHack(void)
 {
-    if (theMenubar >= mbarRegular) {
-        (void) doversion();
-    } else {
-        unsigned char aboutStr[32];
-        char tmp[32];
+    GrafPtr oldport;
+    DialogRef dlog;
+    short item, type;
+    Handle h;
+    Rect r;
+    char tmp[64];
+    Str255 vers;
+    UserItemUPP redraw = NewUserItemUPP(about_redraw);
+    ModalFilterUPP filter = NewModalFilterUPP(about_filter);
 
-        /* snprintf truncates to 31 chars + NUL, so C2P's 1 + strlen(tmp)
-           bytes always fit aboutStr */
-        snprintf(tmp, sizeof tmp, "NetHack %d.%d.%d",
-                 VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL);
-        C2P(tmp, aboutStr);
-
-        ParamText(aboutStr, P_STRING_CONV("\rdevteam@www.nethack.org"), P_EMPTY_STRING, P_EMPTY_STRING);
-        (void) Alert(alrtMenuNote, (ModalFilterUPP) 0L);
-        ResetAlertStage();
+    dlog = GetNewDialog(RSRC_ABOUT, NULL, (WindowRef) -1);
+    if (!dlog) {
+        DisposeUserItemUPP(redraw);
+        DisposeModalFilterUPP(filter);
+        return;
     }
+    GetPort(&oldport);
+    SetPortDialogPort(dlog);
+
+/* which slice of the fat binary this object was compiled into */
+#ifdef CROSS_TO_MACPPC
+#define ABOUT_ARCH "PowerPC"
+#else
+#define ABOUT_ARCH "68k"
+#endif
+    snprintf(tmp, sizeof tmp, "Version %d.%d.%d for the Macintosh (%s)",
+             VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL, ABOUT_ARCH);
+    C2P(tmp, vers);
+    GetDialogItem(dlog, abtVersion, &type, &h, &r);
+    SetDialogItemText(h, vers);
+
+    {
+        char big[128];
+        /* years from the authoritative banner ("NetHack, Copyright
+           1985-20xx"), so this line tracks upstream updates;
+           \251 = Mac Roman copyright sign */
+        const char *yrs = strstr(COPYRIGHT_BANNER_A, "1985");
+
+        snprintf(big, sizeof big,
+                 "\251 %s Stichting Mathematisch Centrum, Amsterdam,"
+                 " and the NetHack DevTeam.",
+                 yrs ? yrs : "1985");
+        C2P(big, vers);
+        GetDialogItem(dlog, abtCredits, &type, &h, &r);
+        SetDialogItemText(h, vers);
+
+        /* \245 = Mac Roman bullet */
+        snprintf(big, sizeof big, "Built %s \245 %s",
+                 nomakedefs.build_date ? nomakedefs.build_date : "?",
+                 nomakedefs.git_branch ? nomakedefs.git_branch
+                                       : "unknown branch");
+        C2P(big, vers);
+        GetDialogItem(dlog, abtContact, &type, &h, &r);
+        SetDialogItemText(h, vers);
+    }
+
+    GetDialogItem(dlog, abtArt, &type, &h, &r);
+    SetDialogItem(dlog, abtArt, type, (Handle) redraw, &r);
+    GetDialogItem(dlog, abtRing, &type, &h, &r);
+    SetDialogItem(dlog, abtRing, type, (Handle) redraw, &r);
+    /* the initial draw ran before the user-item procs were installed */
+    GetWindowPortBounds(GetDialogWindow(dlog), &r);
+    InvalWindowRect(GetDialogWindow(dlog), &r);
+
+    do {
+        ModalDialog(filter, &item);
+    } while (item != abtOK);
+
+    DisposeDialog(dlog);
+    SetPort(oldport);
+    DisposeUserItemUPP(redraw);
+    DisposeModalFilterUPP(filter);
 }
 
 static void

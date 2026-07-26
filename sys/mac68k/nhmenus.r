@@ -53,7 +53,9 @@ resource 'MENU' (130) {
         "Cut", noIcon, "X", noMark, plain,
         "Copy", noIcon, "C", noMark, plain,
         "Paste", noIcon, "V", noMark, plain,
-        "Clear", noIcon, noKey, noMark, plain
+        "Clear", noIcon, noKey, noMark, plain,
+        "-", noIcon, noKey, noMark, plain,
+        "Preferences\0xC9", noIcon, noKey, noMark, plain
     }
 };
 
@@ -424,5 +426,80 @@ resource 'STR#' (201, "current") {
         "(",
         "$",
         "+"
+    }
+};
+
+/* Preferences dialog (macprefs.c).  Item numbers are load-bearing --
+ * they must match the prefSave..prefSizeLast enum in macprefs.c: the
+ * font popups (8-12) and size popups (13-17) are contiguous runs in
+ * uiprefs_fonts order (map, status, message, menu, text). */
+resource 'DLOG' (6100, "Preferences") {
+    {24, 56, 320, 456},
+    movableDBoxProc, /* System 7 movable modal (titled; drag handled in
+                        pref_filter -- ModalDialog won't track it) */
+    visible,
+    noGoAway,
+    0x0,
+    6100,
+    "Preferences",
+    centerMainScreen
+};
+
+resource 'DITL' (6100) {
+    {
+        {264, 310, 284, 384}, Button { enabled, "Save" },          /* 1 */
+        {264, 228, 284, 292}, Button { enabled, "Cancel" },        /* 2 */
+        {264, 16, 284, 140},  Button { enabled, "Forget Settings" }, /* 3 */
+        {12, 16, 30, 190},    CheckBox { enabled, "Tiled map" },   /* 4 */
+        {36, 16, 54, 190},    CheckBox { enabled, "Hit-point bar" }, /* 5 */
+        {12, 210, 30, 384},   RadioButton { enabled, "2 status lines" }, /* 6 */
+        {36, 210, 54, 384},   RadioButton { enabled, "3 status lines" }, /* 7 */
+        {78, 100, 98, 300},   UserItem { enabled },                /* 8 map font */
+        {106, 100, 126, 300}, UserItem { enabled },                /* 9 status */
+        {134, 100, 154, 300}, UserItem { enabled },                /* 10 message */
+        {162, 100, 182, 300}, UserItem { enabled },                /* 11 menu */
+        {190, 100, 210, 300}, UserItem { enabled },                /* 12 text */
+        {78, 312, 98, 388},   UserItem { enabled },                /* 13 map size */
+        {106, 312, 126, 388}, UserItem { enabled },                /* 14 status */
+        {134, 312, 154, 388}, UserItem { enabled },                /* 15 message */
+        {162, 312, 182, 388}, UserItem { enabled },                /* 16 menu */
+        {190, 312, 210, 388}, UserItem { enabled },                /* 17 text */
+        {80, 16, 96, 96},     StaticText { disabled, "Map:" },     /* 18 */
+        {108, 16, 124, 96},   StaticText { disabled, "Status:" },  /* 19 */
+        {136, 16, 152, 96},   StaticText { disabled, "Message:" }, /* 20 */
+        {164, 16, 180, 96},   StaticText { disabled, "Menu:" },    /* 21 */
+        {192, 16, 208, 96},   StaticText { disabled, "Text:" },    /* 22 */
+        {222, 16, 254, 384},  StaticText { disabled,
+            "Changes take effect at the next launch." },           /* 23 */
+        {56, 210, 74, 384},   CheckBox { enabled, "Tiles in menus" }, /* 24 */
+        {260, 306, 288, 388}, UserItem { disabled },  /* 25 default ring */
+        {257, 16, 258, 388},  UserItem { disabled }   /* 26 separator */
+    }
+};
+
+/* About dialog (macmenu.c aboutNetHack).  Item numbers must match the
+ * abtOK..abtRing enum there.  The version StaticText (3) is filled at
+ * runtime; the art UserItem (2) draws the big title and a tile row. */
+resource 'DLOG' (6200, "About NetHack") {
+    {40, 30, 322, 510},
+    movableDBoxProc, /* System 7 movable modal; drag handled in
+                        about_filter (ModalDialog won't track it) */
+    visible,
+    noGoAway,
+    0x0,
+    6200,
+    "About NetHack",
+    centerMainScreen
+};
+
+resource 'DITL' (6200) {
+    {
+        {248, 396, 268, 460}, Button { enabled, "OK" },        /* 1 */
+        {8, 10, 162, 470},    UserItem { disabled },           /* 2 art:
+            title PICT aspect-fit at the top, tile parade below */
+        {170, 20, 186, 460},  StaticText { disabled, "" },     /* 3 version */
+        {190, 20, 222, 460},  StaticText { disabled, "" },     /* 4 copyright */
+        {224, 20, 240, 460},  StaticText { disabled, "" },     /* 5 build info */
+        {244, 392, 272, 464}, UserItem { disabled }            /* 6 ring */
     }
 };

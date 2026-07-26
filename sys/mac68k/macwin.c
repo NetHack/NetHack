@@ -770,6 +770,7 @@ got1:
     aWin->pendingCount = 0L;
     aWin->hasPending = 0;
     aWin->menuStyle = 0;
+    aWin->menuTiles = 0;
     aWin->miLen = 0;
     aWin->miSize = 0;
     aWin->menuChar = 'a';
@@ -2341,7 +2342,7 @@ mac_start_menu(winid win, unsigned long mbehavior)
 }
 
 void
-mac_add_menu(winid win, const glyph_info *glyphinfo UNUSED,
+mac_add_menu(winid win, const glyph_info *glyphinfo,
              const anything *any, char menuChar,
              char groupAcc, int attr, int clr,
              const char *inStr, unsigned int itemflags)
@@ -2437,6 +2438,12 @@ mac_add_menu(winid win, const glyph_info *glyphinfo UNUSED,
         item->groupAcc = groupAcc;
         item->preselected = (Boolean) preselected;
         item->line = aWin->y_size;
+        /* menu tiles: remember the row's tile when the core sent a real
+           glyph and the sheet is usable (color screens only) */
+        item->tileidx = -1;
+        if (iflags.use_menu_glyphs && glyphinfo
+            && glyphinfo->glyph != NO_GLYPH && mactile_available())
+            item->tileidx = remap_tile_idx(glyphinfo->gm.tileidx);
         HUnlock((char **) aWin->menuInfo);
         HUnlock((char **) aWin->menuCounts);
     } else
@@ -2460,6 +2467,46 @@ mac_end_menu(winid win, const char *morestr)
     if (morestr)
         C2P(morestr, buf);
     SetWTitle(aWin->its_window, buf);
+
+    /* Menu tiles: decided once per menu. Reset the row metrics to the
+       font first -- the window is recycled and a previous tile menu must
+       not leave tall rows behind -- then grow the rows to fit tiles and
+       center the text baseline. All row math (draw, click hit-testing,
+       scroll, selection hilite) keys off row_height, so it stays
+       consistent everywhere. */
+    aWin->menuTiles = 0;
+    if (aWin->menuInfo && aWin->miLen > 0) {
+        short k;
+
+        HLock((char **) aWin->menuInfo);
+        for (k = 0; k < aWin->miLen; k++)
+            if ((*aWin->menuInfo)[k].tileidx >= 0) {
+                aWin->menuTiles = 1;
+                break;
+            }
+        HUnlock((char **) aWin->menuInfo);
+    }
+    if (aWin->its_window) {
+        FontInfo fi;
+        GrafPtr saveP;
+
+        GetPort(&saveP);
+        SetPortWindowPort(aWin->its_window);
+        TextFont(aWin->font_number);
+        TextSize(aWin->font_size);
+        GetFontInfo(&fi);
+        aWin->ascent_height = fi.ascent + fi.leading;
+        aWin->row_height = aWin->ascent_height + fi.descent;
+        SetPort(saveP);
+    }
+    if (aWin->menuTiles) {
+        if (aWin->row_height < MACTILE_DIM + 2) {
+            aWin->ascent_height +=
+                (short) ((MACTILE_DIM + 2 - aWin->row_height) / 2);
+            aWin->row_height = MACTILE_DIM + 2;
+        }
+        aWin->x_size += MACTILE_DIM + 2; /* rows are indented that much */
+    }
 }
 
 int
@@ -3386,6 +3433,7 @@ MenwDrawStyled(NhWindow *wind)
     char *base;
     long tlen, i, lineStart;
     short lineIdx, row, vis_rows;
+    short tile_indent = wind->menuTiles ? MACTILE_DIM + 2 : 0;
 
     GetWindowPortBounds(wind->its_window, &r);
     OffsetRect(&r, -r.left, -r.top);
@@ -3471,7 +3519,8 @@ MenwDrawStyled(NhWindow *wind)
                 } else {
                     mac_set_text_color(color);
                 }
-                MoveTo(r.left, row * wind->row_height + wind->ascent_height);
+                MoveTo(r.left + tile_indent,
+                       row * wind->row_height + wind->ascent_height);
                 /* pass the line via the pointer: lineStart can exceed
                    DrawText's 16-bit byte offset in a >32KB text window */
                 if (llen > 0x7FFF)
@@ -3481,6 +3530,22 @@ MenwDrawStyled(NhWindow *wind)
                     ForeColor(blackColor);
                     if (mac_main_depth() < 2)
                         TextMode(srcOr);
+                }
+                if (tile_indent) {
+                    /* item tile in the indent strip; drawn after the
+                       inverse box so it sits on top of it */
+                    short it = ListCoordinateToItem(wind, row);
+
+                    if (it >= 0) {
+                        short ti = (*wind->menuInfo)[it].tileidx;
+
+                        if (ti >= 0)
+                            mactile_blit_to_window(
+                                wind->its_window, ti, r.left + 1,
+                                (short) (row * wind->row_height
+                                         + (wind->row_height - MACTILE_DIM)
+                                               / 2));
+                    }
                 }
             }
             lineStart = i + 1;
@@ -3952,6 +4017,16 @@ DoOsEvt(EventRecord *theEvent)
             }
         }
     }
+}
+
+/* Service an update event for a game window from OUTSIDE the main event
+   loop: ModalDialog only redraws its own dialog, so a movable-modal
+   filter (macprefs.c) routes other windows' updates here or they stay
+   white while the dialog is dragged around. */
+void
+mac_handle_update_event(EventRecord *theEvent)
+{
+    HandleUpdate(theEvent);
 }
 
 void

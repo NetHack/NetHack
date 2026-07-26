@@ -79,6 +79,7 @@ typedef struct {
     char groupAcc;
     Boolean preselected;      /* MENU_ITEMFLAGS_SELECTED at build time */
     short line;
+    short tileidx;            /* sheet tile for the row; -1 = none */
 } MacMHMenuItem;
 
 typedef struct NhWindow {
@@ -110,6 +111,9 @@ typedef struct NhWindow {
     short miSelLen;           /* number of items selected */
     short how;                /* menu mode */
     Handle menuStyle;         /* per-line {attr,color} bytes for styled menu draw */
+    char menuTiles;           /* nonzero: rows carry item tiles (taller rows,
+                                 text indented by MACTILE_DIM+2); decided in
+                                 mac_end_menu */
 
     char drawn;
     Handle windowText;
@@ -148,6 +152,38 @@ extern Boolean RetrieveSize(short, short, short, short *, short *);
 extern void SaveWindowPos(WindowPtr);
 extern void SaveWindowSize(WindowPtr);
 extern void SaveSizeForKind(short kind, short height, short width);
+
+/* UI settings persisted in the "NetHack Preferences" file after the
+   window-position records; written by the Preferences dialog (macprefs.c)
+   and applied at startup AFTER initoptions(), so they override the
+   NetHack Defaults file.  valid==0 (never saved / "Forget Settings")
+   leaves the config-file values alone. */
+#define UIPREFS_VERSION 2 /* v2: added menutiles */
+enum uiprefs_fonts {
+    uiFontMap = 0, uiFontStatus, uiFontMessage, uiFontMenu, uiFontText,
+    UIPREFS_NFONTS
+};
+typedef struct UiPrefs {
+    short version;               /* UIPREFS_VERSION */
+    char valid;                  /* 0 => record unused */
+    char tiled_map;              /* startup map display mode */
+    char hitpointbar;
+    char statuslines;            /* 2 or 3 */
+    char menutiles;              /* item tiles in menu rows */
+    char pad_;                   /* keep the shorts word-aligned */
+    Str31 fonts[UIPREFS_NFONTS]; /* fonts[i][0]==0 => port default */
+    short sizes[UIPREFS_NFONTS]; /* 0 => port default */
+} UiPrefs;
+extern Boolean RetrieveUiPrefs(UiPrefs *);
+extern void StoreUiPrefs(const UiPrefs *);
+
+/* ### macprefs.c ### */
+
+extern void macprefs_dialog(void);
+extern void macprefs_apply_startup(void);
+
+/* macwin.c: update-event dispatch for movable-modal dialog filters */
+extern void mac_handle_update_event(EventRecord *);
 extern Boolean RetrieveWinPos(WindowPtr, short *, short *);
 
 /* ### macerrs.c ### */

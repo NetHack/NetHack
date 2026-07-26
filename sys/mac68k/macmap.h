@@ -26,6 +26,10 @@ extern void    macmap_curs(NhWindow *map, int x, int y);
 /* Blit the pending dirty region to the window once (per-frame flush boundary). */
 extern void    macmap_flush(void);
 
+/* Map a core tileidx into the PICT sheet (statue slots fold to the one
+   generic statue tile); shared with macwin.c's menu tiles. */
+extern short   remap_tile_idx(int idx);
+
 /* Mac event callbacks. */
 extern void    macmap_update_event(NhWindow *map);
 extern void    macmap_grow_event(NhWindow *map, long newSize);

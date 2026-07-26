@@ -366,6 +366,7 @@ $(TARGETPFX)dprintf.o : ../sys/mac68k/dprintf.c $(MAC_H)
 $(TARGETPFX)mactile.o : ../sys/mac68k/mactile.c $(MAC_H) ../sys/mac68k/mactile.h
 $(TARGETPFX)macmap.o : ../sys/mac68k/macmap.c $(MAC_H) ../sys/mac68k/macmap.h ../sys/mac68k/mactile.h
 $(TARGETPFX)macstat.o : ../sys/mac68k/macstat.c $(MAC_H)
+$(TARGETPFX)macprefs.o : ../sys/mac68k/macprefs.c $(MAC_H)
 # tile.c is the generated glyph-to-tileidx lookup table; tilemap is built
 # by util/Makefile and writes to ../src/tile.c.
 $(TARGETPFX)tile.o : tile.c
@@ -404,9 +405,9 @@ $(TARGETPFX)nhmapwind.rsrc : ../sys/mac68k/nhmapwind.r
 	@mkdir -p $(dir $@)
 	$(RETRO68)/bin/Rez ../sys/mac68k/nhmapwind.r \
 		-I $(RETRO68)/multiversal/RIncludes -o $@
-$(TARGETPFX)nhmenus.rsrc : ../sys/mac68k/nhmenus.r
+$(TARGETPFX)nhmenus.rsrc : ../sys/mac68k/nhmenus.r ../sys/mac68k/nhtitle.r
 	@mkdir -p $(dir $@)
-	$(RETRO68)/bin/Rez ../sys/mac68k/nhmenus.r \
+	$(RETRO68)/bin/Rez ../sys/mac68k/nhmenus.r ../sys/mac68k/nhtitle.r \
 		-I $(RETRO68)/multiversal/RIncludes -o $@
 #
 .PHONY: mac68kpkg
@@ -545,6 +546,7 @@ $(TARGETPFX)dprintf.o : ../sys/mac68k/dprintf.c $(MAC_H)
 $(TARGETPFX)mactile.o : ../sys/mac68k/mactile.c $(MAC_H) ../sys/mac68k/mactile.h
 $(TARGETPFX)macmap.o : ../sys/mac68k/macmap.c $(MAC_H) ../sys/mac68k/macmap.h ../sys/mac68k/mactile.h
 $(TARGETPFX)macstat.o : ../sys/mac68k/macstat.c $(MAC_H)
+$(TARGETPFX)macprefs.o : ../sys/mac68k/macprefs.c $(MAC_H)
 $(TARGETPFX)tile.o : tile.c
 tile.c : ../util/tilemap
 	cd ../util && ./tilemap
@@ -567,9 +569,9 @@ $(TARGETPFX)nhsize.rsrc : ../sys/mac68k/nhsize.r
 $(TARGETPFX)nhmapwind.rsrc : ../sys/mac68k/nhmapwind.r
 	@mkdir -p $(dir $@)
 	$(RETRO68)/bin/Rez ../sys/mac68k/nhmapwind.r -I $(RETRO68)/multiversal/RIncludes -o $@
-$(TARGETPFX)nhmenus.rsrc : ../sys/mac68k/nhmenus.r
+$(TARGETPFX)nhmenus.rsrc : ../sys/mac68k/nhmenus.r ../sys/mac68k/nhtitle.r
 	@mkdir -p $(dir $@)
-	$(RETRO68)/bin/Rez ../sys/mac68k/nhmenus.r -I $(RETRO68)/multiversal/RIncludes -o $@
+	$(RETRO68)/bin/Rez ../sys/mac68k/nhmenus.r ../sys/mac68k/nhtitle.r -I $(RETRO68)/multiversal/RIncludes -o $@
 $(TARGETPFX)nhcfrg.rsrc : ../sys/mac68k/nhcfrg.r
 	@mkdir -p $(dir $@)
 	$(RETRO68)/bin/Rez ../sys/mac68k/nhcfrg.r -I $(RETRO68)/multiversal/RIncludes -o $@

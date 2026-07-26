@@ -207,6 +207,11 @@ mactile_blit_to_window(WindowPtr dst, int tile_idx, short dst_x, short dst_y)
     PixMapHandle spm = GetGWorldPixMap(gTileSheet);   /* sheet stays locked */
     GrafPtr saveP; GetPort(&saveP);
     SetPort(dst);
+    /* CopyBits colorizes through fg/bg; the caller may have a styled text
+       color set (menu rows) -- normalize so tiles never come out tinted.
+       Classic ForeColor black/white can't disturb the CLUT. */
+    ForeColor(blackColor);
+    BackColor(whiteColor);
     CopyBits((BitMap *) *spm,
              GetPortBitMapForCopyBits(GetWindowPort(dst)),
              &src, &dr, srcCopy, NULL);

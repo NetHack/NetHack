@@ -25,6 +25,10 @@ typedef struct WinPosSave {
 
 static WinPosSave savePos[kLastWindowKind + 1];
 
+/* UI settings stored after savePos[] in the same file; zeroed (valid==0)
+   when the file predates them or the version doesn't match */
+static UiPrefs uiPrefs;
+
 static void
 InitWinFile(void)
 {
@@ -67,6 +71,13 @@ InitWinFile(void)
         /* error or short read (e.g. prefs from an older layout):
            don't trust partial data */
         memset(savePos, 0, sizeof savePos);
+        memset(&uiPrefs, 0, sizeof uiPrefs);
+    } else {
+        len = sizeof(uiPrefs);
+        if (FSRead(ref, &len, &uiPrefs) != noErr
+            || len < (long) sizeof(uiPrefs)
+            || uiPrefs.version != UIPREFS_VERSION)
+            memset(&uiPrefs, 0, sizeof uiPrefs);
     }
     winFileInit = 1; /* don't retry on every call */
     FSClose(ref);
@@ -91,7 +102,28 @@ FlushWinFile(void)
     winFileInit = 1;
     len = sizeof(savePos);
     (void) FSWrite(ref, &len, savePos); /* Don't care about error */
+    len = sizeof(uiPrefs);
+    (void) FSWrite(ref, &len, &uiPrefs);
     FSClose(ref);
+}
+
+Boolean
+RetrieveUiPrefs(UiPrefs *up)
+{
+    InitWinFile();
+    if (!uiPrefs.valid)
+        return 0;
+    *up = uiPrefs;
+    return 1;
+}
+
+void
+StoreUiPrefs(const UiPrefs *up)
+{
+    InitWinFile();
+    uiPrefs = *up;
+    uiPrefs.version = UIPREFS_VERSION;
+    FlushWinFile();
 }
 
 Boolean
