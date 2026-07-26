@@ -232,6 +232,10 @@ static struct soundlib_information soundlib_opts[] = {
     { soundlib_qtsound, "soundlib_qtsound",
         "https://doc.qt.io/qt-5/qsoundeffect.html", FALSE },
 #endif
+#ifdef SND_LIB_MAC68KSOUND
+    /* Uses the classic Mac OS Sound Manager */
+    { soundlib_mac68ksound, "soundlib_mac68ksound", "", FALSE },
+#endif
     { 0, 0, 0, FALSE },
 };
 #endif  /* !MAKEDEFS_C */

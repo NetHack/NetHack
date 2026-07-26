@@ -367,6 +367,8 @@ $(TARGETPFX)mactile.o : ../sys/mac68k/mactile.c $(MAC_H) ../sys/mac68k/mactile.h
 $(TARGETPFX)macmap.o : ../sys/mac68k/macmap.c $(MAC_H) ../sys/mac68k/macmap.h ../sys/mac68k/mactile.h
 $(TARGETPFX)macstat.o : ../sys/mac68k/macstat.c $(MAC_H)
 $(TARGETPFX)macprefs.o : ../sys/mac68k/macprefs.c $(MAC_H)
+$(TARGETPFX)mac68ksound.o : ../sound/mac68ksound/mac68ksound.c $(HACK_H)
+	$(TARGET_CC) $(TARGET_CFLAGS) -o$@ $<
 # tile.c is the generated glyph-to-tileidx lookup table; tilemap is built
 # by util/Makefile and writes to ../src/tile.c.
 $(TARGETPFX)tile.o : tile.c
@@ -419,11 +421,10 @@ mac68kpkg: $(GAMEBIN) $(TARGETPFX)Recover \
 	python3 ../sys/mac68k/tools/decode_hqx.py \
 		../sys/mac68k/NHrsrc.hqx $(TARGETPFX)resources \
 		--creator-fixup nh31 nh50
-	@echo "=== Decoding sound resources ==="
-	python3 ../sys/mac68k/tools/decode_hqx.py \
-		../sys/mac68k/NHsound.hqx $(TARGETPFX)sounds
+	@echo "=== Converting wav sounds to snd resources ==="
 	@mkdir -p $(TARGETPFX)sounds/.rsrc
-	@cp $(TARGETPFX)sounds/Sounds.rsrc.rsrc $(TARGETPFX)sounds/.rsrc/Sounds
+	python3 ../sys/mac68k/tools/wav2snd.py ../sound/wav \
+		$(TARGETPFX)sounds/.rsrc/Sounds
 	@touch $(TARGETPFX)sounds/Sounds
 	@echo "=== Decoding Recover resources ==="
 	python3 ../sys/mac68k/tools/decode_hqx.py \
@@ -552,6 +553,8 @@ $(TARGETPFX)mactile.o : ../sys/mac68k/mactile.c $(MAC_H) ../sys/mac68k/mactile.h
 $(TARGETPFX)macmap.o : ../sys/mac68k/macmap.c $(MAC_H) ../sys/mac68k/macmap.h ../sys/mac68k/mactile.h
 $(TARGETPFX)macstat.o : ../sys/mac68k/macstat.c $(MAC_H)
 $(TARGETPFX)macprefs.o : ../sys/mac68k/macprefs.c $(MAC_H)
+$(TARGETPFX)mac68ksound.o : ../sound/mac68ksound/mac68ksound.c $(HACK_H)
+	$(TARGET_CC) $(TARGET_CFLAGS) -o$@ $<
 $(TARGETPFX)tile.o : tile.c
 tile.c : ../util/tilemap
 	cd ../util && ./tilemap
@@ -597,10 +600,9 @@ macppcpkg: $(GAMEBIN) $(TARGETPFX)Recover.xcoff \
 	$(RETRO68)/bin/MakePEF $(TARGETPFX)Recover.xcoff -o $(TARGETPFX)Recover.pef
 	@echo "=== Decoding UI resources ==="
 	python3 ../sys/mac68k/tools/decode_hqx.py ../sys/mac68k/NHrsrc.hqx $(TARGETPFX)resources --creator-fixup nh31 nh50
-	@echo "=== Decoding sound resources ==="
-	python3 ../sys/mac68k/tools/decode_hqx.py ../sys/mac68k/NHsound.hqx $(TARGETPFX)sounds
+	@echo "=== Converting wav sounds to snd resources ==="
 	@mkdir -p $(TARGETPFX)sounds/.rsrc
-	@cp $(TARGETPFX)sounds/Sounds.rsrc.rsrc $(TARGETPFX)sounds/.rsrc/Sounds
+	python3 ../sys/mac68k/tools/wav2snd.py ../sound/wav $(TARGETPFX)sounds/.rsrc/Sounds
 	@touch $(TARGETPFX)sounds/Sounds
 	@echo "=== Decoding Recover resources ==="
 	python3 ../sys/mac68k/tools/decode_hqx.py ../sys/mac68k/mrecover.hqx $(TARGETPFX)recrsrc

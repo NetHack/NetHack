@@ -38,6 +38,10 @@ main(void)
 
     early_init(argc, (char **) 0);
     choose_windows("mac");
+#ifdef SND_LIB_MAC68KSOUND
+    assign_soundlib(soundlib_mac68ksound); /* default; OPTIONS=soundlib can
+                                              override during initoptions() */
+#endif
     InitMac();
     macalloc_stats("boot");   /* baseline; ignore its dt */
 

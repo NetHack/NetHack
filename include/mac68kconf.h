@@ -29,6 +29,9 @@
 #define NO_SIGNAL /* You wouldn't believe our signals ... */
 #define FILENAME 256
 #define NO_TERMS /* For tty port (see wintty.h) */
+/* NetHack 5 sound interface: sound/mac68ksound/mac68ksound.c plays named
+   'snd ' resources via the classic Sound Manager (doc/sound.txt) */
+#define SND_LIB_MAC68KSOUND
 #ifndef NO_CHANGE_COLOR
 #define CHANGE_COLOR
 #endif
