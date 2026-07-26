@@ -155,6 +155,8 @@ extern Boolean RetrieveWinPos(WindowPtr, short *, short *);
 /* ### macfile.c ### */
 
 extern void C2P(const char *c, unsigned char *p);
+extern void mac_fsspec(FSSpec *spec, short vol, long dir,
+                       ConstStr255Param name);
 extern void P2C(const unsigned char *p, char *c);
 
 /* P_STRING_CONV (compile-time Pascal string from a C literal) lives in
@@ -176,8 +178,7 @@ extern void mactile_menu_refresh(void);
 
 /* ### macmain.c ### */
 
-extern void process_openfile(short s_vol, long s_dir, StringPtr fNm,
-                             OSType ft);
+extern void process_openfile(FSSpec *fss, OSType ft);
 
 /* ### mttymain.c ### */
 

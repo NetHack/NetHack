@@ -180,6 +180,19 @@ P2C(const unsigned char *p, char *c)
     *c = '\0';
 }
 
+/* Bundle known-good HFS (vol, dir, name) into an FSSpec without the
+   FSMakeFSSpec disk hit; HFS names are <= 31 chars so Str63 always fits. */
+void
+mac_fsspec(FSSpec *spec, short vol, long dir, ConstStr255Param name)
+{
+    short len = name[0] > 63 ? 63 : name[0];
+
+    spec->vRefNum = vol;
+    spec->parID = dir;
+    BlockMove(name, spec->name, (long) len + 1);
+    spec->name[0] = (unsigned char) len;
+}
+
 int
 maccreat(const char *name, long fileType)
 {
@@ -192,11 +205,13 @@ macopen(const char *name, int flags, long fileType)
     short refNum;
     short perm;
     Str255 s;
+    FSSpec spec;
 
     C2P(name, s);
+    mac_fsspec(&spec, theDirs.dataRefNum, theDirs.dataDirID, s);
     if (flags & O_CREAT) {
-        if (HCreate(theDirs.dataRefNum, theDirs.dataDirID, s, TEXT_CREATOR,
-                    fileType) && (flags & O_EXCL)) {
+        if (FSpCreate(&spec, TEXT_CREATOR, fileType, smSystemScript)
+            && (flags & O_EXCL)) {
             return -1;
         }
     }
@@ -208,8 +223,7 @@ macopen(const char *name, int flags, long fileType)
         perm = fsRdPerm;
     }
     {
-        OSErr openErr = HOpen(theDirs.dataRefNum, theDirs.dataDirID, s, perm,
-                              &refNum);
+        OSErr openErr = FSpOpenDF(&spec, perm, &refNum);
 
         if (openErr == fnfErr) {
             /* No HFS file: fall back to a read-only copy embedded as a
@@ -303,11 +317,11 @@ int
 macunlink(const char *name)
 {
     Str255 pname;
+    FSSpec spec;
 
     C2P(name, pname);
-    return (HDelete(theDirs.dataRefNum, theDirs.dataDirID, pname) == noErr
-                ? 0
-                : -1);
+    mac_fsspec(&spec, theDirs.dataRefNum, theDirs.dataDirID, pname);
+    return (FSpDelete(&spec) == noErr ? 0 : -1);
 }
 
 /* ---------------------------------------------------------------------- */

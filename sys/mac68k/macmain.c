@@ -120,16 +120,14 @@ attempt_restore:
 }
 
 static OSErr
-copy_file(short src_vol, long src_dir, short dst_vol, long dst_dir,
-          Str255 fName,
-          pascal OSErr (*opener)(short vRefNum, long dirID,
-                                 ConstStr255Param fileName,
-                                 signed char permission, short *refNum))
+copy_file(FSSpec *src, FSSpec *dst, Boolean rsrc_fork)
 {
     short src_ref, dst_ref;
-    OSErr err = (*opener)(src_vol, src_dir, fName, fsRdPerm, &src_ref);
+    OSErr err = rsrc_fork ? FSpOpenRF(src, fsRdPerm, &src_ref)
+                          : FSpOpenDF(src, fsRdPerm, &src_ref);
     if (err == noErr) {
-        err = (*opener)(dst_vol, dst_dir, fName, fsWrPerm, &dst_ref);
+        err = rsrc_fork ? FSpOpenRF(dst, fsWrPerm, &dst_ref)
+                        : FSpOpenDF(dst, fsWrPerm, &dst_ref);
         if (err == noErr) {
             long file_len;
             /* truncate: the destination may exist from an earlier failed
@@ -177,43 +175,47 @@ copy_file(short src_vol, long src_dir, short dst_vol, long dst_dir,
 }
 
 static void
-force_hdelete(short vol, long dir, Str255 fName)
+force_hdelete(FSSpec *spec)
 {
-    HRstFLock(vol, dir, fName);
-    HDelete(vol, dir, fName);
+    FSpRstFLock(spec);
+    FSpDelete(spec);
 }
 
 void
-process_openfile(short src_vol, long src_dir, StringPtr fName, OSType ftype)
+process_openfile(FSSpec *src, OSType ftype)
 {
     OSErr err = noErr;
+    FSSpec dst;
 
     if (ftype != SAVE_TYPE)
         return; /* only deal with save files */
 
-    if ((src_vol != theDirs.dataRefNum
-         || src_dir != theDirs.dataDirID)
-               && CatMove(src_vol, src_dir, fName, theDirs.dataDirID, P_STRING_CONV(":"))
-                      != noErr) {
-        HCreate(theDirs.dataRefNum, theDirs.dataDirID, fName, MAC_CREATOR,
-                SAVE_TYPE);
-        err =
-            copy_file(src_vol, src_dir, theDirs.dataRefNum, theDirs.dataDirID,
-                      fName, &HOpen); /* HOpenDF is only there under 7.0 */
-        if (err == noErr)
-            err = copy_file(src_vol, src_dir, theDirs.dataRefNum,
-                            theDirs.dataDirID, fName, &HOpenRF);
-        if (err == noErr)
-            force_hdelete(src_vol, src_dir, fName);
-        else
-            HDelete(theDirs.dataRefNum, theDirs.dataDirID, fName);
+    /* same name, but in the data (game) directory */
+    mac_fsspec(&dst, theDirs.dataRefNum, theDirs.dataDirID, src->name);
+
+    if (src->vRefNum != theDirs.dataRefNum
+        || src->parID != theDirs.dataDirID) {
+        /* FSpCatMove's dst names the target directory itself */
+        FSSpec dstdir;
+
+        mac_fsspec(&dstdir, theDirs.dataRefNum, theDirs.dataDirID,
+                   P_STRING_CONV(":"));
+        if (FSpCatMove(src, &dstdir) != noErr) {
+            FSpCreate(&dst, MAC_CREATOR, SAVE_TYPE, smSystemScript);
+            err = copy_file(src, &dst, false);
+            if (err == noErr)
+                err = copy_file(src, &dst, true);
+            if (err == noErr)
+                force_hdelete(src);
+            else
+                FSpDelete(&dst);
+        }
     }
 
     if (err == noErr) {
         short ref;
 
-        ref = HOpenResFile(theDirs.dataRefNum, theDirs.dataDirID, fName,
-                           fsRdPerm);
+        ref = FSpOpenResFile(&dst, fsRdPerm);
         if (ref != -1) {
             Handle name = Get1Resource('STR ', PLAYER_NAME_RES_ID);
             if (name) {
@@ -225,11 +227,14 @@ process_openfile(short src_vol, long src_dir, StringPtr fName, OSType ftype)
                 P2C(*(StringHandle) name, svp.plname);
                 set_savefile_name(TRUE);
                 C2P(fqname(gs.SAVEF, SAVEPREFIX, 0), save_f_p);
-                force_hdelete(theDirs.dataRefNum, theDirs.dataDirID,
-                              save_f_p);
+                {
+                    FSSpec oldsave;
 
-                if (HRename(theDirs.dataRefNum, theDirs.dataDirID, fName,
-                            save_f_p) == noErr)
+                    mac_fsspec(&oldsave, theDirs.dataRefNum,
+                               theDirs.dataDirID, save_f_p);
+                    force_hdelete(&oldsave);
+                }
+                if (FSpRename(&dst, save_f_p) == noErr)
                     macFlags.gotOpen = 1;
             }
             CloseResFile(ref);

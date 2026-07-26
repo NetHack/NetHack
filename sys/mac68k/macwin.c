@@ -290,8 +290,7 @@ AppleEventHandler(const AppleEvent *inAppleEvent, AppleEvent *outAEReply,
                 if (fndrInfo.fdType != SAVE_TYPE)
                     continue; /* only look at save files */
 
-                process_openfile(fss.vRefNum, fss.parID, fss.name,
-                                 fndrInfo.fdType);
+                process_openfile(&fss, fndrInfo.fdType);
                 if (macFlags.gotOpen)
                     break; /* got our save file */
             }
