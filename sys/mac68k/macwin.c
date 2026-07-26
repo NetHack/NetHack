@@ -585,19 +585,56 @@ SanePositions(void)
             }
         }
 
+        /* Persistent inventory open (or due to reopen at launch):
+           reserve a right-hand strip for it, stack the rest on the left */
+        short inv_w = 0;
+        WindowPtr invw = (WIN_INVEN != WIN_ERR)
+                             ? theWindows[WIN_INVEN].its_window
+                             : (WindowPtr) 0;
+        {
+            Boolean inv_open = (invw && IsWindowVisible(invw));
+
+            if (!inv_open && invw) {
+                UiPrefs up;
+
+                if (RetrieveUiPrefs(&up) && up.perminv_open)
+                    inv_open = TRUE; /* reopens at the first update */
+            }
+            if (inv_open) {
+                short it2, il2, ih2, iw2;
+
+                if (IsWindowVisible(invw)) {
+                    Rect ir;
+
+                    GetWindowPortBounds(invw, &ir);
+                    inv_w = ir.right - ir.left;
+                } else if (RetrievePosition(kInvenWindow, &it2, &il2)
+                           && RetrieveSize(kInvenWindow, it2, il2, &ih2,
+                                           &iw2)) {
+                    inv_w = iw2;
+                } else {
+                    inv_w = 200;
+                }
+                inv_w += 6; /* gap to the stack */
+                if (inv_w > screenArea.right / 2)
+                    inv_w = screenArea.right / 2; /* don't starve the map */
+            }
+        }
+
         /* Fit the map into the space left by menu bar, message+status windows,
            and title bars; macmap_fit resizes the map window + viewport/backing */
         msg_top = y + title_h;
         map_top = msg_top + msg_h + 2 + title_h;
         avail_map_h = screenArea.bottom - map_top - (title_h + stat_h + 2);
-        avail_map_w = screenArea.right - 4;
+        avail_map_w = screenArea.right - 4 - inv_w;
         macmap_fit(avail_map_w, avail_map_h, honor);
 
-        /* Re-read the fitted map size; center the stack on its width. */
+        /* Re-read the fitted map size; center the stack on its width
+           (within the region left of the inventory strip). */
         GetWindowPortBounds(mapw, &mr);
         map_h = mr.bottom - mr.top;
         content_w = mr.right - mr.left;
-        content_left = (screenArea.right - content_w) / 2;
+        content_left = (screenArea.right - inv_w - content_w) / 2;
         if (content_left < 0) content_left = 0;
 
         /* Messages on top (honor a saved position on large screens). */
@@ -633,6 +670,19 @@ SanePositions(void)
             if (stat_w < stat_min_w)
                 stat_w = stat_min_w;
         }
+        /* a manually resized status keeps its width across launches
+           (Reposition = clean stack, so only on the honor path) */
+        if (honor) {
+            short st2, sl2, sh2, sw2;
+
+            if (RetrievePosition(kStatusWindow, &st2, &sl2)
+                && RetrieveSize(kStatusWindow, st2, sl2, &sh2, &sw2)
+                && sw2 > 0) {
+                stat_w = sw2;
+                if (stat_w > screenArea.right - 4)
+                    stat_w = screenArea.right - 4;
+            }
+        }
         stat_top = map_top + map_h + 2 + title_h;
         if (stat_top + stat_h > screenArea.bottom)
             stat_top = screenArea.bottom - stat_h - 2;
@@ -640,7 +690,7 @@ SanePositions(void)
             stat_top = mbar_height + 2;
         if (!(honor && RetrievePosition(kStatusWindow, &top, &left))) {
             top = stat_top;
-            left = (screenArea.right - stat_w) / 2;
+            left = (screenArea.right - inv_w - stat_w) / 2;
             if (left < 0) left = 0;
         }
         MoveWindow(statw, left, top, 1);
@@ -655,6 +705,19 @@ SanePositions(void)
             Rect sfull;
             GetWindowPortBounds(statw, &sfull);
             InvalWindowRect(statw, &sfull);
+        }
+
+        /* inventory windoid in the reserved right-hand strip */
+        if (inv_w && invw && IsWindowVisible(invw)
+            && !(honor && RetrievePosition(kInvenWindow, &top, &left))) {
+            Rect ir;
+
+            GetWindowPortBounds(invw, &ir);
+            top = msg_top;
+            left = screenArea.right - (ir.right - ir.left) - 4;
+            if (left < 0)
+                left = 0;
+            MoveWindow(invw, left, top, 0);
         }
     }
 

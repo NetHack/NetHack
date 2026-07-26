@@ -216,6 +216,25 @@ macstat_redraw(void)
     }
     TextFace(normal);
     ForeColor(blackColor);
+    if (!small_screen) {
+        /* resize affordance: the window is a documentProc (growable);
+           clip to the corner so DrawGrowIcon's scrollbar frame lines
+           don't cross the status text */
+        RgnHandle oc = NewRgn();
+
+        if (oc) {
+            Rect gr;
+
+            GetClip(oc);
+            GetWindowPortBounds(_mt_window, &gr);
+            gr.left = gr.right - 15;
+            gr.top = gr.bottom - 15;
+            ClipRect(&gr);
+            DrawGrowIcon(_mt_window);
+            SetClip(oc);
+            DisposeRgn(oc);
+        }
+    }
     SetPort(savePort);
 }
 
