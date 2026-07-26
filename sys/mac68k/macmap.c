@@ -50,12 +50,20 @@ typedef struct {
        of one CopyBits per cell. Coords are backing/window-local. */
     Rect           dirty;
     Boolean        has_dirty;
-    /* print_glyph doesn't paint; it accumulates this cell range (end
-       exclusive) and macmap_flush repaints it from cache in ONE batch.
-       Per-cell painting paid LockPixels/SetGWorld/GetFontInfo/color
-       setup per call -- a full-map redraw took seconds on a 68030. */
+    /* print_glyph doesn't paint; it queues cells and macmap_flush
+       repaints them from cache in one batch, so the per-call
+       LockPixels/SetGWorld/GetFontInfo/color setup is paid once a frame.
+       Exact cells are kept up to PEND_MAX; past that (bulk redraws like
+       ^R/level entry) only the bounding box is kept and the whole strip
+       repaints.  Tracking the box alone would repaint thousands of
+       unchanged cells on an ordinary turn, since a hero step plus a
+       far-away monster update already span most of the map. */
+#define PEND_MAX 256
     Boolean        cells_pending;
-    short          pend_c0, pend_r0, pend_c1, pend_r1;
+    Boolean        pend_overflow;
+    short          pend_n;
+    unsigned char  pend_x[PEND_MAX], pend_y[PEND_MAX];
+    short          pend_c0, pend_r0, pend_c1, pend_r1; /* end exclusive */
 } MacMapState;
 
 static MacMapState gMap = {0};
@@ -1038,16 +1046,19 @@ repaint_strip(int col_start, int row_start, int col_end, int row_end)
         end_cell_batch();
 }
 
-/* Accumulate a print_glyph cell into the pending range. */
+/* Accumulate a print_glyph cell: exact list while it fits, bounding box
+   after overflow. */
 static void
 queue_cell(int x, int y)
 {
     if (!gMap.cells_pending) {
+        gMap.cells_pending = true;
+        gMap.pend_overflow = false;
+        gMap.pend_n = 0;
         gMap.pend_c0 = (short) x;
         gMap.pend_c1 = (short) (x + 1);
         gMap.pend_r0 = (short) y;
         gMap.pend_r1 = (short) (y + 1);
-        gMap.cells_pending = true;
     } else {
         if (x < gMap.pend_c0)
             gMap.pend_c0 = (short) x;
@@ -1058,18 +1069,38 @@ queue_cell(int x, int y)
         if (y + 1 > gMap.pend_r1)
             gMap.pend_r1 = (short) (y + 1);
     }
+    if (!gMap.pend_overflow) {
+        if (gMap.pend_n >= PEND_MAX) {
+            gMap.pend_overflow = true; /* bulk redraw: box takes over */
+        } else {
+            gMap.pend_x[gMap.pend_n] = (unsigned char) x;
+            gMap.pend_y[gMap.pend_n] = (unsigned char) y;
+            gMap.pend_n++;
+        }
+    }
 }
 
-/* Repaint the pending cell range from cache in one batch; the range may
-   cover unchanged cells (it's a bounding box) -- redrawing those from
-   cache is idempotent. */
+/* Repaint the queued cells from cache in one batch: exactly the listed
+   cells on a normal turn, the whole bounding box after an overflow
+   (bulk redraws repaint most of it anyway). */
 static void
 flush_pending_cells(void)
 {
     if (!gMap.cells_pending)
         return;
     gMap.cells_pending = false;
-    repaint_strip(gMap.pend_c0, gMap.pend_r0, gMap.pend_c1, gMap.pend_r1);
+    if (gMap.pend_overflow) {
+        repaint_strip(gMap.pend_c0, gMap.pend_r0, gMap.pend_c1,
+                      gMap.pend_r1);
+    } else {
+        short i;
+        Boolean batched = begin_cell_batch();
+
+        for (i = 0; i < gMap.pend_n; i++)
+            redraw_cell_from_cache(gMap.pend_x[i], gMap.pend_y[i]);
+        if (batched)
+            end_cell_batch();
+    }
 }
 
 /* Move the viewport to (new_col,new_row), clamped, repainting via soft-scroll
