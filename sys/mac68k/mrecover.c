@@ -180,8 +180,8 @@ UserItemUPP drawThermoUPP;           /* UPP for progress callback */
 #define APP_NAME_RES_ID (-16396) /* macfile.h */
 #define PLAYER_NAME_RES_ID 1001  /* macfile.h */
 
-/* variables from util/recover.c */
-#define SAVESIZE FILENAME
+/* variables from util/recover.c; SAVESIZE comes from fnamesiz.h, which is
+   what src/files.c sizes the level-0 header's savename field with */
 unsigned char savename[SAVESIZE]; /* originally a C string */
 unsigned char lock[256];          /* pascal string */
 
@@ -596,7 +596,7 @@ optionMemStats(void)
     unsigned char *pFormat =
         (unsigned char *) P_STRING_CONV("Free:#k  Max:#k  Purge:#k  Stack:#k");
     char *pSub = "#"; /* not a pascal string */
-    unsigned char nBuf[16];
+    Str255 nBuf;      /* NumToString's declared output size */
     long nStat, contig;
     Handle strHnd;
     long nOffset;
@@ -630,7 +630,7 @@ optionMemStats(void)
             break;
         }
 
-        NumToString((nStat >> 10), *(Str255 *) &nBuf);
+        NumToString((nStat >> 10), nBuf);
 
         **strHnd += nBuf[0] - 1;
         nOffset =
