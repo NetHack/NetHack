@@ -1183,15 +1183,21 @@ leave_topl_mode(char *answer) /* answer must have room for BUFSZ bytes */
     if (ans_len >= BUFSZ)
         ans_len = BUFSZ - 1;
 
-    /* remove unprintables from the answer */
+    /* remove unprintables from the answer -- except a leading ESC, the
+       cancel marker topl_key_body plants; getlin callers test for "\033" */
     HLock((*top_line)->hText);
-    for (ap = *(*top_line)->hText + topl_query_len, bp = answer; ans_len > 0;
-         ans_len--, ap++) {
-        if (*ap >= ' ' && *ap < 128) {
-            *bp++ = *ap;
+    ap = *(*top_line)->hText + topl_query_len;
+    if (ans_len > 0 && *ap == CHAR_ESC) {
+        answer[0] = CHAR_ESC;
+        answer[1] = 0;
+    } else {
+        for (bp = answer; ans_len > 0; ans_len--, ap++) {
+            if (*ap >= ' ' && *ap < 128) {
+                *bp++ = *ap;
+            }
         }
+        *bp = 0;
     }
-    *bp = 0;
     HUnlock((*top_line)->hText);
 
     if (aWin->windowTextLen
@@ -1199,7 +1205,7 @@ leave_topl_mode(char *answer) /* answer must have room for BUFSZ bytes */
         --aWin->windowTextLen;
         --aWin->y_size;
     }
-    putstr(WIN_MESSAGE, ATR_BOLD, answer);
+    putstr(WIN_MESSAGE, ATR_BOLD, answer[0] == CHAR_ESC ? "" : answer);
 
     /* Invalidate the button area so stale buttons get erased */
     if (topl_resp[0])
