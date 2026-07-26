@@ -605,18 +605,37 @@ SanePositions(void)
         MoveWindow(mapw, left, top, 1);
 
         /* Status on the bottom; keep it on-screen. */
+        {
+        short stat_w = content_w;
+
+        /* match map width so the status' right edge aligns -- but never
+           narrower than a full 80-column status line, which would clip
+           the right-hand fields when the map window is small */
+        if (!small_screen) {
+            short stat_min_w;
+            SetPortWindowPort(statw);
+            TextFont(theWindows[WIN_STATUS].font_number);
+            TextSize(theWindows[WIN_STATUS].font_size);
+            stat_min_w = 80 * CharWidth('m') + 2;
+            if (stat_min_w > screenArea.right - 4)
+                stat_min_w = screenArea.right - 4;
+            if (stat_w < stat_min_w)
+                stat_w = stat_min_w;
+        }
         stat_top = map_top + map_h + 2 + title_h;
         if (stat_top + stat_h > screenArea.bottom)
             stat_top = screenArea.bottom - stat_h - 2;
         if (stat_top < mbar_height + 2)
             stat_top = mbar_height + 2;
         if (!(honor && RetrievePosition(kStatusWindow, &top, &left))) {
-            top = stat_top; left = content_left;
+            top = stat_top;
+            left = (screenArea.right - stat_w) / 2;
+            if (left < 0) left = 0;
         }
         MoveWindow(statw, left, top, 1);
-        /* match map width so the status' right edge aligns; stat_h already
-           carries the +2 frame allowance from creation */
-        SizeWindow(statw, content_w, stat_h, 1);
+        /* stat_h already carries the +2 frame allowance from creation */
+        SizeWindow(statw, stat_w, stat_h, 1);
+        }
         /* MoveWindow reset the port origin; restore the 1px frame inset and
            repaint so the status rows stay visible */
         SetPortWindowPort(statw);
