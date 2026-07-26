@@ -390,7 +390,10 @@ use_stethoscope(struct obj *obj)
     }
     if ((mtmp = m_at(rx, ry)) != 0) {
         const char *mnm = x_monnam(mtmp, ARTICLE_A, (const char *) 0,
-                                   SUPPRESS_IT | SUPPRESS_INVISIBLE, FALSE);
+                                   (SUPPRESS_IT | SUPPRESS_INVISIBLE
+                                    /* stethoscope reveals true form; seemimic
+                                       below will clear mtmp->mappearance */
+                                    | SUPPRESS_MAPPEARANCE), FALSE);
 
         /* gb.bhitpos needed by mstatusline() iff mtmp is a long worm */
         gb.bhitpos.x = rx, gb.bhitpos.y = ry;
