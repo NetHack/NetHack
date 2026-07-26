@@ -668,10 +668,10 @@ add_tty_char(WindowPtr window, short character)
 short
 add_tty_string(WindowPtr window, const char *string)
 {
-    register const unsigned char *start_c;
-    register const unsigned char *the_c;
-    register unsigned char ch, is_control = 0, tty_wrap;
-    register short max_x, pos_x;
+    const unsigned char *start_c;
+    const unsigned char *the_c;
+    unsigned char ch, is_control = 0, tty_wrap;
+    short max_x, pos_x;
     RECORD_EXISTS(record);
 
     if (record->curs_state != 0)

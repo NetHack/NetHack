@@ -228,11 +228,11 @@ E int mac_get_ext_cmd(void);
 E void mac_number_pad(int);
 E void mac_delay_output(void);
 
-/* macwin.c — palette-safe text color, shared by menus and status */
+/* macwin.c: palette-safe text color, shared by menus and status */
 extern void mac_set_text_color(int);
 extern short mac_main_depth(void); /* main-device pixel depth (1 = B&W) */
 
-/* macstat.c — native status renderer */
+/* macstat.c: native status renderer */
 extern void mac_status_init(void);
 extern void mac_status_finish(void);
 extern void mac_status_enablefield(int, const char *, const char *, boolean);

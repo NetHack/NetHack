@@ -180,8 +180,8 @@ UserItemUPP drawThermoUPP;           /* UPP for progress callback */
 #define APP_NAME_RES_ID (-16396) /* macfile.h */
 #define PLAYER_NAME_RES_ID 1001  /* macfile.h */
 
-/* variables from util/recover.c */
-#define SAVESIZE FILENAME
+/* variables from util/recover.c; SAVESIZE comes from fnamesiz.h, which is
+   what src/files.c sizes the level-0 header's savename field with */
 unsigned char savename[SAVESIZE]; /* originally a C string */
 unsigned char lock[256];          /* pascal string */
 
@@ -265,7 +265,7 @@ main(void)
 }
 
 static void
-warmup()
+warmup(void)
 {
     short i;
 
@@ -513,7 +513,7 @@ note(short errorSignal, short alertID, unsigned char *msg)
 }
 
 static void
-adjustGUI()
+adjustGUI(void)
 {
     static short oldMenubar = mbar_Init; /* force initial update */
     short newMenubar;
@@ -577,7 +577,7 @@ adjustGUI()
 }
 
 static void
-adjustMemory()
+adjustMemory(void)
 {
     Size grow;
 
@@ -591,12 +591,12 @@ adjustMemory()
 
 /* show memory stats: FreeMem, MaxBlock, PurgeSpace, and StackSpace */
 static void
-optionMemStats()
+optionMemStats(void)
 {
     unsigned char *pFormat =
         (unsigned char *) P_STRING_CONV("Free:#k  Max:#k  Purge:#k  Stack:#k");
     char *pSub = "#"; /* not a pascal string */
-    unsigned char nBuf[16];
+    Str255 nBuf;      /* NumToString's declared output size */
     long nStat, contig;
     Handle strHnd;
     long nOffset;
@@ -630,7 +630,7 @@ optionMemStats()
             break;
         }
 
-        NumToString((nStat >> 10), *(Str255 *) &nBuf);
+        NumToString((nStat >> 10), nBuf);
 
         **strHnd += nBuf[0] - 1;
         nOffset =
@@ -704,7 +704,7 @@ RecoverMenuEvent(long menuEntry)
 }
 
 static void
-eventLoop()
+eventLoop(void)
 {
     short wneMask = (in.Front ? everyEvent : (osMask + updateMask));
     long wneSleep = (in.Front ? 0L : 3L);
@@ -818,7 +818,7 @@ eventLoop()
 }
 
 static void
-cooldown()
+cooldown(void)
 {
     if (in.Recover)
         endRecover();
@@ -898,7 +898,7 @@ basenameFileFilter(ParmBlkPtr pPB)
 }
 
 static void
-beginRecover()
+beginRecover(void)
 {
     SFTypeList levlType = { 'LEVL' };
     SFReply sfGetReply;
@@ -948,7 +948,7 @@ beginRecover()
 }
 
 static void
-continueRecover()
+continueRecover(void)
 {
     restore_savefile();
 
@@ -969,7 +969,7 @@ continueRecover()
 
 /* no messages from here (since we might be quitting) */
 static void
-endRecover()
+endRecover(void)
 {
     in.Recover = 0;
 
@@ -1001,7 +1001,7 @@ endRecover()
 
 /* add friendly, non-essential resource strings to save file */
 static short
-saveRezStrings()
+saveRezStrings(void)
 {
     short sRefNum;
     StringHandle strHnd;
@@ -1175,17 +1175,30 @@ copy_bytes(short inRefNum, short outRefNum)
  * number, read in step 1, across subsequent calls.
  */
 static void
-restore_savefile()
+restore_savefile(void)
 {
     static int savelev;
     long saveTemp, lev;
     xint8 levc;
     struct version_info version_data;
+    char indicator, cscsize;
+    /* cscsize is a single byte, so 256 always holds the list; Recover
+       does not link version.c, so it cannot share its cscbuf */
+    unsigned char cscbuf[256];
+    int pltmpsiz;
+    char plbuf[PL_NSIZ_PLUS];
 
-    /* level 0 file contains:
+    /* level 0 file contains, in order (keep in step with util/recover.c
+     * and the writer in src/files.c):
      *	pid of creating process (ignored here)
      *	level number for current level of save file
      *	name of save file nethack would have created
+     *	format indicator (1 byte)
+     *	count of the critical size list (1 byte)
+     *	that many critical sizes
+     *	version info
+     *	player name size (int)
+     *	player name
      *	and game state
      */
 
@@ -1211,10 +1224,35 @@ restore_savefile()
             (void) read_levelfile(gameRefNum, (Ptr) savename,
                                   sizeof(savename));
         if (in.Recover)
+            (void) read_levelfile(gameRefNum, (Ptr) &indicator,
+                                  sizeof indicator);
+        if (in.Recover)
+            (void) read_levelfile(gameRefNum, (Ptr) &cscsize,
+                                  sizeof cscsize);
+        if (in.Recover && cscsize > 0)
+            (void) read_levelfile(gameRefNum, (Ptr) cscbuf, (long) cscsize);
+        if (in.Recover)
             (void) read_levelfile(gameRefNum, (Ptr) &version_data,
                                   sizeof version_data);
+        if (in.Recover)
+            (void) read_levelfile(gameRefNum, (Ptr) &pltmpsiz,
+                                  sizeof pltmpsiz);
+        if (in.Recover && (pltmpsiz < 0 || pltmpsiz > PL_NSIZ_PLUS)) {
+            endRecover();
+            note(noErr, alidNote,
+                 P_STRING_CONV("Sorry: bad player name in checkpoint"));
+            return;
+        }
+        if (in.Recover && pltmpsiz > 0)
+            (void) read_levelfile(gameRefNum, (Ptr) plbuf, (long) pltmpsiz);
 
         /* save file should contain:
+         *	format indicator (1 byte)
+         *	count of the critical size list (1 byte)
+         *	that many critical sizes
+         *	version info
+         *	player name size (int)
+         *	player name
          *	current level (including pets)
          *	(non-level-based) game state
          *	other levels
@@ -1226,8 +1264,21 @@ restore_savefile()
             levRefNum = open_levelfile(savelev);
 
         if (in.Recover)
+            (void) write_savefile(saveRefNum, (Ptr) &indicator,
+                                  sizeof indicator);
+        if (in.Recover)
+            (void) write_savefile(saveRefNum, (Ptr) &cscsize,
+                                  sizeof cscsize);
+        if (in.Recover && cscsize > 0)
+            (void) write_savefile(saveRefNum, (Ptr) cscbuf, (long) cscsize);
+        if (in.Recover)
             (void) write_savefile(saveRefNum, (Ptr) &version_data,
                                   sizeof version_data);
+        if (in.Recover)
+            (void) write_savefile(saveRefNum, (Ptr) &pltmpsiz,
+                                  sizeof pltmpsiz);
+        if (in.Recover && pltmpsiz > 0)
+            (void) write_savefile(saveRefNum, (Ptr) plbuf, (long) pltmpsiz);
         if (in.Recover)
             copy_bytes(levRefNum, saveRefNum);
 

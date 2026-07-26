@@ -50,7 +50,7 @@ mac_getlin(const char *query, char *bufp)
    wizard-only / CMD_NOT_AVAILABLE / INTERNALCMD entries are filtered
    by the same rules as every other port. */
 int
-mac_get_ext_cmd()
+mac_get_ext_cmd(void)
 {
     char bufp[BUFSZ];
     int nmatches;

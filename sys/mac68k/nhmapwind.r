@@ -1,4 +1,4 @@
-/* nhmapwind.r — WIND resources for the dedicated map window.
+/* nhmapwind.r: WIND resources for the dedicated map window.
  * 200 = documentProc (resizable, for Quadra+ / large screens, small_screen=false).
  * 201 = plainDBox    (borderless, fixed, for SE/30 screens,  small_screen=true).
  *
@@ -15,8 +15,8 @@
 resource 'WIND' (200, "Dungeon Map (document)", purgeable) {
     {40, 0, 334, 480},          /* content top y=40: title bar (~y29-40) clears the 20px menu bar */
     documentProc,               /* WDEF procID = 0 (doc, with grow) */
-    invisible,                  /* visible flag — we ShowWindow later */
-    noGoAway,                   /* no close box — use File→Quit */
+    invisible,                  /* visible flag; we ShowWindow later */
+    noGoAway,                   /* no close box; use File > Quit */
     0x0,                        /* refCon */
     "Dungeon Map",
     noAutoCenter

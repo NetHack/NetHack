@@ -10,7 +10,7 @@
 void
 regularize(char *s)
 {
-    register char *lp;
+    char *lp;
 
     for (lp = s; *lp; lp++) {
         if (*lp == '.' || *lp == ':')
