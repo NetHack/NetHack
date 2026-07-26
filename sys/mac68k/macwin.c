@@ -2437,6 +2437,43 @@ mac_curs(winid win, int x, int y)
     aWin->y_curs = y;
 }
 
+/* Game > Save Window Positions: snapshot the position and size of
+   every standing game window into the preferences file.  Dragging
+   and growing save as you go; this is the explicit "keep this whole
+   arrangement", including layouts produced by Reposition, which
+   moves windows programmatically and saves nothing itself. */
+void
+mac_save_window_positions(void)
+{
+    WindowPtr w;
+    Rect b;
+
+    if (WIN_MAP != WIN_ERR && (w = theWindows[WIN_MAP].its_window) != 0
+        && IsWindowVisible(w)) {
+        SaveWindowPos(w); /* position lives in kMapWindow */
+        GetWindowPortBounds(w, &b);
+        /* size is per display mode (text vs tile) */
+        SaveSizeForKind(theWindows[WIN_MAP].tile_mode ? kMapTileWindow
+                                                      : kMapWindow,
+                        b.bottom - b.top, b.right - b.left);
+    }
+    if (WIN_MESSAGE != WIN_ERR
+        && (w = theWindows[WIN_MESSAGE].its_window) != 0
+        && IsWindowVisible(w)) {
+        SaveWindowPos(w);
+        SaveWindowSize(w);
+    }
+    if (_mt_window && IsWindowVisible(_mt_window)) { /* status */
+        SaveWindowPos(_mt_window);
+        SaveWindowSize(_mt_window);
+    }
+    if (WIN_INVEN != WIN_ERR && (w = theWindows[WIN_INVEN].its_window) != 0
+        && IsWindowVisible(w)) {
+        SaveWindowPos(w);
+        SaveWindowSize(w);
+    }
+}
+
 /* One-shot at the first input wait inside the moveloop: reopen the
    inventory windoid if the preferences file says it was open when the
    last session ended.  Shown via the select_menu intercept, so no

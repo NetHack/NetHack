@@ -104,6 +104,7 @@ enum {
     menuGameRedraw = 1,
     menuGamePrevMsg,
     menuGameReposition,
+    menuGameSavePositions,
     menuGameTileMode,
     ____Game___1,
     menuGamePlayMode,
@@ -977,6 +978,10 @@ DoMenuEvt(long menuEntry)
             /* queue ^R: synchronous redraw from menu-handler context doesn't
                take (window port unsettled), so redraw in the command loop */
             AddToKeyQueue('R' & 0x1f, 1);
+            break;
+
+        case menuGameSavePositions:
+            mac_save_window_positions();
             break;
 
         case menuGameTileMode: {

@@ -215,6 +215,7 @@ resource 'MENU' (138) {
         "Redraw", noIcon, "R", noMark, plain,
         "Previous Message", noIcon, "P", noMark, plain,
         "Reposition Windows", noIcon, "N", noMark, plain,
+        "Save Window Positions", noIcon, noKey, noMark, plain,
         "Tile Mode", noIcon, "T", noMark, plain,
         "-", noIcon, noKey, noMark, plain,
         "Play Mode", noIcon, "\0x1B" /* hierarchicalMenu */, "\0xCA", plain

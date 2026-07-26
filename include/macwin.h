@@ -188,6 +188,9 @@ extern void macprefs_note_perminv(Boolean); /* persist windoid open/closed */
 
 /* macwin.c: update-event dispatch for movable-modal dialog filters */
 extern void mac_handle_update_event(EventRecord *);
+
+/* macwin.c: Game > Save Window Positions */
+extern void mac_save_window_positions(void);
 extern Boolean RetrieveWinPos(WindowPtr, short *, short *);
 
 /* ### macerrs.c ### */
