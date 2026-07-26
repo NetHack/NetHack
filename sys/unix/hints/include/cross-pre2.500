@@ -624,7 +624,7 @@ MAC68K_COMMON_FLAGS = -std=gnu17 -m68020 -msoft-float \
 	-DOPAQUE_TOOLBOX_STRUCTS=0 -DACCESSOR_CALLS_ARE_FUNCTIONS=0 \
 	-DCROSSCOMPILE -DCROSSCOMPILE_TARGET -DCROSS_TO_MAC68K \
 	-Wall -Wno-missing-field-initializers \
-	-Wno-unused-parameter -Wno-unused-variable -Wno-four-char-constants \
+	-Wno-unused-parameter -Wno-unused-variable -Wno-multichar \
 	-ffunction-sections -fdata-sections
 # -Os for size on RAM-tight 68k; the Lua interpreter stays at -O2.
 override TARGET_CFLAGS = -c -Os $(MAC68K_COMMON_FLAGS)
@@ -705,7 +705,7 @@ MACPPC_COMMON_FLAGS = -std=gnu17 \
 	-DOPAQUE_TOOLBOX_STRUCTS=0 -DACCESSOR_CALLS_ARE_FUNCTIONS=0 \
 	-DCROSSCOMPILE -DCROSSCOMPILE_TARGET -DCROSS_TO_MACPPC \
 	-Wall -Wno-missing-field-initializers \
-	-Wno-unused-parameter -Wno-unused-variable -Wno-four-char-constants \
+	-Wno-unused-parameter -Wno-unused-variable -Wno-multichar \
 	-fsigned-char \
 	-ffunction-sections -fdata-sections
 override TARGET_CFLAGS = -c -O2 $(MACPPC_COMMON_FLAGS)
