@@ -504,7 +504,8 @@ mac68kpkg: $(GAMEBIN) $(TARGETPFX)Recover \
 	rm $(TARGETPFX)nethack_hfs.img
 	@echo "=== Creating StuffIt archive (distribution) ==="
 	@rm -f $(TARGETPFX)NetHack.sit
-	sit -T TEXT -C ttxt -o $(TARGETPFX)NetHack.sit \
+	@if command -v sit >/dev/null 2>&1; then \
+	  sit -T TEXT -C ttxt -o $(TARGETPFX)NetHack.sit \
 		$(TARGETPFX)pkg/NetHack \
 		$(TARGETPFX)pkg/Recover \
 		$(TARGETPFX)pkg/nhdat \
@@ -512,11 +513,15 @@ mac68kpkg: $(GAMEBIN) $(TARGETPFX)Recover \
 		"$(TARGETPFX)pkg/NetHack Defaults" \
 		$(TARGETPFX)pkg/license \
 		$(TARGETPFX)pkg/symbols \
-		"$(TARGETPFX)pkg/Read Me"
+		"$(TARGETPFX)pkg/Read Me" ; \
+	else \
+	  echo "sit not found: skipping the StuffIt archive (see sys/mac68k/BUILD.md)"; \
+	fi
 	@rm -rf $(TARGETPFX)pkg
 	@echo "=== Done ==="
 	@echo "SCSI image: $(TARGETPFX)NetHack.img"
-	@echo "StuffIt:    $(TARGETPFX)NetHack.sit"
+	@test -f $(TARGETPFX)NetHack.sit && \
+	  echo "StuffIt:    $(TARGETPFX)NetHack.sit" || true
 endif  # CROSS_TO_MAC68K
 
 ifdef CROSS_TO_MACPPC
@@ -648,7 +653,8 @@ macppcpkg: $(GAMEBIN) $(TARGETPFX)Recover.xcoff \
 	tr '\n' '\r' < ../sys/mac68k/NHDeflts > "$(TARGETPFX)pkg/NetHack Defaults"
 	@echo "=== Creating StuffIt archive (distribution) ==="
 	@rm -f $(TARGETPFX)NetHack.sit
-	sit -T TEXT -C ttxt -o $(TARGETPFX)NetHack.sit \
+	@if command -v sit >/dev/null 2>&1; then \
+	  sit -T TEXT -C ttxt -o $(TARGETPFX)NetHack.sit \
 		$(TARGETPFX)pkg/NetHack \
 		$(TARGETPFX)pkg/Recover \
 		$(TARGETPFX)pkg/nhdat \
@@ -656,10 +662,14 @@ macppcpkg: $(GAMEBIN) $(TARGETPFX)Recover.xcoff \
 		"$(TARGETPFX)pkg/NetHack Defaults" \
 		$(TARGETPFX)pkg/license \
 		$(TARGETPFX)pkg/symbols \
-		"$(TARGETPFX)pkg/Read Me"
+		"$(TARGETPFX)pkg/Read Me" ; \
+	else \
+	  echo "sit not found: skipping the StuffIt archive (see sys/mac68k/BUILD.md)"; \
+	fi
 	@rm -rf $(TARGETPFX)pkg
 	@echo "=== Done ==="
-	@echo "StuffIt: $(TARGETPFX)NetHack.sit"
+	@test -f $(TARGETPFX)NetHack.sit && \
+	  echo "StuffIt: $(TARGETPFX)NetHack.sit" || true
 
 # --- Fat (68k + PowerPC) binary -----------------------------------------
 # One app whose resource fork holds the 68k CODE/DATA/RELA + a cfrg + the
@@ -708,7 +718,8 @@ macfatpkg: macppcpkg
 	tr '\n' '\r' < ../sys/mac68k/NHDeflts > "../targets/macfat/pkg/NetHack Defaults"
 	@echo "=== Creating fat StuffIt archive ==="
 	@rm -f ../targets/macfat/NetHack.sit
-	sit -T TEXT -C ttxt -o ../targets/macfat/NetHack.sit \
+	@if command -v sit >/dev/null 2>&1; then \
+	  sit -T TEXT -C ttxt -o ../targets/macfat/NetHack.sit \
 		../targets/macfat/pkg/NetHack \
 		../targets/macfat/pkg/Recover \
 		../targets/macfat/pkg/nhdat \
@@ -716,10 +727,14 @@ macfatpkg: macppcpkg
 		"../targets/macfat/pkg/NetHack Defaults" \
 		../targets/macfat/pkg/license \
 		../targets/macfat/pkg/symbols \
-		"../targets/macfat/pkg/Read Me"
+		"../targets/macfat/pkg/Read Me" ; \
+	else \
+	  echo "sit not found: skipping the StuffIt archive (see sys/mac68k/BUILD.md)"; \
+	fi
 	@rm -rf ../targets/macfat/pkg
 	@echo "=== Done ==="
-	@echo "Fat (68k+PPC) StuffIt: ../targets/macfat/NetHack.sit"
+	@test -f ../targets/macfat/NetHack.sit && \
+	  echo "Fat (68k+PPC) StuffIt: ../targets/macfat/NetHack.sit" || true
 
 endif  # CROSS_TO_MACPPC
 

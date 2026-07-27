@@ -13,8 +13,10 @@ toolchain. Three targets:
   default GCC 12 through GCC 16; the build pins `-std=gnu17` automatically.
 - Apple Universal Interfaces 3.x in `/opt/retro68/universal` (Retro68's bundled
   Multiversal headers are incomplete). Install steps below.
-- Host tools: `hfsutils`, `sit` (StuffIt), `python3`, and optionally
-  `qemu-system-m68k` (8.0+) for testing.
+- Host tools: `hfsutils` and `python3`; optionally `sit` for the StuffIt
+  archive (see below) and `qemu-system-m68k` (8.0+) for testing.  Without
+  `sit` the packaging step skips the `.sit` and still writes the disk image
+  and MacBinary.
 
 ## Get the prerequisites
 
@@ -24,6 +26,17 @@ Host packages (Debian/Ubuntu):
 
     sudo apt install build-essential cmake bison flex texinfo ruby hfsutils \
         libgmp-dev libmpfr-dev libmpc-dev libboost-all-dev
+
+### Install sit (optional, for the StuffIt archive)
+
+Build it from source and put it on `PATH`:
+
+    git clone https://github.com/thecloudexpanse/sit.git
+    cd sit && make
+    cp sit ~/.local/bin/
+
+Skip this if you only need `NetHack.img` or `NetHack.bin`; the packaging
+targets note the missing tool and carry on.
 
 Clone with submodules (GCC and binutils are submodules):
 
