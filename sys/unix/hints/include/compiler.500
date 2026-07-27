@@ -138,6 +138,9 @@ CCXXFLAGS+=-Wall -Wextra -Wno-missing-field-initializers \
         -Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wwrite-strings
 CCXXFLAGS+=-pedantic
 CCXXFLAGS+=-Wmissing-declarations
+ifdef ADDITIONAL_NO_WARN
+CCXXFLAGS+=$(ADDITIONAL_NO_WARN)
+endif
 #detection of clang++ vs g++
 CXXISCLANG := $(shell echo `$(CXX) --version` | grep clang)
 ifeq "$(CXXISCLANG)" ""
