@@ -74,6 +74,12 @@ USE_NOSTATICFN = 1
 
 #-INCLUDE multiw-2.500
 
+#QT6 prior to compiler include
+ifdef WANT_WIN_QT6
+CPLUSPLUS_NEED20=1
+ADDITIONAL_NO_WARN=-Wno-sfinae-incomplete
+endif   # WANT_WIN_QT6
+
 # compiler.500 contains compiler detection and adjustments common
 # to both linux and macOS
 
@@ -415,67 +421,27 @@ LINK = $(CXX)
 ifndef CROSSCOMPILE
 GENTILEOFILE = $(SRCDIR)/tile.o
 endif
+# QT4
 ifdef WANT_WIN_QT4
 QTCXXFLAGS += $(sort $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config QtGui --cflags)) -DQT_NO_SOUND=1
 WINLIB += $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config QtGui --libs)
 endif    # WANT_WIN_QT4
+#QT5
 ifdef WANT_WIN_QT5
 QTCXXFLAGS += $(sort $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --cflags))
 WINLIB += $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --libs)
 endif    # WANT_WIN_QT5
+#QT6
 ifdef WANT_WIN_QT6
-ifdef QT6MANUAL
-# Try some likely spots for a self-built Qt6.
-# You'll have to change these manually before using the hints file
-# if they don't match the installed location on your system.
-ifneq "$(HOSTTYPE)" ""
-QTHOST=$(HOSTTYPE)
-else
-QTHOST=x86_64
-endif
-QTTOP=/usr/include/$(HOSTTYPE)-linux-gnu/qt6
-ifneq ($(wildcard $(QTTOP)/*),)
-#we don't set QTLOCATED=1 for this
-QTINCDIR=/usr/include/$(QTHOST)-linux-gnu/qt6
-QTLIBDIR=/usr/lib/$(QTHOST)-linux.gnu
-QTCXXFLAGS += -DQT_WIDGETS_LIB -DQT_MULTIMEDIA_LIB -DQT_NETWORK_LIB -DQT_GUI_LIB -DQT_CORE_LIB
-QTCXXFLAGS += -I$(QTINCDIR)/QtWidgets -I$(QTINCDIR) -I$(QTINCDIR)/QtMultimedia
-QTCXXFLAGS += -I$(QTINCDIR)/QtNetwork -I$(QTINCDIR)/QtGui -I$(QTINCDIR)/QtCore
-WINLIB += -L$(QTLIBDIR) -lQt6Widgets -lQt6Multimedia -lQt6Network -lQt6Gui -lQt6Core
-MOCPATH = /usr/lib/qt6/libexec/moc
-#/usr/lib/x86_64-linux-gnu/libQt6EglFSDeviceIntegration.so
-endif    # QTTOP/*
-ifndef QTINCDIR
-ifneq ($(wildcard /usr/local/Qt6/*),)
-QTDIR=/usr/local/Qt6
-QTLOCATED=1
-endif    # wildcard /usr/local/Qt6
-ifneq ($(wildcard /usr/local/qt6/*),)
-QTDIR=/usr/local/qt6
-QTLOCATED=1
-endif    # wildcard /usr/local/qt6
-endif    # !QTINCDIR
-ifdef QTLOCATED
-QTCXXFLAGS += -I$(QTDIR)/include/QtCore
-QTCXXFLAGS += -I$(QTDIR)/include/QtGui
-QTCXXFLAGS += -I$(QTDIR)/include/QtMultimedia
-QTCXXFLAGS += -I$(QTDIR)/include/QtWidgets
-MOCPATH = $(QTDIR)/libexec/moc
-WINLIB += -L$(QTDIR)/lib -lQt6Widgets -lQt6Multimedia -lQt6Network -lQt6Gui -lQt6Core
-endif   # QTLOCATED
-else    # !QT6MANUAL
-MOCDIR = $(shell pkg-config Qt6Gui --variable=libexecdir)
-ifneq ($(wildcard $(MOCDIR)/*),)
-MOCPATH = $(MOCDIR)/moc
-else
-MOCPATH = /usr/lib/qt6/libexec/moc
-endif   # MOCDIR
-QTCXXFLAGS += $(sort $(shell pkg-config Qt6Gui Qt6Widgets Qt6Multimedia --cflags))
-WINLIB += $(shell pkg-config Qt6Gui Qt6Widgets Qt6Multimedia --libs)
-endif   # QT6MANUAL
+QTCXXFLAGS += $(shell pkg-config --cflags Qt6Multimedia)
+WINLIB += $(shell pkg-config --libs Qt6Core Qt6Gui Qt6Widgets Qt6Multimedia)
+MOCPATH = $(shell pkg-config --variable=libexecdir Qt6Core)/moc
 endif   # WANT_WIN_QT6
+
 ifndef QTDIR
+ifndef WANT_WIN_QT6
 $(error QTDIR not defined in the environment or Makefile)
+endif   # not WANT_WIN_QT6
 endif	# QTDIR
 # XXX if /Developer/qt exists and QTDIR not set, use that
 # XXX make sure QTDIR points to something reasonable
