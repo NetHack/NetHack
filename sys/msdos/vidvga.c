@@ -181,7 +181,11 @@ static struct map_struct {
     uint32 framecolor;
 } map[ROWNO][COLNO]; /* track the glyphs */
 
-extern int total_tiles_used, Tile_corr, Tile_unexplored;  /* from tile.c */
+extern int total_tiles_used,
+           Tile_corr, Tile_unexplored,
+           Tile_delimiter,
+           Tile_petmark,
+           Tile_pilemark;  /* from tile.c */
 
 #define vga_clearmap()                                          \
     {                                                           \

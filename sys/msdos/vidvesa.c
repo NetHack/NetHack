@@ -29,7 +29,12 @@ struct Pixel {
 #define FIRST_TEXT_COLOR 240
 
 #ifdef TILES_IN_GLYPHMAP
-extern int total_tiles_used, Tile_corr, Tile_unexplored;  /* from tile.c */
+extern int total_tiles_used,
+           Tile_corr,
+           Tile_unexplored,
+           Tile_delimiter,
+           Tile_petmark,
+           Tile_pilemark;  /* from tile.c */
 #endif
 struct VesaCharacter {
     uint32 colour, bgcolour;
@@ -60,7 +65,8 @@ static boolean vesa_SetPalette(const struct Pixel *);
 static boolean vesa_SetHardPalette(const struct Pixel *);
 static boolean vesa_SetSoftPalette(const struct Pixel *);
 #ifdef TILES_IN_GLYPHMAP
-static void vesa_DisplayCell(int, int, int);
+static void vesa_DisplayCell(int, int, int, uint8_t);
+static unsigned char const *tile_with_decal(unsigned char const *, unsigned char const *);
 #endif
 static unsigned vesa_FindMode(unsigned long mode_addr, unsigned bits);
 static void vesa_WriteChar(uint32, int, int, uint32);
@@ -110,6 +116,11 @@ static struct map_struct {
     int framecolor;
     int inverse;
 } map[ROWNO][COLNO]; /* track the glyphs */
+
+enum { delimdecal, petdecal, piledecal, NUMDECALS };
+static unsigned char *vesa_decals[NUMDECALS] = { 0 };
+static unsigned char *tmptilebuf;
+static unsigned short tilebackground;
 
 #define vesa_clearmap()                                         \
     {                                                           \
@@ -711,6 +722,18 @@ vesa_xputg(const glyph_info *glyphinfo, const glyph_info *bkglyphinfo UNUSED)
     uint32_t attr = (g_attribute == 0) ? attrib_gr_normal : g_attribute;
     int ry;
 
+    /* some decal initializations */
+    if (!vesa_decals[delimdecal]) {
+        vesa_decals[delimdecal] = vesa_tile(Tile_delimiter);
+        /* The first pixel in Tile_delimiter is the background color */
+        tilebackground = *((unsigned short *)vesa_decals[delimdecal]);
+        if (!vesa_decals[petdecal])
+            vesa_decals[petdecal] = vesa_tile(Tile_petmark);
+
+        if (!vesa_decals[piledecal])
+            vesa_decals[piledecal] = vesa_tile(Tile_pilemark);
+    }
+ 
 #ifdef ENHANCED_SYMBOLS
     if (SYMHANDLING(H_UTF8) && glyphinfo->gm.u && glyphinfo->gm.u->utf8str) {
         ch = glyphinfo->gm.u->utf32ch;
@@ -755,7 +778,11 @@ vesa_xputg(const glyph_info *glyphinfo, const glyph_info *bkglyphinfo UNUSED)
             if (!iflags.over_view && map[ry][col].special)
                 decal_packed(packcell, special);
 #endif
-            vesa_DisplayCell(glyphinfo->gm.tileidx, col - clipx, ry - clipy);
+            vesa_DisplayCell(glyphinfo->gm.tileidx, col - clipx, ry - clipy,
+                             ((special & MG_PET) && iflags.hilite_pet)
+                                 ? petdecal
+                                 : ((special & MG_OBJPILE) && iflags.hilite_pile)
+                                     ? piledecal : 0);
             if (bkglyphinfo->framecolor != NO_COLOR) {
                 int curtypbak = cursor_type;
                 int cclr = cursor_color;
@@ -1390,6 +1417,8 @@ vesa_Finish(void)
     free(vesa_tiles);
     free(vesa_oview_tiles);
     free_tiles();
+    if (tmptilebuf)
+        free((genericptr_t) tmptilebuf), tmptilebuf = 0;
 #endif
     vesa_SwitchMode(MODETEXT);
     windowprocs.win_cliparound = tty_cliparound;
@@ -1941,14 +1970,16 @@ vesa_TriplePixels(unsigned long fnt)
  */
 #ifdef TILES_IN_GLYPHMAP
 static void
-vesa_DisplayCell(int tilenum, int col, int row)
+vesa_DisplayCell(int tilenum, int col, int row, uint8_t decalnum)
 {
     unsigned char const *tile;
     unsigned t_width, t_height;
     unsigned char const *tptr;
+
     int /* px, */ py, pixx, pixy;
     unsigned long offset;
     unsigned p_row_width;
+    unsigned char const *decal;
 
     if (iflags.over_view) {
         tile = vesa_oview_tile(tilenum);
@@ -1967,13 +1998,69 @@ vesa_DisplayCell(int tilenum, int col, int row)
     pixx += vesa_x_center;
     pixy += vesa_y_center;
     offset = pixy * (unsigned long)vesa_scan_line + pixx * vesa_pixel_bytes;
-    tptr = tile;
+    decal = (decalnum == petdecal)
+                ? vesa_decals[petdecal]
+                : (decalnum == piledecal)
+                    ? vesa_decals[piledecal]
+                    : NULL;
+    tptr = (decal == NULL) ? tile : tile_with_decal(tile, decal);
 
     for (py = 0; py < (int) t_height; ++py) {
         vesa_WritePixelRow(offset, tptr, p_row_width);
         offset += vesa_scan_line;
         tptr += p_row_width;
     }
+}
+
+unsigned char const *
+tile_with_decal(unsigned char const *tile, unsigned char const *decal)
+{
+    int tr, tc;
+    unsigned char const *tptr, *declptr;
+    unsigned char *dst;
+
+    if (!tmptilebuf)
+        tmptilebuf = (unsigned char *)
+                        alloc(iflags.wc_tile_width * vesa_pixel_bytes *  iflags.wc_tile_height);
+
+    tptr = tile;
+    declptr = decal;
+    dst = tmptilebuf;
+    for (tr = 0; tr < iflags.wc_tile_height; ++tr) {
+        for (tc = 0; tc < iflags.wc_tile_width; ++tc) {
+            switch(vesa_pixel_bytes) {
+                /*
+                 * FIXME: add the other switch cases
+                 */
+                case 2: {
+                        unsigned short *t1 = (unsigned short *) tptr,
+                                       *t2 = (unsigned short *) declptr,
+                                       *t3 = (unsigned short *) dst;
+
+                        /* 
+                        * ignore the "background" pixesl in decal,
+                        * which is identified by the delim tile in the stock
+                        * tile set which is 100% background.
+                        */
+                        *t3 = (!(*t2 == tilebackground)) ? *t2 : *t1;
+                    }
+                    break;
+                default: {
+                        unsigned char const *t1 = tptr;
+                        unsigned char *t3 = dst;
+
+                        for (int i = 0; i < vesa_pixel_bytes; ++i) {
+                            *t3 = *t1;
+                        }
+                    }
+                    break;
+            }
+            tptr += vesa_pixel_bytes;
+            dst += vesa_pixel_bytes;
+            declptr += vesa_pixel_bytes;
+        }
+    }
+    return tmptilebuf;
 }
 #endif /* TILES_IN_GLYPHMAP */
 
