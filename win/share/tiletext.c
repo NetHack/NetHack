@@ -20,9 +20,9 @@ static FILE *tile_file;
 static int tile_set, tile_set_indx;
 static const char *const text_sets[] = {
 #if (TILE_X == 8)
-    "monthin.txt", "objthin.txt", "oththin.txt"
+    "monthin.txt", "objthin.txt", "oththin.txt", "monthin.txt", "decthin.txt"
 #else
-    "monsters.txt", "objects.txt", "other.txt"
+    "monsters.txt", "objects.txt", "other.txt", "monsters.txt", "decals.txt"
 #endif
 };
 
@@ -36,7 +36,7 @@ static boolean write_text_colormap(FILE *);
 static boolean read_txttile(FILE *, pixel (*)[TILE_X]);
 static void write_txttile(FILE *, pixel (*)[TILE_X]);
 
-enum { MONSTER_SET, OBJECT_SET, OTHER_SET};
+enum { MONSTER_SET, OBJECT_SET, OTHER_SET, STATUE_SET, DECAL_SET };
 
 /* Ugh.  DICE doesn't like %[A-Z], so we have to spell it out... */
 #define FORMAT_STRING \
@@ -189,7 +189,7 @@ read_txttile(FILE *txtfile, pixel (*pixels)[TILE_X])
     gend[0] = '\0';
     reslt = 0;
     if (get_next_line(txtfile, FALSE)) {
-        if (tile_set == MONSTER_SET)
+        if (tile_set == MONSTER_SET || tile_set == STATUE_SET)
             reslt = sscanf(inbuf, "# %255s %d (%255[^,],%255[^)])",
                            ttype, &i, buf, gend);
         else
@@ -202,7 +202,7 @@ read_txttile(FILE *txtfile, pixel (*pixels)[TILE_X])
     ttype[sizeof ttype - 1] = '\0';
     buf[sizeof buf - 1] = '\0';
 
-    if (tile_set == MONSTER_SET && gend[0] == 'f')
+    if ((tile_set == MONSTER_SET || tile_set == STATUE_SET) && gend[0] == 'f')
         gidx = 1;
 
     ph = strcmp(ttype, "placeholder") == 0;
