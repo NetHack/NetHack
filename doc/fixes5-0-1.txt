@@ -77,6 +77,8 @@ Some optimizations of the glyph lookup - don't produce names for swallow
 stethoscope applied to one monster disguised as another (double-trouble Wizard)
 	mis-described undisguised form (unintended side-effect of 5.0 commit
 	064523e162f8e30bdb76186a854b9d8958f3b340)
+mon_offmap() and place_monster() needed to operate on the same mstate bits
+food_disappears() needed to include a tin check
 
 
 Platform- and/or Interface-Specific Fixes
@@ -142,6 +144,8 @@ Amiga: fix latent issue found in code review: (1L << i) for i==31 (or
 Amiga: fix latent issue found in code review: Drop unused cnt= from
 	amii_display_nhwindow's DoMenuScroll call; the menu return value
 	is consumed elsewhere, not here
+Amiga & Atari: enable USE_BUFFERING for buffered stdio structlevel savefile
+	write path
 curses on Windows: the number of columns was being capped by default
 	at 110 in cursinit.c; try to use the console width if no explicit
 	setting was specified in the config file; impacted both wincon
@@ -209,6 +213,7 @@ MS-DOS: Define a separate palette for VGA text (pr #1620 by chasonr)
 MS-DOS: some conditional cleanup for SUPPRESS_GRAPHICS, TILES_IN_GLYPHMAP,
 	NO_TILES, WANT_WIN_CURSES=1 without WANT_WIN_TTY=1
 	(pr #1632 by chasonr)
+MS-DOS: add some hilite_pet and hilite_pile support to tiled display
 musl: musl libc does not have __sighandler_t so don't use it in the
 	macro definition for SIG_RET_TYPE with musl
 WASM: resolve some build failures in 'make CROSS_TO_WASM=1'
@@ -229,6 +234,8 @@ Windows: with SELECTSAVE don't display error messages to a regular player
 Windows: fix startup of GUI NetHackW.exe if there was an explicit
 	OPTIONS=windowtype:tty in the config file
 Windows: fix hilite_pet on the GUI NetHackW.exe when ascii map was selected
+Windows: support -a (alignment) -g (gender) -p (profession) -r (race)
+	command line options via genl_prag() function in earlyarg.c
 tty: allow custom glyph colors if they're basic 16 nethack colors
 	on terminals with less than 256 colors
 X11: obey timed_delay
@@ -292,3 +299,7 @@ unix hints: the Makefiles distributed by sys/unix/setup.sh will now check
 share a single copy of nhuuid generation code between Amiga, Atari, and msdos
 	by way of sys/share/pcmain.c (cherry-pick from pr #1541 by ingpaschke)
 nhgitset.pl: Set up future deprecation of PRE and POST hooks.
+switch to using LUA_VERSION_NUM instead of LUA_VERSION_RELEASE_NUM for Lua
+	version checking
+include a set of decals (petmark and pilemark) in win/share/decals.txt
+	and adjust tile processing to include it
