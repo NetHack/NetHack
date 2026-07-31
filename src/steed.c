@@ -938,7 +938,7 @@ place_monster(struct monst *mon, coordxy x, coordxy y)
     mon->mstate &= ~(MON_OFF_MAP_BITS);
 
     /* We don't mess with these bits above:
-       MON_OBLITERATE | MON_STILL_ARRIVING | MON_PARKED
+       MON_OBLITERATE | MON_STILL_ARRIVING
      */
 }
 
