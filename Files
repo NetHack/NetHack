@@ -626,10 +626,10 @@ NetHackTerm.applescript       recover.pl
 
 win/share:
 (files for versions using optional tiles)
-bmptiles.c     gifread.c      giftiles.c     monsters.txt   nhicns.uu
-nhsplash.xpm   objects.txt    other.txt      ppmwrite.c     renumtiles.pl
-thintile.c     tile.doc       tile.h         tile2bmp.c     tilemap.c
-tileset.c      tiletext.c     tiletxt.c
+bmptiles.c     decals.txt     gifread.c      giftiles.c     monsters.txt
+nhicns.uu      nhsplash.xpm   objects.txt    other.txt      ppmwrite.c
+renumtiles.pl  thintile.c     tile.doc       tile.h         tile2bmp.c
+tilemap.c      tileset.c      tiletext.c     tiletxt.c
 
 win/shim:
 (file in top directory)
