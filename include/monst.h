@@ -257,7 +257,10 @@ struct monst {
 
 #define mon_perma_blind(mon) (!mon->mcansee && !mon->mblinded)
 
-#define mon_offmap(mon) ((mon)->mstate != MON_FLOOR)
+#define MON_OFF_MAP_BITS (MON_OFFMAP | MON_DETACH | MON_LIMBO | MON_MIGRATING \
+               | MON_ENDGAME_FREE | MON_ENDGAME_MIGR | MON_BUBBLEMOVE | MON_PARKED)
+
+#define mon_offmap(mon) (((mon)->mstate & (MON_OFF_MAP_BITS)) != 0)
 
 /* Get the maximum difficulty monsters that can currently be generated,
    given the current level difficulty and the hero's level. */
