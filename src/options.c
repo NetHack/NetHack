@@ -2559,6 +2559,14 @@ optfn_name(
 
         if ((op = string_for_env_opt(allopt[optidx].name, opts, FALSE))
             != empty_optstr) {
+#ifdef WIN32
+            /*
+             * Under windows, if we already set flags.debug with -D
+             * on the command line, leave that alone.
+             */
+            if (flags.debug && !strcmpi(svp.plname, "wizard"))
+                return optn_ok;
+#endif
             nmcpy(svp.plname, op, PL_NSIZ);
         } else
             return optn_err;
