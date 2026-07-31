@@ -398,6 +398,11 @@ food_disappears(struct obj *obj)
     if (obj == svc.context.victual.piece)
         svc.context.victual = zero_victual; /* victual.piece = 0, .o_id = 0 */
 
+    if (obj == svc.context.tin.tin) {
+        svc.context.tin.tin = (struct obj *) 0;
+        svc.context.tin.o_id = 0;
+    }
+
     if (obj->timed)
         obj_stop_timers(obj);
 }
