@@ -216,6 +216,8 @@ MS-DOS: some conditional cleanup for SUPPRESS_GRAPHICS, TILES_IN_GLYPHMAP,
 MS-DOS: add some hilite_pet and hilite_pile support to tiled display
 musl: musl libc does not have __sighandler_t so don't use it in the
 	macro definition for SIG_RET_TYPE with musl
+tty: allow custom glyph colors if they're basic 16 nethack colors
+	on terminals with less than 256 colors
 WASM: resolve some build failures in 'make CROSS_TO_WASM=1'
 WASM: hints file cross-pre2.500 update to CFLAGS to include -DNHUUID
 Windows: don't demand keypress on intentional exit
@@ -236,8 +238,9 @@ Windows: fix startup of GUI NetHackW.exe if there was an explicit
 Windows: fix hilite_pet on the GUI NetHackW.exe when ascii map was selected
 Windows: support -a (alignment) -g (gender) -p (profession) -r (race)
 	command line options via genl_prag() function in earlyarg.c
-tty: allow custom glyph colors if they're basic 16 nethack colors
-	on terminals with less than 256 colors
+Windows: in the event that there is a collision between a menu group
+	accelerator and an individual menu item's accelerator, disregard
+	the group accelerator; only known collision is '$' at this time
 X11: obey timed_delay
 
 
