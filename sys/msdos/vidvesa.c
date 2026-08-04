@@ -120,7 +120,7 @@ static struct map_struct {
 enum { delimdecal, petdecal, piledecal, NUMDECALS };
 static unsigned char *vesa_decals[NUMDECALS] = { 0 };
 static unsigned char *tmptilebuf;
-static unsigned short tilebackground;
+static uint32_t tilebackground;
 
 #define vesa_clearmap()                                         \
     {                                                           \
@@ -726,7 +726,20 @@ vesa_xputg(const glyph_info *glyphinfo, const glyph_info *bkglyphinfo UNUSED)
     if (!vesa_decals[delimdecal]) {
         vesa_decals[delimdecal] = vesa_tile(Tile_delimiter);
         /* The first pixel in Tile_delimiter is the background color */
-        tilebackground = *((unsigned short *)vesa_decals[delimdecal]);
+        switch(vesa_pixel_bytes) {
+        case 1:
+            tilebackground = *((uint8_t *)vesa_decals[delimdecal]);
+            break;
+
+        case 2:
+            tilebackground = *((uint16_t *)vesa_decals[delimdecal]);
+            break;
+
+        case 3:
+        case 4:
+            tilebackground = *((uint32_t *)vesa_decals[delimdecal]) & 0x00FFFFFF;
+            break;
+        }
         if (!vesa_decals[petdecal])
             vesa_decals[petdecal] = vesa_tile(Tile_petmark);
 
@@ -2028,21 +2041,68 @@ tile_with_decal(unsigned char const *tile, unsigned char const *decal)
     dst = tmptilebuf;
     for (tr = 0; tr < iflags.wc_tile_height; ++tr) {
         for (tc = 0; tc < iflags.wc_tile_width; ++tc) {
+            /* 
+             * ignore the "background" pixels in decal,
+             * which is identified by the delim tile in the stock
+             * tile set which is 100% background.
+             */
             switch(vesa_pixel_bytes) {
-                /*
-                 * FIXME: add the other switch cases
-                 */
-                case 2: {
-                        unsigned short *t1 = (unsigned short *) tptr,
-                                       *t2 = (unsigned short *) declptr,
-                                       *t3 = (unsigned short *) dst;
+                case 1: {
+                        uint8_t *t1 = (uint8_t *) tptr,
+                                *t2 = (uint8_t *) declptr,
+                                *t3 = (uint8_t *) dst;
 
-                        /* 
-                        * ignore the "background" pixesl in decal,
-                        * which is identified by the delim tile in the stock
-                        * tile set which is 100% background.
-                        */
-                        *t3 = (!(*t2 == tilebackground)) ? *t2 : *t1;
+                        *t3 = (*t2 != tilebackground) ? *t2 : *t1;
+                    }
+                    break;
+                case 2: {
+                        uint16_t *t1 = (uint16_t *) tptr,
+                                 *t2 = (uint16_t *) declptr,
+                                 *t3 = (uint16_t *) dst;
+
+                        *t3 = (*t2 != tilebackground) ? *t2 : *t1;
+                    }
+                    break;
+                case 3: {
+                        uint16_t *t1a, *t2a, *t3a;
+                        uint8_t *t1b, *t2b, *t3b;
+                        uint32_t pix;
+
+                        if ((tc & 1) == 0) {
+                            /* pixel column is even */
+                            t1a = (uint16_t *) (tptr + 0);
+                            t2a = (uint16_t *) (declptr + 0);
+                            t3a = (uint16_t *) (dst + 0);
+                            t1b = (uint8_t *) (tptr + 2);
+                            t2b = (uint8_t *) (declptr + 2);
+                            t3b = (uint8_t *) (dst + 2);
+                            pix = ((uint32_t) *t2b << 16) | *t2a;
+                        } else {
+                            /* pixel column is odd */
+                            t1b = (uint8_t *) (tptr + 0);
+                            t2b = (uint8_t *) (declptr + 0);
+                            t3b = (uint8_t *) (dst + 0);
+                            t1a = (uint16_t *) (tptr + 1);
+                            t2a = (uint16_t *) (declptr + 1);
+                            t3a = (uint16_t *) (dst + 1);
+                            pix = ((uint32_t) *t2a << 8) | *t2b;
+                        }
+
+                        if (pix != tilebackground) {
+                            *t3a = *t2a;
+                            *t3b = *t2b;
+                        } else {
+                            *t3a = *t1a;
+                            *t3b = *t1b;
+                        }
+                    }
+                    break;
+                case 4: {
+                        uint32_t *t1 = (uint32_t *) tptr,
+                                 *t2 = (uint32_t *) declptr,
+                                 *t3 = (uint32_t *) dst;
+
+                        *t3 = ((*t2 & 0x00FFFFFF) != tilebackground) ? *t2 : *t1;
                     }
                     break;
                 default: {
