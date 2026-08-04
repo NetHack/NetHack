@@ -2064,36 +2064,21 @@ tile_with_decal(unsigned char const *tile, unsigned char const *decal)
                     }
                     break;
                 case 3: {
-                        uint16_t *t1a, *t2a, *t3a;
-                        uint8_t *t1b, *t2b, *t3b;
-                        uint32_t pix;
-
-                        if ((tc & 1) == 0) {
-                            /* pixel column is even */
-                            t1a = (uint16_t *) (tptr + 0);
-                            t2a = (uint16_t *) (declptr + 0);
-                            t3a = (uint16_t *) (dst + 0);
-                            t1b = (uint8_t *) (tptr + 2);
-                            t2b = (uint8_t *) (declptr + 2);
-                            t3b = (uint8_t *) (dst + 2);
-                            pix = ((uint32_t) *t2b << 16) | *t2a;
-                        } else {
-                            /* pixel column is odd */
-                            t1b = (uint8_t *) (tptr + 0);
-                            t2b = (uint8_t *) (declptr + 0);
-                            t3b = (uint8_t *) (dst + 0);
-                            t1a = (uint16_t *) (tptr + 1);
-                            t2a = (uint16_t *) (declptr + 1);
-                            t3a = (uint16_t *) (dst + 1);
-                            pix = ((uint32_t) *t2a << 8) | *t2b;
-                        }
+                        uint8_t *t1 = (uint8_t *) tptr,
+                                *t2 = (uint8_t *) declptr,
+                                *t3 = (uint8_t *) dst;
+                        uint32_t pix = ((uint32_t) t2[2] << 16)
+                                     | ((uint32_t) t2[1] <<  8)
+                                     | ((uint32_t) t2[0] <<  0);
 
                         if (pix != tilebackground) {
-                            *t3a = *t2a;
-                            *t3b = *t2b;
+                            t3[0] = t2[0];
+                            t3[1] = t2[1];
+                            t3[2] = t2[2];
                         } else {
-                            *t3a = *t1a;
-                            *t3b = *t1b;
+                            t3[0] = t1[0];
+                            t3[1] = t1[1];
+                            t3[2] = t1[2];
                         }
                     }
                     break;
