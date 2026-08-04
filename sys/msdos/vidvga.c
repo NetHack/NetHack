@@ -136,7 +136,7 @@ static void vga_DisplayCell_O(struct overview_planar_cell_struct *, int,
 #endif
 static void vga_SwitchMode(unsigned int);
 static void vga_SetPalette(const struct Pixel *);
-static void vga_WriteChar(uint32, int, int, int);
+static void vga_WriteChar(uint32, int, int, int, int);
 static void vga_GetBitmap(uint32, unsigned char *);
 static void vga_WriteStr(char *, int, int, int, int);
 static char __far *vga_FontPtrs(void);
@@ -181,6 +181,7 @@ static struct map_struct {
     unsigned special;
     short int tileidx;
     uint32 framecolor;
+    int inverse;
 } map[ROWNO][COLNO]; /* track the glyphs */
 
 extern int total_tiles_used,
@@ -200,6 +201,7 @@ extern int total_tiles_used,
                 map[y][x].attr = 0;                             \
                 map[y][x].special = 0;                          \
                 map[y][x].tileidx = Tile_unexplored;            \
+                map[y][x].inverse = 0;                          \
             }                                                   \
     }
 #endif /* TILES_IN_GLYPHMAP */
@@ -308,7 +310,7 @@ void vga_cl_end(int col, int row)
      * mode 2 methods as did term_clear_screen()
      */
     for (count = col; count < (CO - 1); ++count) {
-        vga_WriteChar(' ', count, row, BACKGROUND_VGA_COLOR);
+        vga_WriteChar(' ', count, row, BACKGROUND_VGA_COLOR, FALSE);
     }
 }
 
@@ -320,7 +322,7 @@ void vga_cl_eos(int cy)
     cl_end();
     while (cy <= LI - 2) {
         for (count = 0; count < (CO - 1); ++count) {
-            vga_WriteChar(' ', count, cy, BACKGROUND_VGA_COLOR);
+            vga_WriteChar(' ', count, cy, BACKGROUND_VGA_COLOR, FALSE);
         }
         cy++;
     }
@@ -392,7 +394,7 @@ void vga_xputc(char ch, int attr)
         ++row;
         break;
     default:
-        vga_WriteChar((unsigned char) ch, col, row, attr);
+        vga_WriteChar((unsigned char) ch, col, row, attr, FALSE);
         if (col < (CO - 1))
             ++col;
         break;
@@ -439,12 +441,13 @@ vga_xputg(const glyph_info *glyphinfo,
     attr = (g_attribute == 0) ? attrib_gr_normal : g_attribute;
     map[ry][col].attr = attr;
     map[ry][col].tileidx = glyphinfo->gm.tileidx;
+    map[ry][col].inverse = inversed;
     if (bkglyphinfo->framecolor != NO_COLOR) {
         map[ry][col].framecolor = bkglyphinfo->framecolor;
     }
 
     if (iflags.traditional_view) {
-        vga_WriteChar(ch, col, row, attr);
+        vga_WriteChar(ch, col, row, attr, inversed);
     } else if (!iflags.over_view) {
         if ((col >= clipx) && (col <= clipxmax)) {
             struct planar_cell_struct planecell;
@@ -549,7 +552,8 @@ vga_redrawmap(boolean clearfirst)
             if (iflags.traditional_view) {
                 if (!(clearfirst && map[y][x].ch == S_stone))
                     vga_WriteChar(map[y][x].ch, x,
-                                  y + TOP_MAP_ROW, map[y][x].attr);
+                                  y + TOP_MAP_ROW, map[y][x].attr,
+                                  map[y][x].inverse);
             } else {
                 t = map[y][x].glyph;
                 if (!iflags.over_view) {
@@ -1162,7 +1166,7 @@ extern int curframecolor;    /* video.c */
  *
  */
 static void
-vga_WriteChar(uint32 chr, int col, int row, int colour)
+vga_WriteChar(uint32 chr, int col, int row, int colour, int inverse)
 {
     int i;
     int x, pixy;
@@ -1182,7 +1186,7 @@ vga_WriteChar(uint32 chr, int col, int row, int colour)
     else
         bgcolor = CLR_BLACK;
 
-    if (inversed) {
+    if (inverse) {
         int tmpc = actual_colour;
         actual_colour = bgcolor;
         bgcolor = tmpc;
@@ -1346,7 +1350,7 @@ vga_WriteStr(char *s, int len, int col, int row, int colour)
     i = 0;
     us = (unsigned char *) s;
     while ((*us != 0) && (i < len) && (col < (CO - 1))) {
-        vga_WriteChar((uchar) *us, col, row, colour);
+        vga_WriteChar((uchar) *us, col, row, colour, FALSE);
         ++us;
         ++i;
         ++col;
