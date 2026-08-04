@@ -30,6 +30,8 @@ OPTIONS=rawio,BIOS,symset:IBMGraphics_2,roguesymset:RogueEpyx
 #OPTIONS=video_width:1024
 #OPTIONS=video_height:768
 
+# To show markers for pets and piles if this is supported
+OPTIONS=hilite_pet,hilite_pile
 
 # If your machine is NEC PC-9800, use:
 #OPTIONS=rawio,BIOS,video:default
