@@ -77,7 +77,8 @@ USE_NOSTATICFN = 1
 #QT6 prior to compiler include
 ifdef WANT_WIN_QT6
 CPLUSPLUS_NEED20=1
-ADDITIONAL_NO_WARN=-Wno-sfinae-incomplete
+ADDITIONAL_NO_WARN_GPPCCX=-Wno-sfinae-incomplete
+ADDITIONAL_NO_WARN_CLANGCCX=-Wno-c++26-extensions
 endif   # WANT_WIN_QT6
 
 # compiler.500 contains compiler detection and adjustments common
