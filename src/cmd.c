@@ -2355,6 +2355,7 @@ handler_rebind_keys_add(boolean keyfirst)
         struct Cmd_bind *prevcmd;
         char cmdstr[BUFSZ];
 
+        cmdstr[0] = '\0';
         i = picks->item.a_int;
         free((genericptr_t) picks);
 
