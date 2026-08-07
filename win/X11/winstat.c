@@ -1283,6 +1283,19 @@ tty_render_text(Widget w, int x, int y, const char *text, int color, int attr,
             fgpixel = pixel;
     }
 
+    /* Implement bold font */
+    if (attr & HL_BOLD) {
+        struct xwindow *wp = find_widget(w);
+        load_boldfont(wp, w);
+        font = wp->boldfs;
+    }
+
+    /* Implement dim text */
+    if (attr & HL_DIM) {
+        fgpixel = (fgpixel & 0xFEFEFE) >> 1;
+        bgpixel = (bgpixel & 0xFEFEFE) >> 1;
+    }
+
     /* Get a graphics context */
     if (attr & HL_INVERSE) {
         values.foreground = bgpixel;
