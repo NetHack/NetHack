@@ -201,6 +201,7 @@ static const char *const fancy_status_hilite_colors[] = {
 struct tty_status_field {
     char *text;
     int color;
+    unsigned attrs;
     int chg;
     int percent;
 };
@@ -741,7 +742,8 @@ X11_status_update_tty(
             fldp->text = dupstr(str);
             fldp->chg = chg;
             fldp->percent = percent;
-            fldp->color = color;
+            fldp->color = color & 0xFF;
+            fldp->attrs = color >> 8;
         }
         break;
     }
@@ -1162,33 +1164,33 @@ tty_status_redraw(Widget w)
         const char *pre;
         const char *post;
     } formats[MAXBLSTATS] = {
-        /*@@@*/[BL_TITLE] = { NULL, NULL },
-        /*@@@*/[BL_STR] = { "St:", NULL },
-        /*@@@*/[BL_DX] = { "Dx:", NULL },
-        /*@@@*/[BL_CO] = { "Co:", NULL },
-        /*@@@*/[BL_IN] = { "In:", NULL },
-        /*@@@*/[BL_WI] = { "Wi:", NULL },
-        /*@@@*/[BL_CH] = { "Ch:", NULL },
-        /*@@@*/[BL_ALIGN] = { NULL, NULL },
-        /*@@@*/[BL_SCORE] = { "S:", NULL },
-        /*@@@*/[BL_CAP] = { NULL, NULL },
-        /*@@@*/[BL_GOLD] = { NULL, NULL },
-        /*@@@*/[BL_ENE] = { "Pw:", NULL },
-        /*@@@*/[BL_ENEMAX] = { "(", ")" },
-        /*@@@*/[BL_XP] = { "Xp:", NULL },
-        /*@@@*/[BL_AC] = { "AC:", NULL },
-        /*@@@*/[BL_HD] = { "HD:", NULL },
-        /*@@@*/[BL_TIME] = { "T:", NULL },
-        /*@@@*/[BL_HUNGER] = { NULL, NULL },
-        /*@@@*/[BL_HP] = { "HP:", NULL },
-        /*@@@*/[BL_HPMAX] = { "(", ")" },
-        /*@@@*/[BL_LEVELDESC] = { NULL, NULL },
-        /*@@@*/[BL_EXP] = { "/", NULL },
-        /*@@@*/[BL_CONDITION] = { NULL, NULL },
+        [BL_TITLE] = { NULL, NULL },
+        [BL_STR] = { "St:", NULL },
+        [BL_DX] = { "Dx:", NULL },
+        [BL_CO] = { "Co:", NULL },
+        [BL_IN] = { "In:", NULL },
+        [BL_WI] = { "Wi:", NULL },
+        [BL_CH] = { "Ch:", NULL },
+        [BL_ALIGN] = { NULL, NULL },
+        [BL_SCORE] = { "S:", NULL },
+        [BL_CAP] = { NULL, NULL },
+        [BL_GOLD] = { NULL, NULL },
+        [BL_ENE] = { "Pw:", NULL },
+        [BL_ENEMAX] = { "(", ")" },
+        [BL_XP] = { "Xp:", NULL },
+        [BL_AC] = { "AC:", NULL },
+        [BL_HD] = { "HD:", NULL },
+        [BL_TIME] = { "T:", NULL },
+        [BL_HUNGER] = { NULL, NULL },
+        [BL_HP] = { "HP:", NULL },
+        [BL_HPMAX] = { "(", ")" },
+        [BL_LEVELDESC] = { NULL, NULL },
+        [BL_EXP] = { "/", NULL },
+        [BL_CONDITION] = { NULL, NULL },
         [BL_WEAPON] = { NULL, NULL }, /* not in 2-line */
         [BL_ARMOR] = { NULL, NULL }, /* not in 2-line */
         [BL_TERRAIN] = { NULL, NULL }, /* not in 2-line */
-        /*@@@*/[BL_VERS] = { NULL, NULL },
+        [BL_VERS] = { NULL, NULL },
     };
     Arg args[5];
     int num_args;
@@ -1233,7 +1235,7 @@ tty_status_redraw(Widget w)
                             x += tty_render_text(w, x, y, formats[fld].pre, NO_COLOR, 0, FALSE);
                         }
                         x += tty_render_text(w, x, y, fldp->text, fldp->color,
-                                             fldp->chg ? HL_INVERSE : 0, fld == BL_GOLD);
+                                             fldp->attrs, fld == BL_GOLD);
                         if (formats[fld].post != NULL) {
                             x += tty_render_text(w, x, y, formats[fld].post, NO_COLOR, 0, FALSE);
                         }
@@ -1266,6 +1268,20 @@ tty_render_text(Widget w, int x, int y, const char *text, int color, int attr,
     XtSetArg(args[num_args], XtNbackground, &bgpixel); num_args++;
     XtSetArg(args[num_args], XtNfont, &font); num_args++;
     XtGetValues(w, args, num_args);
+
+    /* Implement color if requested */
+    if (color != NO_COLOR) {
+        XrmValue source;
+        XrmValue dest;
+        Pixel pixel;
+        const char *cname = fancy_status_hilite_colors[color];
+        source.addr = (XPointer) cname;
+        source.size = (unsigned int) strlen(cname) + 1;
+        dest.size = (unsigned int) sizeof (Pixel);
+        dest.addr = (XPointer) &pixel;
+        if (XtConvertAndStore(w, XtRString, &source, XtRPixel, &dest))
+            fgpixel = pixel;
+    }
 
     /* Get a graphics context */
     if (attr & HL_INVERSE) {
