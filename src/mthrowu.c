@@ -535,7 +535,7 @@ u_catch_thrown_obj(struct obj *otmp)
     int catch_chance = 100 - ACURR(A_DEX)
                        - ((Role_if(PM_MONK) || Role_if(PM_ROGUE)) ? 20 : 0);
 
-    if (!Blind && !Confusion && !Stunned && !Fumbling
+    if (!Blind && !Confusion && !Stunned && !Fumbling && !Unaware
         && otmp->oclass != VENOM_CLASS
         && !nohands(gy.youmonst.data) && freehand()
         && calc_capacity(otmp->owt) <= SLT_ENCUMBER && !rn2(catch_chance)) {
