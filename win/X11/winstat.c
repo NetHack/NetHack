@@ -693,7 +693,6 @@ X11_status_update_tty(
     int color,
     unsigned long *colormasks) /* bitmask of highlights for conditions */
 {
-    printf("fld=%d\n", fld); fflush(stdout);
     switch (fld) {
     case BL_RESET:
     case BL_FLUSH:
@@ -1260,9 +1259,6 @@ tty_render_text(Widget w, int x, int y, const char *text, int color, int attr,
     Pixel fgpixel, bgpixel;
     XFontStruct *font;
     int goldwidth = 0;
-#ifdef ENHANCED_SYMBOLS
-    XFontStruct *unifont = NULL;
-#endif
 
     /* Get default foreground and background colors, and font */
     num_args = 0;
@@ -1290,21 +1286,50 @@ tty_render_text(Widget w, int x, int y, const char *text, int color, int attr,
     if (is_gold && memcmp(text, "\\G", 2) == 0) {
         char *end;
         unsigned long glyphcode = strtoul(text+2, &end, 16);
-        if ((glyphcode >> 16) == svc.context.rndencode && *end == ':') {
+        if ((glyphcode >> 16) == (unsigned) svc.context.rndencode && *end == ':') {
             /* We have a proper glyph code */
             glyph_info glyphinfo;
             glyphcode &= 0xFFFF;
             map_glyphinfo(0, 0, glyphcode, 0, &glyphinfo);
-            {
-                char goldstr[2];
-                goldstr[0] = glyphinfo.ttychar;
-                goldstr[1] = 0;
-                goldwidth = XTextWidth(font, goldstr, strlen(goldstr));
+            X11_map_symbol goldsym = X11_glyph_char(&glyphinfo);
+#ifdef ENHANCED_SYMBOLS
+            if (goldsym > 0xFFFF) {
+                /* No support for supplementary planes */
+                goldsym = GOLD_SYM;
+            }
+            if (goldsym > 0x7F) {
+                XFontStruct *unifont = X11_unicode_font(XtDisplay(w), font);
+
+                if (unifont != NULL) {
+                    XChar2b goldstr[1];
+                    values.font = unifont->fid;
+                    GC ggc2 = XtGetGC(w,
+                                      GCFunction | GCForeground | GCBackground | GCFont,
+                                      &values);
+
+                    goldstr[0].byte1 = goldsym >> 8;
+                    goldstr[0].byte2 = goldsym & 0xFF;
+                    goldwidth = XTextWidth16(font, goldstr, 1);
+
+                    /* Render the string */
+                    XDrawImageString16(XtDisplay(w), XtWindow(w), ggc,
+                                       x, y + font->max_bounds.ascent,
+                                       goldstr, 1);
+
+                    XFreeFont(XtDisplay(w), unifont);
+                    XtReleaseGC(w, ggc2);
+                }
+            }
+#endif
+            if (goldwidth == 0) {
+                char goldstr[1];
+                goldstr[0] = (char) goldsym;
+                goldwidth = XTextWidth(font, goldstr, 1);
 
                 /* Render the string */
                 XDrawImageString(XtDisplay(w), XtWindow(w), ggc,
                                  x, y + font->max_bounds.ascent,
-                                 goldstr, strlen(goldstr));
+                                 goldstr, 1);
             }
 
             text = end;
@@ -1321,11 +1346,6 @@ tty_render_text(Widget w, int x, int y, const char *text, int color, int attr,
 
     /* Release resources */
     XtReleaseGC(w, ggc);
-#ifdef ENHANCED_SYMBOLS
-    if (unifont != NULL) {
-        XFreeFont(XtDisplay(w), unifont);
-    }
-#endif
 
     /* Caller will advance x by the width */
     return goldwidth + width;
