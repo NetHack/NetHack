@@ -3004,6 +3004,51 @@ X11_glyph_char(const glyph_info *glyphinfo)
 #endif
 }
 
+/* Given an XFontStruct, return a corresponding italic font */
+XFontStruct *
+X11_italic_font(Display *display, XFontStruct *font)
+{
+    Atom font_atom;
+    if (!XGetFontProperty(font, XA_FONT, &font_atom)) {
+        return NULL;
+    }
+
+    const char *font_name = XGetAtomName(display, font_atom);
+    if (font_name == NULL) {
+        return NULL;
+    }
+
+    /* Proceed to the slant */
+    unsigned dashes = 4;
+    const char *p = font_name;
+    while (dashes != 0) {
+        const char *q = strchr(p, '-');
+        if (q == NULL) {
+            break;
+        }
+        p = q + 1;
+        --dashes;
+    }
+
+    /* Try substituting "i" for the slant */
+    char italic_font[BUFSZ];
+    int pre = (int)(p - font_name);
+    p += strcspn(p, "-");
+    Snprintf(italic_font, sizeof(italic_font), "%.*sI%s", pre, font_name, p);
+    XFontStruct *font2 = XLoadQueryFont(display, italic_font);
+    printf("italic font=%p\n", (void *)font2);
+    if (font2 != NULL) {
+        return font2;
+    }
+
+    /* Try substituting "o" */
+    Snprintf(italic_font, sizeof(italic_font), "%.*sO%s", pre, font_name, p);
+    font2 = XLoadQueryFont(display, italic_font);
+    printf("oblique font=%p\n", (void *)font2);
+
+    return font2;
+}
+
 #ifdef ENHANCED_SYMBOLS
 /* Given an XFontStruct, return a corresponding font that supports Unicode */
 XFontStruct *
