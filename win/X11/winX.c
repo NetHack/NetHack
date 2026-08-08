@@ -3036,7 +3036,6 @@ X11_italic_font(Display *display, XFontStruct *font)
     p += strcspn(p, "-");
     Snprintf(italic_font, sizeof(italic_font), "%.*sI%s", pre, font_name, p);
     XFontStruct *font2 = XLoadQueryFont(display, italic_font);
-    printf("italic font=%p\n", (void *)font2);
     if (font2 != NULL) {
         return font2;
     }
@@ -3044,7 +3043,6 @@ X11_italic_font(Display *display, XFontStruct *font)
     /* Try substituting "o" */
     Snprintf(italic_font, sizeof(italic_font), "%.*sO%s", pre, font_name, p);
     font2 = XLoadQueryFont(display, italic_font);
-    printf("oblique font=%p\n", (void *)font2);
 
     return font2;
 }
