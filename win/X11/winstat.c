@@ -1264,6 +1264,7 @@ tty_render_text(Widget w, int x, int y, const char *text, int color, int attr,
     XGCValues values;
     Pixel fgpixel, bgpixel;
     XFontStruct *font;
+    XFontStruct *font_italic = NULL; /* custodial */
     int goldwidth = 0;
 
     /* Get default foreground and background colors, and font */
@@ -1292,6 +1293,15 @@ tty_render_text(Widget w, int x, int y, const char *text, int color, int attr,
         struct xwindow *wp = find_widget(w);
         load_boldfont(wp, w);
         font = wp->boldfs;
+    }
+
+    /* Implement italic font */
+    if (attr & HL_ITALIC) {
+        /* font may also be bold */
+        font_italic = X11_italic_font(XtDisplay(w), font);
+        if (font_italic != NULL) {
+            font = font_italic;
+        }
     }
 
     /* Implement dim text */
@@ -1370,18 +1380,28 @@ tty_render_text(Widget w, int x, int y, const char *text, int color, int attr,
     }
 
     /* Get the width of the rendered string */
-    int width = XTextWidth(font, text, strlen(text));
+    int width = XTextWidth(font, text, strlen(text)) + goldwidth;
 
     /* Render the string */
     XDrawImageString(XtDisplay(w), XtWindow(w), ggc,
                      x + goldwidth, y + font->max_bounds.ascent,
                      text, strlen(text));
 
+    /* Implement underline */
+    if (attr & HL_ULINE) {
+        XDrawLine(XtDisplay(w), XtWindow(w), ggc,
+                  x, y + font->max_bounds.ascent,
+                  x + width - 1, y + font->max_bounds.ascent);
+    }
+
     /* Release resources */
     XtReleaseGC(w, ggc);
+    if (font_italic != NULL) {
+        XFreeFont(XtDisplay(w), font_italic);
+    }
 
     /* Caller will advance x by the width */
-    return goldwidth + width;
+    return width;
 }
 
 /*ARGSUSED*/
