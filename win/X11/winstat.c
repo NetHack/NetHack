@@ -111,14 +111,12 @@ static void destroy_status_window_tty(struct xwindow *);
 static void adjust_status_fancy(struct xwindow *, const char *);
 static void adjust_status_tty(struct xwindow *, const char *);
 static void tty_status_exposed(Widget, XtPointer, XtPointer);
+#ifdef STATUS_HILITES
 static void tty_status_blink(XtPointer client_data, XtIntervalId *timer);
+#endif
 static void tty_status_redraw(Widget);
 static int tty_render_field(Widget, int, int, enum statusfields);
 static int tty_render_text(Widget, int, int, const char *, int, int, enum statusfields);
-
-extern const char *status_fieldfmt[MAXBLSTATS];
-extern char *status_vals[MAXBLSTATS];
-extern boolean status_activefields[MAXBLSTATS];
 
 static unsigned long X11_condition_bits, old_condition_bits;
 static int X11_status_colors[MAXBLSTATS],
@@ -206,10 +204,12 @@ struct tty_cond_field {
 static Widget X11_status_widget;
 static struct tty_status_field X11_status_labels[MAXBLSTATS];
 static struct tty_cond_field X11_cond_labels[32]; /* Ugh */
+#ifdef STATUS_HILITES
 static boolean blink;
 static const unsigned long blink_interval = 500; /* milliseconds */
+#endif
 
-struct xwindow *xw_status_win;
+static struct xwindow *xw_status_win;
 
 static int
 condcolor(long bm, unsigned long *bmarray)
@@ -320,6 +320,10 @@ X11_status_update_tty(
     int color,
     unsigned long *colormasks) /* bitmask of highlights for conditions */
 {
+#ifndef STATUS_HILITES
+    nhUse(colormasks);
+#endif
+
     switch (fld) {
     case BL_RESET:
     case BL_FLUSH:
@@ -339,6 +343,7 @@ X11_status_update_tty(
                     fldp->text = NULL;
                 }
             }
+#ifdef STATUS_HILITES
             for (unsigned i = 0; i < CLR_MAX; ++i) {
                 unsigned long mask = colormasks[i];
                 for (unsigned j = 0; j < SIZE(tt_condorder); ++j) {
@@ -357,6 +362,7 @@ X11_status_update_tty(
                     }
                 }
             }
+#endif
         }
         break;
 
@@ -528,8 +534,10 @@ create_tty_status(Widget parent, Widget top)
 
     XtAddCallback(X11_status_widget, XtNexposeCallback, tty_status_exposed,
                   (XtPointer) 0);
+#ifdef STATUS_HILITES
     XtAppAddTimeOut(app_context, blink_interval, tty_status_blink,
                     (XtPointer) X11_status_widget);
+#endif
 
     return X11_status_widget;
 }
@@ -547,6 +555,7 @@ tty_status_exposed(Widget w, XtPointer client_data, /* unused */
     nhUse(widget_data);
 }
 
+#ifdef STATUS_HILITES
 static void
 tty_status_blink(XtPointer client_data, XtIntervalId *timer)
 {
@@ -570,6 +579,7 @@ tty_status_blink(XtPointer client_data, XtIntervalId *timer)
     /* Do it again */
     XtAppAddTimeOut(app_context, blink_interval, tty_status_blink, client_data);
 }
+#endif /* STATUS_HILITES */
 
 static void
 tty_status_redraw(Widget w)
@@ -696,6 +706,11 @@ static int
 tty_render_text(Widget w, int x, int y, const char *text, int color, int attr,
                 enum statusfields fld)
 {
+#ifndef STATUS_HILITES
+    nhUse(color);
+    nhUse(attr);
+#endif
+
     Arg args[5];
     Cardinal num_args;
     XGCValues values;
@@ -712,6 +727,7 @@ tty_render_text(Widget w, int x, int y, const char *text, int color, int attr,
     XtGetValues(w, args, num_args);
 
     /* Implement color if requested */
+#ifdef STATUS_HILITES
     if (color != NO_COLOR) {
         XrmValue source;
         XrmValue dest;
@@ -760,6 +776,11 @@ tty_render_text(Widget w, int x, int y, const char *text, int color, int attr,
         values.foreground = fgpixel;
         values.background = bgpixel;
     }
+#else /* !STATUS_HILITES */
+    values.foreground = fgpixel;
+    values.background = bgpixel;
+#endif /* ?STATUS_HILITES */
+
     values.font = font->fid;
     values.function = GXcopy;
     GC ggc = XtGetGC(w,
@@ -841,12 +862,14 @@ tty_render_text(Widget w, int x, int y, const char *text, int color, int attr,
                      x + goldwidth, y + font->max_bounds.ascent,
                      text, strlen(text));
 
+#ifdef STATUS_HILITES
     /* Implement underline */
     if (attr & HL_ULINE) {
         XDrawLine(XtDisplay(w), XtWindow(w), ggc,
                   x, y + font->max_bounds.ascent,
                   x + width - 1, y + font->max_bounds.ascent);
     }
+#endif /* STATUS_HILITES */
 
     /* Release resources */
     XtReleaseGC(w, ggc);
