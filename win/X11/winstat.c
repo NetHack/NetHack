@@ -122,6 +122,7 @@ static void destroy_status_window_tty(struct xwindow *);
 static void adjust_status_fancy(struct xwindow *, const char *);
 static void adjust_status_tty(struct xwindow *, const char *);
 static void tty_status_exposed(Widget, XtPointer, XtPointer);
+static void tty_status_blink(XtPointer client_data, XtIntervalId *timer);
 static void tty_status_redraw(Widget);
 static int tty_render_text(Widget, int, int, const char *, int, int, boolean);
 
@@ -215,6 +216,8 @@ struct tty_cond_field {
 static Widget X11_status_widget;
 static struct tty_status_field X11_status_labels[MAXBLSTATS];
 static struct tty_cond_field X11_cond_labels[32]; /* Ugh */
+static boolean blink;
+static const unsigned long blink_interval = 500; /* milliseconds */
 #if 0 /*RLC*/
 static XFontStruct *X11_status_font;
 static Pixel X11_status_fg, X11_status_bg;
@@ -1121,6 +1124,8 @@ create_tty_status(Widget parent, Widget top)
 
     XtAddCallback(X11_status_widget, XtNexposeCallback, tty_status_exposed,
                   (XtPointer) 0);
+    XtAppAddTimeOut(app_context, blink_interval, tty_status_blink,
+                    (XtPointer) X11_status_widget);
 
 #if 0 /*RLC*/
     for (y = 0; y < X11_NUM_STATUS_LINES; y++) {
@@ -1161,6 +1166,30 @@ tty_status_exposed(Widget w, XtPointer client_data, /* unused */
     tty_status_redraw(w);
     nhUse(client_data);
     nhUse(widget_data);
+}
+
+static void
+tty_status_blink(XtPointer client_data, XtIntervalId *timer)
+{
+    Widget w = (Widget) client_data;
+    nhUse(timer);
+
+    /* Do we have any active blink attributes? */
+    boolean have_blink = FALSE;
+    for (unsigned i = 0; i < SIZE(X11_status_labels) && !have_blink; ++i) {
+        have_blink = (X11_status_labels[i].attrs & HL_BLINK) != 0;
+    }
+    for (unsigned i = 0; i < SIZE(X11_cond_labels) && !have_blink; ++i) {
+        have_blink = (X11_cond_labels[i].attrs & HL_BLINK) != 0;
+    }
+
+    if (have_blink) {
+        tty_status_redraw(w);
+        blink = !blink;
+    }
+
+    /* Do it again */
+    XtAppAddTimeOut(app_context, blink_interval, tty_status_blink, client_data);
 }
 
 static void
@@ -1308,6 +1337,11 @@ tty_render_text(Widget w, int x, int y, const char *text, int color, int attr,
     if (attr & HL_DIM) {
         fgpixel = (fgpixel & 0xFEFEFE) >> 1;
         bgpixel = (bgpixel & 0xFEFEFE) >> 1;
+    }
+
+    /* Implement blink */
+    if ((attr & HL_BLINK) && blink) {
+        fgpixel = bgpixel;
     }
 
     /* Get a graphics context */
