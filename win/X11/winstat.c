@@ -124,7 +124,8 @@ static void adjust_status_tty(struct xwindow *, const char *);
 static void tty_status_exposed(Widget, XtPointer, XtPointer);
 static void tty_status_blink(XtPointer client_data, XtIntervalId *timer);
 static void tty_status_redraw(Widget);
-static int tty_render_text(Widget, int, int, const char *, int, int, boolean);
+static int tty_render_field(Widget, int, int, enum statusfields);
+static int tty_render_text(Widget, int, int, const char *, int, int, enum statusfields);
 
 extern const char *status_fieldfmt[MAXBLSTATS];
 extern char *status_vals[MAXBLSTATS];
@@ -141,17 +142,22 @@ static int hpbar_percent, hpbar_color;
 static int next_cond_indx = 0, prev_cond_indx = 0;
 #endif /*RLC*/
 
-/* TODO: support statuslines:3 in addition to 2 for the tty-style status */
-#define X11_NUM_STATUS_LINES 2
-#define X11_NUM_STATUS_FIELD 16
-
-static enum statusfields X11_fieldorder[][X11_NUM_STATUS_FIELD] = {
+static enum statusfields X11_fieldorder_2[][18] = {
     { BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, BL_ALIGN,
       BL_SCORE, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH,
-      BL_FLUSH, BL_FLUSH },
+      BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH },
     { BL_LEVELDESC, BL_GOLD, BL_HP, BL_HPMAX, BL_ENE, BL_ENEMAX,
-      BL_AC, BL_XP, BL_EXP, BL_HD, BL_TIME, BL_HUNGER,
-      BL_CAP, BL_CONDITION, BL_VERS, BL_FLUSH }
+      BL_AC, BL_XP, BL_EXP, BL_HD, BL_TIME, BL_HUNGER, BL_CAP,
+      BL_CONDITION, BL_WEAPON, BL_ARMOR, BL_TERRAIN, BL_VERS }
+};
+
+static enum statusfields X11_fieldorder_3[][13] = {
+    { BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, BL_SCORE, BL_FLUSH },
+    { BL_ALIGN, BL_GOLD, BL_HP, BL_HPMAX, BL_ENE, BL_ENEMAX,
+      BL_AC, BL_XP, BL_EXP, BL_HD, BL_HUNGER, BL_CAP,
+      BL_FLUSH },
+    { BL_LEVELDESC, BL_TIME, BL_CONDITION, BL_WEAPON, BL_ARMOR, BL_TERRAIN,
+      BL_VERS, BL_FLUSH }
 };
 
 /* condition list for tty-style display, roughly in order of importance */
@@ -1195,6 +1201,50 @@ tty_status_blink(XtPointer client_data, XtIntervalId *timer)
 static void
 tty_status_redraw(Widget w)
 {
+    Arg args[5];
+    int num_args;
+    Dimension width;
+
+    /* Get the height of the font and the width of the widget */
+    num_args = 0;
+    XtSetArg(args[num_args], XtNwidth, &width); num_args++;
+    XtGetValues(w, args, num_args);
+    int height = nhFontHeight(w);
+
+    int x = 0;
+    int y = 0;
+    XClearWindow(XtDisplay(w), XtWindow(w));
+    if (iflags.wc2_statuslines <= 2) {
+        for (unsigned row = 0; row < SIZE(X11_fieldorder_2); ++row) {
+            for (unsigned i = 0; i < SIZE(X11_fieldorder_2[0]); ++i) {
+                enum statusfields fld = X11_fieldorder_2[row][i];
+                if (fld == BL_FLUSH) {
+                    break;
+                }
+                x += tty_render_field(w, x, y, fld);
+            }
+            x = 0;
+            y += height;
+        }
+    } else {
+        for (unsigned row = 0; row < SIZE(X11_fieldorder_3); ++row) {
+            for (unsigned i = 0; i < SIZE(X11_fieldorder_3[0]); ++i) {
+                enum statusfields fld = X11_fieldorder_3[row][i];
+                if (fld == BL_FLUSH) {
+                    break;
+                }
+                x += tty_render_field(w, x, y, fld);
+            }
+            x = 0;
+            y += height;
+        }
+    }
+}
+
+/* Render one field of the TTY status */
+static int
+tty_render_field(Widget w, int x, int y, enum statusfields fld)
+{
     static struct stat_fmt {
         const char *pre;
         const char *post;
@@ -1222,71 +1272,56 @@ tty_status_redraw(Widget w)
         [BL_LEVELDESC] = { NULL, NULL },
         [BL_EXP] = { "/", NULL },
         [BL_CONDITION] = { NULL, NULL },
-        [BL_WEAPON] = { NULL, NULL }, /* not in 2-line */
-        [BL_ARMOR] = { NULL, NULL }, /* not in 2-line */
-        [BL_TERRAIN] = { NULL, NULL }, /* not in 2-line */
+        [BL_WEAPON] = { NULL, NULL },
+        [BL_ARMOR] = { NULL, NULL },
+        [BL_TERRAIN] = { NULL, NULL },
         [BL_VERS] = { NULL, NULL },
     };
-    Arg args[5];
-    int num_args;
-    Dimension width;
 
-    /* Get the height of the font and the width of the widget */
-    num_args = 0;
-    XtSetArg(args[num_args], XtNwidth, &width); num_args++;
-    XtGetValues(w, args, num_args);
-    int height = nhFontHeight(w);
+    int width = 0;
 
-    int x = 0;
-    int y = 0;
-    XClearWindow(XtDisplay(w), XtWindow(w));
-    for (unsigned row = 0; row < X11_NUM_STATUS_LINES; ++row) {
-        for (unsigned i = 0; i < X11_NUM_STATUS_FIELD; ++i) {
-            enum statusfields fld = X11_fieldorder[row][i];
-            switch (fld) {
-            case BL_FLUSH:
-                break;
+    switch (fld) {
+    case BL_FLUSH:
+        break;
 
-            case BL_CONDITION:
-                for (unsigned j = 0; j < SIZE(X11_cond_labels); ++j) {
-                    struct tty_cond_field const *fldp = &X11_cond_labels[j];
-                    if (fldp->text != NULL) {
-                        x += tty_render_text(w, x, y, " ", NO_COLOR, 0, FALSE);
-                        x += tty_render_text(w, x, y, fldp->text, fldp->color, fldp->attrs, FALSE);
-                    }
-                }
-                break;
-
-            default:
-                {
-                    struct tty_status_field const *fldp = &X11_status_labels[fld];
-                    if (fldp->text != NULL && fldp->text[0] != '\0') {
-                        if (x != 0 && (formats[fld].pre == NULL || strchr("(/", formats[fld].pre[0]) == NULL)) {
-                            x += tty_render_text(w, x, y, " ", NO_COLOR, 0, FALSE);
-                        }
-                        if (formats[fld].pre != NULL) {
-                            x += tty_render_text(w, x, y, formats[fld].pre, NO_COLOR, 0, FALSE);
-                        }
-                        x += tty_render_text(w, x, y, fldp->text, fldp->color,
-                                             fldp->attrs, fld == BL_GOLD);
-                        if (formats[fld].post != NULL) {
-                            x += tty_render_text(w, x, y, formats[fld].post, NO_COLOR, 0, FALSE);
-                        }
-                        /* @@@TODO: do the percent field */
-                    }
-                }
-                break;
+    case BL_CONDITION:
+        for (unsigned j = 0; j < SIZE(X11_cond_labels); ++j) {
+            struct tty_cond_field const *fldp = &X11_cond_labels[j];
+            if (fldp->text != NULL) {
+                width += tty_render_text(w, x + width, y, " ", NO_COLOR, 0, BL_FLUSH);
+                width += tty_render_text(w, x + width, y, fldp->text, fldp->color, fldp->attrs, BL_FLUSH);
             }
         }
-        x = 0;
-        y += height;
+        break;
+
+    default:
+        {
+            struct tty_status_field const *fldp = &X11_status_labels[fld];
+            if (fldp->text != NULL && fldp->text[0] != '\0') {
+                if (x != 0 && (formats[fld].pre == NULL || strchr("(/", formats[fld].pre[0]) == NULL)) {
+                    width += tty_render_text(w, x + width, y, " ", NO_COLOR, 0, BL_FLUSH);
+                }
+                if (formats[fld].pre != NULL) {
+                    width += tty_render_text(w, x + width, y, formats[fld].pre, NO_COLOR, 0, BL_FLUSH);
+                }
+                width += tty_render_text(w, x + width, y, fldp->text, fldp->color,
+                                     fldp->attrs, fld);
+                if (formats[fld].post != NULL) {
+                    width += tty_render_text(w, x + width, y, formats[fld].post, NO_COLOR, 0, BL_FLUSH);
+                }
+                /* @@@TODO: do the percent field */
+            }
+        }
+        break;
     }
+
+    return width;
 }
 
 /* Render text as part of the TTY status */
 static int
 tty_render_text(Widget w, int x, int y, const char *text, int color, int attr,
-                boolean is_gold)
+                enum statusfields fld)
 {
     Arg args[5];
     Cardinal num_args;
@@ -1360,7 +1395,7 @@ tty_render_text(Widget w, int x, int y, const char *text, int color, int attr,
 
     /* Gold will begin with a glyph string. Convert this to the proper
        character, which might possibly be Unicode */
-    if (is_gold && memcmp(text, "\\G", 2) == 0) {
+    if (fld == BL_GOLD && memcmp(text, "\\G", 2) == 0) {
         char *end;
         unsigned long glyphcode = strtoul(text+2, &end, 16);
         if ((glyphcode >> 16) == (unsigned) svc.context.rndencode && *end == ':') {
@@ -1415,6 +1450,18 @@ tty_render_text(Widget w, int x, int y, const char *text, int color, int attr,
 
     /* Get the width of the rendered string */
     int width = XTextWidth(font, text, strlen(text)) + goldwidth;
+
+    /* Place version on the right */
+    if (fld == BL_VERS) {
+        num_args = 0;
+        Dimension wwidth;
+        XtSetArg(args[num_args], XtNwidth, &wwidth); num_args++;
+        XtGetValues(w, args, num_args);
+        int x2 = wwidth - width;
+        if (x2 > x) {
+            x = x2;
+        }
+    }
 
     /* Render the string */
     XDrawImageString(XtDisplay(w), XtWindow(w), ggc,
