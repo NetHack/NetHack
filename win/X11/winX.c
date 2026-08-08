@@ -749,27 +749,28 @@ nhFreePixel(
 Dimension
 nhFontHeight(Widget w)
 {
+    Arg args[1];
+    XFontStruct *fs;
+
 #ifdef _XawTextSink_h
-    Widget sink;
+    Widget sink = NULL;
     XawTextPosition pos = 0;
     int resWidth, resHeight;
-    Arg args[1];
 
     XtSetArg(args[0], XtNtextSink, &sink);
     XtGetValues(w, args, 1);
 
-    XawTextSinkFindPosition(sink, pos, 0, 0, 0, &pos, &resWidth, &resHeight);
-    return resHeight;
-#else
-    XFontStruct *fs;
-    Arg args[1];
+    if (sink != NULL) {
+        XawTextSinkFindPosition(sink, pos, 0, 0, 0, &pos, &resWidth, &resHeight);
+        return resHeight;
+    }
+#endif
 
     XtSetArg(args[0], XtNfont, &fs);
     XtGetValues(w, args, 1);
 
     /* Assume font height is ascent + descent. */
-    return = fs->ascent + fs->descent;
-#endif
+    return fs->ascent + fs->descent;
 }
 
 static String *default_resource_data = 0, /* NULL-terminated arrays */

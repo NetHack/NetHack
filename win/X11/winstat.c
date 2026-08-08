@@ -1113,6 +1113,12 @@ create_tty_status(Widget parent, Widget top)
     X11_status_widget = XtCreateManagedWidget("status_form", windowWidgetClass,
                                               form, args, num_args);
 
+    int height = nhFontHeight(X11_status_widget) * 3;
+    num_args = 0;
+    XtSetArg(args[num_args], XtNheight, height); num_args++;
+    XtSetValues(form, args, num_args);
+    XtSetValues(X11_status_widget, args, num_args);
+
     XtAddCallback(X11_status_widget, XtNexposeCallback, tty_status_exposed,
                   (XtPointer) 0);
 
@@ -1194,15 +1200,13 @@ tty_status_redraw(Widget w)
     };
     Arg args[5];
     int num_args;
-    XFontStruct *font;
     Dimension width;
 
     /* Get the height of the font and the width of the widget */
     num_args = 0;
-    XtSetArg(args[num_args], XtNfont, &font); num_args++;
     XtSetArg(args[num_args], XtNwidth, &width); num_args++;
     XtGetValues(w, args, num_args);
-    int height = font->max_bounds.ascent + font->max_bounds.descent;
+    int height = nhFontHeight(w);
 
     int x = 0;
     int y = 0;
