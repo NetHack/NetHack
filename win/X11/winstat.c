@@ -116,6 +116,7 @@ static void tty_status_blink(XtPointer client_data, XtIntervalId *timer);
 #endif
 static void tty_status_redraw(Widget);
 static int tty_render_field(Widget, int, int, enum statusfields);
+static void tty_status_colors(Widget, int, int, Pixel *, Pixel *);
 static int tty_render_text(Widget, int, int, const char *, int, int, enum statusfields);
 
 static unsigned long X11_condition_bits, old_condition_bits;
@@ -588,6 +589,11 @@ tty_status_redraw(Widget w)
     int num_args;
     Dimension width;
 
+    /* Name is placed here */
+    int name_x = 0;
+    int name_y = 0;
+    int name_width = 0;
+
     /* Get the height of the font and the width of the widget */
     num_args = 0;
     XtSetArg(args[num_args], XtNwidth, &width); num_args++;
@@ -604,7 +610,13 @@ tty_status_redraw(Widget w)
                 if (fld == BL_FLUSH) {
                     break;
                 }
-                x += tty_render_field(w, x, y, fld);
+                int wid = tty_render_field(w, x, y, fld);
+                if (fld == BL_TITLE) {
+                    name_x = x;
+                    name_y = y;
+                    name_width = wid;
+                }
+                x += wid;
             }
             x = 0;
             y += height;
@@ -616,11 +628,36 @@ tty_status_redraw(Widget w)
                 if (fld == BL_FLUSH) {
                     break;
                 }
-                x += tty_render_field(w, x, y, fld);
+                int wid = tty_render_field(w, x, y, fld);
+                if (fld == BL_TITLE) {
+                    name_x = x;
+                    name_y = y;
+                    name_width = wid;
+                }
+                x += wid;
             }
             x = 0;
             y += height;
         }
+    }
+
+    if (name_width != 0 && iflags.wc2_hitpointbar) {
+        XGCValues values;
+        Pixel fgpixel, bgpixel;
+        struct tty_status_field const *fldp = &X11_status_labels[BL_TITLE];
+        tty_status_colors(w, fldp->color, fldp->attrs, &fgpixel, &bgpixel);
+        values.foreground = fgpixel ^ bgpixel;
+        values.background = fgpixel ^ bgpixel;
+        values.function = GXxor;
+        values.fill_style = FillSolid;
+        GC ggc = XtGetGC(w,
+                         GCFunction | GCForeground | GCBackground | GCFillStyle,
+                         &values);
+        XFillRectangle(XtDisplay(w), XtWindow(w), ggc,
+                       name_x, name_y,
+                       name_width * X11_status_labels[BL_HP].percent / 100,
+                       height);
+        XtReleaseGC(w, ggc);
     }
 }
 
@@ -692,7 +729,6 @@ tty_render_field(Widget w, int x, int y, enum statusfields fld)
                 if (formats[fld].post != NULL) {
                     width += tty_render_text(w, x + width, y, formats[fld].post, NO_COLOR, 0, BL_FLUSH);
                 }
-                /* @@@TODO: do the percent field */
             }
         }
         break;
@@ -719,27 +755,16 @@ tty_render_text(Widget w, int x, int y, const char *text, int color, int attr,
     XFontStruct *font_italic = NULL; /* custodial */
     int goldwidth = 0;
 
-    /* Get default foreground and background colors, and font */
+    /* Get the colors */
+    tty_status_colors(w, color, attr, &fgpixel, &bgpixel);
+
+    values.foreground = fgpixel;
+    values.background = bgpixel;
+
+    /* Get the font */
     num_args = 0;
-    XtSetArg(args[num_args], XtNforeground, &fgpixel); num_args++;
-    XtSetArg(args[num_args], XtNbackground, &bgpixel); num_args++;
     XtSetArg(args[num_args], XtNfont, &font); num_args++;
     XtGetValues(w, args, num_args);
-
-    /* Implement color if requested */
-#ifdef STATUS_HILITES
-    if (color != NO_COLOR) {
-        XrmValue source;
-        XrmValue dest;
-        Pixel pixel;
-        const char *cname = fancy_status_hilite_colors[color];
-        source.addr = (XPointer) cname;
-        source.size = (unsigned int) strlen(cname) + 1;
-        dest.size = (unsigned int) sizeof (Pixel);
-        dest.addr = (XPointer) &pixel;
-        if (XtConvertAndStore(w, XtRString, &source, XtRPixel, &dest))
-            fgpixel = pixel;
-    }
 
     /* Implement bold font */
     if (attr & HL_BOLD) {
@@ -756,30 +781,6 @@ tty_render_text(Widget w, int x, int y, const char *text, int color, int attr,
             font = font_italic;
         }
     }
-
-    /* Implement dim text */
-    if (attr & HL_DIM) {
-        fgpixel = (fgpixel & 0xFEFEFE) >> 1;
-        bgpixel = (bgpixel & 0xFEFEFE) >> 1;
-    }
-
-    /* Implement blink */
-    if ((attr & HL_BLINK) && blink) {
-        fgpixel = bgpixel;
-    }
-
-    /* Get a graphics context */
-    if (attr & HL_INVERSE) {
-        values.foreground = bgpixel;
-        values.background = fgpixel;
-    } else {
-        values.foreground = fgpixel;
-        values.background = bgpixel;
-    }
-#else /* !STATUS_HILITES */
-    values.foreground = fgpixel;
-    values.background = bgpixel;
-#endif /* ?STATUS_HILITES */
 
     values.font = font->fid;
     values.function = GXcopy;
@@ -879,6 +880,57 @@ tty_render_text(Widget w, int x, int y, const char *text, int color, int attr,
 
     /* Caller will advance x by the width */
     return width;
+}
+
+static void
+tty_status_colors(Widget w, int color, int attr, Pixel *fgpixel, Pixel *bgpixel)
+{
+    Cardinal num_args;
+    Arg args[5];
+
+    /* Get the default colors */
+    num_args = 0;
+    XtSetArg(args[num_args], XtNforeground, fgpixel); num_args++;
+    XtSetArg(args[num_args], XtNbackground, bgpixel); num_args++;
+    XtGetValues(w, args, num_args);
+
+    /* Implement color if requested */
+#ifdef STATUS_HILITES
+    if (color != NO_COLOR) {
+        XrmValue source;
+        XrmValue dest;
+        Pixel pixel;
+        const char *cname = fancy_status_hilite_colors[color];
+        source.addr = (XPointer) cname;
+        source.size = (unsigned int) strlen(cname) + 1;
+        dest.size = (unsigned int) sizeof (Pixel);
+        dest.addr = (XPointer) &pixel;
+        if (XtConvertAndStore(w, XtRString, &source, XtRPixel, &dest))
+            *fgpixel = pixel;
+    }
+
+    /* Implement dim text */
+    if (attr & HL_DIM) {
+        *fgpixel = (*fgpixel & 0xFEFEFE) >> 1;
+        *bgpixel = (*bgpixel & 0xFEFEFE) >> 1;
+    }
+
+    /* Implement blink */
+    if ((attr & HL_BLINK) && blink) {
+        *fgpixel = *bgpixel;
+    }
+
+    /* Get a graphics context */
+    if (attr & HL_INVERSE) {
+        Pixel swap;
+        swap = *fgpixel;
+        *fgpixel = *bgpixel;
+        *bgpixel = swap;
+    }
+#else
+    nhUse(color);
+    nhUse(attr);
+#endif
 }
 
 /*ARGSUSED*/

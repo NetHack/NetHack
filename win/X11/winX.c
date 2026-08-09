@@ -135,7 +135,7 @@ struct window_procs X11_procs = {
 #ifdef STATUS_HILITES
       | WC2_RESET_STATUS | WC2_HILITE_STATUS
 #endif
-      | WC2_EXTRASTATUS
+      | WC2_EXTRASTATUS | WC2_HITPOINTBAR
       | WC2_MENU_SHIFT ),
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, /* color availability */
     X11_init_nhwindows,
