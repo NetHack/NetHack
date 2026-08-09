@@ -117,7 +117,8 @@ static void tty_status_blink(XtPointer client_data, XtIntervalId *timer);
 static void tty_status_redraw(Widget);
 static int tty_render_field(Widget, int, int, enum statusfields);
 static void tty_status_colors(Widget, int, int, Pixel *, Pixel *);
-static int tty_render_text(Widget, int, int, const char *, int, int, enum statusfields);
+static int tty_render_text(Widget, const XRectangle *, int, int, const char *,
+                           int, int, enum statusfields);
 
 static unsigned long X11_condition_bits, old_condition_bits;
 static int X11_status_colors[MAXBLSTATS],
@@ -641,23 +642,26 @@ tty_status_redraw(Widget w)
         }
     }
 
+    /*
+     * Draw the hit point bar using:
+     * * the colors for hit points
+     * * the opposite of the HL_INVERSE bit for the title
+     * * the font for the title
+     */
     if (name_width != 0 && iflags.wc2_hitpointbar) {
-        XGCValues values;
-        Pixel fgpixel, bgpixel;
-        struct tty_status_field const *fldp = &X11_status_labels[BL_TITLE];
-        tty_status_colors(w, fldp->color, fldp->attrs, &fgpixel, &bgpixel);
-        values.foreground = fgpixel ^ bgpixel;
-        values.background = fgpixel ^ bgpixel;
-        values.function = GXxor;
-        values.fill_style = FillSolid;
-        GC ggc = XtGetGC(w,
-                         GCFunction | GCForeground | GCBackground | GCFillStyle,
-                         &values);
-        XFillRectangle(XtDisplay(w), XtWindow(w), ggc,
-                       name_x, name_y,
-                       name_width * X11_status_labels[BL_HP].percent / 100,
-                       height);
-        XtReleaseGC(w, ggc);
+        XRectangle clip = {
+            .x = name_x,
+            .y = name_y,
+            .width = name_width * X11_status_labels[BL_HP].percent / 100,
+            .height = height
+        };
+        struct tty_status_field const *title = &X11_status_labels[BL_TITLE];
+        struct tty_status_field const *hitp = &X11_status_labels[BL_HP];
+        int attrs = ((title->attrs & ~HL_DIM) ^ HL_INVERSE)
+                  | (hitp->attrs & HL_DIM);
+        tty_render_text(w, &clip, name_x, name_y,
+                        title->text, hitp->color, attrs,
+                        BL_TITLE);
     }
 }
 
@@ -708,8 +712,8 @@ tty_render_field(Widget w, int x, int y, enum statusfields fld)
         for (unsigned j = 0; j < SIZE(X11_cond_labels); ++j) {
             struct tty_cond_field const *fldp = &X11_cond_labels[j];
             if (fldp->text != NULL) {
-                width += tty_render_text(w, x + width, y, " ", NO_COLOR, 0, BL_FLUSH);
-                width += tty_render_text(w, x + width, y, fldp->text, fldp->color, fldp->attrs, BL_FLUSH);
+                width += tty_render_text(w, NULL, x + width, y, " ", NO_COLOR, 0, BL_FLUSH);
+                width += tty_render_text(w, NULL, x + width, y, fldp->text, fldp->color, fldp->attrs, BL_FLUSH);
             }
         }
         break;
@@ -719,15 +723,15 @@ tty_render_field(Widget w, int x, int y, enum statusfields fld)
             struct tty_status_field const *fldp = &X11_status_labels[fld];
             if (fldp->text != NULL && fldp->text[0] != '\0') {
                 if (x != 0 && (formats[fld].pre == NULL || strchr("(/", formats[fld].pre[0]) == NULL)) {
-                    width += tty_render_text(w, x + width, y, " ", NO_COLOR, 0, BL_FLUSH);
+                    width += tty_render_text(w, NULL, x + width, y, " ", NO_COLOR, 0, BL_FLUSH);
                 }
                 if (formats[fld].pre != NULL) {
-                    width += tty_render_text(w, x + width, y, formats[fld].pre, NO_COLOR, 0, BL_FLUSH);
+                    width += tty_render_text(w, NULL, x + width, y, formats[fld].pre, NO_COLOR, 0, BL_FLUSH);
                 }
-                width += tty_render_text(w, x + width, y, fldp->text, fldp->color,
+                width += tty_render_text(w, NULL, x + width, y, fldp->text, fldp->color,
                                      fldp->attrs, fld);
                 if (formats[fld].post != NULL) {
-                    width += tty_render_text(w, x + width, y, formats[fld].post, NO_COLOR, 0, BL_FLUSH);
+                    width += tty_render_text(w, NULL, x + width, y, formats[fld].post, NO_COLOR, 0, BL_FLUSH);
                 }
             }
         }
@@ -739,8 +743,8 @@ tty_render_field(Widget w, int x, int y, enum statusfields fld)
 
 /* Render text as part of the TTY status */
 static int
-tty_render_text(Widget w, int x, int y, const char *text, int color, int attr,
-                enum statusfields fld)
+tty_render_text(Widget w, const XRectangle *clip, int x, int y,
+                const char *text, int color, int attr, enum statusfields fld)
 {
 #ifndef STATUS_HILITES
     nhUse(color);
@@ -787,6 +791,13 @@ tty_render_text(Widget w, int x, int y, const char *text, int color, int attr,
     GC ggc = XtGetGC(w,
                      GCFunction | GCForeground | GCBackground | GCFont,
                      &values);
+
+    /* If drawing a hitpoint bar, we'll need a clipping rectangle */
+    if (clip != NULL) {
+        /* @#$% non-const-correct Xlib functions */
+        XRectangle clip2 = *clip;
+        XSetClipRectangles(XtDisplay(w), ggc, 0, 0, &clip2, 1, Unsorted);
+    }
 
     /* Gold will begin with a glyph string. Convert this to the proper
        character, which might possibly be Unicode */
