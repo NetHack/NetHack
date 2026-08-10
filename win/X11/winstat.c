@@ -1633,8 +1633,10 @@ update_val(struct X_status_value *attr_rec, long new_value)
         }
         attr_rec->turn_count = 0;
     } else {
+        Widget w = (attr_rec->type == SV_LABEL || attr_rec->type == SV_NAME) ? attr_rec->w
+                   : get_value_widget(attr_rec->w);
         XtSetArg(args[0], XtNforeground, &attr_rec->default_fg);
-        XtGetValues(attr_rec->w, args, ONE);
+        XtGetValues(w, args, ONE);
         attr_rec->after_init = TRUE;
     }
 }
