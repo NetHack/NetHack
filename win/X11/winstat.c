@@ -98,15 +98,6 @@
 
 static int condcolor(long, unsigned long *);
 static int condattr(long, unsigned long *);
-static void HiliteField(Widget, int, int, int, XFontStruct **);
-static void PrepStatusField(int, Widget, const char *);
-static void DisplayCond(int, unsigned long *);
-static int render_conditions(int, int);
-#ifdef STATUS_HILITES
-static void tt_reset_color(int, int, unsigned long *);
-#endif
-static void tt_status_fixup(void);
-static Widget create_tty_status_field(int, int, Widget, Widget);
 static Widget create_tty_status(Widget, Widget);
 static void stat_resized(Widget, XtPointer, XtPointer);
 static void update_fancy_status_field(int, int, int);
@@ -119,31 +110,38 @@ static void destroy_status_window_fancy(struct xwindow *);
 static void destroy_status_window_tty(struct xwindow *);
 static void adjust_status_fancy(struct xwindow *, const char *);
 static void adjust_status_tty(struct xwindow *, const char *);
-
-extern const char *status_fieldfmt[MAXBLSTATS];
-extern char *status_vals[MAXBLSTATS];
-extern boolean status_activefields[MAXBLSTATS];
+static void tty_status_exposed(Widget, XtPointer, XtPointer);
+#ifdef STATUS_HILITES
+static void tty_status_blink(XtPointer client_data, XtIntervalId *timer);
+#endif
+static void tty_status_redraw(Widget);
+static int tty_render_field(Widget, int, int, enum statusfields);
+static void tty_status_colors(Widget, int, int, Pixel *, Pixel *);
+static int tty_render_text(Widget, const XRectangle *, int, int, const char *,
+                           int, int, enum statusfields);
 
 static unsigned long X11_condition_bits, old_condition_bits;
 static int X11_status_colors[MAXBLSTATS],
            old_field_colors[MAXBLSTATS],
            old_cond_colors[32];
 static int hpbar_percent, hpbar_color;
-/* Number of conditions displayed during this update and last update.
-   When the last update had more, the excess need to be erased. */
-static int next_cond_indx = 0, prev_cond_indx = 0;
 
-/* TODO: support statuslines:3 in addition to 2 for the tty-style status */
-#define X11_NUM_STATUS_LINES 2
-#define X11_NUM_STATUS_FIELD 16
-
-static enum statusfields X11_fieldorder[][X11_NUM_STATUS_FIELD] = {
+static enum statusfields X11_fieldorder_2[][18] = {
     { BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, BL_ALIGN,
       BL_SCORE, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH,
-      BL_FLUSH, BL_FLUSH },
+      BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH },
     { BL_LEVELDESC, BL_GOLD, BL_HP, BL_HPMAX, BL_ENE, BL_ENEMAX,
-      BL_AC, BL_XP, BL_EXP, BL_HD, BL_TIME, BL_HUNGER,
-      BL_CAP, BL_CONDITION, BL_VERS, BL_FLUSH }
+      BL_AC, BL_XP, BL_EXP, BL_HD, BL_TIME, BL_HUNGER, BL_CAP,
+      BL_CONDITION, BL_WEAPON, BL_ARMOR, BL_TERRAIN, BL_VERS }
+};
+
+static enum statusfields X11_fieldorder_3[][13] = {
+    { BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, BL_SCORE, BL_FLUSH },
+    { BL_ALIGN, BL_GOLD, BL_HP, BL_HPMAX, BL_ENE, BL_ENEMAX,
+      BL_AC, BL_XP, BL_EXP, BL_HD, BL_HUNGER, BL_CAP,
+      BL_FLUSH },
+    { BL_LEVELDESC, BL_TIME, BL_CONDITION, BL_WEAPON, BL_ARMOR, BL_TERRAIN,
+      BL_VERS, BL_FLUSH }
 };
 
 /* condition list for tty-style display, roughly in order of importance */
@@ -191,13 +189,29 @@ static const char *const fancy_status_hilite_colors[] = {
     "white",
 };
 
-static Widget X11_status_widget;
-static Widget X11_status_labels[MAXBLSTATS];
-static Widget X11_cond_labels[32]; /* Ugh */
-static XFontStruct *X11_status_font;
-static Pixel X11_status_fg, X11_status_bg;
+struct tty_status_field {
+    char *text;
+    int color;
+    unsigned attrs;
+    int chg;
+    int percent;
+};
 
-struct xwindow *xw_status_win;
+struct tty_cond_field {
+    const char *text;
+    int color;
+    unsigned attrs;
+};
+
+static Widget X11_status_widget;
+static struct tty_status_field X11_status_labels[MAXBLSTATS];
+static struct tty_cond_field X11_cond_labels[32]; /* Ugh */
+#ifdef STATUS_HILITES
+static boolean blink;
+static const unsigned long blink_interval = 500; /* milliseconds */
+#endif
+
+static struct xwindow *xw_status_win;
 
 static int
 condcolor(long bm, unsigned long *bmarray)
@@ -274,6 +288,11 @@ void
 X11_status_enablefield(int fieldidx, const char *nm,
                        const char *fmt, boolean enable)
 {
+    if (X11_status_widget && !enable && 0 <= fieldidx && fieldidx < MAXBLSTATS) {
+        free(X11_status_labels[fieldidx].text);
+        X11_status_labels[fieldidx].text = NULL;
+        tty_status_redraw(X11_status_widget);
+    }
     genl_status_enablefield(fieldidx, nm, fmt, enable);
 }
 
@@ -290,367 +309,6 @@ cond_bm2idx(unsigned long bm)
 }
 #endif
 
-/* highlight a tty-style status field (or condition) */
-static void
-HiliteField(Widget label,
-            int fld, int cond, int colrattr,
-            XFontStruct **font_p)
-{
-#ifdef STATUS_HILITES
-    static Pixel grayPxl, blackPxl, whitePxl;
-    Arg args[6];
-    Cardinal num_args;
-    XFontStruct *font = X11_status_font;
-    Pixel px, fg = X11_status_fg, bg = X11_status_bg;
-    struct xwindow *xw = xw_status_win;
-    int colr, attr;
-
-    if ((colrattr & 0x00ff) >= CLR_MAX)
-        colrattr = (colrattr & ~0x00ff) | NO_COLOR;
-    colr = colrattr & 0x00ff; /* guaranteed to be >= 0 and < CLR_MAX */
-    attr = (colrattr >> 8) & 0x00ff;
-
-    if (!grayPxl) {/* one-time init */
-        grayPxl = get_nhcolor(xw, CLR_GRAY).pixel;
-        blackPxl = get_nhcolor(xw, CLR_BLACK).pixel;
-        whitePxl = get_nhcolor(xw, CLR_WHITE).pixel;
-    }
-    /* [shouldn't be necessary; setting up gray will set up all colors] */
-    if (colr != NO_COLOR && !xw->nh_colors[colr].pixel)
-        (void) get_nhcolor(xw, colr);
-
-    /* handle highlighting if caller has specified that; set foreground,
-       background, and font even if not specified this time in case they
-       used modified values last time (which would stick if not reset) */
-    (void) memset((genericptr_t) args, 0, sizeof args);
-    num_args = 0;
-    if (colr != NO_COLOR)
-        fg = xw->nh_colors[colr].pixel;
-    if ((attr & HL_INVERSE) != 0) {
-        px = fg;
-        fg = bg;
-        bg = px;
-    }
-    /* foreground and background might both default to black, so we
-       need to force one to be different if/when they're the same
-       (actually, tt_status_fixup() takes care of that nowadays);
-       using gray to implement 'dim' only works for black and white
-       (or color+'inverse' when former background was black or white) */
-    if (fg == bg
-        || ((attr & HL_DIM) != 0 && (fg == whitePxl || fg == blackPxl)))
-        fg = (fg != grayPxl) ? grayPxl
-             : (fg != blackPxl) ? blackPxl
-               : whitePxl;
-    XtSetArg(args[num_args], nhStr(XtNforeground), fg); num_args++;
-    XtSetArg(args[num_args], nhStr(XtNbackground), bg); num_args++;
-    if (attr & HL_BOLD) {
-        load_boldfont(xw_status_win, label);
-        if (xw_status_win->boldfs)
-            font = xw_status_win->boldfs;
-    }
-    XtSetArg(args[num_args], nhStr(XtNfont), font); num_args++;
-    XtSetValues(label, args, num_args);
-
-    /* return possibly modified font to caller so that text width
-       measurement can use it */
-    if (font_p)
-        *font_p = font;
-#else /*!STATUS_HILITES*/
-    nhUse(label);
-    nhUse(font_p);
-#endif /*?STATUS_HILITES*/
-    if (fld != BL_CONDITION)
-        old_field_colors[fld] = colrattr;
-    else
-        old_cond_colors[cond] = colrattr;
-}
-
-/* set up a specific field other than 'condition'; its general location
-   was specified during widget creation but it might need adjusting */
-static void
-PrepStatusField(int fld, Widget label, const char *text)
-{
-    Arg args[6];
-    Cardinal num_args;
-    Dimension lbl_wid;
-    XFontStruct *font = X11_status_font;
-    int colrattr = X11_status_colors[fld];
-    struct status_info_t *si = xw_status_win->Win_info.Status_info;
-
-    /* highlight if color and/or attribute(s) are different from last time */
-    if (colrattr != old_field_colors[fld])
-        HiliteField(label, fld, 0, colrattr, &font);
-
-    num_args = 0;
-    (void) memset((genericptr_t) args, 0, sizeof args);
-    /* set up the current text to be displayed */
-    if (text && *text) {
-        lbl_wid = 2 * si->in_wd + XTextWidth(font, text, (int) strlen(text));
-    } else {
-        text = "";
-        lbl_wid = 1;
-    }
-    XtSetArg(args[num_args], nhStr(XtNlabel), text); num_args++;
-    /*XtSetArg(args[num_args], nhStr(XtNwidth), lbl_wid); num_args++;*/
-    XtSetValues(label, args, num_args);
-    XtResizeWidget(label, lbl_wid, si->ht, si->brd);
-}
-
-/* set up one status condition for tty-style status display */
-static void
-DisplayCond(
-    int c_idx, /* index into tt_condorder[] */
-    unsigned long *colormasks)
-{
-    Widget label;
-    Arg args[6];
-    Cardinal num_args;
-    Dimension lbl_wid;
-    XFontStruct *font = X11_status_font;
-    int coloridx, attrmask, colrattr, idx;
-    unsigned long bm = tt_condorder[c_idx].mask;
-    const char *text = tt_condorder[c_idx].text;
-    struct status_info_t *si = xw_status_win->Win_info.Status_info;
-
-    if ((X11_condition_bits & bm) == 0)
-        return;
-
-    /* widgets have been created for every condition; we allocate them
-       from left to right rather than keeping their original assignments */
-    idx = next_cond_indx;
-    label = X11_cond_labels[idx];
-
-    /* handle highlighting if caller requests it */
-    coloridx = condcolor(bm, colormasks);
-    attrmask = condattr(bm, colormasks);
-    colrattr = (attrmask << 8) | coloridx;
-    if (colrattr != old_cond_colors[c_idx])
-        HiliteField(label, BL_CONDITION, c_idx, colrattr, &font);
-
-    (void) memset((genericptr_t) args, 0, sizeof args);
-    num_args = 0;
-    /* set the condition text and its width; this widget might have
-       been displaying a different condition last time around */
-    XtSetArg(args[num_args], nhStr(XtNlabel), text); num_args++;
-    /* measure width after maybe changing font [HiliteField()] */
-    lbl_wid = 2 * si->in_wd + XTextWidth(font, text, (int) strlen(text));
-    /*XtSetArg(args[num_args], nhStr(XtNwidth), lbl_wid); num_args++;*/
-
-    /* make this condition widget be ready for display */
-    XtSetValues(label, args, num_args);
-    XtResizeWidget(label, lbl_wid, si->ht, si->brd);
-
-    ++next_cond_indx;
-}
-
-/* display the tty-style status conditions; the number shown varies and
-   we might be showing more, same, or fewer than during previous status */
-static int
-render_conditions(int row, int dx)
-{
-    Widget label;
-    Arg args[6];
-    Cardinal num_args;
-    Position lbl_x;
-    int i, gap = 5;
-    struct status_info_t *si = xw_status_win->Win_info.Status_info;
-    Dimension lbl_wid, brd_wid = si->brd;
-
-    for (i = 0; i < next_cond_indx; i++) {
-        label = X11_cond_labels[i];
-
-        /* width of this widget was set in DisplayCond(); fetch it */
-        (void) memset((genericptr_t) args, 0, sizeof args);
-        num_args = 0;
-        XtSetArg(args[num_args], nhStr(XtNwidth), &lbl_wid); num_args++;
-        XtGetValues(label, args, num_args);
-
-        /* figure out where to draw this widget and place it there */
-        lbl_x = (Position) (dx + 1 + gap);
-
-        XtConfigureWidget(label, lbl_x, si->y[row], lbl_wid, si->ht, brd_wid);
-
-        /* keep track of where the end of our text appears */
-        dx = (int) lbl_x + (int) (lbl_wid + 2 * brd_wid) - 1;
-    }
-
-    /* if we have fewer conditions shown now than last time, set the
-       excess ones to blank; unlike the set drawn above, these haven't
-       been prepared in advance by DisplayCond because they aren't
-       being displayed; they might have been highlighted last time so
-       we need to specify more than just an empty text string */
-    if (next_cond_indx < prev_cond_indx) {
-        XFontStruct *font = X11_status_font;
-        Pixel fg = X11_status_fg, bg = X11_status_bg;
-
-        lbl_x = dx + 1;
-        lbl_wid = 1 + 2 * brd_wid;
-        for (i = next_cond_indx; i < prev_cond_indx; ++i) {
-            label = X11_cond_labels[i];
-
-            (void) memset((genericptr_t) args, 0, sizeof args);
-            num_args = 0;
-            XtSetArg(args[num_args], nhStr(XtNlabel), ""); num_args++;
-            XtSetArg(args[num_args], nhStr(XtNfont), font); num_args++;
-            XtSetArg(args[num_args], nhStr(XtNforeground), fg); num_args++;
-            XtSetArg(args[num_args], nhStr(XtNbackground), bg); num_args++;
-            /*XtSetArg(args[num_args], nhStr(XtNwidth), lbl_wid); num_args++;*/
-            /*XtSetArg(args[num_args], nhStr(XtNx), lbl_x); num_args++;*/
-            XtSetValues(label, args, num_args);
-            old_cond_colors[i] = NO_COLOR; /* fg, bg, font were just reset */
-            XtConfigureWidget(label, lbl_x, si->y[row], lbl_wid, si->ht, 0);
-            /* don't advance 'dx' here */
-        }
-    }
-
-    return dx;
-}
-
-#ifdef STATUS_HILITES
-/* reset status_hilite for BL_RESET; if highlighting has been disabled or
-   this field is disabled, clear highlighting for this field or condition */
-static void
-tt_reset_color(
-    int fld,
-    int cond,
-    unsigned long *colormasks)
-{
-    Widget label;
-    int colrattr = NO_COLOR;
-
-    if (fld != BL_CONDITION) {
-        if (iflags.hilite_delta != 0L && status_activefields[fld])
-            colrattr = X11_status_colors[fld];
-        cond = 0;
-        label = X11_status_labels[fld];
-    } else {
-        unsigned long bm = tt_condorder[cond].mask;
-
-        if (iflags.hilite_delta != 0L && (X11_condition_bits & bm) != 0) {
-            /* BL_RESET before first BL_CONDITION will have colormasks==Null
-               but condcolor() and condattr() can cope with that */
-            colrattr = condcolor(bm, colormasks);
-            colrattr |= (condattr(bm, colormasks) << 8);
-        }
-        label = X11_cond_labels[cond];
-    }
-    HiliteField(label, fld, cond, colrattr, (XFontStruct **) 0);
-}
-#endif
-
-/* make sure foreground, background, and font have reasonable values,
-   then explicitly set them for all the status widgets;
-   also cache some geometry settings in (*xw_status_win).Status_info */
-static void
-tt_status_fixup(void)
-{
-    Arg args[6];
-    Cardinal num_args;
-    Widget w;
-    Position lbl_y;
-    int x, y, ci, fld;
-    XFontStruct *font = 0;
-    Pixel fg = 0, bg = 0;
-    struct status_info_t *si = xw_status_win->Win_info.Status_info;
-
-    (void) memset((genericptr_t) args, 0, sizeof args);
-    num_args = 0;
-    XtSetArg(args[num_args], nhStr(XtNfont), &font); num_args++;
-    XtSetArg(args[num_args], nhStr(XtNforeground), &fg); num_args++;
-    XtSetArg(args[num_args], nhStr(XtNbackground), &bg); num_args++;
-    XtGetValues(X11_status_widget, args, num_args);
-    if (fg == bg) {
-        XColor black = get_nhcolor(xw_status_win, CLR_BLACK),
-               white = get_nhcolor(xw_status_win, CLR_WHITE);
-
-        fg = (bg == white.pixel) ? black.pixel : white.pixel;
-    }
-    X11_status_fg = si->fg = fg, X11_status_bg = si->bg = bg;
-
-    if (!font) {
-        w = X11_status_widget;
-        XtSetArg(args[0], nhStr(XtNfont), &font);
-        do {
-            XtGetValues(w, args, ONE);
-        } while (!font && (w = XtParent(w)) != 0);
-
-        if (!font) {
-            /* trial and error time -- this is where we've actually
-               been obtaining the font even though we aren't setting
-               it for any of the field widgets (until for(y,x) below) */
-            XtGetValues(X11_status_labels[0], args, ONE);
-
-            if (!font) { /* this bit is untested... */
-                /* write some text and hope Xaw sets up font for us */
-                XtSetArg(args[0], nhStr(XtNlabel), "NetHack");
-                XtSetValues(X11_status_labels[0], args, ONE);
-                (void) XFlush(XtDisplay(X11_status_labels[0]));
-
-                XtSetArg(args[0], nhStr(XtNfont), &font);
-                XtGetValues(X11_status_labels[0], args, ONE);
-
-                /* if still Null, XTextWidth() would crash so bail out */
-                if (!font)
-                    panic("X11 status can't determine font.");
-            }
-        }
-    }
-    X11_status_font = si->fs = font;
-
-    /* amount of space to advance a widget's location by one space;
-       increase width a tiny bit beyond the actual space */
-    si->spacew = XTextWidth(X11_status_font, " ", 1) + (Dimension) 1;
-
-    (void) memset((genericptr_t) args, 0, sizeof args);
-    num_args = 0;
-    XtSetArg(args[num_args], nhStr(XtNfont), font); num_args++;
-    XtSetArg(args[num_args], nhStr(XtNforeground), fg); num_args++;
-    XtSetArg(args[num_args], nhStr(XtNbackground), bg); num_args++;
-    XtSetValues(X11_status_widget, args, num_args);
-
-    for (y = 0; y < X11_NUM_STATUS_LINES; y++) {
-        for (x = 0; x < X11_NUM_STATUS_FIELD; x++) {
-            fld = X11_fieldorder[y][x]; /* next field to handle */
-            if (fld <= BL_FLUSH)
-                continue; /* skip fieldorder[][] padding */
-
-            XtSetValues(X11_status_labels[fld], args, num_args);
-            old_field_colors[fld] = NO_COLOR;
-
-            if (fld == BL_CONDITION) {
-                for (ci = 0; ci < SIZE(X11_cond_labels); ++ci) { /* 0..31 */
-                    XtSetValues(X11_cond_labels[ci], args, num_args);
-                    old_cond_colors[ci] = NO_COLOR;
-                }
-            }
-        }
-    }
-
-    /* cache the y coordinate of each row for XtConfigureWidget() */
-    (void) memset((genericptr_t) args, 0, sizeof args);
-    num_args = 0;
-    XtSetArg(args[0], nhStr(XtNy), &lbl_y); num_args++;
-    for (y = 0; y < X11_NUM_STATUS_LINES; y++) {
-        fld = X11_fieldorder[y][0];
-        XtGetValues(X11_status_labels[fld], args, num_args);
-        si->y[y] = lbl_y;
-    }
-
-    /* cache height, borderWidth, and internalWidth for XtResizeWidget() */
-    (void) memset((genericptr_t) args, 0, sizeof args);
-    num_args = 0;
-    XtSetArg(args[num_args], nhStr(XtNheight), &si->ht); num_args++;
-    XtSetArg(args[num_args], nhStr(XtNborderWidth), &si->brd); num_args++;
-    XtSetArg(args[num_args], nhStr(XtNinternalWidth), &si->in_wd); num_args++;
-    XtGetValues(X11_status_labels[0], args, num_args);
-
-    /* X11_status_update_tty() wants this in order to right justify 'vers' */
-    if (!xw_status_win->pixel_width) {
-        XtSetArg(args[0], nhStr(XtNwidth), &xw_status_win->pixel_width);
-        XtGetValues(xw_status_win->w, args, ONE);
-    }
-}
-
 DISABLE_WARNING_FORMAT_NONLITERAL
 
 /* core requests updating one status field (or is indicating that it's time
@@ -659,179 +317,70 @@ static void
 X11_status_update_tty(
     int fld,
     genericptr_t ptr,
-    int chg UNUSED,
+    int chg,
     int percent,
     int color,
     unsigned long *colormasks) /* bitmask of highlights for conditions */
 {
-    static int xtra_space[MAXBLSTATS];
-    static unsigned long *cond_colormasks = (unsigned long *) 0;
+#ifndef STATUS_HILITES
+    nhUse(colormasks);
+#endif
 
-    Arg args[6];
-    Cardinal num_args;
-    Position lbl_x;
-    Dimension lbl_wid, brd_wid;
-    Widget label;
+    switch (fld) {
+    case BL_RESET:
+    case BL_FLUSH:
+        tty_status_redraw(X11_status_widget);
+        break;
 
-    struct status_info_t *si;
-    char goldbuf[40];
-    const char *fmt;
-    const char *text;
-    unsigned long *condptr;
-    int f, x, y, dx;
-
-    if (X11_status_fg == X11_status_bg || !X11_status_font)
-        tt_status_fixup();
-
-    if (fld == BL_RESET) {
-#ifdef STATUS_HILITES
-        for (y = 0; y < X11_NUM_STATUS_LINES; y++) {
-            for (x = 0; x < X11_NUM_STATUS_FIELD; x++) {
-                f = X11_fieldorder[y][x];
-                if (f <= BL_FLUSH)
-                    continue; /* skip padding in the fieldorder[][] layout */
-                if (f != BL_CONDITION) {
-                    tt_reset_color(f, 0, (unsigned long *) 0);
+    case BL_CONDITION:
+        {
+            unsigned long cond = *(unsigned long const *)ptr;
+            for (unsigned j = 0; j < SIZE(tt_condorder); ++j) {
+                struct tty_cond_field *fldp = &X11_cond_labels[j];
+                fldp->color = NO_COLOR;
+                fldp->attrs = 0;
+                if ((cond & tt_condorder[j].mask) != 0) {
+                    fldp->text = tt_condorder[j].text;
                 } else {
-                    int c_i;
-
-                    for (c_i = 0; c_i < SIZE(tt_condorder); ++c_i)
-                        tt_reset_color(f, c_i, cond_colormasks);
+                    fldp->text = NULL;
                 }
             }
-        }
-#endif
-        fld = BL_FLUSH;
-    }
-
-    if (fld == BL_CONDITION) {
-        condptr = (unsigned long *) ptr;
-        X11_condition_bits = *condptr;
-        cond_colormasks = colormasks; /* expected to be non-Null */
-
-        prev_cond_indx = next_cond_indx;
-        next_cond_indx = 0;
-        /* if any conditions are active, set up their widgets */
-        if (X11_condition_bits)
-            for (f = 0; f < SIZE(tt_condorder); ++f)
-                DisplayCond(f, cond_colormasks);
-        return;
-
-    } else if (fld != BL_FLUSH) {
-        /* set up a specific field other than 'condition' */
-        text = (char *) ptr;
-        if (fld == BL_GOLD)
-            text = decode_mixed(goldbuf, text);
-        xtra_space[fld] = 0;
-        if (status_activefields[fld]) {
-            fmt = (fld == BL_TITLE && iflags.wc2_hitpointbar) ? "%-30s"
-                  : status_fieldfmt[fld] ? status_fieldfmt[fld] : "%s";
-            if (*fmt == ' ') {
-                ++xtra_space[fld];
-                ++fmt;
-            }
-            Sprintf(status_vals[fld], fmt, text);
-        } else {
-            /* don't expect this since core won't call status_update()
-               for a field which isn't active */
-            *status_vals[fld] = '\0';
-        }
 #ifdef STATUS_HILITES
-        if (!iflags.hilite_delta)
-            color = NO_COLOR;
+            for (unsigned i = 0; i < CLR_MAX; ++i) {
+                unsigned long mask = colormasks[i];
+                for (unsigned j = 0; j < SIZE(tt_condorder); ++j) {
+                    if ((mask & tt_condorder[j].mask) != 0) {
+                        struct tty_cond_field *fldp = &X11_cond_labels[j];
+                        fldp->color = i;
+                    }
+                }
+            }
+            for (unsigned i = CLR_MAX; i < BL_ATTCLR_MAX; ++i) {
+                unsigned long mask = colormasks[i];
+                for (unsigned j = 0; j < SIZE(tt_condorder); ++j) {
+                    if ((mask & tt_condorder[j].mask) != 0) {
+                        struct tty_cond_field *fldp = &X11_cond_labels[j];
+                        fldp->attrs |= 0x1 << (i - CLR_MAX);
+                    }
+                }
+            }
 #endif
-        X11_status_colors[fld] = color;
-        if (iflags.wc2_hitpointbar && fld == BL_HP) {
-            hpbar_percent = percent;
-            hpbar_color = color;
         }
+        break;
 
-        label = X11_status_labels[fld];
-        text = status_vals[fld];
-        PrepStatusField(fld, label, text);
-        return;
+    default:
+        if (0 <= fld && fld < SIZE(X11_status_labels)) {
+            struct tty_status_field *fldp = &X11_status_labels[fld];
+            const char *str = (const char *) ptr;
+            free(fldp->text);
+            fldp->text = dupstr(str);
+            fldp->chg = chg;
+            fldp->percent = percent;
+            fldp->color = color & 0xFF;
+            fldp->attrs = color >> 8;
+        }
+        break;
     }
-
-    /*
-     * BL_FLUSH:  draw all the status fields.
-     */
-    si = xw_status_win->Win_info.Status_info; /* for cached geometry */
-
-    for (y = 0; y < X11_NUM_STATUS_LINES; y++) { /* row */
-        dx = 0; /* no pixels written to this row yet */
-
-        for (x = 0; x < X11_NUM_STATUS_FIELD; x++) { /* 'column' */
-            f = X11_fieldorder[y][x];
-            if (f <= BL_FLUSH)
-                continue; /* skip padding in the fieldorder[][] layout */
-
-            if (f == BL_CONDITION) {
-                if (next_cond_indx > 0 || prev_cond_indx > 0)
-                    dx = render_conditions(y, dx);
-                continue;
-            }
-
-            label = X11_status_labels[f];
-            text = status_vals[f];
-
-            (void) memset((genericptr_t) args, 0, sizeof args);
-            num_args = 0;
-            XtSetArg(args[num_args], nhStr(XtNwidth), &lbl_wid); num_args++;
-            XtGetValues(label, args, num_args);
-            brd_wid = si->brd;
-
-            /* for a field which shouldn't be shown, we can't just skip
-               it because we might need to remove its previous content
-               if it has just been toggled off */
-            if (!status_activefields[f]) {
-                if (lbl_wid <= 1)
-                    continue;
-                text = "";
-                lbl_wid = (Dimension) 1;
-                brd_wid = (Dimension) 0;
-            } else if (xtra_space[f]) {
-                /* if this field was to be formatted with a leading space
-                   to separate it from the preceding field, we suppressed
-                   that space during formatting; insert separation between
-                   fields here; this prevents inverse video highlighting
-                   from inverting the separating space along with the text */
-                dx += xtra_space[f] * si->spacew;
-            }
-
-            /* where to display the current widget */
-            lbl_x = (Position) (dx + 1);
-            if (f == BL_VERS) {
-                Dimension win_wid = xw_status_win->pixel_width,
-                          fld_wid = lbl_wid + 2 * brd_wid;
-
-                /* in case the doodad for resizing the window via click and
-                   drag is in the lower right corner; justifying all the way
-                   to the edge results in the last character being obscured;
-                   avoid that by treating the 'vers' widget as one char
-                   bigger than it actually is (an implicit trailing space) */
-                fld_wid += si->spacew;
-                /* right justify if there's room */
-                if (dx < win_wid - fld_wid)
-                    lbl_x = win_wid - fld_wid;
-            }
-
-            (void) memset((genericptr_t) args, 0, sizeof args);
-            num_args = 0;
-            XtSetArg(args[num_args], nhStr(XtNlabel), text); num_args++;
-            /*XtSetArg(args[num_args], nhStr(XtNwidth), lbl_wid); num_args++;*/
-            /*XtSetArg(args[num_args], nhStr(XtNx), lbl_x); num_args++;*/
-            XtSetValues(label, args, num_args);
-            XtConfigureWidget(label, lbl_x, si->y[y],
-                              lbl_wid, si->ht, brd_wid);
-
-            /* track the right-most pixel written so far */
-            dx = (int) lbl_x + (int) (lbl_wid + 2 * brd_wid) - 1;
-        } /* [x] fields/columns in current row */
-    } /* [y] rows */
-
-    /* this probably doesn't buy us anything but it isn't a sure thing
-       that nethack will immediately ask for input (triggering auto-flush) */
-    (void) XFlush(XtDisplay(X11_status_labels[0]));
 }
 
 RESTORE_WARNING_FORMAT_NONLITERAL
@@ -951,57 +500,14 @@ X11_status_update(
         X11_status_update_tty(fld, ptr, chg, percent, color, colormasks);
 }
 
-/* create a widget for a particular status field or potential condition */
-static Widget
-create_tty_status_field(int fld, int condindx, Widget above, Widget left)
-{
-    Arg args[16];
-    Cardinal num_args;
-    char labelname[40];
-    int gap = condindx ? 5 : 0;
-
-    if (!condindx)
-        Sprintf(labelname, "label_%s", bl_idx_to_fldname(fld));
-    else
-        Sprintf(labelname, "cond_%02d", condindx);
-
-    /* set up widget attributes which (mostly) aren't going to be changing */
-    (void) memset((genericptr_t) args, 0, sizeof args);
-    num_args = 0;
-    if (above) {
-        XtSetArg(args[num_args], nhStr(XtNfromVert), above); num_args++;
-    }
-    if (left) {
-        XtSetArg(args[num_args], nhStr(XtNfromHoriz), left); num_args++;
-    }
-
-    XtSetArg(args[num_args], nhStr(XtNhorizDistance), gap); num_args++;
-    XtSetArg(args[num_args], nhStr(XtNvertDistance), 0); num_args++;
-
-    XtSetArg(args[num_args], nhStr(XtNtopMargin), 0); num_args++;
-    XtSetArg(args[num_args], nhStr(XtNbottomMargin), 0); num_args++;
-    XtSetArg(args[num_args], nhStr(XtNleftMargin), 0); num_args++;
-    XtSetArg(args[num_args], nhStr(XtNrightMargin), 0); num_args++;
-    XtSetArg(args[num_args], nhStr(XtNjustify), XtJustifyLeft); num_args++;
-    /* internalWidth:  default is 4; cut that it half and adjust regular
-       width to have it on both left and right instead of just on the left */
-    XtSetArg(args[num_args], nhStr(XtNinternalWidth), 2); num_args++;
-    XtSetArg(args[num_args], nhStr(XtNborderWidth), 0); num_args++;
-    XtSetArg(args[num_args], nhStr(XtNlabel), ""); num_args++;
-    return XtCreateManagedWidget(labelname, labelWidgetClass,
-                                 X11_status_widget, args, num_args);
-}
-
 /* create an overall status widget (X11_status_widget) and also
    separate widgets for all status fields and potential conditions */
 static Widget
 create_tty_status(Widget parent, Widget top)
 {
     Widget form; /* viewport that holds the form that surrounds everything */
-    Widget w, over_w, prev_w;
     Arg args[6];
     Cardinal num_args;
-    int x, y, i, fld;
 
     (void) memset((genericptr_t) args, 0, sizeof args);
     num_args = 0;
@@ -1019,33 +525,423 @@ create_tty_status(Widget parent, Widget top)
     num_args = 0;
     XtSetArg(args[num_args], XtNwidth, 400); num_args++;
     XtSetArg(args[num_args], XtNheight, 100); num_args++;
-    X11_status_widget = XtCreateManagedWidget("status_form", formWidgetClass,
+    X11_status_widget = XtCreateManagedWidget("status_form", windowWidgetClass,
                                               form, args, num_args);
 
-    for (y = 0; y < X11_NUM_STATUS_LINES; y++) {
-        fld = (y > 0) ? X11_fieldorder[y - 1][0] : 0; /* temp, for over_w */
-        /* for row(s) beyond the first, pick a widget in the previous
-           row to put this one underneath (in 'y' terms; 'x' is fluid) */
-        over_w = (y > 0) ? X11_status_labels[fld] : (Widget) 0;
-        /* widget on current row to put the next one to the right of ('x') */
-        prev_w = (Widget) 0;
-        for (x = 0; x < X11_NUM_STATUS_FIELD; x++) {
-            fld = X11_fieldorder[y][x]; /* next field to handle */
-            if (fld <= BL_FLUSH)
-                continue; /* skip fieldorder[][] padding */
+    int height = nhFontHeight(X11_status_widget) * 3;
+    num_args = 0;
+    XtSetArg(args[num_args], XtNheight, height); num_args++;
+    XtSetValues(form, args, num_args);
+    XtSetValues(X11_status_widget, args, num_args);
 
-            w = create_tty_status_field(fld, 0, over_w, prev_w);
-            X11_status_labels[fld] = prev_w = w;
+    XtAddCallback(X11_status_widget, XtNexposeCallback, tty_status_exposed,
+                  (XtPointer) 0);
+#ifdef STATUS_HILITES
+    XtAppAddTimeOut(app_context, blink_interval, tty_status_blink,
+                    (XtPointer) X11_status_widget);
+#endif
 
-            if (fld == BL_CONDITION) {
-                for (i = 1; i <= SIZE(X11_cond_labels); ++i) { /* 1..32 */
-                    w = create_tty_status_field(fld, i, over_w, prev_w);
-                    X11_cond_labels[i - 1] = prev_w = w;
+    return X11_status_widget;
+}
+
+/*
+ * TTY status window expose callback.
+ */
+/*ARGSUSED*/
+static void
+tty_status_exposed(Widget w, XtPointer client_data, /* unused */
+                   XtPointer widget_data) /* expose event from Window widget */
+{
+    tty_status_redraw(w);
+    nhUse(client_data);
+    nhUse(widget_data);
+}
+
+#ifdef STATUS_HILITES
+static void
+tty_status_blink(XtPointer client_data, XtIntervalId *timer)
+{
+    Widget w = (Widget) client_data;
+    nhUse(timer);
+
+    /* Do we have any active blink attributes? */
+    boolean have_blink = FALSE;
+    for (unsigned i = 0; i < SIZE(X11_status_labels) && !have_blink; ++i) {
+        have_blink = (X11_status_labels[i].attrs & HL_BLINK) != 0;
+    }
+    for (unsigned i = 0; i < SIZE(X11_cond_labels) && !have_blink; ++i) {
+        have_blink = (X11_cond_labels[i].attrs & HL_BLINK) != 0;
+    }
+
+    if (have_blink) {
+        tty_status_redraw(w);
+        blink = !blink;
+    }
+
+    /* Do it again */
+    XtAppAddTimeOut(app_context, blink_interval, tty_status_blink, client_data);
+}
+#endif /* STATUS_HILITES */
+
+static void
+tty_status_redraw(Widget w)
+{
+    Arg args[5];
+    int num_args;
+    Dimension width;
+
+    /* Name is placed here */
+    int name_x = 0;
+    int name_y = 0;
+    int name_width = 0;
+
+    /* Get the height of the font and the width of the widget */
+    num_args = 0;
+    XtSetArg(args[num_args], XtNwidth, &width); num_args++;
+    XtGetValues(w, args, num_args);
+    int height = nhFontHeight(w);
+
+    int x = 0;
+    int y = 0;
+    XClearWindow(XtDisplay(w), XtWindow(w));
+    if (iflags.wc2_statuslines <= 2) {
+        for (unsigned row = 0; row < SIZE(X11_fieldorder_2); ++row) {
+            for (unsigned i = 0; i < SIZE(X11_fieldorder_2[0]); ++i) {
+                enum statusfields fld = X11_fieldorder_2[row][i];
+                if (fld == BL_FLUSH) {
+                    break;
+                }
+                int wid = tty_render_field(w, x, y, fld);
+                if (fld == BL_TITLE) {
+                    name_x = x;
+                    name_y = y;
+                    name_width = wid;
+                }
+                x += wid;
+            }
+            x = 0;
+            y += height;
+        }
+    } else {
+        for (unsigned row = 0; row < SIZE(X11_fieldorder_3); ++row) {
+            for (unsigned i = 0; i < SIZE(X11_fieldorder_3[0]); ++i) {
+                enum statusfields fld = X11_fieldorder_3[row][i];
+                if (fld == BL_FLUSH) {
+                    break;
+                }
+                int wid = tty_render_field(w, x, y, fld);
+                if (fld == BL_TITLE) {
+                    name_x = x;
+                    name_y = y;
+                    name_width = wid;
+                }
+                x += wid;
+            }
+            x = 0;
+            y += height;
+        }
+    }
+
+    /*
+     * Draw the hit point bar using:
+     * * the colors for hit points
+     * * the opposite of the HL_INVERSE bit for the title
+     * * the font for the title
+     */
+    if (name_width != 0 && iflags.wc2_hitpointbar) {
+        XRectangle clip = {
+            .x = name_x,
+            .y = name_y,
+            .width = name_width * X11_status_labels[BL_HP].percent / 100,
+            .height = height
+        };
+        struct tty_status_field const *title = &X11_status_labels[BL_TITLE];
+        struct tty_status_field const *hitp = &X11_status_labels[BL_HP];
+        int attrs = ((title->attrs & ~HL_DIM) ^ HL_INVERSE)
+                  | (hitp->attrs & HL_DIM);
+        tty_render_text(w, &clip, name_x, name_y,
+                        title->text, hitp->color, attrs,
+                        BL_TITLE);
+    }
+}
+
+/* Render one field of the TTY status */
+static int
+tty_render_field(Widget w, int x, int y, enum statusfields fld)
+{
+    static struct stat_fmt {
+        const char *pre;
+        const char *post;
+    } formats[MAXBLSTATS] = {
+        [BL_TITLE] = { NULL, NULL },
+        [BL_STR] = { "St:", NULL },
+        [BL_DX] = { "Dx:", NULL },
+        [BL_CO] = { "Co:", NULL },
+        [BL_IN] = { "In:", NULL },
+        [BL_WI] = { "Wi:", NULL },
+        [BL_CH] = { "Ch:", NULL },
+        [BL_ALIGN] = { NULL, NULL },
+        [BL_SCORE] = { "S:", NULL },
+        [BL_CAP] = { NULL, NULL },
+        [BL_GOLD] = { NULL, NULL },
+        [BL_ENE] = { "Pw:", NULL },
+        [BL_ENEMAX] = { "(", ")" },
+        [BL_XP] = { "Xp:", NULL },
+        [BL_AC] = { "AC:", NULL },
+        [BL_HD] = { "HD:", NULL },
+        [BL_TIME] = { "T:", NULL },
+        [BL_HUNGER] = { NULL, NULL },
+        [BL_HP] = { "HP:", NULL },
+        [BL_HPMAX] = { "(", ")" },
+        [BL_LEVELDESC] = { NULL, NULL },
+        [BL_EXP] = { "/", NULL },
+        [BL_CONDITION] = { NULL, NULL },
+        [BL_WEAPON] = { NULL, NULL },
+        [BL_ARMOR] = { NULL, NULL },
+        [BL_TERRAIN] = { NULL, NULL },
+        [BL_VERS] = { NULL, NULL },
+    };
+
+    int width = 0;
+
+    switch (fld) {
+    case BL_FLUSH:
+        break;
+
+    case BL_CONDITION:
+        for (unsigned j = 0; j < SIZE(X11_cond_labels); ++j) {
+            struct tty_cond_field const *fldp = &X11_cond_labels[j];
+            if (fldp->text != NULL) {
+                width += tty_render_text(w, NULL, x + width, y, " ", NO_COLOR, 0, BL_FLUSH);
+                width += tty_render_text(w, NULL, x + width, y, fldp->text, fldp->color, fldp->attrs, BL_FLUSH);
+            }
+        }
+        break;
+
+    default:
+        {
+            struct tty_status_field const *fldp = &X11_status_labels[fld];
+            if (fldp->text != NULL && fldp->text[0] != '\0') {
+                if (x != 0 && (formats[fld].pre == NULL || strchr("(/", formats[fld].pre[0]) == NULL)) {
+                    width += tty_render_text(w, NULL, x + width, y, " ", NO_COLOR, 0, BL_FLUSH);
+                }
+                if (formats[fld].pre != NULL) {
+                    width += tty_render_text(w, NULL, x + width, y, formats[fld].pre, NO_COLOR, 0, BL_FLUSH);
+                }
+                width += tty_render_text(w, NULL, x + width, y, fldp->text, fldp->color,
+                                     fldp->attrs, fld);
+                if (formats[fld].post != NULL) {
+                    width += tty_render_text(w, NULL, x + width, y, formats[fld].post, NO_COLOR, 0, BL_FLUSH);
                 }
             }
         }
+        break;
     }
-    return X11_status_widget;
+
+    return width;
+}
+
+/* Render text as part of the TTY status */
+static int
+tty_render_text(Widget w, const XRectangle *clip, int x, int y,
+                const char *text, int color, int attr, enum statusfields fld)
+{
+#ifndef STATUS_HILITES
+    nhUse(color);
+    nhUse(attr);
+#endif
+
+    Arg args[5];
+    Cardinal num_args;
+    XGCValues values;
+    Pixel fgpixel, bgpixel;
+    XFontStruct *font;
+    XFontStruct *font_italic = NULL; /* custodial */
+    int goldwidth = 0;
+
+    /* Get the colors */
+    tty_status_colors(w, color, attr, &fgpixel, &bgpixel);
+
+    values.foreground = fgpixel;
+    values.background = bgpixel;
+
+    /* Get the font */
+    num_args = 0;
+    XtSetArg(args[num_args], XtNfont, &font); num_args++;
+    XtGetValues(w, args, num_args);
+
+    /* Implement bold font */
+    if (attr & HL_BOLD) {
+        struct xwindow *wp = find_widget(w);
+        load_boldfont(wp, w);
+        font = wp->boldfs;
+    }
+
+    /* Implement italic font */
+    if (attr & HL_ITALIC) {
+        /* font may also be bold */
+        font_italic = X11_italic_font(XtDisplay(w), font);
+        if (font_italic != NULL) {
+            font = font_italic;
+        }
+    }
+
+    values.font = font->fid;
+    values.function = GXcopy;
+    GC ggc = XtGetGC(w,
+                     GCFunction | GCForeground | GCBackground | GCFont,
+                     &values);
+
+    /* If drawing a hitpoint bar, we'll need a clipping rectangle */
+    if (clip != NULL) {
+        /* @#$% non-const-correct Xlib functions */
+        XRectangle clip2 = *clip;
+        XSetClipRectangles(XtDisplay(w), ggc, 0, 0, &clip2, 1, Unsorted);
+    }
+
+    /* Gold will begin with a glyph string. Convert this to the proper
+       character, which might possibly be Unicode */
+    if (fld == BL_GOLD && memcmp(text, "\\G", 2) == 0) {
+        char *end;
+        unsigned long glyphcode = strtoul(text+2, &end, 16);
+        if ((glyphcode >> 16) == (unsigned) svc.context.rndencode && *end == ':') {
+            /* We have a proper glyph code */
+            glyph_info glyphinfo;
+            glyphcode &= 0xFFFF;
+            map_glyphinfo(0, 0, glyphcode, 0, &glyphinfo);
+            X11_map_symbol goldsym = X11_glyph_char(&glyphinfo);
+#ifdef ENHANCED_SYMBOLS
+            if (goldsym > 0xFFFF) {
+                /* No support for supplementary planes */
+                goldsym = GOLD_SYM;
+            }
+            if (goldsym > 0x7F) {
+                XFontStruct *unifont = X11_unicode_font(XtDisplay(w), font);
+
+                if (unifont != NULL) {
+                    XChar2b goldstr[1];
+                    values.font = unifont->fid;
+                    GC ggc2 = XtGetGC(w,
+                                      GCFunction | GCForeground | GCBackground | GCFont,
+                                      &values);
+
+                    goldstr[0].byte1 = goldsym >> 8;
+                    goldstr[0].byte2 = goldsym & 0xFF;
+                    goldwidth = XTextWidth16(font, goldstr, 1);
+
+                    /* Render the string */
+                    XDrawImageString16(XtDisplay(w), XtWindow(w), ggc,
+                                       x, y + font->max_bounds.ascent,
+                                       goldstr, 1);
+
+                    XFreeFont(XtDisplay(w), unifont);
+                    XtReleaseGC(w, ggc2);
+                }
+            }
+#endif
+            if (goldwidth == 0) {
+                char goldstr[1];
+                goldstr[0] = (char) goldsym;
+                goldwidth = XTextWidth(font, goldstr, 1);
+
+                /* Render the string */
+                XDrawImageString(XtDisplay(w), XtWindow(w), ggc,
+                                 x, y + font->max_bounds.ascent,
+                                 goldstr, 1);
+            }
+
+            text = end;
+        }
+    }
+
+    /* Get the width of the rendered string */
+    int width = XTextWidth(font, text, strlen(text)) + goldwidth;
+
+    /* Place version on the right */
+    if (fld == BL_VERS) {
+        num_args = 0;
+        Dimension wwidth;
+        XtSetArg(args[num_args], XtNwidth, &wwidth); num_args++;
+        XtGetValues(w, args, num_args);
+        int x2 = wwidth - width;
+        if (x2 > x) {
+            x = x2;
+        }
+    }
+
+    /* Render the string */
+    XDrawImageString(XtDisplay(w), XtWindow(w), ggc,
+                     x + goldwidth, y + font->max_bounds.ascent,
+                     text, strlen(text));
+
+#ifdef STATUS_HILITES
+    /* Implement underline */
+    if (attr & HL_ULINE) {
+        XDrawLine(XtDisplay(w), XtWindow(w), ggc,
+                  x, y + font->max_bounds.ascent,
+                  x + width - 1, y + font->max_bounds.ascent);
+    }
+#endif /* STATUS_HILITES */
+
+    /* Release resources */
+    XtReleaseGC(w, ggc);
+    if (font_italic != NULL) {
+        XFreeFont(XtDisplay(w), font_italic);
+    }
+
+    /* Caller will advance x by the width */
+    return width;
+}
+
+static void
+tty_status_colors(Widget w, int color, int attr, Pixel *fgpixel, Pixel *bgpixel)
+{
+    Cardinal num_args;
+    Arg args[5];
+
+    /* Get the default colors */
+    num_args = 0;
+    XtSetArg(args[num_args], XtNforeground, fgpixel); num_args++;
+    XtSetArg(args[num_args], XtNbackground, bgpixel); num_args++;
+    XtGetValues(w, args, num_args);
+
+    /* Implement color if requested */
+#ifdef STATUS_HILITES
+    if (color != NO_COLOR) {
+        XrmValue source;
+        XrmValue dest;
+        Pixel pixel;
+        const char *cname = fancy_status_hilite_colors[color];
+        source.addr = (XPointer) cname;
+        source.size = (unsigned int) strlen(cname) + 1;
+        dest.size = (unsigned int) sizeof (Pixel);
+        dest.addr = (XPointer) &pixel;
+        if (XtConvertAndStore(w, XtRString, &source, XtRPixel, &dest))
+            *fgpixel = pixel;
+    }
+
+    /* Implement dim text */
+    if (attr & HL_DIM) {
+        *fgpixel = (*fgpixel & 0xFEFEFE) >> 1;
+        *bgpixel = (*bgpixel & 0xFEFEFE) >> 1;
+    }
+
+    /* Implement blink */
+    if ((attr & HL_BLINK) && blink) {
+        *fgpixel = *bgpixel;
+    }
+
+    /* Get a graphics context */
+    if (attr & HL_INVERSE) {
+        Pixel swap;
+        swap = *fgpixel;
+        *fgpixel = *bgpixel;
+        *bgpixel = swap;
+    }
+#else
+    nhUse(color);
+    nhUse(attr);
+#endif
 }
 
 /*ARGSUSED*/

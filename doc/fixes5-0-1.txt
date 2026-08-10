@@ -242,6 +242,8 @@ Windows: in the event that there is a collision between a menu group
 	accelerator and an individual menu item's accelerator, disregard
 	the group accelerator; only known collision is '$' at this time
 X11: obey timed_delay
+X11: improve TTY-style status line with text attributes for status hilites,
+	hitpointbar, some unicode support, 3-line status
 
 
 General New Features
