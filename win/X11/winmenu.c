@@ -168,6 +168,7 @@ menu_select(Widget w, XtPointer client_data, XtPointer call_data)
 
     XtSetArg(args[0], nhStr(XtNlabel), curr->str);
     XtSetValues(w, args, ONE);
+    X11_update_label(w);
 
     if (menu_info->how == PICK_ONE)
         menu_popdown(wp);
@@ -214,6 +215,7 @@ invert_line(struct xwindow *wp, x11_menu_item *curr, int which, long how_many)
         XtSetValues(curr->w, args, ONE);
         curr->pick_count = -1L;
     }
+    X11_update_label(curr->w);
 }
 
 static XEvent fake_perminv_event;
@@ -1350,14 +1352,8 @@ menu_create_entries(struct xwindow *wp, struct menu *curr_menu)
                                                        ? commandWidgetClass
                                                        : labelWidgetClass,
                                                      wp->w, args, num_args);
-
-        if (attr == ATR_BOLD) {
-            load_boldfont(wp, curr->w);
-            num_args = 0;
-            XtSetArg(args[num_args], nhStr(XtNfont),
-                     wp->boldfs); num_args++;
-            XtSetValues(curr->w, args, num_args);
-        }
+        X11_wrap_widget(curr->w);
+        X11_set_attrs(curr->w, 0x1 << attr);
 
         if (canpick)
             XtAddCallback(linewidget, XtNcallback, menu_select,
