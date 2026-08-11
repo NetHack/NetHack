@@ -1398,6 +1398,7 @@ null_out_status(void)
         case SV_NAME:
             XtSetArg(args[0], XtNlabel, "");
             XtSetValues(sv->w, args, ONE);
+            X11_update_label(sv->w);
             break;
 
         default:
@@ -1473,6 +1474,7 @@ update_val(struct X_status_value *attr_rec, long new_value)
         Strcpy((char *) attr_rec->name, buf);
         XtSetArg(args[0], XtNlabel, buf);
         XtSetValues(attr_rec->w, args, ONE);
+        X11_update_label(attr_rec->w);
 
     } else if (attr_rec->type == SV_NAME) {
         if (attr_rec->last_value == new_value)
@@ -1494,6 +1496,7 @@ update_val(struct X_status_value *attr_rec, long new_value)
 
         XtSetArg(args[0], XtNlabel, buf);
         XtSetValues(attr_rec->w, args, ONE);
+        X11_update_label(attr_rec->w);
 
     } else { /* a value pair */
         boolean force_update = FALSE;
@@ -1687,6 +1690,7 @@ update_color(struct X_status_value *sv, int color)
 
         XtSetArg(args[0], arg_name, pixel);
         XtSetValues(w, args, ONE);
+        X11_update_label(w);
     }
 }
 
@@ -2096,6 +2100,7 @@ create_widget(Widget parent, struct X_status_value *sv, int sv_index)
                                          : "dlevel",
                                       labelWidgetClass, parent,
                                       args, num_args);
+        X11_wrap_widget(sv->w);
         break;
     case SV_NAME: {
         char buf[BUFSZ];
@@ -2132,6 +2137,7 @@ create_widget(Widget parent, struct X_status_value *sv, int sv_index)
         XtSetArg(args[num_args], XtNinternalHeight, 0); num_args++;
         sv->w = XtCreateManagedWidget(sv->name, labelWidgetClass, parent,
                                       args, num_args);
+        X11_wrap_widget(sv->w);
         break;
     }
     default:
