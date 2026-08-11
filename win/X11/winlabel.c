@@ -282,6 +282,9 @@ update_label(Widget w, WidgetData *data)
             values.foreground = (values.foreground & 0xFEFEFE) >> 1;
             values.background = (values.background & 0xFEFEFE) >> 1;
         }
+        if ((attrs & HL_BLINK) && X11_blink) {
+            values.foreground = values.background;
+        }
         values.font = font->fid;
         values.function = GXcopy;
         GC ggc = XtGetGC(w,
@@ -504,4 +507,18 @@ delete_widget(Widget w)
         widget_table[i] = widget_table[i+1];
     }
     --num_widgets;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
+/* Call every time the blink flag changes */
+void
+X11_blink_labels(void)
+{
+    for (unsigned i = 0; i < num_widgets; ++i) {
+        WidgetBucket *bucket = &widget_table[i];
+        if (bucket->data->attrs & HL_BLINK) {
+            update_label(bucket->w, bucket->data);
+        }
+    }
 }
