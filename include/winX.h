@@ -523,5 +523,7 @@ extern XFontStruct *X11_unicode_font(Display *, XFontStruct *);
 /* Functions for management of enhanced labels */
 extern void X11_wrap_widget(Widget);
 extern void X11_update_label(Widget);
+extern void X11_set_attrs(Widget, unsigned);
+extern void X11_set_percent(Widget, unsigned, Pixel);
 
 #endif /* WINX_H */

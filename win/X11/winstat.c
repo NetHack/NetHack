@@ -110,6 +110,7 @@ static void destroy_status_window_fancy(struct xwindow *);
 static void destroy_status_window_tty(struct xwindow *);
 static void adjust_status_fancy(struct xwindow *, const char *);
 static void adjust_status_tty(struct xwindow *, const char *);
+static void set_percent(int, int, int);
 static void tty_status_exposed(Widget, XtPointer, XtPointer);
 #ifdef STATUS_HILITES
 static void tty_status_blink(XtPointer client_data, XtIntervalId *timer);
@@ -390,7 +391,7 @@ static void
 X11_status_update_fancy(
     int fld,
     genericptr_t ptr,
-    int chg UNUSED, int percent UNUSED,
+    int chg UNUSED, int percent,
     int colrattr,
     unsigned long *colormasks UNUSED)
 {
@@ -480,6 +481,11 @@ X11_status_update_fancy(
                 update_fancy_status_field(bl_to_fancyfield[i].ff, colr, attr);
                 break;
             }
+
+        /* Hit point bar */
+        if (fld == BL_HP) {
+            set_percent(F_NAME, iflags.wc2_hitpointbar ? percent : 0, colr);
+        }
     }
 }
 
@@ -1221,6 +1227,7 @@ static void hilight_label(Widget);
 static void update_val(struct X_status_value *, long);
 static void skip_cond_val(struct X_status_value *);
 static void update_color(struct X_status_value *, int);
+static Pixel color_to_pixel(Widget, int);
 static boolean name_widget_has_label(struct X_status_value *);
 static void apply_hilite_attributes(struct X_status_value *, int);
 static const char *width_string(int);
@@ -1667,8 +1674,6 @@ update_color(struct X_status_value *sv, int color)
 {
     Pixel pixel = 0;
     Arg args[1];
-    XrmValue source;
-    XrmValue dest;
     Widget w = (sv->type == SV_LABEL || sv->type == SV_NAME) ? sv->w
                : get_value_widget(sv->w);
 
@@ -1677,12 +1682,8 @@ update_color(struct X_status_value *sv, int color)
             pixel = sv->default_fg;
         sv->colr = NO_COLOR;
     } else {
-        source.addr = (XPointer) fancy_status_hilite_colors[color];
-        source.size = (unsigned int) strlen((const char *) source.addr) + 1;
-        dest.size = (unsigned int) sizeof (Pixel);
-        dest.addr = (XPointer) &pixel;
-        if (XtConvertAndStore(w, XtRString, &source, XtRPixel, &dest))
-            sv->colr = color;
+        pixel = color_to_pixel(w, color);
+        sv->colr = color;
     }
     if (pixel != 0) {
         char *arg_name = (sv->set || sv->inverted_hilite) ? XtNbackground
@@ -1692,6 +1693,30 @@ update_color(struct X_status_value *sv, int color)
         XtSetValues(w, args, ONE);
         X11_update_label(w);
     }
+}
+
+static Pixel
+color_to_pixel(Widget w, int color)
+{
+    Pixel pixel;
+
+    if (fancy_status_hilite_colors[color][0] != '\0') {
+        XrmValue source;
+        XrmValue dest;
+        source.addr = (XPointer) fancy_status_hilite_colors[color];
+        source.size = (unsigned int) strlen((const char *) source.addr) + 1;
+        dest.size = (unsigned int) sizeof (Pixel);
+        dest.addr = (XPointer) &pixel;
+        if (XtConvertAndStore(w, XtRString, &source, XtRPixel, &dest)) {
+            return pixel;
+        }
+    }
+
+    pixel = 0xFFFFFF;
+    Arg args[1];
+    XtSetArg(args[0], XtNforeground, &pixel);
+    XtGetValues(toplevel, args, ONE);
+    return pixel;
 }
 
 static boolean
@@ -1726,6 +1751,13 @@ apply_hilite_attributes(struct X_status_value *sv, int attributes)
        HL_ATTCLR_BLINK, HL_ATTCLR_ULINE, and HL_ATTCLR_BOLD. If so,
        extract the above into its own function apply_hilite_inverse()
        and each other attribute into its own to keep the code clean. */
+}
+
+static void
+set_percent(int index, int percent, int color)
+{
+    Widget w = shown_stats[index].w;
+    X11_set_percent(w, percent, color_to_pixel(w, color));
 }
 
 /*
