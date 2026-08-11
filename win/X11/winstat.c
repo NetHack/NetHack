@@ -1223,12 +1223,10 @@ struct f_overload {
 
 static const struct f_overload *ff_ovld_from_mask(unsigned long);
 static const struct f_overload *ff_ovld_from_indx(int);
-static void hilight_label(Widget);
 static void update_val(struct X_status_value *, long);
 static void skip_cond_val(struct X_status_value *);
 static void update_color(struct X_status_value *, int);
 static Pixel color_to_pixel(Widget, int);
-static boolean name_widget_has_label(struct X_status_value *);
 static void apply_hilite_attributes(struct X_status_value *, int);
 static const char *width_string(int);
 static void create_widget(Widget, struct X_status_value *, int);
@@ -1413,18 +1411,6 @@ null_out_status(void)
             break;
         }
     }
-}
-
-/* this is almost an exact duplicate of hilight_value() */
-static void
-hilight_label(Widget w) /* label widget */
-{
-    /*
-     * This predates STATUS_HILITES.
-     * It is used to show any changed item in inverse and gets
-     * reset on the next turn.
-     */
-    swap_fg_bg(w);
 }
 
 DISABLE_WARNING_FORMAT_NONLITERAL
@@ -1631,14 +1617,10 @@ update_val(struct X_status_value *attr_rec, long new_value)
         if (attr_rec != &shown_stats[F_TIME]
             && attr_rec != &shown_stats[F_VERS]
             && !attr_rec->set ^ !*buf) {
-            /* But don't hilite if inverted from status_hilite since
-               it will already be hilited by apply_hilite_attributes(). */
-            if (!attr_rec->inverted_hilite) {
-                if (attr_rec->type == SV_VALUE)
-                    hilight_value(attr_rec->w);
-                else
-                    hilight_label(attr_rec->w);
-            }
+            if (attr_rec->type == SV_VALUE)
+                X11_set_highlight(get_value_widget(attr_rec->w), TRUE);
+            else
+                X11_set_highlight(attr_rec->w, TRUE);
             attr_rec->set = !attr_rec->set;
         }
         attr_rec->turn_count = 0;
@@ -1664,7 +1646,7 @@ skip_cond_val(struct X_status_value *sv)
            also requested to be highlighted, it used its own copy of
            'set' but the same widget so the highlighting got toggled
            off; this will turn in back on in that exceptional case */
-        hilight_label(sv->w);
+        X11_set_highlight(sv->w, FALSE);
         sv->set = FALSE;
     }
 }
@@ -1686,10 +1668,7 @@ update_color(struct X_status_value *sv, int color)
         sv->colr = color;
     }
     if (pixel != 0) {
-        char *arg_name = (sv->set || sv->inverted_hilite) ? XtNbackground
-                         : XtNforeground;
-
-        XtSetArg(args[0], arg_name, pixel);
+        XtSetArg(args[0], XtNforeground, pixel);
         XtSetValues(w, args, ONE);
         X11_update_label(w);
     }
@@ -1719,38 +1698,14 @@ color_to_pixel(Widget w, int color)
     return pixel;
 }
 
-static boolean
-name_widget_has_label(struct X_status_value *sv)
-{
-    Arg args[1];
-    const char *label;
-
-    XtSetArg(args[0], XtNlabel, &label);
-    XtGetValues(sv->w, args, ONE);
-    return (*label != '\0');
-}
-
 static void
 apply_hilite_attributes(struct X_status_value *sv, int attributes)
 {
-    boolean attr_inversion = ((HL_INVERSE & attributes)
-                              && (sv->type != SV_NAME
-                                  || name_widget_has_label(sv)));
-
-    if (sv->inverted_hilite != attr_inversion) {
-        sv->inverted_hilite = attr_inversion;
-        if (!sv->set) {
-            if (sv->type == SV_VALUE)
-                hilight_value(sv->w);
-            else
-                hilight_label(sv->w);
-        }
+    Widget w = sv->w;
+    if (sv->type == SV_VALUE) {
+        w = get_value_widget(w);
     }
-    sv->attr = attributes;
-    /* Could possibly add more attributes here: HL_ATTCLR_DIM,
-       HL_ATTCLR_BLINK, HL_ATTCLR_ULINE, and HL_ATTCLR_BOLD. If so,
-       extract the above into its own function apply_hilite_inverse()
-       and each other attribute into its own to keep the code clean. */
+    X11_set_attrs(w, attributes);
 }
 
 static void
@@ -2021,14 +1976,10 @@ check_turn_events(void)
             continue;
 
         if (sv->turn_count++ >= hilight_time) {
-            /* unhighlights by toggling a highlighted item back off again,
-               unless forced inverted by a status_hilite rule */
-            if (!sv->inverted_hilite) {
-                if (sv->type == SV_VALUE)
-                    hilight_value(sv->w);
-                else
-                    hilight_label(sv->w);
-            }
+            if (sv->type == SV_VALUE)
+                X11_set_highlight(get_value_widget(sv->w), FALSE);
+            else
+                X11_set_highlight(sv->w, FALSE);
             sv->set = FALSE;
         }
     }

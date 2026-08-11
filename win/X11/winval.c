@@ -152,14 +152,6 @@ get_value_width(Widget w)
     return (int) width;
 }
 
-/* Swap foreground and background colors (this is the best I can do with */
-/* a label widget, unless I can get some init hook in there).            */
-void
-hilight_value(Widget w)
-{
-    swap_fg_bg(get_value_widget(w));
-}
-
 /* Swap the foreground and background colors of the given widget */
 void
 swap_fg_bg(Widget w)

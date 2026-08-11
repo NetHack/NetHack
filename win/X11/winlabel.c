@@ -25,6 +25,7 @@ typedef struct WidgetData {
 
     /* Attributes */
     unsigned attrs;
+    boolean highlight;
 
     /* Fonts for italic, bold and bold-italic */
     XFontStruct *font[4]; /* To use the fonts */
@@ -139,6 +140,16 @@ X11_set_attrs(Widget w, unsigned attrs)
 }
 
 void
+X11_set_highlight(Widget w, boolean highlight)
+{
+    WidgetData *data = get_widget_data(w);
+    if (data != NULL) {
+        data->highlight = highlight;
+        update_label(w, data);
+    }
+}
+
+void
 X11_set_percent(Widget w, unsigned percent, Pixel color)
 {
     WidgetData *data = get_widget_data(w);
@@ -232,16 +243,23 @@ update_label(Widget w, WidgetData *data)
         XtSetArg(args[num_args], XtNheight, &height); num_args++;
         XtGetValues(w, args, num_args);
     }
-    width = max(width, 1);
-    height = max(height, 1);
+    if (width < 2 || height < 2) {
+        /* Pixmap must not have zero size, or a crash will ensue;
+           minimum size 2 simplifies border logic */
+        width = max(width, 2);
+        height = max(height, 2);
+        fgpixel = bgpixel;
+    }
 
-    /* Use the full width of the widget if a percentage bar is set */
-    if (data->percent != 0) {
-        Dimension wwidth;
+    /* Use the full width of the widget if a percentage bar is set or inverse
+       is in effect */
+    if (data->percent != 0 || (attrs & HL_INVERSE) != 0 || data->highlight) {
+        Dimension wwidth, iwidth;
         num_args = 0;
         XtSetArg(args[num_args], XtNwidth, &wwidth); num_args++;
+        XtSetArg(args[num_args], XtNinternalWidth, &iwidth); num_args++;
         XtGetValues(w, args, num_args);
-        width = max(width, wwidth);
+        width = max(width, wwidth - iwidth*2);
     }
 
     /* Create the pixmap */
@@ -253,7 +271,7 @@ update_label(Widget w, WidgetData *data)
     for (unsigned pass = 0; pass < 2; ++pass) {
         XGCValues values;
 
-        if (attrs & HL_INVERSE) {
+        if (!!(attrs & HL_INVERSE) ^ !!data->highlight) {
             values.foreground = bgpixel;
             values.background = fgpixel;
         } else {
@@ -280,7 +298,11 @@ update_label(Widget w, WidgetData *data)
             XSetClipRectangles(display, ggc, 0, 0, &clip, 1, Unsorted);
         }
 
-        XSetForeground(display, ggc, values.background);
+        /* Draw a border for inverse and highlight together */
+        /* Otherwise, fill with the background color */
+        if (!((attrs & HL_INVERSE) && data->highlight)) {
+            XSetForeground(display, ggc, values.background);
+        }
         XFillRectangle(display, new_pixmap, ggc, 0, 0, width, height);
         XSetForeground(display, ggc, values.foreground);
 
@@ -314,9 +336,16 @@ update_label(Widget w, WidgetData *data)
             }
 
             /* Render the line */
-            XDrawString(display, new_pixmap, ggc,
-                        x, y,
-                        label + i, line2);
+            XDrawImageString(display, new_pixmap, ggc,
+                             x, y,
+                             label + i, line2);
+
+            /* Draw the underline if requested */
+            if (attrs & HL_ULINE) {
+                XDrawLine(display, new_pixmap, ggc,
+                          x, y,
+                          x + lwidth - 1, y);
+            }
 
             y += font->ascent + font->descent;
 
@@ -325,6 +354,11 @@ update_label(Widget w, WidgetData *data)
             if (label[i] == '\n') {
                 ++i;
             }
+        }
+
+        /* Ensure a one-pixel border if both inverse and highlight */
+        if ((attrs & HL_INVERSE) && data->highlight) {
+            XDrawRectangle(display, new_pixmap, ggc, 0, 0, width-1, height-1);
         }
 
         XtReleaseGC(w, ggc);
