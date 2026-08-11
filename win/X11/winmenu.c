@@ -1062,6 +1062,7 @@ X11_select_menu(winid window, int how, menu_item **menu_list)
     menu_create_entries(wp, &menu_info->curr_menu);
 
     /* if viewport will be bigger than the screen, limit its height */
+    XtRealizeWidget(wp->popup); /* need to realize before we get size/pos */
     num_args = 0;
     XtSetArg(args[num_args], XtNwidth, &v_pixel_width); num_args++;
     XtSetArg(args[num_args], XtNheight, &v_pixel_height); num_args++;
@@ -1076,9 +1077,8 @@ X11_select_menu(winid window, int how, menu_item **menu_list)
         num_args = 0;
         XtSetArg(args[num_args], XtNwidth, v_pixel_width); num_args++;
         XtSetArg(args[num_args], XtNheight, v_pixel_height); num_args++;
-        XtSetValues(wp->w, args, num_args);
+        XtSetValues(wp->popup, args, num_args);
     }
-    XtRealizeWidget(wp->popup); /* need to realize before we position */
 
     /* if menu is not up, position it */
     if (!menu_info->is_up) {
