@@ -454,7 +454,6 @@ extern int get_name_width(Widget);
 extern Widget get_value_widget(Widget);
 extern void set_value_width(Widget, int);
 extern int get_value_width(Widget);
-extern void hilight_value(Widget);
 extern void swap_fg_bg(Widget);
 extern void set_value(Widget w, const char *new_value);
 /* external declarations */
@@ -524,6 +523,7 @@ extern XFontStruct *X11_unicode_font(Display *, XFontStruct *);
 extern void X11_wrap_widget(Widget);
 extern void X11_update_label(Widget);
 extern void X11_set_attrs(Widget, unsigned);
+extern void X11_set_highlight(Widget, boolean);
 extern void X11_set_percent(Widget, unsigned, Pixel);
 
 #endif /* WINX_H */
