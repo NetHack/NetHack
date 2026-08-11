@@ -409,7 +409,9 @@ free_fonts(Widget w, WidgetData *data)
 {
     Display *display = XtDisplay(w);
     for (unsigned i = 0; i < 4; ++i) {
-        XFreeFont(display, data->font_ptr[i]);
+        if (data->font_ptr[i] != NULL) {
+            XFreeFont(display, data->font_ptr[i]);
+        }
         data->font[i] = NULL;
         data->font_ptr[i] = NULL;
     }
