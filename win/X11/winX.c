@@ -3005,6 +3005,27 @@ X11_glyph_char(const glyph_info *glyphinfo)
 #endif
 }
 
+/* Given an XFontStruct, return a corresponding bold font */
+XFontStruct *
+X11_bold_font(Display *display, XFontStruct *font)
+{
+    Atom font_atom;
+    if (!XGetFontProperty(font, XA_FONT, &font_atom)) {
+        return NULL;
+    }
+
+    const char *font_name = XGetAtomName(display, font_atom);
+    if (font_name == NULL) {
+        return NULL;
+    }
+
+    char *bold_font = fontname_boldify(font_name);
+    XFontStruct *font2 = XLoadQueryFont(display, bold_font);
+    free(bold_font);
+
+    return font2;
+}
+
 /* Given an XFontStruct, return a corresponding italic font */
 XFontStruct *
 X11_italic_font(Display *display, XFontStruct *font)

@@ -514,9 +514,14 @@ extern void X11_preference_update(const char *);
 extern void X11_update_inventory(int);
 extern win_request_info *X11_ctrl_nhwindow(winid, int, win_request_info *);
 extern X11_map_symbol X11_glyph_char(const glyph_info *);
+extern XFontStruct *X11_bold_font(Display *, XFontStruct *);
 extern XFontStruct *X11_italic_font(Display *, XFontStruct *);
 #ifdef ENHANCED_SYMBOLS
 extern XFontStruct *X11_unicode_font(Display *, XFontStruct *);
 #endif
+
+/* Functions for management of enhanced labels */
+extern void X11_wrap_widget(Widget);
+extern void X11_update_label(Widget);
 
 #endif /* WINX_H */

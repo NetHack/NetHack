@@ -57,6 +57,7 @@ create_value(Widget parent, const char *name_value)
     num_args++;
     name =
         XtCreateManagedWidget(WNAME, labelWidgetClass, form, args, num_args);
+    X11_wrap_widget(name);
 
     num_args = 0;
     XtSetArg(args[num_args], XtNjustify, XtJustifyRight);
@@ -67,8 +68,9 @@ create_value(Widget parent, const char *name_value)
     num_args++;
     XtSetArg(args[num_args], XtNinternalHeight, 0);
     num_args++;
-    (void) XtCreateManagedWidget(WVALUE, labelWidgetClass, form, args,
-                                 num_args);
+    Widget value = XtCreateManagedWidget(WVALUE, labelWidgetClass, form, args,
+                                         num_args);
+    X11_wrap_widget(value);
     return form;
 }
 
@@ -81,6 +83,7 @@ set_name(Widget w, const char *new_label)
     name = XtNameToWidget(w, WNAME);
     XtSetArg(args[0], XtNlabel, new_label);
     XtSetValues(name, args, ONE);
+    X11_update_label(name);
 }
 
 void
@@ -122,6 +125,7 @@ set_value(Widget w, const char *new_value)
     val = get_value_widget(w);
     XtSetArg(args[0], XtNlabel, new_value);
     XtSetValues(val, args, ONE);
+    X11_update_label(val);
 }
 
 void
@@ -170,4 +174,5 @@ swap_fg_bg(Widget w)
     XtSetArg(args[0], XtNforeground, bg);
     XtSetArg(args[1], XtNbackground, fg);
     XtSetValues(w, args, TWO);
+    X11_update_label(w);
 }
