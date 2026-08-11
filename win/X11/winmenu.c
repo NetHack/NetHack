@@ -262,10 +262,14 @@ menu_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
            overridden if it happens to duplicate a mapped menu command (':'
            to look inside a container vs ':' to select via search string);
            check for group accelerator match too */
-        for (curr = menu_info->curr_menu.base; curr; curr = curr->next)
-            if (curr->identifier.a_void != 0
-                && (curr->selector == ch || curr->gselector == ch))
-                goto make_selection;
+        for (curr = menu_info->curr_menu.base; curr; curr = curr->next) {
+            if (curr->identifier.a_void != 0) {
+                if (curr->selector == ch)
+                    goto make_selection;
+                if (curr->gselector == ch)
+                    goto group_accel;
+            }
+        }
 
         ch = map_menu_cmd(ch);
         if (ch == '\033') { /* quit */
