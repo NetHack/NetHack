@@ -112,9 +112,6 @@ static void adjust_status_fancy(struct xwindow *, const char *);
 static void adjust_status_tty(struct xwindow *, const char *);
 static void set_percent(int, int, int);
 static void tty_status_exposed(Widget, XtPointer, XtPointer);
-#ifdef STATUS_HILITES
-static void tty_status_blink(XtPointer client_data, XtIntervalId *timer);
-#endif
 static void tty_status_redraw(Widget);
 static int tty_render_field(Widget, int, int, enum statusfields);
 static void tty_status_colors(Widget, int, int, Pixel *, Pixel *);
@@ -207,10 +204,6 @@ struct tty_cond_field {
 static Widget X11_status_widget;
 static struct tty_status_field X11_status_labels[MAXBLSTATS];
 static struct tty_cond_field X11_cond_labels[32]; /* Ugh */
-#ifdef STATUS_HILITES
-static boolean blink;
-static const unsigned long blink_interval = 500; /* milliseconds */
-#endif
 
 static struct xwindow *xw_status_win;
 
@@ -361,7 +354,7 @@ X11_status_update_tty(
                 for (unsigned j = 0; j < SIZE(tt_condorder); ++j) {
                     if ((mask & tt_condorder[j].mask) != 0) {
                         struct tty_cond_field *fldp = &X11_cond_labels[j];
-                        fldp->attrs |= 0x1 << (i - CLR_MAX);
+                        fldp->attrs |= 0x1 << (i - HL_ATTCLR_NONE);
                     }
                 }
             }
@@ -542,10 +535,6 @@ create_tty_status(Widget parent, Widget top)
 
     XtAddCallback(X11_status_widget, XtNexposeCallback, tty_status_exposed,
                   (XtPointer) 0);
-#ifdef STATUS_HILITES
-    XtAppAddTimeOut(app_context, blink_interval, tty_status_blink,
-                    (XtPointer) X11_status_widget);
-#endif
 
     return X11_status_widget;
 }
@@ -564,12 +553,9 @@ tty_status_exposed(Widget w, XtPointer client_data, /* unused */
 }
 
 #ifdef STATUS_HILITES
-static void
-tty_status_blink(XtPointer client_data, XtIntervalId *timer)
+void
+X11_tty_status_blink(void)
 {
-    Widget w = (Widget) client_data;
-    nhUse(timer);
-
     /* Do we have any active blink attributes? */
     boolean have_blink = FALSE;
     for (unsigned i = 0; i < SIZE(X11_status_labels) && !have_blink; ++i) {
@@ -580,12 +566,8 @@ tty_status_blink(XtPointer client_data, XtIntervalId *timer)
     }
 
     if (have_blink) {
-        tty_status_redraw(w);
-        blink = !blink;
+        tty_status_redraw(X11_status_widget);
     }
-
-    /* Do it again */
-    XtAppAddTimeOut(app_context, blink_interval, tty_status_blink, client_data);
 }
 #endif /* STATUS_HILITES */
 
@@ -933,7 +915,7 @@ tty_status_colors(Widget w, int color, int attr, Pixel *fgpixel, Pixel *bgpixel)
     }
 
     /* Implement blink */
-    if ((attr & HL_BLINK) && blink) {
+    if ((attr & HL_BLINK) && X11_blink) {
         *fgpixel = *bgpixel;
     }
 

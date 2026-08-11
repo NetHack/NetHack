@@ -331,6 +331,9 @@ extern void (*input_func)(Widget, XEvent *, String *, Cardinal *);
 
 extern struct window_procs X11_procs;
 
+/* Flag maintained by the blink callback */
+extern boolean X11_blink;
+
 /* Check for an invalid window id. */
 #define check_winid(window) \
     do {                                                        \
@@ -424,6 +427,9 @@ extern void destroy_status_window(struct xwindow *);
 extern void adjust_status(struct xwindow *, const char *);
 extern void null_out_status(void);
 extern void check_turn_events(void);
+#ifdef STATUS_HILITES
+extern void X11_tty_status_blink(void);
+#endif
 
 /* ### wintext.c ### */
 extern void delete_text(Widget, XEvent *, String *, Cardinal *);
@@ -519,11 +525,13 @@ extern XFontStruct *X11_italic_font(Display *, XFontStruct *);
 extern XFontStruct *X11_unicode_font(Display *, XFontStruct *);
 #endif
 
+/* ### winlabel.c ### */
 /* Functions for management of enhanced labels */
 extern void X11_wrap_widget(Widget);
 extern void X11_update_label(Widget);
 extern void X11_set_attrs(Widget, unsigned);
 extern void X11_set_highlight(Widget, boolean);
 extern void X11_set_percent(Widget, unsigned, Pixel);
+extern void X11_blink_labels(void);
 
 #endif /* WINX_H */
