@@ -238,14 +238,14 @@ extern int cond_idx[CONDITION_COUNT];
 #define BL_TH_ALWAYS_HILITE 105  /* highlight regardless of value */
 #define BL_TH_CRITICALHP 106     /* highlight critically low HP */
 
-#define HL_ATTCLR_NONE    CLR_MAX + 1
-#define HL_ATTCLR_BOLD    CLR_MAX + 2
-#define HL_ATTCLR_DIM     CLR_MAX + 3
-#define HL_ATTCLR_ITALIC  CLR_MAX + 4
-#define HL_ATTCLR_ULINE   CLR_MAX + 5
-#define HL_ATTCLR_BLINK   CLR_MAX + 6
-#define HL_ATTCLR_INVERSE CLR_MAX + 7
-#define BL_ATTCLR_MAX     CLR_MAX + 8
+#define HL_ATTCLR_NONE    (CLR_MAX + 1)
+#define HL_ATTCLR_BOLD    (CLR_MAX + 2)
+#define HL_ATTCLR_DIM     (CLR_MAX + 3)
+#define HL_ATTCLR_ITALIC  (CLR_MAX + 4)
+#define HL_ATTCLR_ULINE   (CLR_MAX + 5)
+#define HL_ATTCLR_BLINK   (CLR_MAX + 6)
+#define HL_ATTCLR_INVERSE (CLR_MAX + 7)
+#define BL_ATTCLR_MAX     (CLR_MAX + 8)
 
 enum hlattribs {
     HL_UNDEF   = 0x00,
