@@ -3021,7 +3021,6 @@ X11_bold_font(Display *display, XFontStruct *font)
 
     char *bold_font = fontname_boldify(font_name);
     XFontStruct *font2 = XLoadQueryFont(display, bold_font);
-    free(bold_font);
 
     return font2;
 }
