@@ -85,8 +85,6 @@ X11_wrap_widget(Widget w)
 
     /* Create the pixmap for the first time */
     update_label(w, data);
-
-    return w;
 }
 
 /* Callback when the widget is deleted */
@@ -124,8 +122,29 @@ check_label(Widget w)
 void
 X11_update_label(Widget w)
 {
-    if (check_label(w)) {
-        WidgetData *data = get_widget_data(w);
+    WidgetData *data = get_widget_data(w);
+    if (data != NULL) {
+        update_label(w, data);
+    }
+}
+
+void
+X11_set_attrs(Widget w, unsigned attrs)
+{
+    WidgetData *data = get_widget_data(w);
+    if (data != NULL) {
+        data->attrs = attrs;
+        update_label(w, data);
+    }
+}
+
+void
+X11_set_percent(Widget w, unsigned percent, Pixel color)
+{
+    WidgetData *data = get_widget_data(w);
+    if (data != NULL) {
+        data->percent = percent;
+        data->bar_color = color;
         update_label(w, data);
     }
 }
@@ -215,6 +234,15 @@ update_label(Widget w, WidgetData *data)
     }
     width = max(width, 1);
     height = max(height, 1);
+
+    /* Use the full width of the widget if a percentage bar is set */
+    if (data->percent != 0) {
+        Dimension wwidth;
+        num_args = 0;
+        XtSetArg(args[num_args], XtNwidth, &wwidth); num_args++;
+        XtGetValues(w, args, num_args);
+        width = max(width, wwidth);
+    }
 
     /* Create the pixmap */
     new_pixmap = XCreatePixmap(display, RootWindowOfScreen(screen),
