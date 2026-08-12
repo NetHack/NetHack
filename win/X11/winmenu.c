@@ -77,6 +77,10 @@ static const char menu_translations[] = "#override\n\
      <Key>Right: scroll(6)\n\
      <Key>Up: scroll(8)\n\
      <Key>Down: scroll(2)\n\
+     <Key>Prior: menu_key(<)\n\
+     <Key>Next: menu_key(>)\n\
+     <Key>Home: menu_key(^)\n\
+     <Key>End: menu_key(|)\n\
      <Btn4Down>: scroll(8)\n\
      <Btn5Down>: scroll(2)\n\
      <Key>: menu_key()";
@@ -233,14 +237,14 @@ menu_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
     int count;
     boolean selected_something,
             perminv_scrolling = (event == &fake_perminv_event);
-
-    nhUse(params);
-    nhUse(num_params);
+    Cardinal in_nparams = (num_params ? *num_params : 0);
 
     wp = find_widget(w);
     menu_info = wp->menu_information;
 
-    if (!perminv_scrolling)
+    if (in_nparams) {
+        ch = get_menu_cmd_key(*params[0]);
+    } else if (!perminv_scrolling)
         ch = key_event_to_char((XKeyEvent *) event);
     else
         ch = (char) fake_perminv_event.type;
