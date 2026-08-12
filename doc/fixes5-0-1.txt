@@ -245,6 +245,7 @@ X11: obey timed_delay
 X11: improve TTY-style status line with text attributes for status hilites,
 	hitpointbar, some unicode support, 3-line status
 X11: fix menu windows being taller than the screen
+X11: allow menu scrolling by pageup/pagedown/home/end keys
 
 
 General New Features
