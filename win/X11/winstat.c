@@ -1513,8 +1513,9 @@ update_val(struct X_status_value *attr_rec, long new_value, const char *new_valu
             Strcpy(buf, attr_rec->name); /* condition name On */
         /* Special cases: weapon, armor and terrain */
         } else if (direct) {
-            if (new_valuestr == NULL)
+            if (new_valuestr == NULL) {
                 return;
+            }
             Strcpy(buf, new_valuestr);
         } else {
             *buf = '\0'; /* condition name Off */
@@ -2331,16 +2332,19 @@ init_column(
  * two columns and might expand to more if 'hitpointbar' is implemented.
  * Version is optional, right justified, and much wider than the others.
  *
- Title ("Plname the Rank")   <>            <>       <>           <>          <>
- Dungeon-Branch-and-Level    <>           Weapon   Hunger       Grabbed     Held
- Hit-points    Max-HP       Strength      Armor    Encumbrance  Petrifying  Blind
- Power-points  Max-Power    Dexterity     Terrain  Trapped      Slimed      Deaf
- Armor-class   Alignment    Constitution   <>      Levitation   Strangled   Stunned
- Xp-level     [Exp-points]  Intelligence   <>      Flying       Food-Pois   Confused
- Gold         [Score]       Wisdom         <>      Riding       Term-Ill    Hallucinat
-  <>          [Time]        Charisma       <>       <>          Sinking         Version
+ Title ("Plname the Rank")   <>            <>           <>          <>
+ Dungeon-Branch-and-Level    <>            <>           <>          <>
+ Hit-points    Max-HP       Strength      Hunger       Grabbed     Held
+ Power-points  Max-Power    Dexterity     Encumbrance  Petrifying  Blind
+ Armor-class   Alignment    Constitution  Trapped      Slimed      Deaf
+ Xp-level     [Exp-points]  Intelligence  Levitation   Strangled   Stunned
+ Gold         [Score]       Wisdom        Flying       Food-Pois   Confused
+  <>          [Time]        Charisma      Riding       Term-Ill    Hallucinat
+ BareHands     <>            <>           HurtLegs     Sinking     GlowHands
+ Weapon       Armor         Terrain       Elf-Iron     Busy        Icy
+  <>           <>            <>           Slippery     Submerged       Version
  *
- * An eighth column is going to be needed to fit in more conditions.
+ * A seventh column is going to be needed to fit in more conditions.
  */
 
 /* including F_DUMMY makes the status condition columns evenly
@@ -2348,29 +2352,34 @@ init_column(
    we lose track of the Widget pointer for F_DUMMY, each use clobbering the
    one before, leaving the one from leftover_indices[]; since they're never
    updated, that shouldn't matter */
-static int status_indices[][11] = {
-    { F_DUMMY, F_WEAPON, F_ARMOR, F_TERRAIN,
-      F_BAREH, F_GLOWHANDS, F_ICY, F_DUMMY, -1, 0, 0 },
+static int status_indices[][13] = {
     { F_DUMMY, F_HUNGER, F_ENCUMBER, F_TRAPPED,
-      F_LEV, F_FLY, F_RIDE, F_DUMMY, -1, 0, 0 },
+      F_LEV, F_FLY, F_RIDE, F_WOUNDEDL, F_IRON, F_SLIPPERY,
+      -1, 0, 0 },
     { F_DUMMY, F_GRABBED, F_STONE, F_SLIME, F_STRNGL,
-      F_FOODPOIS, F_TERMILL, F_IN_LAVA, -1, 0, 0 },
+      F_FOODPOIS, F_TERMILL, F_IN_LAVA, F_BUSY, F_SUBMERGED,
+      -1, 0, 0 },
     { F_DUMMY, F_HELD, F_BLIND, F_DEAF, F_STUN,
-      F_CONF, F_HALLU, F_DUMMY, -1, 0, 0 },
-    { F_DUMMY, F_BUSY, F_IRON, F_SLIPPERY,
-      F_SUBMERGED, F_WOUNDEDL, F_DUMMY, F_VERS, -1, 0, 0 }
+      F_CONF, F_HALLU, F_GLOWHANDS, F_ICY, F_VERS,
+      -1, 0, 0 },
 };
 /* used to fill up the empty space to right of last status condition column */
 static int leftover_indices[] = { F_DUMMY, -1, 0, 0 };
 /* -2: top two rows of these columns are reserved for title and location */
-static int col1_indices[11 - 2] = {
-    F_HP,    F_POWER,    F_AC,    F_XP_LEVL, F_GOLD,  F_DUMMY,  -1, 0, 0
+static int col1_indices[13 - 2] = {
+    F_HP,    F_POWER,    F_AC,    F_XP_LEVL, F_GOLD,  F_DUMMY,
+    F_BAREH, F_WEAPON, F_DUMMY,
+    -1, 0, 0
 };
-static int col2_indices[11 - 2] = {
-    F_MAXHP, F_MAXPOWER, F_ALIGN, F_EXP_PTS, F_SCORE, F_TIME,   -1, 0, 0
+static int col2_indices[13 - 2] = {
+    F_MAXHP, F_MAXPOWER, F_ALIGN, F_EXP_PTS, F_SCORE, F_TIME,
+    F_DUMMY, F_ARMOR, F_DUMMY,
+    -1, 0, 0
 };
-static int characteristics_indices[11 - 2] = {
-    F_STR, F_DEX, F_CON, F_INT, F_WIS, F_CHA, -1, 0, 0
+static int characteristics_indices[13 - 2] = {
+    F_STR, F_DEX, F_CON, F_INT, F_WIS, F_CHA,
+    F_DUMMY, F_TERRAIN, F_DUMMY,
+    -1, 0, 0
 };
 
 /*
@@ -2378,10 +2387,10 @@ static int characteristics_indices[11 - 2] = {
  *
  *                title
  *               location
- * col1_indices[0]      col2_indices[0]      col3_indices[0]
- * col1_indices[1]      col2_indices[1]      col3_indices[1]
- *    ...                  ...                  ...
- * col1_indices[5]      col2_indices[5]      col3_indices[5]
+ * col1_indices[0]      col2_indices[0]      col3_indices[0]      col4_indices[0]
+ * col1_indices[1]      col2_indices[1]      col3_indices[1]      col4_indices[1]
+ *    ...                  ...                  ...                  ...
+ * col1_indices[5]      col2_indices[5]      col3_indices[5]      col4_indices[5]
  *
  * The status conditions are managed separately and appear to the right
  * of this form.
@@ -2420,7 +2429,7 @@ init_info_form(Widget parent, Widget top, Widget left)
     XtSetArg(args[num_args], nhStr(XtNfromVert), sv_name->w); num_args++;
     XtSetValues(sv_dlevel->w, args, num_args);
 
-    /* there are 3 columns beneath but top 2 rows are centered over first 2 */
+    /* there are 4 columns beneath but top 2 rows are centered over first 2 */
     col1 = init_column("name_col1", form, sv_dlevel->w, (Widget) 0,
                        col1_indices, 0);
     col2 = init_column("name_col2", form, sv_dlevel->w, col1,
@@ -2488,7 +2497,7 @@ fixup_cond_widths(void)
             XtSetArg(args[0], XtNwidth, &vers_width);
             XtGetValues(sv->w, args, ONE);
             if (vers_width) {
-                vers_width *= 2;
+                vers_width *= 3;
                 XtSetArg(args[0], XtNwidth, vers_width);
                 XtSetArg(args[1], nhStr(XtNjustify), XtJustifyRight);
                 XtSetValues(sv->w, args, TWO);
