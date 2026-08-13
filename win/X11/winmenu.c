@@ -616,6 +616,8 @@ menu_popdown(struct xwindow *wp)
     wp->w = wp->popup = (Widget) 0;
     if (wp->menu_information->is_active)
         exit_x_event = TRUE;             /* exit our event handler */
+    if (wp->menu_information->permi)
+        iflags.perm_invent = FALSE;
     wp->menu_information->is_up = FALSE; /* menu is down */
 }
 
