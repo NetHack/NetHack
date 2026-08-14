@@ -158,11 +158,20 @@ create_message_window(struct xwindow *wp, /* window pointer */
     XtGetValues(wp->w, args, num_args);
 
     /* Save character information for fast use later. */
+#ifdef USE_XFT
+    XftFont *font = X11_new_font(wp->w, FALSE, NHW_MESSAGE);
+    mesg_info->char_width = font->max_advance_width;
+    mesg_info->char_height = font->height;
+    mesg_info->char_ascent = font->ascent;
+    mesg_info->char_lbearing = 0;
+    X11_release_font(wp->w, font);
+#else
     mesg_info->char_width = mesg_info->fs->max_bounds.width;
     mesg_info->char_height =
         mesg_info->fs->max_bounds.ascent + mesg_info->fs->max_bounds.descent;
     mesg_info->char_ascent = mesg_info->fs->max_bounds.ascent;
     mesg_info->char_lbearing = -mesg_info->fs->min_bounds.lbearing;
+#endif
 
     get_gc(wp->w, mesg_info);
 
@@ -466,20 +475,50 @@ redraw_message_window(struct xwindow *wp)
     }
 
     /* For now, just update the whole shootn' match. */
+#ifdef USE_XFT
+    Display *display = XtDisplay(wp->w);
+    Screen *screen = DefaultScreenOfDisplay(display);
+    Visual *visual = DefaultVisualOfScreen(screen);
+    Colormap cmap = DefaultColormapOfScreen(screen);
+    XftDraw *draw = XftDrawCreate(display, XtWindow(wp->w), visual, cmap);
+    XftFont *font = X11_new_font(wp->w, FALSE, NHW_MESSAGE);
+    XftColor fgcolor;
+    X11_new_color(wp->w, mesg_info->fgpixel, &fgcolor);
+#endif /* USE_XFT */
+
     for (y_base = row = 0, curr = mesg_info->head; row < mesg_info->num_lines;
          row++, y_base += mesg_info->char_height, curr = curr->next) {
+#ifdef USE_XFT
+        if (curr->line != NULL) {
+            XftDrawString8(draw, &fgcolor, font,
+                        mesg_info->char_lbearing, mesg_info->char_ascent + y_base,
+                        (const FcChar8 *) curr->line, curr->str_length);
+        }
+#else /* !USE_XFT */
         XDrawString(XtDisplay(wp->w), XtWindow(wp->w), mesg_info->gc,
                     mesg_info->char_lbearing, mesg_info->char_ascent + y_base,
                     curr->line, curr->str_length);
+#endif /* ?USE_XFT */
         /*
          * This draws a line at the _top_ of the line of text pointed to by
          * mesg_info->last_pause.
          */
         if (appResources.message_line && curr == mesg_info->line_here) {
+#ifdef USE_XFT
+            XftDrawRect(draw, &fgcolor, 0,
+                        y_base, wp->pixel_width, y_base);
+#else /* !USE_XFT */
             XDrawLine(XtDisplay(wp->w), XtWindow(wp->w), mesg_info->gc, 0,
                       y_base, wp->pixel_width, y_base);
+#endif /* ?USE_XFT */
         }
     }
+
+#ifdef USE_XFT
+    XftColorFree(display, visual, cmap, &fgcolor);
+    XftFontClose(display, font);
+    XftDrawDestroy(draw);
+#endif /* USE_XFT */
 
     mesg_info->dirty = False;
 }
@@ -549,6 +588,12 @@ mesg_exposed(Widget w,
 static void
 get_gc(Widget w, struct mesg_info_t *mesg_info)
 {
+#ifdef USE_XFT
+    Arg arg[1];
+
+    XtSetArg(arg[0], XtNforeground, &mesg_info->fgpixel);
+    XtGetValues(w, arg, ONE);
+#else /* !USE_XFT */
     XGCValues values;
     XtGCMask mask = GCFunction | GCForeground | GCBackground | GCFont;
     Pixel fgpixel, bgpixel;
@@ -563,6 +608,7 @@ get_gc(Widget w, struct mesg_info_t *mesg_info)
     values.function = GXcopy;
     values.font = WindowFont(w);
     mesg_info->gc = XtGetGC(w, mask, &values);
+#endif /* ?USE_XFT */
 }
 
 /*
