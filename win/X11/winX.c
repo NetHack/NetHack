@@ -1513,6 +1513,22 @@ static XtResource resources[] = {
     { nhStr("pilemark_color"), nhStr("Pilemark_color"), XtRPixel,
       sizeof(XtRPixel), XtOffset(AppResources *, pilemark_color), XtRString,
       nhStr("Green") },
+#ifdef USE_XFT
+    { nhStr("font_map"), nhStr("Font_map"), XtRString, sizeof(String),
+      XtOffset(AppResources *, font_map), XtRString, nhStr("mono-10") },
+    { nhStr("font_menu"), nhStr("Font_menu"), XtRString, sizeof(String),
+      XtOffset(AppResources *, font_menu), XtRString, nhStr("mono-10") },
+    { nhStr("font_message"), nhStr("Font_message"), XtRString, sizeof(String),
+      XtOffset(AppResources *, font_message), XtRString, nhStr("sans-10") },
+    { nhStr("font_status"), nhStr("Font_status"), XtRString, sizeof(String),
+      XtOffset(AppResources *, font_status), XtRString, nhStr("sans-10") },
+    { nhStr("font_text"), nhStr("Font_text"), XtRString, sizeof(String),
+      XtOffset(AppResources *, font_text), XtRString, nhStr("mono-10") },
+#ifdef GRAPHIC_TOMBSTONE
+    { nhStr("font_rip"), nhStr("Font_rip"), XtRString, sizeof(String),
+      XtOffset(AppResources *, font_rip), XtRString, nhStr("sans-9") },
+#endif
+#endif
 #ifdef GRAPHIC_TOMBSTONE
     { nhStr("tombstone"), nhStr("Tombstone"), XtRString, sizeof(String),
       XtOffset(AppResources *, tombstone), XtRString, nhStr("rip.xpm") },
@@ -3129,5 +3145,133 @@ X11_unicode_font(Display *display, XFontStruct *font)
     return unifont;
 }
 #endif /* ENHANCED_SYMBOLS */
+
+#ifdef USE_XFT
+
+/* Open a vector font for the given widget */
+
+extern XftFont *
+X11_new_font(Widget w, boolean bold, int win_type)
+{
+    const char *font_name = NULL;
+    const char *iflags_font_name = NULL;
+    int font_size = 0;
+    char name[512];
+
+    switch (win_type) {
+    case NHW_MESSAGE:
+        font_name = appResources.font_message;
+        iflags_font_name = iflags.wc_font_message;
+        font_size = iflags.wc_fontsiz_message;
+        break;
+
+    case NHW_STATUS:
+        font_name = appResources.font_status;
+        iflags_font_name = iflags.wc_font_status;
+        font_size = iflags.wc_fontsiz_status;
+        break;
+
+    case NHW_MAP:
+        font_name = appResources.font_map;
+        iflags_font_name = iflags.wc_font_map;
+        font_size = iflags.wc_fontsiz_map;
+        break;
+
+    case NHW_MENU:
+    case NHW_PERMINVENT:
+        font_name = appResources.font_menu;
+        iflags_font_name = iflags.wc_font_menu;
+        font_size = iflags.wc_fontsiz_menu;
+        break;
+
+    case NHW_TEXT:
+        font_name = appResources.font_text;
+        iflags_font_name = iflags.wc_font_text;
+        font_size = iflags.wc_fontsiz_text;
+        break;
+
+    default:
+        break;
+    }
+
+    if (font_name == NULL) {
+        font_name = "mono-10";
+    }
+
+    /* Override the font name if specified in the configuration file */
+    if (iflags_font_name != NULL) {
+        font_name = iflags_font_name;
+    }
+
+    /*
+     * Specify font size as follows:
+     * * Use any font size specified in the configuration file
+     * * If no such size is specified, use the one in the font name;
+     *   e.g., "Courier-14" specifies 14 points
+     * * If still no size, use 10 points
+     */
+    size_t name_len = strlen(font_name);
+    const char *dash = strrchr(font_name, '-');
+    if (dash) {
+        char *end;
+        long size = strtol(dash + 1, &end, 10);
+        if (*end == '\0') {
+            /* The name ends in a size */
+            name_len = (size_t) (dash - font_name);
+            /* Use font_size if specified;
+               else use the size from font_name */
+            if (font_size <= 0) {
+                font_size = (int) size;
+            }
+        }
+    }
+
+    /* Use 10 if no size specified */
+    if (font_size <= 0) {
+        font_size = 10;
+    }
+
+    /* Set reasonable bounds on the font size */
+    font_size = min(max(font_size, 6), 50);
+
+    Snprintf(name, sizeof(name), "%.*s-%d:%s",
+            (int) name_len, font_name, font_size,
+            bold ? "bold" : "medium");
+
+    Display *display = XtDisplay(w);
+    XftFont *font = XftFontOpenName(display, DefaultScreen(display), name);
+
+    return font;
+}
+
+/* Free the font returned by X11_new_font */
+
+void
+X11_release_font(Widget w, XftFont *font)
+{
+    Display *display = XtDisplay(w);
+    XftFontClose(display,  font);
+}
+
+/* Assign a new color having the given RGB components */
+
+void
+X11_new_color(Widget w, Pixel pixel, XftColor *color)
+{
+    XRenderColor rcolor;
+    rcolor.red   = ((pixel >> 16) & 0xFF) * 0x0101;
+    rcolor.green = ((pixel >>  8) & 0xFF) * 0x0101;
+    rcolor.blue  = ((pixel >>  0) & 0xFF) * 0x0101;
+    rcolor.alpha = 0xFFFF;
+
+    Display *display = XtDisplay(w);
+    Screen *screen = DefaultScreenOfDisplay(display);
+    Visual *visual = DefaultVisualOfScreen(screen);
+    Colormap cmap = DefaultColormapOfScreen(screen);
+
+    XftColorAllocValue(display, visual, cmap, &rcolor, color);
+}
+
+#endif /* USE_XFT */
 
 /*winX.c*/
