@@ -259,11 +259,11 @@ WINCURSESOBJ ?= $(TARGETPFX)cursmain.o $(TARGETPFX)curswins.o \
 WINX11SRC ?= ../win/X11/Window.c ../win/X11/dialogs.c ../win/X11/winX.c \
 	../win/X11/winmap.c  ../win/X11/winmenu.c ../win/X11/winmesg.c \
 	../win/X11/winmisc.c ../win/X11/winstat.c ../win/X11/wintext.c \
-	../win/X11/winval.c $(GENTILECFILE)
+	../win/X11/winval.c ../win/X11/winlabel.c $(GENTILECFILE)
 WINX11OBJ ?= $(TARGETPFX)Window.o $(TARGETPFX)dialogs.o $(TARGETPFX)winX.o \
 	$(TARGETPFX)winmap.o $(TARGETPFX)winmenu.o $(TARGETPFX)winmesg.o \
 	$(TARGETPFX)winmisc.o $(TARGETPFX)winstat.o $(TARGETPFX)wintext.o \
-	$(TARGETPFX)winval.o
+	$(TARGETPFX)winval.o $(TARGETPFX)winlabel.o
 #
 # Files for a Qt 3 interface (renamed since nethack 3.6.x)
 #
@@ -1080,6 +1080,8 @@ $(TARGETPFX)winX.o: ../win/X11/winX.c $(HACK_H) ../include/dlb.h \
 		../include/winX.h ../include/xwindow.h ../win/X11/nh32icon \
 		../win/X11/nh56icon ../win/X11/nh72icon
 	$(TARGET_CC) $(TARGET_CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/winX.c
+$(TARGETPFX)winlabel.o: ../win/X11/winlabel.c $(HACK_H)
+	$(TARGET_CC) $(TARGET_CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/winlabel.c
 $(TARGETPFX)winmap.o: ../win/X11/winmap.c $(HACK_H) ../include/dlb.h \
 		../include/tile2x11.h ../include/winX.h ../include/xwindow.h
 	$(TARGET_CC) $(TARGET_CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/winmap.c

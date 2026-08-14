@@ -94,13 +94,28 @@
 #define F_HALLU    40
 
 #define F_VERS     41 /* version info */
-#define NUM_STATS  42
+
+#define F_WEAPON   42
+#define F_ARMOR    43
+#define F_TERRAIN  44
+#define F_BAREH    45
+#define F_GLOWHANDS 46
+#define F_ICY      47
+#define F_BUSY     48
+#define F_PARALYZED 49
+#define F_SLEEPING 50
+#define F_UNCONSCIOUS 51
+#define F_IRON     52
+#define F_SLIPPERY 53
+#define F_SUBMERGED 54
+#define F_WOUNDEDL 55
+#define NUM_STATS  56
 
 static int condcolor(long, unsigned long *);
 static int condattr(long, unsigned long *);
 static Widget create_tty_status(Widget, Widget);
 static void stat_resized(Widget, XtPointer, XtPointer);
-static void update_fancy_status_field(int, int, int);
+static void update_fancy_status_field(int, const char *, int, int);
 static void update_fancy_status(boolean);
 static Widget create_fancy_status(Widget, Widget);
 static void destroy_fancy_status(struct xwindow *);
@@ -110,10 +125,8 @@ static void destroy_status_window_fancy(struct xwindow *);
 static void destroy_status_window_tty(struct xwindow *);
 static void adjust_status_fancy(struct xwindow *, const char *);
 static void adjust_status_tty(struct xwindow *, const char *);
+static void set_percent(int, int, int);
 static void tty_status_exposed(Widget, XtPointer, XtPointer);
-#ifdef STATUS_HILITES
-static void tty_status_blink(XtPointer client_data, XtIntervalId *timer);
-#endif
 static void tty_status_redraw(Widget);
 static int tty_render_field(Widget, int, int, enum statusfields);
 static void tty_status_colors(Widget, int, int, Pixel *, Pixel *);
@@ -206,10 +219,6 @@ struct tty_cond_field {
 static Widget X11_status_widget;
 static struct tty_status_field X11_status_labels[MAXBLSTATS];
 static struct tty_cond_field X11_cond_labels[32]; /* Ugh */
-#ifdef STATUS_HILITES
-static boolean blink;
-static const unsigned long blink_interval = 500; /* milliseconds */
-#endif
 
 static struct xwindow *xw_status_win;
 
@@ -360,7 +369,7 @@ X11_status_update_tty(
                 for (unsigned j = 0; j < SIZE(tt_condorder); ++j) {
                     if ((mask & tt_condorder[j].mask) != 0) {
                         struct tty_cond_field *fldp = &X11_cond_labels[j];
-                        fldp->attrs |= 0x1 << (i - CLR_MAX);
+                        fldp->attrs |= 0x1 << (i - HL_ATTCLR_NONE);
                     }
                 }
             }
@@ -390,7 +399,7 @@ static void
 X11_status_update_fancy(
     int fld,
     genericptr_t ptr,
-    int chg UNUSED, int percent UNUSED,
+    int chg UNUSED, int percent,
     int colrattr,
     unsigned long *colormasks UNUSED)
 {
@@ -418,6 +427,9 @@ X11_status_update_fancy(
         { BL_HPMAX, F_MAXHP },
         { BL_LEVELDESC, F_DLEVEL },
         { BL_VERS, F_VERS },
+        { BL_WEAPON, F_WEAPON },
+        { BL_ARMOR, F_ARMOR },
+        { BL_TERRAIN, F_TERRAIN },
         { BL_EXP, F_EXP_PTS }
     };
     static const struct mask_to_ff {
@@ -442,6 +454,17 @@ X11_status_update_fancy(
         { BL_MASK_TETHERED, F_TETHERED },
         { BL_MASK_LEV, F_LEV },
         { BL_MASK_FLY, F_FLY },
+        { BL_MASK_BAREH, F_BAREH },
+        { BL_MASK_GLOWHANDS, F_GLOWHANDS },
+        { BL_MASK_ICY, F_ICY },
+        { BL_MASK_BUSY, F_BUSY },
+        { BL_MASK_PARLYZ, F_PARALYZED },
+        { BL_MASK_SLEEPING, F_SLEEPING },
+        { BL_MASK_UNCONSC, F_UNCONSCIOUS },
+        { BL_MASK_ELF_IRON, F_IRON },
+        { BL_MASK_SLIPPERY, F_SLIPPERY },
+        { BL_MASK_SUBMERGED, F_SUBMERGED },
+        { BL_MASK_WOUNDEDL, F_WOUNDEDL },
         { BL_MASK_RIDE, F_RIDE }
     };
     int i;
@@ -463,6 +486,7 @@ X11_status_update_fancy(
             for (i = 0; i < SIZE(mask_to_fancyfield); i++)
                 if ((changed_bits & mask_to_fancyfield[i].mask) != 0L)
                     update_fancy_status_field(mask_to_fancyfield[i].ff,
+                            NULL,
                             condcolor(mask_to_fancyfield[i].mask, colormasks),
                             condattr(mask_to_fancyfield[i].mask, colormasks));
             old_condition_bits = X11_condition_bits; /* remember 'On' bits */
@@ -477,9 +501,15 @@ X11_status_update_fancy(
 
         for (i = 0; i < SIZE(bl_to_fancyfield); i++)
             if (bl_to_fancyfield[i].bl == fld) {
-                update_fancy_status_field(bl_to_fancyfield[i].ff, colr, attr);
+                update_fancy_status_field(bl_to_fancyfield[i].ff,
+                                          (const char *) ptr, colr, attr);
                 break;
             }
+
+        /* Hit point bar */
+        if (fld == BL_HP) {
+            set_percent(F_NAME, iflags.wc2_hitpointbar ? percent : 0, colr);
+        }
     }
 }
 
@@ -536,10 +566,6 @@ create_tty_status(Widget parent, Widget top)
 
     XtAddCallback(X11_status_widget, XtNexposeCallback, tty_status_exposed,
                   (XtPointer) 0);
-#ifdef STATUS_HILITES
-    XtAppAddTimeOut(app_context, blink_interval, tty_status_blink,
-                    (XtPointer) X11_status_widget);
-#endif
 
     return X11_status_widget;
 }
@@ -558,12 +584,9 @@ tty_status_exposed(Widget w, XtPointer client_data, /* unused */
 }
 
 #ifdef STATUS_HILITES
-static void
-tty_status_blink(XtPointer client_data, XtIntervalId *timer)
+void
+X11_tty_status_blink(void)
 {
-    Widget w = (Widget) client_data;
-    nhUse(timer);
-
     /* Do we have any active blink attributes? */
     boolean have_blink = FALSE;
     for (unsigned i = 0; i < SIZE(X11_status_labels) && !have_blink; ++i) {
@@ -574,12 +597,8 @@ tty_status_blink(XtPointer client_data, XtIntervalId *timer)
     }
 
     if (have_blink) {
-        tty_status_redraw(w);
-        blink = !blink;
+        tty_status_redraw(X11_status_widget);
     }
-
-    /* Do it again */
-    XtAppAddTimeOut(app_context, blink_interval, tty_status_blink, client_data);
 }
 #endif /* STATUS_HILITES */
 
@@ -927,7 +946,7 @@ tty_status_colors(Widget w, int color, int attr, Pixel *fgpixel, Pixel *bgpixel)
     }
 
     /* Implement blink */
-    if ((attr & HL_BLINK) && blink) {
+    if ((attr & HL_BLINK) && X11_blink) {
         *fgpixel = *bgpixel;
     }
 
@@ -1217,11 +1236,10 @@ struct f_overload {
 
 static const struct f_overload *ff_ovld_from_mask(unsigned long);
 static const struct f_overload *ff_ovld_from_indx(int);
-static void hilight_label(Widget);
-static void update_val(struct X_status_value *, long);
+static void update_val(struct X_status_value *, long, const char *);
 static void skip_cond_val(struct X_status_value *);
 static void update_color(struct X_status_value *, int);
-static boolean name_widget_has_label(struct X_status_value *);
+static Pixel color_to_pixel(Widget, int);
 static void apply_hilite_attributes(struct X_status_value *, int);
 static const char *width_string(int);
 static void create_widget(Widget, struct X_status_value *, int);
@@ -1306,6 +1324,20 @@ static struct X_status_value shown_stats[NUM_STATS] = {
     { "Hallucinat",   SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
     /* F_VERS; optionally shown, generally treated as a pseudo-condition */
     { "Version 1.2.3", SV_LABEL, W0,  0L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },
+    { "Weapon",       SV_NAME,  W0,  -1L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },
+    { "Armor",        SV_NAME,  W0,  -1L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },
+    { "Terrain",      SV_NAME,  W0,  -1L, 0, FALSE, FALSE, FALSE, P0, 0, 0 },
+    { "BareHands",    SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
+    { "GlowHands",    SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
+    { "Icy",          SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
+    { "Busy",         SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
+    { "Paralyzed",    SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
+    { "Sleeping",     SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
+    { "Unconsc",      SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
+    { "ElfIron",      SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
+    { "Slippery",     SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
+    { "Submerged",    SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
+    { "HurtLegs",     SV_NAME,  W0,   0L, 0, FALSE, TRUE,  FALSE, P0, 0, 0 },
 };
 #undef W0
 #undef P0
@@ -1338,14 +1370,12 @@ static const struct f_overload cond_ovl[] = {
       { { BL_MASK_HELD, F_HELD },
         { BL_MASK_HOLDING, F_HOLDING } },
     },
-#if 0   /* not yet implemented */
-    { (BL_MASK_BUSY | BL_MASK_PARALYZ | BL_MASK_SLEEPING | BL_MASK_UNCONSC),
+    { (BL_MASK_BUSY | BL_MASK_PARLYZ | BL_MASK_SLEEPING | BL_MASK_UNCONSC),
       { { BL_MASK_BUSY, F_BUSY }, /* can't move but none of the below... */
-        { BL_MASK_PARALYZ, F_PARALYZED }
-        { BL_MASK_SLEEPING, F_SLEEPING }
+        { BL_MASK_PARLYZ, F_PARALYZED },
+        { BL_MASK_SLEEPING, F_SLEEPING },
         { BL_MASK_UNCONSC, F_UNCONSCIOUS } },
     },
-#endif
 };
 
 static const struct f_overload *
@@ -1398,6 +1428,7 @@ null_out_status(void)
         case SV_NAME:
             XtSetArg(args[0], XtNlabel, "");
             XtSetValues(sv->w, args, ONE);
+            X11_update_label(sv->w);
             break;
 
         default:
@@ -1407,22 +1438,10 @@ null_out_status(void)
     }
 }
 
-/* this is almost an exact duplicate of hilight_value() */
-static void
-hilight_label(Widget w) /* label widget */
-{
-    /*
-     * This predates STATUS_HILITES.
-     * It is used to show any changed item in inverse and gets
-     * reset on the next turn.
-     */
-    swap_fg_bg(w);
-}
-
 DISABLE_WARNING_FORMAT_NONLITERAL
 
 static void
-update_val(struct X_status_value *attr_rec, long new_value)
+update_val(struct X_status_value *attr_rec, long new_value, const char *new_valuestr)
 {
     static boolean Exp_shown = TRUE, time_shown = TRUE, score_shown = TRUE,
                    Xp_was_HD = FALSE;
@@ -1473,9 +1492,13 @@ update_val(struct X_status_value *attr_rec, long new_value)
         Strcpy((char *) attr_rec->name, buf);
         XtSetArg(args[0], XtNlabel, buf);
         XtSetValues(attr_rec->w, args, ONE);
+        X11_update_label(attr_rec->w);
 
     } else if (attr_rec->type == SV_NAME) {
-        if (attr_rec->last_value == new_value)
+        boolean direct = attr_rec == &shown_stats[F_ARMOR]
+                      || attr_rec == &shown_stats[F_WEAPON]
+                      || attr_rec == &shown_stats[F_TERRAIN];
+        if (!direct && attr_rec->last_value == new_value)
             return; /* no change */
 
         attr_rec->last_value = new_value;
@@ -1488,12 +1511,19 @@ update_val(struct X_status_value *attr_rec, long new_value)
             Strcpy(buf, enc_stat[new_value]);
         } else if (new_value) {
             Strcpy(buf, attr_rec->name); /* condition name On */
+        /* Special cases: weapon, armor and terrain */
+        } else if (direct) {
+            if (new_valuestr == NULL) {
+                return;
+            }
+            Strcpy(buf, new_valuestr);
         } else {
             *buf = '\0'; /* condition name Off */
         }
 
         XtSetArg(args[0], XtNlabel, buf);
         XtSetValues(attr_rec->w, args, ONE);
+        X11_update_label(attr_rec->w);
 
     } else { /* a value pair */
         boolean force_update = FALSE;
@@ -1559,7 +1589,7 @@ update_val(struct X_status_value *attr_rec, long new_value)
             /* core won't call status_update() for Exp when it hasn't changed
                so do so ourselves (to get Exp_shown flag to match display) */
             if (force_update)
-                update_fancy_status_field(F_EXP_PTS, NO_COLOR, HL_UNDEF);
+                update_fancy_status_field(F_EXP_PTS, NULL, NO_COLOR, HL_UNDEF);
         }
 
         if (attr_rec->last_value == new_value && !force_update) /* same */
@@ -1620,21 +1650,20 @@ update_val(struct X_status_value *attr_rec, long new_value)
            already highlighted and being set to blank */
         if (attr_rec != &shown_stats[F_TIME]
             && attr_rec != &shown_stats[F_VERS]
+            && attr_rec != &shown_stats[F_TERRAIN]
             && !attr_rec->set ^ !*buf) {
-            /* But don't hilite if inverted from status_hilite since
-               it will already be hilited by apply_hilite_attributes(). */
-            if (!attr_rec->inverted_hilite) {
-                if (attr_rec->type == SV_VALUE)
-                    hilight_value(attr_rec->w);
-                else
-                    hilight_label(attr_rec->w);
-            }
+            if (attr_rec->type == SV_VALUE)
+                X11_set_highlight(get_value_widget(attr_rec->w), TRUE);
+            else
+                X11_set_highlight(attr_rec->w, TRUE);
             attr_rec->set = !attr_rec->set;
         }
         attr_rec->turn_count = 0;
     } else {
+        Widget w = (attr_rec->type == SV_LABEL || attr_rec->type == SV_NAME) ? attr_rec->w
+                   : get_value_widget(attr_rec->w);
         XtSetArg(args[0], XtNforeground, &attr_rec->default_fg);
-        XtGetValues(attr_rec->w, args, ONE);
+        XtGetValues(w, args, ONE);
         attr_rec->after_init = TRUE;
     }
 }
@@ -1652,7 +1681,7 @@ skip_cond_val(struct X_status_value *sv)
            also requested to be highlighted, it used its own copy of
            'set' but the same widget so the highlighting got toggled
            off; this will turn in back on in that exceptional case */
-        hilight_label(sv->w);
+        X11_set_highlight(sv->w, FALSE);
         sv->set = FALSE;
     }
 }
@@ -1662,8 +1691,6 @@ update_color(struct X_status_value *sv, int color)
 {
     Pixel pixel = 0;
     Arg args[1];
-    XrmValue source;
-    XrmValue dest;
     Widget w = (sv->type == SV_LABEL || sv->type == SV_NAME) ? sv->w
                : get_value_widget(sv->w);
 
@@ -1672,54 +1699,55 @@ update_color(struct X_status_value *sv, int color)
             pixel = sv->default_fg;
         sv->colr = NO_COLOR;
     } else {
+        pixel = color_to_pixel(w, color);
+        sv->colr = color;
+    }
+    if (pixel != 0) {
+        XtSetArg(args[0], XtNforeground, pixel);
+        XtSetValues(w, args, ONE);
+        X11_update_label(w);
+    }
+}
+
+static Pixel
+color_to_pixel(Widget w, int color)
+{
+    Pixel pixel;
+
+    if (fancy_status_hilite_colors[color][0] != '\0') {
+        XrmValue source;
+        XrmValue dest;
         source.addr = (XPointer) fancy_status_hilite_colors[color];
         source.size = (unsigned int) strlen((const char *) source.addr) + 1;
         dest.size = (unsigned int) sizeof (Pixel);
         dest.addr = (XPointer) &pixel;
-        if (XtConvertAndStore(w, XtRString, &source, XtRPixel, &dest))
-            sv->colr = color;
+        if (XtConvertAndStore(w, XtRString, &source, XtRPixel, &dest)) {
+            return pixel;
+        }
     }
-    if (pixel != 0) {
-        char *arg_name = (sv->set || sv->inverted_hilite) ? XtNbackground
-                         : XtNforeground;
 
-        XtSetArg(args[0], arg_name, pixel);
-        XtSetValues(w, args, ONE);
-    }
-}
-
-static boolean
-name_widget_has_label(struct X_status_value *sv)
-{
+    pixel = 0xFFFFFF;
     Arg args[1];
-    const char *label;
-
-    XtSetArg(args[0], XtNlabel, &label);
-    XtGetValues(sv->w, args, ONE);
-    return (*label != '\0');
+    XtSetArg(args[0], XtNforeground, &pixel);
+    XtGetValues(toplevel, args, ONE);
+    return pixel;
 }
 
 static void
 apply_hilite_attributes(struct X_status_value *sv, int attributes)
 {
-    boolean attr_inversion = ((HL_INVERSE & attributes)
-                              && (sv->type != SV_NAME
-                                  || name_widget_has_label(sv)));
-
-    if (sv->inverted_hilite != attr_inversion) {
-        sv->inverted_hilite = attr_inversion;
-        if (!sv->set) {
-            if (sv->type == SV_VALUE)
-                hilight_value(sv->w);
-            else
-                hilight_label(sv->w);
-        }
+    Widget w = sv->w;
+    if (sv->type == SV_VALUE) {
+        w = get_value_widget(w);
     }
-    sv->attr = attributes;
-    /* Could possibly add more attributes here: HL_ATTCLR_DIM,
-       HL_ATTCLR_BLINK, HL_ATTCLR_ULINE, and HL_ATTCLR_BOLD. If so,
-       extract the above into its own function apply_hilite_inverse()
-       and each other attribute into its own to keep the code clean. */
+    X11_set_attrs(w, attributes);
+}
+
+static void
+set_percent(int index, int percent, int color)
+{
+    Widget w = shown_stats[index].w;
+    X11_set_percent(w, percent, color_to_pixel(w, color));
 }
 
 /*
@@ -1741,7 +1769,7 @@ apply_hilite_attributes(struct X_status_value *sv, int attributes)
  * [***] version is optional, right-justified after conditions
  */
 static void
-update_fancy_status_field(int i, int color, int attributes)
+update_fancy_status_field(int i, const char *valstr, int color, int attributes)
 {
     struct X_status_value *sv = &shown_stats[i];
     unsigned long condmask = 0L;
@@ -1841,6 +1869,39 @@ update_fancy_status_field(int i, int color, int attributes)
         case F_HALLU:
             condmask = BL_MASK_HALLU;
             break;
+        case F_BAREH:
+            condmask = BL_MASK_BAREH;
+            break;
+        case F_GLOWHANDS:
+            condmask = BL_MASK_GLOWHANDS;
+            break;
+        case F_ICY:
+            condmask = BL_MASK_ICY;
+            break;
+        case F_BUSY:
+            condmask = BL_MASK_BUSY;
+            break;
+        case F_PARALYZED:
+            condmask = BL_MASK_PARLYZ;
+            break;
+        case F_SLEEPING:
+            condmask = BL_MASK_SLEEPING;
+            break;
+        case F_UNCONSCIOUS:
+            condmask = BL_MASK_UNCONSC;
+            break;
+        case F_IRON:
+            condmask = BL_MASK_ELF_IRON;
+            break;
+        case F_SLIPPERY:
+            condmask = BL_MASK_SLIPPERY;
+            break;
+        case F_SUBMERGED:
+            condmask = BL_MASK_SUBMERGED;
+            break;
+        case F_WOUNDEDL:
+            condmask = BL_MASK_WOUNDEDL;
+            break;
 
         /* pseudo-condition */
         case F_VERS:
@@ -1892,6 +1953,11 @@ update_fancy_status_field(int i, int color, int attributes)
             val = 0L;
 #endif
             break;
+        case F_WEAPON:
+        case F_ARMOR:
+        case F_TERRAIN:
+            /* valstr is the value */
+            break;
         default: {
             /*
              * There is a possible infinite loop that occurs with:
@@ -1925,7 +1991,7 @@ update_fancy_status_field(int i, int color, int attributes)
             return;
         }
     }
-    update_val(sv, val);
+    update_val(sv, val, valstr);
     if (color != sv->colr)
         update_color(sv, color);
     if (attributes != sv->attr)
@@ -1953,7 +2019,7 @@ update_fancy_status(boolean force_update)
            the no longer displayed field; we're a bit more conservative
            than that and do this when toggling on as well as off */
         for (i = 0; i < NUM_STATS; i++)
-            update_fancy_status_field(i, NO_COLOR, HL_UNDEF);
+            update_fancy_status_field(i, NULL, NO_COLOR, HL_UNDEF);
         old_condition_bits = X11_condition_bits;
 
         old_upolyd = Upolyd;
@@ -1983,14 +2049,10 @@ check_turn_events(void)
             continue;
 
         if (sv->turn_count++ >= hilight_time) {
-            /* unhighlights by toggling a highlighted item back off again,
-               unless forced inverted by a status_hilite rule */
-            if (!sv->inverted_hilite) {
-                if (sv->type == SV_VALUE)
-                    hilight_value(sv->w);
-                else
-                    hilight_label(sv->w);
-            }
+            if (sv->type == SV_VALUE)
+                X11_set_highlight(get_value_widget(sv->w), FALSE);
+            else
+                X11_set_highlight(sv->w, FALSE);
             sv->set = FALSE;
         }
     }
@@ -2039,6 +2101,17 @@ width_string(int sv_index)
     case F_STUN:
     case F_CONF:
     case F_HALLU:
+    case F_BAREH:
+    case F_GLOWHANDS:
+    case F_BUSY:
+    case F_PARALYZED:
+    case F_SLEEPING:
+    case F_UNCONSCIOUS:
+    case F_IRON:
+    case F_SLIPPERY:
+    case F_SUBMERGED:
+    case F_WOUNDEDL:
+    case F_ICY:
         return shown_stats[sv_index].name;
 
     case F_NAME:
@@ -2064,6 +2137,12 @@ width_string(int sv_index)
         return "123456789"; /* a tenth digit will still fit legibly */
     case F_ALIGN:
         return "Neutral";
+    case F_WEAPON:
+        return "Dual+joust";
+    case F_ARMOR:
+        return "GCAUHBS";
+    case F_TERRAIN:
+        return "Portcullis";
     }
     impossible("width_string: unknown index %d\n", sv_index);
     return "";
@@ -2094,6 +2173,7 @@ create_widget(Widget parent, struct X_status_value *sv, int sv_index)
                                          : "dlevel",
                                       labelWidgetClass, parent,
                                       args, num_args);
+        X11_wrap_widget(sv->w);
         break;
     case SV_NAME: {
         char buf[BUFSZ];
@@ -2130,6 +2210,7 @@ create_widget(Widget parent, struct X_status_value *sv, int sv_index)
         XtSetArg(args[num_args], XtNinternalHeight, 0); num_args++;
         sv->w = XtCreateManagedWidget(sv->name, labelWidgetClass, parent,
                                       args, num_args);
+        X11_wrap_widget(sv->w);
         break;
     }
     default:
@@ -2252,41 +2333,53 @@ init_column(
  * Version is optional, right justified, and much wider than the others.
  *
  Title ("Plname the Rank")   <>            <>           <>          <>
- Dungeon-Branch-and-Level    <>           Hunger       Grabbed     Held
- Hit-points    Max-HP       Strength      Encumbrance  Petrifying  Blind
- Power-points  Max-Power    Dexterity     Trapped      Slimed      Deaf
- Armor-class   Alignment    Constitution  Levitation   Strangled   Stunned
- Xp-level     [Exp-points]  Intelligence  Flying       Food-Pois   Confused
- Gold         [Score]       Wisdom        Riding       Term-Ill    Hallucinat
-  <>          [Time]        Charisma       <>          Sinking         Version
+ Dungeon-Branch-and-Level    <>            <>           <>          <>
+ Hit-points    Max-HP       Strength      Hunger       Grabbed     Held
+ Power-points  Max-Power    Dexterity     Encumbrance  Petrifying  Blind
+ Armor-class   Alignment    Constitution  Trapped      Slimed      Deaf
+ Xp-level     [Exp-points]  Intelligence  Levitation   Strangled   Stunned
+ Gold         [Score]       Wisdom        Flying       Food-Pois   Confused
+  <>          [Time]        Charisma      Riding       Term-Ill    Hallucinat
+ BareHands     <>            <>           HurtLegs     Sinking     GlowHands
+ Weapon       Armor         Terrain       Elf-Iron     Busy        Icy
+  <>           <>            <>           Slippery     Submerged       Version
  *
  * A seventh column is going to be needed to fit in more conditions.
  */
 
-/* including F_DUMMY makes the three status condition columns evenly
+/* including F_DUMMY makes the status condition columns evenly
    spaced with regard to the adjacent characteristics (Str,Dex,&c) column;
    we lose track of the Widget pointer for F_DUMMY, each use clobbering the
    one before, leaving the one from leftover_indices[]; since they're never
    updated, that shouldn't matter */
-static int status_indices[3][11] = {
+static int status_indices[][13] = {
     { F_DUMMY, F_HUNGER, F_ENCUMBER, F_TRAPPED,
-      F_LEV, F_FLY, F_RIDE, F_DUMMY, -1, 0, 0 },
+      F_LEV, F_FLY, F_RIDE, F_WOUNDEDL, F_IRON, F_SLIPPERY,
+      -1, 0, 0 },
     { F_DUMMY, F_GRABBED, F_STONE, F_SLIME, F_STRNGL,
-      F_FOODPOIS, F_TERMILL, F_IN_LAVA, -1, 0, 0 },
+      F_FOODPOIS, F_TERMILL, F_IN_LAVA, F_BUSY, F_SUBMERGED,
+      -1, 0, 0 },
     { F_DUMMY, F_HELD, F_BLIND, F_DEAF, F_STUN,
-      F_CONF, F_HALLU, F_VERS, -1, 0, 0 },
+      F_CONF, F_HALLU, F_GLOWHANDS, F_ICY, F_VERS,
+      -1, 0, 0 },
 };
-/* used to fill up the empty space to right of 3rd status condition column */
+/* used to fill up the empty space to right of last status condition column */
 static int leftover_indices[] = { F_DUMMY, -1, 0, 0 };
 /* -2: top two rows of these columns are reserved for title and location */
-static int col1_indices[11 - 2] = {
-    F_HP,    F_POWER,    F_AC,    F_XP_LEVL, F_GOLD,  F_DUMMY,  -1, 0, 0
+static int col1_indices[13 - 2] = {
+    F_HP,    F_POWER,    F_AC,    F_XP_LEVL, F_GOLD,  F_DUMMY,
+    F_BAREH, F_WEAPON, F_DUMMY,
+    -1
 };
-static int col2_indices[11 - 2] = {
-    F_MAXHP, F_MAXPOWER, F_ALIGN, F_EXP_PTS, F_SCORE, F_TIME,   -1, 0, 0
+static int col2_indices[13 - 2] = {
+    F_MAXHP, F_MAXPOWER, F_ALIGN, F_EXP_PTS, F_SCORE, F_TIME,
+    F_DUMMY, F_ARMOR, F_DUMMY,
+    -1
 };
-static int characteristics_indices[11 - 2] = {
-    F_STR, F_DEX, F_CON, F_INT, F_WIS, F_CHA, -1, 0, 0
+static int characteristics_indices[13 - 2] = {
+    F_STR, F_DEX, F_CON, F_INT, F_WIS, F_CHA,
+    F_DUMMY, F_TERRAIN, F_DUMMY,
+    -1
 };
 
 /*
@@ -2294,10 +2387,10 @@ static int characteristics_indices[11 - 2] = {
  *
  *                title
  *               location
- * col1_indices[0]      col2_indices[0]      col3_indices[0]
- * col1_indices[1]      col2_indices[1]      col3_indices[1]
- *    ...                  ...                  ...
- * col1_indices[5]      col2_indices[5]      col3_indices[5]
+ * col1_indices[0]      col2_indices[0]      col3_indices[0]      col4_indices[0]
+ * col1_indices[1]      col2_indices[1]      col3_indices[1]      col4_indices[1]
+ *    ...                  ...                  ...                  ...
+ * col1_indices[5]      col2_indices[5]      col3_indices[5]      col4_indices[5]
  *
  * The status conditions are managed separately and appear to the right
  * of this form.
@@ -2336,7 +2429,7 @@ init_info_form(Widget parent, Widget top, Widget left)
     XtSetArg(args[num_args], nhStr(XtNfromVert), sv_name->w); num_args++;
     XtSetValues(sv_dlevel->w, args, num_args);
 
-    /* there are 3 columns beneath but top 2 rows are centered over first 2 */
+    /* there are 4 columns beneath but top 2 rows are centered over first 2 */
     col1 = init_column("name_col1", form, sv_dlevel->w, (Widget) 0,
                        col1_indices, 0);
     col2 = init_column("name_col2", form, sv_dlevel->w, col1,
@@ -2362,7 +2455,7 @@ init_info_form(Widget parent, Widget top, Widget left)
     return form;
 }
 
-/* give the three status condition columns the same width */
+/* give the status condition columns the same width */
 static void
 fixup_cond_widths(void)
 {
@@ -2370,7 +2463,7 @@ fixup_cond_widths(void)
 
     w1 = w2 = 0;
     for (pass = 1; pass <= 2; ++pass) { /* two passes... */
-        for (i = 0; i < 3; i++) { /* three columns */
+        for (i = 0; i < SIZE(status_indices); i++) {
             for (ip = status_indices[i]; *ip != -1; ++ip) { /* X fields */
                 /* pass 1: find -1;  pass 2: update field widths, find -1 */
                 if (pass == 2)
@@ -2400,7 +2493,7 @@ fixup_cond_widths(void)
         Dimension vers_width = 0;
         struct X_status_value *sv = &shown_stats[F_VERS];
 
-        if (sv) {
+        if (sv->w) {
             XtSetArg(args[0], XtNwidth, &vers_width);
             XtGetValues(sv->w, args, ONE);
             if (vers_width) {
@@ -2443,15 +2536,15 @@ create_fancy_status(Widget parent, Widget top)
     w = init_column("status_characteristics", form, (Widget) 0, w,
                     characteristics_indices, 15);
 #endif
-    for (i = 0; i < 3; i++) {
+    for (i = 0; i < SIZE(status_indices); i++) {
         Sprintf(buf, "status_condition%d", i + 1);
         w = init_column(buf, form, (Widget) 0, w, status_indices[i], 0);
     }
-    fixup_cond_widths(); /* make all 3 status_conditionN columns same width
+    fixup_cond_widths(); /* make all status_conditionN columns same width
                           * (actually, the slot for F_VERS is much wider) */
     /* TODO:
      * Calculate and set the width of the F_VERS widjet to be from the
-     * start of the third condition column through the right edge and
+     * start of the last condition column through the right edge and
      * get rid of the dummy column.
      */
 

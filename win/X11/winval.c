@@ -57,6 +57,7 @@ create_value(Widget parent, const char *name_value)
     num_args++;
     name =
         XtCreateManagedWidget(WNAME, labelWidgetClass, form, args, num_args);
+    X11_wrap_widget(name);
 
     num_args = 0;
     XtSetArg(args[num_args], XtNjustify, XtJustifyRight);
@@ -67,8 +68,9 @@ create_value(Widget parent, const char *name_value)
     num_args++;
     XtSetArg(args[num_args], XtNinternalHeight, 0);
     num_args++;
-    (void) XtCreateManagedWidget(WVALUE, labelWidgetClass, form, args,
-                                 num_args);
+    Widget value = XtCreateManagedWidget(WVALUE, labelWidgetClass, form, args,
+                                         num_args);
+    X11_wrap_widget(value);
     return form;
 }
 
@@ -81,6 +83,7 @@ set_name(Widget w, const char *new_label)
     name = XtNameToWidget(w, WNAME);
     XtSetArg(args[0], XtNlabel, new_label);
     XtSetValues(name, args, ONE);
+    X11_update_label(name);
 }
 
 void
@@ -122,6 +125,7 @@ set_value(Widget w, const char *new_value)
     val = get_value_widget(w);
     XtSetArg(args[0], XtNlabel, new_value);
     XtSetValues(val, args, ONE);
+    X11_update_label(val);
 }
 
 void
@@ -148,14 +152,6 @@ get_value_width(Widget w)
     return (int) width;
 }
 
-/* Swap foreground and background colors (this is the best I can do with */
-/* a label widget, unless I can get some init hook in there).            */
-void
-hilight_value(Widget w)
-{
-    swap_fg_bg(get_value_widget(w));
-}
-
 /* Swap the foreground and background colors of the given widget */
 void
 swap_fg_bg(Widget w)
@@ -170,4 +166,5 @@ swap_fg_bg(Widget w)
     XtSetArg(args[0], XtNforeground, bg);
     XtSetArg(args[1], XtNbackground, fg);
     XtSetValues(w, args, TWO);
+    X11_update_label(w);
 }

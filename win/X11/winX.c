@@ -112,6 +112,9 @@ static void X11_error_handler(String) __attribute__((noreturn));
 ATTRNORETURN static XtErrorHandler X11_error_handler(String);
 #endif
 
+boolean X11_blink;
+static unsigned blink_interval = 500; /* milliseconds */
+
 static int X11_io_error_handler(Display *);
 
 static int (*old_error_handler)(Display *, XErrorEvent *);
@@ -200,6 +203,7 @@ static void release_yn_widgets(void);
 static int input_event(int);
 static void win_visible(Widget, XtPointer, XEvent *, Boolean *);
 static void init_standard_windows(void);
+static void blink_callback(XtPointer client_data, XtIntervalId *timer);
 
 /*
  * Local variables.
@@ -1611,6 +1615,7 @@ X11_init_nhwindows(int *argcp, char **argv)
                                (ArgList) args, num_args);
     XtOverrideTranslations(toplevel,
               XtParseTranslationTable("<Message>WM_PROTOCOLS: X11_hangup()"));
+    XtAppAddTimeOut(app_context, blink_interval, blink_callback, NULL);
 
     /* We don't need to realize the top level widget. */
 
@@ -1665,6 +1670,20 @@ X11_init_nhwindows(int *argcp, char **argv)
     /* Display the startup banner in the message window. */
     for (i = 1; i <= 4 + 2; ++i) /* (values beyond 4 yield blank lines) */
         X11_putstr(WIN_MESSAGE, 0, copyright_banner_line(i));
+}
+
+static void
+blink_callback(XtPointer client_data, XtIntervalId *timer)
+{
+    nhUse(timer);
+#ifdef STATUS_HILITES
+    X11_tty_status_blink();
+#endif
+    X11_blink_labels();
+
+    X11_blink = !X11_blink;
+    /* Do it again */
+    XtAppAddTimeOut(app_context, blink_interval, blink_callback, client_data);
 }
 
 /*
@@ -3003,6 +3022,26 @@ X11_glyph_char(const glyph_info *glyphinfo)
 #else
     return (char) glyphinfo->ttychar;
 #endif
+}
+
+/* Given an XFontStruct, return a corresponding bold font */
+XFontStruct *
+X11_bold_font(Display *display, XFontStruct *font)
+{
+    Atom font_atom;
+    if (!XGetFontProperty(font, XA_FONT, &font_atom)) {
+        return NULL;
+    }
+
+    const char *font_name = XGetAtomName(display, font_atom);
+    if (font_name == NULL) {
+        return NULL;
+    }
+
+    char *bold_font = fontname_boldify(font_name);
+    XFontStruct *font2 = XLoadQueryFont(display, bold_font);
+
+    return font2;
 }
 
 /* Given an XFontStruct, return a corresponding italic font */

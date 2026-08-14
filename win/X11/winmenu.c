@@ -172,6 +172,7 @@ menu_select(Widget w, XtPointer client_data, XtPointer call_data)
 
     XtSetArg(args[0], nhStr(XtNlabel), curr->str);
     XtSetValues(w, args, ONE);
+    X11_update_label(w);
 
     if (menu_info->how == PICK_ONE)
         menu_popdown(wp);
@@ -218,6 +219,7 @@ invert_line(struct xwindow *wp, x11_menu_item *curr, int which, long how_many)
         XtSetValues(curr->w, args, ONE);
         curr->pick_count = -1L;
     }
+    X11_update_label(curr->w);
 }
 
 static XEvent fake_perminv_event;
@@ -260,10 +262,14 @@ menu_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
            overridden if it happens to duplicate a mapped menu command (':'
            to look inside a container vs ':' to select via search string);
            check for group accelerator match too */
-        for (curr = menu_info->curr_menu.base; curr; curr = curr->next)
-            if (curr->identifier.a_void != 0
-                && (curr->selector == ch || curr->gselector == ch))
-                goto make_selection;
+        for (curr = menu_info->curr_menu.base; curr; curr = curr->next) {
+            if (curr->identifier.a_void != 0) {
+                if (curr->selector == ch)
+                    goto make_selection;
+                if (curr->gselector == ch)
+                    goto group_accel;
+            }
+        }
 
         ch = map_menu_cmd(ch);
         if (ch == '\033') { /* quit */
@@ -616,6 +622,8 @@ menu_popdown(struct xwindow *wp)
     wp->w = wp->popup = (Widget) 0;
     if (wp->menu_information->is_active)
         exit_x_event = TRUE;             /* exit our event handler */
+    if (wp->menu_information->permi)
+        iflags.perm_invent = FALSE;
     wp->menu_information->is_up = FALSE; /* menu is down */
 }
 
@@ -1354,14 +1362,8 @@ menu_create_entries(struct xwindow *wp, struct menu *curr_menu)
                                                        ? commandWidgetClass
                                                        : labelWidgetClass,
                                                      wp->w, args, num_args);
-
-        if (attr == ATR_BOLD) {
-            load_boldfont(wp, curr->w);
-            num_args = 0;
-            XtSetArg(args[num_args], nhStr(XtNfont),
-                     wp->boldfs); num_args++;
-            XtSetValues(curr->w, args, num_args);
-        }
+        X11_wrap_widget(curr->w);
+        X11_set_attrs(curr->w, 0x1 << attr);
 
         if (canpick)
             XtAddCallback(linewidget, XtNcallback, menu_select,
