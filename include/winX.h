@@ -9,6 +9,10 @@
 #ifndef WINX_H
 #define WINX_H
 
+#ifdef USE_XFT
+#include <X11/Xft/Xft.h>
+#endif
+
 #ifndef COLOR_H
 #include "color.h"      /* CLR_MAX */
 #endif
@@ -317,6 +321,16 @@ typedef struct {
     Pixel pet_mark_color;     /* color of pet mark */
     String pilemark_bitmap;   /* X11 bitmap file used to mark item piles */
     Pixel pilemark_color;     /* color of item pile mark */
+#ifdef USE_XFT
+    String font_map;          /* font for the map */
+    String font_menu;         /* font for menus */
+    String font_message;      /* font for the message window */
+    String font_status;       /* font for the status window */
+    String font_text;         /* font for text windows */
+#ifdef GRAPHIC_TOMBSTONE
+    String font_rip;          /* font for tombstone */
+#endif
+#endif
 #ifdef GRAPHIC_TOMBSTONE
     String tombstone; /* name of XPM file for tombstone */
     int tombtext_x;   /* x-coord of center of first tombstone text */
@@ -523,6 +537,12 @@ extern XFontStruct *X11_bold_font(Display *, XFontStruct *);
 extern XFontStruct *X11_italic_font(Display *, XFontStruct *);
 #ifdef ENHANCED_SYMBOLS
 extern XFontStruct *X11_unicode_font(Display *, XFontStruct *);
+#endif
+
+#ifdef USE_XFT
+extern XftFont *X11_new_font(Widget w, boolean bold, int win_type);
+extern void X11_release_font(Widget w, XftFont *font);
+extern void X11_new_color(Widget w, Pixel pixel, XftColor *color);
 #endif
 
 /* ### winlabel.c ### */
