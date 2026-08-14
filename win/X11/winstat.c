@@ -2369,17 +2369,17 @@ static int leftover_indices[] = { F_DUMMY, -1, 0, 0 };
 static int col1_indices[13 - 2] = {
     F_HP,    F_POWER,    F_AC,    F_XP_LEVL, F_GOLD,  F_DUMMY,
     F_BAREH, F_WEAPON, F_DUMMY,
-    -1, 0, 0
+    -1
 };
 static int col2_indices[13 - 2] = {
     F_MAXHP, F_MAXPOWER, F_ALIGN, F_EXP_PTS, F_SCORE, F_TIME,
     F_DUMMY, F_ARMOR, F_DUMMY,
-    -1, 0, 0
+    -1
 };
 static int characteristics_indices[13 - 2] = {
     F_STR, F_DEX, F_CON, F_INT, F_WIS, F_CHA,
     F_DUMMY, F_TERRAIN, F_DUMMY,
-    -1, 0, 0
+    -1
 };
 
 /*
