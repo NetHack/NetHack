@@ -139,7 +139,11 @@ struct mesg_info_t {
                                      /*     bottom of screen             */
     struct line_element *last_pause_head; /* pointer to head of previous */
                                           /* turn                        */
+#ifdef USE_XFT
+    Pixel fgpixel;   /* Color for text drawing */
+#else
     GC gc;           /* GC for text drawing */
+#endif
     int char_width,  /* Saved font information so we can  */
         char_height, /*   calculate the correct placement */
         char_ascent, /*   of changes.                     */
