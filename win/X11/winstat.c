@@ -2274,7 +2274,7 @@ create_widget(Widget parent, struct X_status_value *sv, int sv_index)
                                          : "dlevel",
                                       labelWidgetClass, parent,
                                       args, num_args);
-        X11_wrap_widget(sv->w);
+        X11_wrap_widget(sv->w, NHW_STATUS);
         break;
     case SV_NAME: {
         char buf[BUFSZ];
@@ -2311,7 +2311,7 @@ create_widget(Widget parent, struct X_status_value *sv, int sv_index)
         XtSetArg(args[num_args], XtNinternalHeight, 0); num_args++;
         sv->w = XtCreateManagedWidget(sv->name, labelWidgetClass, parent,
                                       args, num_args);
-        X11_wrap_widget(sv->w);
+        X11_wrap_widget(sv->w, NHW_STATUS);
         break;
     }
     default:

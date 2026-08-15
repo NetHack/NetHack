@@ -551,7 +551,7 @@ extern void X11_new_color(Widget w, Pixel pixel, XftColor *color);
 
 /* ### winlabel.c ### */
 /* Functions for management of enhanced labels */
-extern void X11_wrap_widget(Widget);
+extern void X11_wrap_widget(Widget, int);
 extern void X11_update_label(Widget);
 extern void X11_set_attrs(Widget, unsigned);
 extern void X11_set_highlight(Widget, boolean);
