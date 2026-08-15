@@ -576,6 +576,9 @@ static const char *const build_opts[] = {
 #ifdef USE_XPM
     "tiles file in XPM format",
 #endif
+#ifdef USE_XFT
+    "font rendering with Xft",
+#endif
 #ifdef GRAPHIC_TOMBSTONE
     "graphical RIP screen",
 #endif
