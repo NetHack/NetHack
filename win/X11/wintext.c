@@ -237,6 +237,8 @@ create_text_window(struct xwindow *wp)
     num_args++;
     XtSetArg(args[num_args], XtNallowHoriz, True);
     num_args++;
+    XtSetArg(args[num_args], XtNtranslations,
+             XtParseTranslationTable(text_translations)), num_args++;
     Widget viewport = XtCreateManagedWidget(
         "text_viewport",     /* name */
         viewportWidgetClass, /* widget class from Window.h */
