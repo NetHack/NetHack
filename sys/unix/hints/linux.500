@@ -410,7 +410,8 @@ X11CFLAGS = -I/opt/X11/include
 # avoid repeated complaints about _X_NONNULL(args...) in <X11/Xfuncproto.h>
 X11CFLAGS += -Wno-variadic-macros
 ifdef USE_XFT
-X11CFLAGS += -DUSE_XFT $(shell pkg-config --cflags xft fontconfig)
+CFLAGS += -DUSE_XFT
+X11CFLAGS += $(shell pkg-config --cflags xft fontconfig)
 WINX11LIB += $(shell pkg-config --libs xft fontconfig)
 endif
 ifdef USE_XPM
