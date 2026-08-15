@@ -136,16 +136,10 @@ add_to_text_window(struct xwindow *wp, int attr, /* currently unused */
                    const char *str)
 {
     struct text_info_t *text_info = wp->text_information;
-    int width;
 
     nhUse(attr);
 
     append_text_buffer(&text_info->text, str, FALSE);
-
-    /* Calculate text width and save longest line */
-    width = XTextWidth(text_info->fs, str, (int) strlen(str));
-    if (width > text_info->max_width)
-        text_info->max_width = width;
 }
 
 void
@@ -208,9 +202,6 @@ create_text_window(struct xwindow *wp)
         (struct text_info_t *) alloc(sizeof(struct text_info_t));
 
     init_text_buffer(&text_info->text);
-    text_info->max_width = 0;
-    text_info->extra_width = 0;
-    text_info->extra_height = 0;
     text_info->blocked = FALSE;
     text_info->destroy_on_ack = TRUE; /* Ok to destroy before display */
 #ifdef GRAPHIC_TOMBSTONE
@@ -269,15 +260,6 @@ create_text_window(struct xwindow *wp)
                                   args,      /* set some values */
                                   num_args); /* number of values to set */
     X11_wrap_widget_if_Xft(wp->w, NHW_TEXT);
-
-    /* Get the font and margin information. */
-    num_args = 0;
-    XtSetArg(args[num_args], XtNfont, &text_info->fs);
-    num_args++;
-    XtGetValues(wp->w, args, num_args);
-
-    text_info->extra_width = 0;
-    text_info->extra_height = 0;
 }
 
 void
@@ -495,12 +477,16 @@ rip_exposed(Widget w, XtPointer client_data UNUSED,
         XDestroyImage(rip_image); /* data bytes free'd also */
     }
 
-    mask = GCFunction | GCForeground | GCGraphicsExposures | GCFont;
     values.graphics_exposures = False;
     XtSetArg(args[0], XtNforeground, &values.foreground);
     XtGetValues(w, args, 1);
     values.function = GXcopy;
+#ifdef USE_XFT
+    mask = GCFunction | GCForeground | GCGraphicsExposures;
+#else
+    mask = GCFunction | GCForeground | GCGraphicsExposures | GCFont;
     values.font = WindowFont(w);
+#endif
     ggc = XtGetGC(w, mask, &values);
 
     if (rip_pixmap != None) {

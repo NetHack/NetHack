@@ -1161,8 +1161,10 @@ X11_create_nhwindow(int type)
         wp->pixel_height = 0;
     wp->keep_window = FALSE;
     wp->nh_colors_inited = FALSE;
+#ifndef USE_XFT
     wp->boldfs = (XFontStruct *) 0;
     wp->boldfs_dpy = (Display *) 0;
+#endif
     wp->title = (char *) 0;
 
     switch (type) {
@@ -1304,11 +1306,13 @@ X11_destroy_nhwindow(winid window)
         WIN_INVEN = WIN_ERR;
     }
 
+#ifndef USE_XFT
     if (wp->boldfs) {
         XFreeFont(wp->boldfs_dpy, wp->boldfs);
         wp->boldfs = (XFontStruct *) 0;
         wp->boldfs_dpy = (Display *) 0;
     }
+#endif
 
     if (wp->title) {
         free(wp->title);
@@ -3158,7 +3162,6 @@ X11_italic_font(Display *display, XFontStruct *font)
 
     return font2;
 }
-#endif /* !USE_XFT */
 
 #ifdef ENHANCED_SYMBOLS
 /* Given an XFontStruct, return a corresponding font that supports Unicode */
@@ -3203,6 +3206,7 @@ X11_unicode_font(Display *display, XFontStruct *font)
     return unifont;
 }
 #endif /* ENHANCED_SYMBOLS */
+#endif /* !USE_XFT */
 
 #ifdef USE_XFT
 
