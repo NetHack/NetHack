@@ -159,7 +159,7 @@ create_message_window(struct xwindow *wp, /* window pointer */
 
     /* Save character information for fast use later. */
 #ifdef USE_XFT
-    XftFont *font = X11_new_font(wp->w, FALSE, NHW_MESSAGE);
+    XftFont *font = X11_new_font(wp->w, 0, NHW_MESSAGE);
     mesg_info->char_width = font->max_advance_width;
     mesg_info->char_height = font->height;
     mesg_info->char_ascent = font->ascent;
@@ -481,7 +481,7 @@ redraw_message_window(struct xwindow *wp)
     Visual *visual = DefaultVisualOfScreen(screen);
     Colormap cmap = DefaultColormapOfScreen(screen);
     XftDraw *draw = XftDrawCreate(display, XtWindow(wp->w), visual, cmap);
-    XftFont *font = X11_new_font(wp->w, FALSE, NHW_MESSAGE);
+    XftFont *font = X11_new_font(wp->w, 0, NHW_MESSAGE);
     XftColor fgcolor;
     X11_new_color(wp->w, mesg_info->fgpixel, &fgcolor);
 #endif /* USE_XFT */

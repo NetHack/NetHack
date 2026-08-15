@@ -3164,7 +3164,7 @@ X11_unicode_font(Display *display, XFontStruct *font)
 /* Open a vector font for the given widget */
 
 extern XftFont *
-X11_new_font(Widget w, boolean bold, int win_type)
+X11_new_font(Widget w, unsigned attrs, int win_type)
 {
     const char *font_name = NULL;
     const char *iflags_font_name = NULL;
@@ -3247,9 +3247,10 @@ X11_new_font(Widget w, boolean bold, int win_type)
     /* Set reasonable bounds on the font size */
     font_size = min(max(font_size, 6), 50);
 
-    Snprintf(name, sizeof(name), "%.*s-%d:%s",
+    Snprintf(name, sizeof(name), "%.*s-%d%s%s",
             (int) name_len, font_name, font_size,
-            bold ? "bold" : "medium");
+            (attrs & HL_BOLD) ? ":bold" : "",
+            (attrs & HL_ITALIC) ? ":italic" : "");
 
     Display *display = XtDisplay(w);
     XftFont *font = XftFontOpenName(display, DefaultScreen(display), name);

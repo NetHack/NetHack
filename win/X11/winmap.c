@@ -1040,7 +1040,7 @@ get_char_info(struct xwindow *wp)
 #ifdef USE_XFT
     struct map_info_t *map_info = wp->map_information;
     struct text_map_info_t *text_map = &map_info->text_map;
-    XftFont *font = X11_new_font(wp->w, FALSE, NHW_MAP);
+    XftFont *font = X11_new_font(wp->w, 0, NHW_MAP);
     text_map->square_width = font->max_advance_width;
     text_map->square_height = font->height;
     text_map->square_ascent = 0;
@@ -1430,7 +1430,7 @@ map_update(struct xwindow *wp, int start_row, int stop_row, int start_col, int s
         XtGetValues(wp->w, arg, 1);
 
         XftDraw *draw = XftDrawCreate(display, XtWindow(wp->w), visual, cmap);
-        XftFont *font = X11_new_font(wp->w, FALSE, NHW_MAP);
+        XftFont *font = X11_new_font(wp->w, 0, NHW_MAP);
         XftColor bgcolor;
         X11_new_color(wp->w, bgpixel, &bgcolor);
 #endif /* USE_XFT */
