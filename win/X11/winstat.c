@@ -776,7 +776,7 @@ tty_render_text(Widget w, const XRectangle *clip, int x, int y,
     Pixel fgpixel, bgpixel;
     tty_status_colors(w, color, attr, &fgpixel, &bgpixel);
 
-#ifdef USE_XPM
+#ifdef USE_XFT
 
     /* Get the font */
     XftFont *font = X11_new_font(w, attr, NHW_STATUS);
@@ -872,7 +872,7 @@ tty_render_text(Widget w, const XRectangle *clip, int x, int y,
     XftDrawDestroy(draw);
     X11_release_font(w, font);
 
-#else /* !USE_XPM */
+#else /* !USE_XFT */
 
     Arg args[5];
     Cardinal num_args;
@@ -1007,7 +1007,7 @@ tty_render_text(Widget w, const XRectangle *clip, int x, int y,
     if (font_italic != NULL) {
         XFreeFont(XtDisplay(w), font_italic);
     }
-#endif /* ?USE_XPM */
+#endif /* ?USE_XFT */
 
     /* Caller will advance x by the width */
     return width;
