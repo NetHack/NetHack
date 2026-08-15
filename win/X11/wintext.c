@@ -506,6 +506,33 @@ rip_exposed(Widget w, XtPointer client_data UNUSED,
 
     x = appResources.tombtext_x;
     y = appResources.tombtext_y;
+#ifdef USE_XFT
+    Display *display = XtDisplay(w);
+    Screen *screen = DefaultScreenOfDisplay(display);
+    Visual *visual = DefaultVisualOfScreen(screen);
+    Colormap cmap = DefaultColormapOfScreen(screen);
+    XftDraw *draw = XftDrawCreate(display, XtWindow(w), visual, cmap);
+    XftFont *font = XftFontOpenName(display, DefaultScreen(display),
+                                    appResources.font_rip);
+    XftColor foreground;
+    X11_new_color(w, values.foreground, &foreground);
+    for (i = 0; i <= YEAR_LINE; i++) {
+        size_t len = strlen(rip_line[i]);
+        XGlyphInfo extents;
+        XftTextExtents8(display, font,
+                        (const FcChar8 *) rip_line[i], len,
+                        &extents);
+        int width = extents.width - extents.x;
+
+        XftDrawString8(draw, &foreground, font, x - width / 2, y,
+                       (const FcChar8 *) rip_line[i], len);
+        x += appResources.tombtext_dx;
+        y += appResources.tombtext_dy;
+    }
+    XftFontClose(display, font);
+    XftDrawDestroy(draw);
+    XftColorFree(display, visual, cmap, &foreground);
+#else /* !USE_XFT */
     for (i = 0; i <= YEAR_LINE; i++) {
         int len = strlen(rip_line[i]);
         XFontStruct *font = WindowFontStruct(w);
@@ -515,6 +542,7 @@ rip_exposed(Widget w, XtPointer client_data UNUSED,
         x += appResources.tombtext_dx;
         y += appResources.tombtext_dy;
     }
+#endif /* ?USE_XFT */
 
     XtReleaseGC(w, ggc);
 }
