@@ -558,7 +558,7 @@ create_tty_status(Widget parent, Widget top)
     X11_status_widget = XtCreateManagedWidget("status_form", windowWidgetClass,
                                               form, args, num_args);
 
-    int height = nhFontHeight(X11_status_widget) * 3;
+    int height = nhFontHeight(X11_status_widget, NHW_STATUS) * 3;
     num_args = 0;
     XtSetArg(args[num_args], XtNheight, height); num_args++;
     XtSetValues(form, args, num_args);
@@ -618,7 +618,7 @@ tty_status_redraw(Widget w)
     num_args = 0;
     XtSetArg(args[num_args], XtNwidth, &width); num_args++;
     XtGetValues(w, args, num_args);
-    int height = nhFontHeight(w);
+    int height = nhFontHeight(w, NHW_STATUS);
 
     int x = 0;
     int y = 0;
@@ -770,16 +770,115 @@ tty_render_text(Widget w, const XRectangle *clip, int x, int y,
     nhUse(attr);
 #endif
 
-    Arg args[5];
-    Cardinal num_args;
-    XGCValues values;
-    Pixel fgpixel, bgpixel;
-    XFontStruct *font;
-    XFontStruct *font_italic = NULL; /* custodial */
     int goldwidth = 0;
 
     /* Get the colors */
+    Pixel fgpixel, bgpixel;
     tty_status_colors(w, color, attr, &fgpixel, &bgpixel);
+
+#ifdef USE_XPM
+
+    /* Get the font */
+    XftFont *font = X11_new_font(w, (attr & HL_BOLD) != 0, NHW_STATUS);
+
+    /* Get the drawing resources */
+    Display *display = XtDisplay(w);
+    Screen *screen = DefaultScreenOfDisplay(display);
+    Visual *visual = DefaultVisualOfScreen(screen);
+    Colormap cmap = DefaultColormapOfScreen(screen);
+    XftDraw *draw = XftDrawCreate(display, XtWindow(w), visual, cmap);
+
+    /* Convert the colors to Xft form */
+    XftColor fgcolor, bgcolor;
+    X11_new_color(w, fgpixel, &fgcolor);
+    X11_new_color(w, bgpixel, &bgcolor);
+
+    /* If drawing a hitpoint bar, we'll need a clipping rectangle */
+    if (clip != NULL) {
+        XftDrawSetClipRectangles(draw, 0, 0, clip, 1);
+    }
+
+    /* Gold will begin with a glyph string. Convert this to the proper
+       character, which might possibly be Unicode */
+    if (fld == BL_GOLD && memcmp(text, "\\G", 2) == 0) {
+        char *end;
+        unsigned long glyphcode = strtoul(text+2, &end, 16);
+        if ((glyphcode >> 16) == (unsigned) svc.context.rndencode && *end == ':') {
+            /* We have a proper glyph code */
+            glyph_info glyphinfo;
+            glyphcode &= 0xFFFF;
+            map_glyphinfo(0, 0, glyphcode, 0, &glyphinfo);
+            X11_map_symbol goldsym = X11_glyph_char(&glyphinfo);
+
+            /* Get the width of the gold symbol */
+            XGlyphInfo extents;
+#ifdef ENHANCED_SYMBOLS
+            FcChar32 goldch = goldsym;
+            XftTextExtents32(display, font, &goldch, 1, &extents);
+#else /* !ENHANCED_SYMBOLS */
+            FcChar8 goldch = goldsym;
+            XftTextExtents8(display, font, &goldch, 1, &extents);
+#endif /* ?ENHANCED_SYMBOLS */
+            goldwidth = extents.width - extents.x;
+
+            /* Render the gold symbol */
+            XftDrawRect(draw, &bgcolor, x, y, goldwidth, font->height);
+#ifdef ENHANCED_SYMBOLS
+            XftDrawString32(draw, &fgcolor, font, x, y + font->ascent, &goldch, 1);
+#else /* !ENHANCED_SYMBOLS */
+            XftDrawString8(draw, &fgcolor, font, x, y + font->ascent, &goldch, 1);
+#endif /* ?ENHANCED_SYMBOLS */
+
+            text = end;
+        }
+    }
+
+    /* Get the width of the rendered string, not including goldwidth */
+    XGlyphInfo extents;
+    XftTextExtents8(display, font, (const FcChar8 *) text, strlen(text), &extents);
+    int width = extents.width - extents.x;
+
+    /* Place version on the right */
+    if (fld == BL_VERS) {
+        Cardinal num_args = 0;
+        Arg args[1];
+        Dimension wwidth;
+        XtSetArg(args[num_args], XtNwidth, &wwidth); num_args++;
+        XtGetValues(w, args, num_args);
+        int x2 = wwidth - width;
+        if (x2 > x) {
+            x = x2;
+        }
+    }
+
+    /* Render the string */
+    XftDrawRect(draw, &bgcolor, x + goldwidth, y, width, font->height);
+    XftDrawString8(draw, &fgcolor, font,
+                   x + goldwidth, y + font->ascent,
+                     (const FcChar8 *) text, strlen(text));
+    width += goldwidth;
+
+#ifdef STATUS_HILITES
+    /* Implement underline */
+    if (attr & HL_ULINE) {
+        XftDrawRect(draw, &fgcolor, x, y + font->ascent, width, 1);
+    }
+#endif /* STATUS_HILITES */
+
+    /* Release resources */
+
+    XftColorFree(display, visual, cmap, &fgcolor);
+    XftColorFree(display, visual, cmap, &bgcolor);
+    XftDrawDestroy(draw);
+    X11_release_font(w, font);
+
+#else /* !USE_XPM */
+
+    Arg args[5];
+    Cardinal num_args;
+    XGCValues values;
+    XFontStruct *font;
+    XFontStruct *font_italic = NULL; /* custodial */
 
     values.foreground = fgpixel;
     values.background = bgpixel;
@@ -805,6 +904,7 @@ tty_render_text(Widget w, const XRectangle *clip, int x, int y,
         }
     }
 
+    /* Get a graphics context */
     values.font = font->fid;
     values.function = GXcopy;
     GC ggc = XtGetGC(w,
@@ -907,6 +1007,7 @@ tty_render_text(Widget w, const XRectangle *clip, int x, int y,
     if (font_italic != NULL) {
         XFreeFont(XtDisplay(w), font_italic);
     }
+#endif /* ?USE_XPM */
 
     /* Caller will advance x by the width */
     return width;
@@ -1139,7 +1240,7 @@ create_status_window_fancy(struct xwindow *wp, /* window pointer */
              &right_margin); num_args++;
     XtGetValues(wp->w, args, num_args);
 
-    wp->pixel_height = 2 * nhFontHeight(wp->w) + top_margin + bottom_margin;
+    wp->pixel_height = 2 * nhFontHeight(wp->w, NHW_STATUS) + top_margin + bottom_margin;
     wp->pixel_width = COLNO * fs->max_bounds.width
                     + left_margin + right_margin;
 

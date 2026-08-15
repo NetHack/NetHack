@@ -382,7 +382,7 @@ extern Boolean nhCvtStringToPixel(Display *, XrmValuePtr, Cardinal *,
 extern void get_window_frame_extents(Widget, long *, long *, long *, long *);
 extern void get_widget_window_geometry(Widget, int *, int *, int *, int *);
 extern char *fontname_boldify(const char *);
-extern Dimension nhFontHeight(Widget);
+extern Dimension nhFontHeight(Widget, int);
 extern char key_event_to_char(XKeyEvent *);
 extern void msgkey(Widget, XtPointer, XEvent *, Boolean *);
 extern void highlight_yn(boolean);

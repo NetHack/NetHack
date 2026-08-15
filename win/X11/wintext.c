@@ -154,7 +154,7 @@ display_text_window(struct xwindow *wp, boolean blocking)
     width = text_info->max_width + text_info->extra_width;
     text_info->blocked = blocking;
     text_info->destroy_on_ack = FALSE;
-    font_height = nhFontHeight(wp->w);
+    font_height = nhFontHeight(wp->w, NHW_TEXT);
 
     /*
      * Calculate the number of lines to use.  First, find the number of
