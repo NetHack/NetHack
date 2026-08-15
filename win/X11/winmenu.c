@@ -1362,7 +1362,7 @@ menu_create_entries(struct xwindow *wp, struct menu *curr_menu)
                                                        ? commandWidgetClass
                                                        : labelWidgetClass,
                                                      wp->w, args, num_args);
-        X11_wrap_widget(curr->w);
+        X11_wrap_widget(curr->w, NHW_MENU);
         X11_set_attrs(curr->w, 0x1 << attr);
 
         if (canpick)

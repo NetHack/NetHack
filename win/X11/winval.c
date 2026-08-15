@@ -57,7 +57,7 @@ create_value(Widget parent, const char *name_value)
     num_args++;
     name =
         XtCreateManagedWidget(WNAME, labelWidgetClass, form, args, num_args);
-    X11_wrap_widget(name);
+    X11_wrap_widget(name, NHW_STATUS);
 
     num_args = 0;
     XtSetArg(args[num_args], XtNjustify, XtJustifyRight);
@@ -70,7 +70,7 @@ create_value(Widget parent, const char *name_value)
     num_args++;
     Widget value = XtCreateManagedWidget(WVALUE, labelWidgetClass, form, args,
                                          num_args);
-    X11_wrap_widget(value);
+    X11_wrap_widget(value, NHW_STATUS);
     return form;
 }
 
