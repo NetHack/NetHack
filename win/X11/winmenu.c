@@ -89,9 +89,9 @@ static const char menu_entry_translations[] = "#override\n\
      <Btn4Down>: scroll(8)\n\
      <Btn5Down>: scroll(2)";
 
-XtTranslations menu_entry_translation_table = (XtTranslations) 0;
-XtTranslations menu_translation_table = (XtTranslations) 0;
-XtTranslations menu_del_translation_table = (XtTranslations) 0;
+static XtTranslations menu_entry_translation_table = (XtTranslations) 0;
+static XtTranslations menu_translation_table = (XtTranslations) 0;
+static XtTranslations menu_del_translation_table = (XtTranslations) 0;
 
 static void
 create_menu_translation_tables(void)

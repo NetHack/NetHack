@@ -123,8 +123,10 @@ static void create_status_window_fancy(struct xwindow *, boolean, Widget);
 static void create_status_window_tty(struct xwindow *, boolean, Widget);
 static void destroy_status_window_fancy(struct xwindow *);
 static void destroy_status_window_tty(struct xwindow *);
+#ifndef STATUS_HILITES
 static void adjust_status_fancy(struct xwindow *, const char *);
 static void adjust_status_tty(struct xwindow *, const char *);
+#endif
 static void set_percent(int, int, int);
 static void tty_status_exposed(Widget, XtPointer, XtPointer);
 static void tty_status_redraw(Widget);
@@ -1092,6 +1094,7 @@ destroy_status_window_tty(struct xwindow *wp)
         wp->type = NHW_NONE;
 }
 
+#ifndef STATUS_HILITES
 /*ARGSUSED*/
 void
 adjust_status_tty(struct xwindow *wp UNUSED, const char *str UNUSED)
@@ -1099,6 +1102,7 @@ adjust_status_tty(struct xwindow *wp UNUSED, const char *str UNUSED)
     /* nothing */
     return;
 }
+#endif
 
 void
 create_status_window(
@@ -1162,6 +1166,7 @@ destroy_status_window(struct xwindow *wp)
         destroy_status_window_tty(wp);
 }
 
+#ifndef STATUS_HILITES
 void
 adjust_status(struct xwindow *wp, const char *str)
 {
@@ -1170,6 +1175,7 @@ adjust_status(struct xwindow *wp, const char *str)
     else
         adjust_status_tty(wp, str);
 }
+#endif
 
 void
 create_status_window_fancy(struct xwindow *wp, /* window pointer */
@@ -1270,6 +1276,7 @@ destroy_status_window_fancy(struct xwindow *wp)
         wp->type = NHW_NONE;
 }
 
+#ifndef STATUS_HILITES
 /*
  * This assumes several things:
  *      + Status has only 2 lines
@@ -1300,6 +1307,7 @@ adjust_status_fancy(struct xwindow *wp, const char *str)
              wp->status_information->text.text); num_args++;
     XtSetValues(wp->w, args, num_args);
 }
+#endif
 
 /* Fancy ================================================================== */
 extern const char *const hu_stat[];  /* from eat.c */
