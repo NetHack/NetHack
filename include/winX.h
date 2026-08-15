@@ -558,4 +558,36 @@ extern void X11_set_highlight(Widget, boolean);
 extern void X11_set_percent(Widget, unsigned, Pixel);
 extern void X11_blink_labels(void);
 
+/*
+ * These are for widgets that use the enhanced label services only for text
+ * rendering; not for percentage bars, underlines and such. They only need
+ * these services if XFT is in use.
+ */
+#ifdef USE_XFT
+static inline void
+X11_wrap_widget_if_Xft(Widget w, int win_type)
+{
+    X11_wrap_widget(w, win_type);
+}
+
+static inline void
+X11_update_label_if_Xft(Widget w)
+{
+    X11_update_label(w);
+}
+#else /* !USE_XFT */
+static inline void
+X11_wrap_widget_if_Xft(Widget w, int win_type)
+{
+    nhUse(w);
+    nhUse(win_type);
+}
+
+static inline void
+X11_update_label_if_Xft(Widget w)
+{
+    nhUse(w);
+}
+#endif /* ?USE_XFT */
+
 #endif /* WINX_H */
