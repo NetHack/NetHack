@@ -59,6 +59,8 @@ static const char rip_translations[] = "#override\n\
 static Widget create_ripout_widget(Widget);
 #endif
 
+static void free_text_buffer(struct text_buffer *);
+
 /*ARGSUSED*/
 void
 delete_text(Widget w, XEvent *event, String *params, Cardinal *num_params)
@@ -388,7 +390,7 @@ clear_text_buffer(struct text_buffer *tb)
 }
 
 /* Free up allocated memory. */
-void
+static void
 free_text_buffer(struct text_buffer *tb)
 {
     free(tb->text);

@@ -98,7 +98,7 @@ void (*input_func)(Widget, XEvent *, String *, Cardinal *);
 int click_x, click_y, click_button; /* Click position on a map window
                                      * (filled by set_button_values()). */
 int updated_inventory; /* used to indicate perm_invent updating */
-color_attr X11_menu_promptstyle = { NO_COLOR, ATR_NONE };
+static color_attr X11_menu_promptstyle = { NO_COLOR, ATR_NONE };
 
 /* X11/Intrinsic.h prototype has an issue if [[NORETURN]] is used
  * rather than the old __attribute((noreturn)) under c23 */
@@ -127,6 +127,41 @@ static XtSignalId X11_sig_id;
 #endif
 #endif
 #endif
+
+static void init_menu_nhcolors(struct xwindow *);
+static Boolean nhApproxColor(Screen *, Colormap, char *, XColor *);
+static Boolean nhCvtStringToPixel(Display *, XrmValuePtr, Cardinal *,
+                                  XrmValuePtr, XrmValuePtr, XtPointer *);
+static void get_window_frame_extents(Widget, long *, long *, long *, long *);
+#ifndef USE_XFT
+static char *fontname_boldify(const char *);
+#endif
+static void msgkey(Widget, XtPointer, XEvent *, Boolean *);
+static void nh_keyscroll(Widget, XEvent *, String *, Cardinal *);
+static char *X11_getmsghistory(boolean);
+static void X11_putmsghistory(const char *, boolean);
+static void X11_init_nhwindows(int *, char **);
+static void X11_askname(void);
+static void X11_get_nh_event(void);
+static void X11_suspend_nhwindows(const char *);
+static void X11_resume_nhwindows(void);
+static void X11_clear_nhwindow(winid);
+static void X11_display_nhwindow(winid, boolean);
+static void X11_curs(winid, int, int);
+static void X11_putstr(winid, int, const char *);
+static void X11_display_file(const char *, boolean);
+static void X11_mark_synch(void);
+static void X11_wait_synch(void);
+static void X11_raw_print_bold(const char *);
+static int X11_nhgetch(void);
+static int X11_nh_poskey(coordxy *, coordxy *, int *);
+static int X11_doprev_message(void);
+static char X11_yn_function(const char *, const char *, char);
+static void X11_number_pad(int);
+static void X11_delay_output(void);
+static void X11_outrip(winid, int, time_t);
+static void X11_preference_update(const char *);
+static win_request_info *X11_ctrl_nhwindow(winid, int, win_request_info *);
 
 /* Interface definition, for windows.c */
 struct window_procs X11_procs = {
@@ -214,7 +249,7 @@ static winid message_win = WIN_ERR, /* These are the winids of the message, */
              status_win = WIN_ERR;  /*   are created in init_windows().     */
 static Pixmap icon_pixmap = None;   /* Pixmap for icon.                     */
 
-void
+static void
 X11_putmsghistory(const char *msg, boolean is_restoring)
 {
     if (WIN_MESSAGE != WIN_ERR) {
@@ -225,7 +260,7 @@ X11_putmsghistory(const char *msg, boolean is_restoring)
     }
 }
 
-char *
+static char *
 X11_getmsghistory(boolean init)
 {
     if (WIN_MESSAGE != WIN_ERR) {
@@ -308,7 +343,7 @@ get_nhcolor(struct xwindow *wp, int clr)
     return wp->nh_colors[0];
 }
 
-void
+static void
 init_menu_nhcolors(struct xwindow *wp)
 {
     static const char *mapCLR_to_res[CLR_MAX] = {
@@ -392,7 +427,7 @@ init_menu_nhcolors(struct xwindow *wp)
  * allocate the exact color, they puke and give you something stupid.
  * This is an attempt to find some close readonly cell and use it.
  */
-XtConvertArgRec const nhcolorConvertArgs[] = {
+static XtConvertArgRec const nhcolorConvertArgs[] = {
     { XtWidgetBaseOffset,
       (XtPointer) (ptrdiff_t) XtOffset(Widget, core.screen),
       sizeof (Screen *) },
@@ -425,7 +460,7 @@ XtConvertArgRec const nhcolorConvertArgs[] = {
  * The approximate color found is returned in color as well.
  * Return True if something close was found.
  */
-Boolean
+static Boolean
 nhApproxColor(
     Screen *screen,    /* screen to use */
     Colormap colormap, /* the colormap to use */
@@ -501,7 +536,7 @@ nhApproxColor(
     return True;
 }
 
-Boolean
+static Boolean
 nhCvtStringToPixel(
     Display *dpy,
     XrmValuePtr args, Cardinal *num_args,
@@ -594,7 +629,7 @@ nhCvtStringToPixel(
 }
 
 /* Ask the WM for window frame size */
-void
+static void
 get_window_frame_extents(
     Widget w,
     long *top, long *bottom,
@@ -670,8 +705,9 @@ get_widget_window_geometry(
     *y -= top;
 }
 
+#ifndef USE_XFT
 /* Change the full font name string so the weight is "bold" */
-char *
+static char *
 fontname_boldify(const char *fontname)
 {
     static char buf[BUFSZ];
@@ -719,6 +755,7 @@ load_boldfont(struct xwindow *wp, Widget w)
     fontname = fontname_boldify(XGetAtomName(dpy, (Atom)ret));
     wp->boldfs = XLoadQueryFont(dpy, fontname);
 }
+#endif /* !USE_XFT */
 
 /* ARGSUSED */
 static void
@@ -960,13 +997,13 @@ X11_raw_print(const char *str)
     (void) puts(str);
 }
 
-void
+static void
 X11_raw_print_bold(const char *str)
 {
     (void) puts(str);
 }
 
-void
+static void
 X11_curs(winid window, int x, int y)
 {
     check_winid(window);
@@ -984,7 +1021,7 @@ X11_curs(winid window, int x, int y)
     window_list[window].cursy = y;
 }
 
-void
+static void
 X11_putstr(winid window, int attr, const char *str)
 {
     winid new_win;
@@ -1032,19 +1069,19 @@ X11_putstr(winid window, int attr, const char *str)
 }
 
 /* We do event processing as a callback, so this is a null routine. */
-void
+static void
 X11_get_nh_event(void)
 {
     return;
 }
 
-int
+static int
 X11_nhgetch(void)
 {
     return input_event(EXIT_ON_KEY_PRESS);
 }
 
-int
+static int
 X11_nh_poskey(coordxy *x, coordxy *y, int *mod)
 {
     int val = input_event(EXIT_ON_KEY_OR_BUTTON_PRESS);
@@ -1151,7 +1188,7 @@ X11_create_nhwindow(int type)
     return window;
 }
 
-void
+static void
 X11_clear_nhwindow(winid window)
 {
     struct xwindow *wp;
@@ -1177,7 +1214,7 @@ X11_clear_nhwindow(winid window)
     }
 }
 
-void
+static void
 X11_display_nhwindow(winid window, boolean blocking)
 {
     struct xwindow *wp;
@@ -1328,7 +1365,7 @@ X11_update_inventory(int arg)
     return;
 }
 
-win_request_info *
+static win_request_info *
 X11_ctrl_nhwindow(
     winid window UNUSED,
     int request UNUSED,
@@ -1351,7 +1388,7 @@ X11_ctrl_nhwindow(
 }
 
 /* The current implementation has all of the saved lines on the screen. */
-int
+static int
 X11_doprev_message(void)
 {
     return 0;
@@ -1374,7 +1411,7 @@ X11_nhbell(void)
     }
 }
 
-void
+static void
 X11_mark_synch(void)
 {
     if (x_inited) {
@@ -1391,7 +1428,7 @@ X11_mark_synch(void)
     }
 }
 
-void
+static void
 X11_wait_synch(void)
 {
     if (x_inited) {
@@ -1401,13 +1438,13 @@ X11_wait_synch(void)
 }
 
 /* Both resume_ and suspend_ are called from ioctl.c and unixunix.c. */
-void
+static void
 X11_resume_nhwindows(void)
 {
     return;
 }
 /* ARGSUSED */
-void
+static void
 X11_suspend_nhwindows(const char *str)
 {
     nhUse(str);
@@ -1417,7 +1454,7 @@ X11_suspend_nhwindows(const char *str)
 
 /* Under X, we don't need to initialize the number pad. */
 /* ARGSUSED */
-void
+static void
 X11_number_pad(int state) /* called from options.c */
 {
     nhUse(state);
@@ -1426,7 +1463,7 @@ X11_number_pad(int state) /* called from options.c */
 }
 
 #ifdef GRAPHIC_TOMBSTONE
-void
+static void
 X11_outrip(winid window, int how, time_t when)
 {
     struct xwindow *wp;
@@ -1597,7 +1634,7 @@ X11_io_error_handler(Display *display)
     return 0;
 }
 
-void
+static void
 X11_init_nhwindows(int *argcp, char **argv)
 {
     int i;
@@ -1812,7 +1849,7 @@ d_timeout(XtPointer client_data, XtIntervalId *id)
  * function will send an event to the map window which will be waiting
  * for a sent event.
  */
-void
+static void
 X11_delay_output(void)
 {
     if (!x_inited)
@@ -1902,7 +1939,7 @@ askname_done(Widget w, XtPointer client_data, XtPointer call_data)
 
 /* ask player for character's name to replace generic name "player" (or other
    values; see config.h) after 'nethack -u player' or OPTIONS=name:player */
-void
+static void
 X11_askname(void)
 {
     Widget popup, dialog;
@@ -2120,7 +2157,7 @@ X11_getlin(
 
 /* uses a menu (with no selectors specified) rather than a text window
    to allow previous_page and first_menu actions to move backwards */
-void
+static void
 X11_display_file(const char *str, boolean complain)
 {
     dlb *fp;
@@ -2518,7 +2555,7 @@ X11_yn_function_core(
 
 /* X11-specific edition of yn_function(), the routine called by the core
    to show a prompt and get a single key answer, often 'y' vs 'n' */
-char
+static char
 X11_yn_function(
     const char *ques,     /* prompt text */
     const char *choices,  /* allowed response chars; any char if Null */
@@ -2531,7 +2568,7 @@ X11_yn_function(
 
 /* used when processing window-capability-specific run-time options;
    we support toggling tiles on and off via iflags.wc_tiled_map */
-void
+static void
 X11_preference_update(const char *pref)
 {
     if (!strcmp(pref, "tiled_map")) {
@@ -2562,7 +2599,7 @@ input_event(int exit_condition)
 }
 
 /*ARGSUSED*/
-void
+static void
 msgkey(Widget w, XtPointer data, XEvent *event, Boolean *continue_to_dispatch)
 {
     Cardinal num = 0;
@@ -2893,7 +2930,7 @@ find_scrollbars(
  * Scroll a viewport, using standard NH 1,2,3,4,6,7,8,9 directions.
  */
 /*ARGSUSED*/
-void
+static void
 nh_keyscroll(Widget viewport, XEvent *event, String *params,
              Cardinal *num_params)
 {
@@ -3058,6 +3095,7 @@ X11_glyph_char(const glyph_info *glyphinfo)
 #endif
 }
 
+#ifndef USE_XFT
 /* Given an XFontStruct, return a corresponding bold font */
 XFontStruct *
 X11_bold_font(Display *display, XFontStruct *font)
@@ -3120,6 +3158,7 @@ X11_italic_font(Display *display, XFontStruct *font)
 
     return font2;
 }
+#endif /* !USE_XFT */
 
 #ifdef ENHANCED_SYMBOLS
 /* Given an XFontStruct, return a corresponding font that supports Unicode */

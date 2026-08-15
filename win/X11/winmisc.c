@@ -124,13 +124,13 @@ static Widget make_menu(const char *, const char *, const char *, const char *,
                         const char **, Widget **, XtCallbackProc, Widget *);
 
 /* Bad Hack alert. Using integers instead of XtPointers */
-XtPointer
+static XtPointer
 i2xtp(int i)
 {
     return (XtPointer) (ptrdiff_t) i;
 }
 
-int
+static int
 xtp2i(XtPointer x)
 {
     return (int) (ptrdiff_t) x;
@@ -328,15 +328,15 @@ algn_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
     exit_x_event = TRUE;
 }
 
-int plsel_n_races, plsel_n_roles;
-Widget *plsel_race_radios = (Widget *) 0;
-Widget *plsel_role_radios = (Widget *) 0;
-Widget *plsel_gend_radios = (Widget *) 0;
-Widget *plsel_align_radios = (Widget *) 0;
+static int plsel_n_races, plsel_n_roles;
+static Widget *plsel_race_radios = (Widget *) 0;
+static Widget *plsel_role_radios = (Widget *) 0;
+static Widget *plsel_gend_radios = (Widget *) 0;
+static Widget *plsel_align_radios = (Widget *) 0;
 
-Widget plsel_name_input;
+static Widget plsel_name_input;
 
-Widget plsel_btn_play;
+static Widget plsel_btn_play;
 
 static void
 plsel_dialog_acceptvalues(void)
