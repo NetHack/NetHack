@@ -752,10 +752,21 @@ nhFreePixel(
  * assumption of ascent + descent is not always valid.
  */
 Dimension
-nhFontHeight(Widget w)
+nhFontHeight(Widget w, int win_type)
 {
+#ifdef USE_XFT
+
+    XftFont *font = X11_new_font(w, 0, win_type);
+    Dimension height = font->height;
+    X11_release_font(w, font);
+    return height;
+
+#else /* !USE_XFT */
+
     Arg args[1];
     XFontStruct *fs;
+
+    nhUse(win_type);
 
 #ifdef _XawTextSink_h
     Widget sink = NULL;
@@ -776,6 +787,8 @@ nhFontHeight(Widget w)
 
     /* Assume font height is ascent + descent. */
     return fs->ascent + fs->descent;
+
+#endif /* ?USE_XFT */
 }
 
 static String *default_resource_data = 0, /* NULL-terminated arrays */
