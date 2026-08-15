@@ -18,6 +18,15 @@
 #include "hack.h"
 #include "winX.h"
 
+/* Declarations depending on Xft support or none */
+#ifdef USE_XFT
+typedef XftFont X11_Font;
+#else
+typedef XFontStruct X11_Font;
+#endif
+static int X11_text_width(Display *, X11_Font *, const char *, size_t);
+static int X11_font_height(X11_Font *);
+
 /* Data attached to a wrapped widget */
 typedef struct WidgetData {
     /* Displayed text */
@@ -28,12 +37,11 @@ typedef struct WidgetData {
     boolean highlight;
 
     /* Fonts for italic, bold and bold-italic */
+    X11_Font *font[4]; /* To use the fonts */
 #ifdef USE_XFT
     int win_type;
-    XftFont *vfont[4];
 #else /* !USE_XFT */
-    XFontStruct *font[4]; /* To use the fonts */
-    XFontStruct *font_ptr[4]; /* To free the fonts */
+    X11_Font *font_ptr[4]; /* To free the fonts */
 #endif /* ?USE_XFT */
 
     /* Percentage bar */
@@ -195,11 +203,7 @@ update_label(Widget w, WidgetData *data)
         font_idx |= font_italic;
         allocate_font(w, data, font_idx);
     }
-#ifdef USE_XFT
-    XftFont *vfont = data->vfont[font_idx];
-#else
-    XFontStruct *font = data->font[font_idx];
-#endif
+    X11_Font *font = data->font[font_idx];
 
     String label;
     Boolean sens;       /* Make dim if not sensitive */
@@ -237,13 +241,7 @@ update_label(Widget w, WidgetData *data)
             }
 
             /* Get the width of the line */
-#ifdef USE_XFT
-            XGlyphInfo extents;
-            XftTextExtents8(display, vfont, (const FcChar8*) (label + i), line2, &extents);
-            int lwidth = extents.width - extents.x;
-#else
-            int lwidth = XTextWidth(font, label + i, line2);
-#endif
+            int lwidth = X11_text_width(display, font, label + i, line2);
 
             /* Update pixmap dimensions */
             width = max(lwidth, width);
@@ -260,11 +258,7 @@ update_label(Widget w, WidgetData *data)
         height = max(height, 1);
 
         /* Convert height to pixels */
-#ifdef USE_XFT
-        height *= vfont->height;
-#else
-        height *= font->ascent + font->descent;
-#endif
+        height *= X11_font_height(font);
     } else {
         num_args = 0;
         XtSetArg(args[num_args], XtNwidth, &width); num_args++;
@@ -358,11 +352,7 @@ update_label(Widget w, WidgetData *data)
         XSetForeground(display, ggc, values.foreground);
 #endif /* ?USE_XFT */
 
-#ifdef USE_XFT
-        int y = vfont->ascent;
-#else /* !USE_XFT */
-        int y = font->max_bounds.ascent;
-#endif /* ?USE_XFT */
+        int y = font->ascent;
         size_t i = 0;
         while (label[i] != '\0') {
             size_t line1 = strcspn(label + i, "\n");
@@ -373,13 +363,7 @@ update_label(Widget w, WidgetData *data)
             }
 
             /* Get the width of the line */
-#ifdef USE_XFT
-            XGlyphInfo extents;
-            XftTextExtents8(display, vfont, (const FcChar8*) (label + i), line2, &extents);
-            int lwidth = extents.width - extents.x;
-#else
-            int lwidth = XTextWidth(font, label + i, line2);
-#endif
+            int lwidth = X11_text_width(display, font, label + i, line2);
 
             /* Place the line horizontally */
             int x = 0;
@@ -399,8 +383,8 @@ update_label(Widget w, WidgetData *data)
 
             /* Render the line */
 #ifdef USE_XFT
-            XftDrawRect(draw, &bgcolor, x, y - vfont->ascent, lwidth, vfont->height);
-            XftDrawString8(draw, &fgcolor, vfont, x, y,
+            XftDrawRect(draw, &bgcolor, x, y - font->ascent, lwidth, font->height);
+            XftDrawString8(draw, &fgcolor, font, x, y,
                            (const FcChar8 *) (label + i), line2);
 #else
             XDrawImageString(display, new_pixmap, ggc,
@@ -419,11 +403,7 @@ update_label(Widget w, WidgetData *data)
 #endif
             }
 
-#ifdef USE_XFT
-            y += vfont->height;
-#else
-            y += font->ascent + font->descent;
-#endif
+            y += X11_font_height(font);
 
             /* Advance to next line */
             i += line1;
@@ -478,10 +458,10 @@ allocate_font(Widget w, WidgetData *data, unsigned font_idx)
     static const unsigned attrs[4] = {
         0, HL_BOLD, HL_ITALIC, HL_BOLD | HL_ITALIC
     };
-    data->vfont[font_idx] = X11_new_font(w, attrs[font_idx], data->win_type);
+    data->font[font_idx] = X11_new_font(w, attrs[font_idx], data->win_type);
 #else
     Display *display = XtDisplay(w);
-    XFontStruct *font1 = (font_idx == (font_bold | font_italic))
+    X11_Font *font1 = (font_idx == (font_bold | font_italic))
                        ? data->font[font_bold]
                        : data->font[0];
     data->font_ptr[font_idx] = (font_idx == font_bold)
@@ -500,10 +480,10 @@ free_fonts(Widget w, WidgetData *data)
     Display *display = XtDisplay(w);
     for (unsigned i = 0; i < 4; ++i) {
 #ifdef USE_XFT
-        if (data->vfont[i] != NULL) {
-            XftFontClose(display, data->vfont[i]);
+        if (data->font[i] != NULL) {
+            XftFontClose(display, data->font[i]);
         }
-        data->vfont[i] = NULL;
+        data->font[i] = NULL;
 #else
         if (data->font_ptr[i] != NULL) {
             XFreeFont(display, data->font_ptr[i]);
@@ -513,6 +493,39 @@ free_fonts(Widget w, WidgetData *data)
 #endif
     }
 }
+
+//////////////////////////////////////////////////////////////////////////////
+//             Functions that depend on the font rendering API              //
+//////////////////////////////////////////////////////////////////////////////
+
+#ifdef USE_XFT
+static int
+X11_text_width(Display *display, X11_Font *font, const char *text, size_t length)
+{
+    XGlyphInfo extents;
+    XftTextExtents8(display, font, (const FcChar8*) text, length, &extents);
+    return extents.width - extents.x;
+}
+
+static int
+X11_font_height(X11_Font *font)
+{
+    return font->height;
+}
+#else /* !USE_XFT */
+static int
+X11_text_width(Display *display, X11_Font *font, const char *text, size_t length)
+{
+    nhUse(display);
+    return XTextWidth(font, text, length);
+}
+
+static int
+X11_font_height(X11_Font *font)
+{
+    return font->ascent + font->descent;
+}
+#endif /* !USE_XFT */
 
 //////////////////////////////////////////////////////////////////////////////
 //                 A table of widgets and their data blocks                 //
