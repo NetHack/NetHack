@@ -2446,6 +2446,7 @@ X11_yn_function_core(
             (void) memset(buf2, 'X', 25), buf2[25] = '\0'; /* 25 'X's */
             yn_minwidth = (Dimension) XTextWidth(yn_font, buf2,
                                                  (int) strlen(buf2));
+            X11_wrap_widget_if_Xft(yn_label, NHW_MESSAGE);
         }
     }
 
@@ -2454,6 +2455,7 @@ X11_yn_function_core(
     num_args = 0;
     XtSetArg(args[num_args], XtNlabel, buf); num_args++;
     XtSetValues(yn_label, args, num_args);
+    X11_update_label_if_Xft(yn_label);
 
     /* for !slow, pop up the prompt+response widget */
     if (!appResources.slow) {
@@ -2497,6 +2499,7 @@ X11_yn_function_core(
         num_args = 0;
         XtSetArg(args[num_args], XtNlabel, " "); num_args++;
         XtSetValues(yn_label, args, num_args);
+        X11_update_label_if_Xft(yn_label);
 
         input_func = 0; /* keystrokes now belong to the map */
         highlight_yn(FALSE); /* disguise yn_label as part of map */
@@ -2620,6 +2623,7 @@ highlight_yn(boolean init)
             XtSetArg(args[0], XtNforeground, vals.foreground);
             XtSetArg(args[1], XtNbackground, vals.background);
             XtSetValues(yn_label, args, TWO);
+            X11_update_label_if_Xft(yn_label);
         }
     } else
         swap_fg_bg(yn_label);
@@ -2687,6 +2691,7 @@ init_standard_windows(void)
         XtSetArg(args[num_args], nhStr(XtNresizable), True); num_args++;
         XtSetArg(args[num_args], nhStr(XtNlabel), " "); num_args++;
         XtSetValues(yn_label, args, num_args);
+        X11_wrap_widget_if_Xft(yn_label, NHW_MESSAGE);
     }
 
     /*
