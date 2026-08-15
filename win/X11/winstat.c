@@ -779,7 +779,7 @@ tty_render_text(Widget w, const XRectangle *clip, int x, int y,
 #ifdef USE_XPM
 
     /* Get the font */
-    XftFont *font = X11_new_font(w, (attr & HL_BOLD) != 0, NHW_STATUS);
+    XftFont *font = X11_new_font(w, attr, NHW_STATUS);
 
     /* Get the drawing resources */
     Display *display = XtDisplay(w);

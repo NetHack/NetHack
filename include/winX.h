@@ -544,7 +544,7 @@ extern XFontStruct *X11_unicode_font(Display *, XFontStruct *);
 #endif
 
 #ifdef USE_XFT
-extern XftFont *X11_new_font(Widget w, boolean bold, int win_type);
+extern XftFont *X11_new_font(Widget w, unsigned attrs, int win_type);
 extern void X11_release_font(Widget w, XftFont *font);
 extern void X11_new_color(Widget w, Pixel pixel, XftColor *color);
 #endif
