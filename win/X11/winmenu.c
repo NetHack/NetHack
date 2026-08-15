@@ -1025,6 +1025,9 @@ X11_select_menu(winid window, int how, menu_item **menu_list)
                                                 labelWidgetClass, form,
                                                 args, num_args)
                         : (Widget) 0;
+        if (label) {
+            X11_wrap_widget_if_Xft(label, NHW_MENU);
+        }
 
         all = menu_create_buttons(wp, form, label);
 
@@ -1194,6 +1197,7 @@ menu_create_buttons(struct xwindow *wp, Widget form, Widget under)
     XtSetArg(args[num_args], nhStr(XtNright), XtChainLeft); num_args++;
     ok = XtCreateManagedWidget("OK", commandWidgetClass, form,
                                args, num_args);
+    X11_wrap_widget_if_Xft(ok, NHW_MENU);
     XtAddCallback(ok, XtNcallback, menu_ok, (XtPointer) wp);
     XtSetArg(args[0], XtNwidth, &lblwidth[0]);
     XtGetValues(lblwidget[0] = ok, args, ONE);
@@ -1212,6 +1216,7 @@ menu_create_buttons(struct xwindow *wp, Widget form, Widget under)
     XtSetArg(args[num_args], nhStr(XtNright), XtChainLeft); num_args++;
     cancel = XtCreateManagedWidget("cancel", commandWidgetClass, form,
                                    args, num_args);
+    X11_wrap_widget_if_Xft(cancel, NHW_MENU);
     XtAddCallback(cancel, XtNcallback, menu_cancel, (XtPointer) wp);
     XtSetArg(args[0], XtNwidth, &lblwidth[1]);
     XtGetValues(lblwidget[1] = cancel, args, ONE);
@@ -1229,6 +1234,7 @@ menu_create_buttons(struct xwindow *wp, Widget form, Widget under)
     XtSetArg(args[num_args], nhStr(XtNright), XtChainLeft); num_args++;
     all = XtCreateManagedWidget("all", commandWidgetClass, form,
                                 args, num_args);
+    X11_wrap_widget_if_Xft(all, NHW_MENU);
     XtAddCallback(all, XtNcallback, menu_all, (XtPointer) wp);
     XtSetArg(args[0], XtNwidth, &lblwidth[2]);
     XtGetValues(lblwidget[2] = all, args, ONE);
@@ -1245,6 +1251,7 @@ menu_create_buttons(struct xwindow *wp, Widget form, Widget under)
     XtSetArg(args[num_args], nhStr(XtNright), XtChainLeft); num_args++;
     none = XtCreateManagedWidget("none", commandWidgetClass, form,
                                  args, num_args);
+    X11_wrap_widget_if_Xft(none, NHW_MENU);
     XtAddCallback(none, XtNcallback, menu_none, (XtPointer) wp);
     XtSetArg(args[0], XtNwidth, &lblwidth[3]);
     XtGetValues(lblwidget[3] = none, args, ONE);
@@ -1261,6 +1268,7 @@ menu_create_buttons(struct xwindow *wp, Widget form, Widget under)
     XtSetArg(args[num_args], nhStr(XtNright), XtChainLeft); num_args++;
     invert = XtCreateManagedWidget("invert", commandWidgetClass, form,
                                    args, num_args);
+    X11_wrap_widget_if_Xft(invert, NHW_MENU);
     XtAddCallback(invert, XtNcallback, menu_invert, (XtPointer) wp);
     XtSetArg(args[0], XtNwidth, &lblwidth[4]);
     XtGetValues(lblwidget[4] = invert, args, ONE);
@@ -1278,6 +1286,7 @@ menu_create_buttons(struct xwindow *wp, Widget form, Widget under)
     XtSetArg(args[num_args], nhStr(XtNright), XtChainLeft); num_args++;
     search = XtCreateManagedWidget("search", commandWidgetClass, form,
                                    args, num_args);
+    X11_wrap_widget_if_Xft(search, NHW_MENU);
     XtAddCallback(search, XtNcallback, menu_search, (XtPointer) wp);
     XtSetArg(args[0], XtNwidth, &lblwidth[5]);
     XtGetValues(lblwidget[5] = search, args, ONE);
