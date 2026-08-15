@@ -84,7 +84,7 @@ struct text_map_info_t {
         square_ascent, /*   placement of changes.        */
         square_lbearing;
 
-#ifdef ENHANCED_SYMBOLS
+#if defined(ENHANCED_SYMBOLS) && !defined(USE_XFT)
     XFontStruct *font;
 #endif
 };
@@ -131,7 +131,12 @@ struct line_element {
 };
 
 struct mesg_info_t {
+#ifdef USE_XFT
+    Pixel fgpixel;   /* Color for text drawing */
+#else
+    GC gc;           /* GC for text drawing */
     XFontStruct *fs;                 /* Font for the window. */
+#endif
     int num_lines;                   /* line count */
     struct line_element *head;       /* head of circular line queue */
     struct line_element *line_here;  /* current drawn line position */
@@ -139,11 +144,6 @@ struct mesg_info_t {
                                      /*     bottom of screen             */
     struct line_element *last_pause_head; /* pointer to head of previous */
                                           /* turn                        */
-#ifdef USE_XFT
-    Pixel fgpixel;   /* Color for text drawing */
-#else
-    GC gc;           /* GC for text drawing */
-#endif
     int char_width,  /* Saved font information so we can  */
         char_height, /*   calculate the correct placement */
         char_ascent, /*   of changes.                     */
@@ -161,7 +161,9 @@ struct mesg_info_t {
 struct status_info_t {
     struct text_buffer text; /* Just a text buffer. */
     Pixel fg, bg;          /* foreground and background */
+#ifndef USE_XFT
     XFontStruct *fs;       /* Status window font structure. */
+#endif
     Dimension spacew;      /* width of one space */
     Position x, y[3];      /* x coord (not used), y for up to three lines */
     Dimension wd, ht;      /* width (not used), height (same for all lines) */
@@ -202,7 +204,9 @@ struct menu_info_t {
     struct menu curr_menu; /* Menu being displayed. */
     struct menu new_menu;  /* New menu being built. */
 
+#ifndef USE_XFT
     XFontStruct *fs;           /* Font for the window. */
+#endif
     long menu_count;           /* number entered by user */
     Dimension line_height;     /* Total height of a line of text. */
     Dimension internal_height; /* Internal height between widget & border */
@@ -225,10 +229,6 @@ struct menu_info_t {
  */
 struct text_info_t {
     struct text_buffer text;
-    XFontStruct *fs;        /* Font for the text window. */
-    int max_width;          /* Width of widest line so far. */
-    int extra_width,        /* Sum of left and right border widths. */
-        extra_height;       /* Sum of top and bottom border widths. */
     boolean blocked;        /*  */
     boolean destroy_on_ack; /* Destroy this window when acknowledged. */
 #ifdef GRAPHIC_TOMBSTONE
@@ -250,8 +250,10 @@ struct xwindow {
 
     boolean nh_colors_inited;
     XColor nh_colors[CLR_MAX];
+#ifndef USE_XFT
     XFontStruct *boldfs;       /* Bold font */
     Display *boldfs_dpy;       /* Bold font display */
+#endif
     char *title;
 
     union {
@@ -361,8 +363,10 @@ extern boolean X11_blink;
     } while (0)
 
 /* ### Window.c ### */
+#ifndef USE_XFT
 extern Font WindowFont(Widget);
 extern XFontStruct *WindowFontStruct(Widget);
+#endif
 
 /* ### dialogs.c ### */
 extern Widget CreateDialog(Widget, String, XtCallbackProc, XtCallbackProc);
