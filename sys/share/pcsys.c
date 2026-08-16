@@ -155,8 +155,11 @@ getreturn(const char *str)
     msmsg("Hit <Enter> %s.", str);
 #endif
 #endif
-    while (pgetchar() != '\n')
-        ;
+#if defined(PC_EARLY_OPTIONS)
+    if (isatty(STDOUT_FILENO))
+#endif
+        while (pgetchar() != '\n')
+            ;
     return;
 }
 

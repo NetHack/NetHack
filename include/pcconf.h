@@ -148,8 +148,12 @@
                              LEVELDIR, SAVEDIR, BONESDIR, DATADIR,         \
                              SCOREDIR, LOCKDIR, CONFIGDIR, and TROUBLEDIR. \
                              */
-
 #endif /* MSDOS configuration stuff */
+
+/* include early argument processing --dumpenums etc. */
+#if defined(MSDOS)
+#define PC_EARLY_OPTIONS
+#endif
 
 #ifndef PATHLEN
 #define PATHLEN 64  /* maximum pathlength */
