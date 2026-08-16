@@ -79,6 +79,7 @@ stethoscope applied to one monster disguised as another (double-trouble Wizard)
 	064523e162f8e30bdb76186a854b9d8958f3b340)
 mon_offmap() and place_monster() needed to operate on the same mstate bits
 food_disappears() needed to include a tin check
+don't refer to pet as "Your pet" until after the taming process has finished
 
 
 Platform- and/or Interface-Specific Fixes
