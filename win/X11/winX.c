@@ -3125,8 +3125,7 @@ X11_unicode_font(Display *display, XFontStruct *font)
     strcpy(unicode_font + len, "iso10646-1");
     font_name = unicode_font;
 
-    Font font_id = XLoadFont(display, font_name);
-    XFontStruct *unifont = XQueryFont(display, font_id);
+    XFontStruct *unifont = XLoadQueryFont(display, font_name);
     return unifont;
 }
 #endif /* ENHANCED_SYMBOLS */
