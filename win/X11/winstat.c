@@ -130,7 +130,7 @@ static void adjust_status_tty(struct xwindow *, const char *);
 static void set_percent(int, int, int);
 static void tty_status_exposed(Widget, XtPointer, XtPointer);
 static void tty_status_redraw(Widget);
-static int tty_render_field(Widget, int, int, enum statusfields);
+static int tty_render_field(Widget, int, int, int, enum statusfields);
 static void tty_status_colors(Widget, int, int, Pixel *, Pixel *);
 static int tty_render_text(Widget, const XRectangle *, int, int, const char *,
                            int, int, enum statusfields);
@@ -622,6 +622,9 @@ tty_status_redraw(Widget w)
     XtGetValues(w, args, num_args);
     int height = nhFontHeight(w, NHW_STATUS);
 
+    /* Space between fields. For now, this is equal to one half the height. */
+    int spacing = height/2;
+
     int x = 0;
     int y = 0;
     XClearWindow(XtDisplay(w), XtWindow(w));
@@ -632,7 +635,7 @@ tty_status_redraw(Widget w)
                 if (fld == BL_FLUSH) {
                     break;
                 }
-                int wid = tty_render_field(w, x, y, fld);
+                int wid = tty_render_field(w, x, y, spacing, fld);
                 if (fld == BL_TITLE) {
                     name_x = x;
                     name_y = y;
@@ -650,7 +653,7 @@ tty_status_redraw(Widget w)
                 if (fld == BL_FLUSH) {
                     break;
                 }
-                int wid = tty_render_field(w, x, y, fld);
+                int wid = tty_render_field(w, x, y, spacing, fld);
                 if (fld == BL_TITLE) {
                     name_x = x;
                     name_y = y;
@@ -688,7 +691,7 @@ tty_status_redraw(Widget w)
 
 /* Render one field of the TTY status */
 static int
-tty_render_field(Widget w, int x, int y, enum statusfields fld)
+tty_render_field(Widget w, int x, int y, int spacing, enum statusfields fld)
 {
     static struct stat_fmt {
         const char *pre;
@@ -733,7 +736,7 @@ tty_render_field(Widget w, int x, int y, enum statusfields fld)
         for (unsigned j = 0; j < SIZE(X11_cond_labels); ++j) {
             struct tty_cond_field const *fldp = &X11_cond_labels[j];
             if (fldp->text != NULL) {
-                width += tty_render_text(w, NULL, x + width, y, " ", NO_COLOR, 0, BL_FLUSH);
+                width += spacing;
                 width += tty_render_text(w, NULL, x + width, y, fldp->text, fldp->color, fldp->attrs, BL_FLUSH);
             }
         }
@@ -744,7 +747,7 @@ tty_render_field(Widget w, int x, int y, enum statusfields fld)
             struct tty_status_field const *fldp = &X11_status_labels[fld];
             if (fldp->text != NULL && fldp->text[0] != '\0') {
                 if (x != 0 && (formats[fld].pre == NULL || strchr("(/", formats[fld].pre[0]) == NULL)) {
-                    width += tty_render_text(w, NULL, x + width, y, " ", NO_COLOR, 0, BL_FLUSH);
+                    width += spacing;
                 }
                 if (formats[fld].pre != NULL) {
                     width += tty_render_text(w, NULL, x + width, y, formats[fld].pre, NO_COLOR, 0, BL_FLUSH);
