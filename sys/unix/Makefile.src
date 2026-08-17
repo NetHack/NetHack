@@ -1080,7 +1080,7 @@ $(TARGETPFX)winX.o: ../win/X11/winX.c $(HACK_H) ../include/dlb.h \
 		../include/winX.h ../include/xwindow.h ../win/X11/nh32icon \
 		../win/X11/nh56icon ../win/X11/nh72icon
 	$(TARGET_CC) $(TARGET_CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/winX.c
-$(TARGETPFX)winlabel.o: ../win/X11/winlabel.c $(HACK_H)
+$(TARGETPFX)winlabel.o: ../win/X11/winlabel.c $(HACK_H) ../include/winX.h
 	$(TARGET_CC) $(TARGET_CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/winlabel.c
 $(TARGETPFX)winmap.o: ../win/X11/winmap.c $(HACK_H) ../include/dlb.h \
 		../include/tile2x11.h ../include/winX.h ../include/xwindow.h
