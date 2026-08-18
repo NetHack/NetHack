@@ -158,7 +158,7 @@ create_message_window(struct xwindow *wp, /* window pointer */
     XftFont *font = X11_new_font(wp->w, 0, NHW_MESSAGE);
     XGlyphInfo extents;
     mesg_info->char_width = font->max_advance_width;
-    mesg_info->char_height = font->height;
+    mesg_info->char_height = X11_font_height(font);
     mesg_info->char_ascent = font->ascent;
     mesg_info->char_lbearing = 0;
     /* Xft seems to offer no direct way to distinguish proportional from

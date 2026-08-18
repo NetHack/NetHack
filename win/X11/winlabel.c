@@ -19,13 +19,7 @@
 #include "winX.h"
 
 /* Declarations depending on Xft support or none */
-#ifdef USE_XFT
-typedef XftFont X11_Font;
-#else
-typedef XFontStruct X11_Font;
-#endif
 static int X11_text_width(Display *, X11_Font *, const char *, size_t);
-static int X11_font_height(X11_Font *);
 
 /* Data attached to a wrapped widget */
 typedef struct WidgetData {
@@ -383,7 +377,7 @@ update_label(Widget w, WidgetData *data)
 
             /* Render the line */
 #ifdef USE_XFT
-            XftDrawRect(draw, &bgcolor, x, y - font->ascent, lwidth, font->height);
+            XftDrawRect(draw, &bgcolor, x, y - font->ascent, lwidth, X11_font_height(font));
             XftDrawString8(draw, &fgcolor, font, x, y,
                            (const FcChar8 *) (label + i), line2);
 #else
@@ -507,10 +501,10 @@ X11_text_width(Display *display, X11_Font *font, const char *text, size_t length
     return extents.width - extents.x;
 }
 
-static int
+int
 X11_font_height(X11_Font *font)
 {
-    return font->height;
+    return max(font->height, font->ascent + font->descent);
 }
 #else /* !USE_XFT */
 static int
@@ -520,7 +514,7 @@ X11_text_width(Display *display, X11_Font *font, const char *text, size_t length
     return XTextWidth(font, text, length);
 }
 
-static int
+int
 X11_font_height(X11_Font *font)
 {
     return font->ascent + font->descent;

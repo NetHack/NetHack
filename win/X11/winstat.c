@@ -785,6 +785,7 @@ tty_render_text(Widget w, const XRectangle *clip, int x, int y,
 
     /* Get the font */
     XftFont *font = X11_new_font(w, attr, NHW_STATUS);
+    int height = X11_font_height(font);
 
     /* Get the drawing resources */
     Display *display = XtDisplay(w);
@@ -827,7 +828,7 @@ tty_render_text(Widget w, const XRectangle *clip, int x, int y,
             goldwidth = extents.width - extents.x;
 
             /* Render the gold symbol */
-            XftDrawRect(draw, &bgcolor, x, y, goldwidth, font->height);
+            XftDrawRect(draw, &bgcolor, x, y, goldwidth, height);
 #ifdef ENHANCED_SYMBOLS
             XftDrawString32(draw, &fgcolor, font, x, y + font->ascent, &goldch, 1);
 #else /* !ENHANCED_SYMBOLS */
@@ -857,7 +858,7 @@ tty_render_text(Widget w, const XRectangle *clip, int x, int y,
     }
 
     /* Render the string */
-    XftDrawRect(draw, &bgcolor, x + goldwidth, y, width, font->height);
+    XftDrawRect(draw, &bgcolor, x + goldwidth, y, width, height);
     XftDrawString8(draw, &fgcolor, font,
                    x + goldwidth, y + font->ascent,
                      (const FcChar8 *) text, strlen(text));
