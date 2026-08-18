@@ -418,7 +418,7 @@ update_label(Widget w, WidgetData *data)
             XftDrawRect(draw, &fgcolor, 0, 0,        width, 1);
             XftDrawRect(draw, &fgcolor, 0, height-1, width, 1);
             XftDrawRect(draw, &fgcolor, 0, 0,        1,     height);
-            XftDrawRect(draw, &fgcolor, 0, height-1, 1,     height);
+            XftDrawRect(draw, &fgcolor, width-1, 0,  1,     height);
 #else
             XDrawRectangle(display, new_pixmap, ggc, 0, 0, width-1, height-1);
 #endif
