@@ -79,7 +79,10 @@ stethoscope applied to one monster disguised as another (double-trouble Wizard)
 	064523e162f8e30bdb76186a854b9d8958f3b340)
 mon_offmap() and place_monster() needed to operate on the same mstate bits
 food_disappears() needed to include a tin check
+cmdstr[] buffer was not being initialized in handler_rebind_keys_add()
+don't catch thrown objects while asleep
 don't refer to pet as "Your pet" until after the taming process has finished
+checkpoint fixes (pr #1660 by k21971)
 
 
 Platform- and/or Interface-Specific Fixes
@@ -214,7 +217,11 @@ MS-DOS: Define a separate palette for VGA text (pr #1620 by chasonr)
 MS-DOS: some conditional cleanup for SUPPRESS_GRAPHICS, TILES_IN_GLYPHMAP,
 	NO_TILES, WANT_WIN_CURSES=1 without WANT_WIN_TTY=1
 	(pr #1632 by chasonr)
-MS-DOS: add some hilite_pet and hilite_pile support to tiled display
+MS-DOS: support decals in all VESA modes and in 16 color mode; support
+	decals in the overview modes as well as the normal map mode;
+	provide correct highlighting for vga_redrawmap and vesa_redrawmap;
+	provide the hilite_pet and hilite_pile flags in the default
+	configuration file (pr #1649 by chasonr)
 musl: musl libc does not have __sighandler_t so don't use it in the
 	macro definition for SIG_RET_TYPE with musl
 tty: allow custom glyph colors if they're basic 16 nethack colors
