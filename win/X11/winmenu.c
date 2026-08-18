@@ -1366,13 +1366,17 @@ menu_create_entries(struct xwindow *wp, struct menu *curr_menu)
 
         menulineidx++;
         Sprintf(tmpbuf, "menuline_%s", (canpick) ? "command" : "label");
-        curr->w = linewidget = XtCreateManagedWidget(tmpbuf,
-                                                     canpick
-                                                       ? commandWidgetClass
-                                                       : labelWidgetClass,
-                                                     wp->w, args, num_args);
+        /* Need to create the widget unmanaged, set up the pixmap, and then
+           manage it, or else items in the inventory window get the wrong
+           size */
+        curr->w = linewidget = XtCreateWidget(tmpbuf,
+                                              canpick
+                                                ? commandWidgetClass
+                                                : labelWidgetClass,
+                                              wp->w, args, num_args);
         X11_wrap_widget(curr->w, NHW_MENU);
         X11_set_attrs(curr->w, 0x1 << attr);
+        XtManageChild(curr->w);
 
         if (canpick)
             XtAddCallback(linewidget, XtNcallback, menu_select,
