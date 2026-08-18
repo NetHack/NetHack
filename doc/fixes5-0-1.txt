@@ -83,6 +83,8 @@ cmdstr[] buffer was not being initialized in handler_rebind_keys_add()
 don't catch thrown objects while asleep
 don't refer to pet as "Your pet" until after the taming process has finished
 checkpoint fixes (pr #1660 by k21971)
+upon return to a level, catch up on remaining nutrition value by the same
+	percentage as the catch up for the weight
 
 
 Platform- and/or Interface-Specific Fixes
