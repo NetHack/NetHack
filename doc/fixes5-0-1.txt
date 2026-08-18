@@ -260,6 +260,7 @@ X11: toggle off perm_invent if user closes the perm inventory window
 X11: fix menu group accelerators
 X11: implement all text attributes for menus
 X11: fix crash when loading a nonexistent font
+Unix: don't complain about MAXPLAYERS with unknown command line param
 
 
 General New Features
