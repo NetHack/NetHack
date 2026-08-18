@@ -128,11 +128,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
 #endif
         gh.hname = "NetHack"; /* used for syntax messages */
 
-#if defined(PC_EARLY_OPTIONS)
-    early_init(argc, argv);
-#endif
     choose_windows(DEFAULT_WINDOW_SYS);
-
 
 #if !defined(AMIGA) && !defined(GNUDOS)
     /* Save current directory and make sure it gets restored when
