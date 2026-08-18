@@ -843,9 +843,6 @@ dorecover(NHFILE *nhfp)
     init_oclass_probs(); /* recompute go.oclass_prob_totals[] */
 
     restlevelstate();
-#ifdef INSURANCE
-    savestateinlock();
-#endif
     rtmp = restlevelfile(ledger_no(&u.uz));
     if (rtmp < 2)
         return rtmp; /* dorecover called recursively */
@@ -953,6 +950,12 @@ dorecover(NHFILE *nhfp)
 
     run_timers(); /* expire all timers that have gone off while away */
     program_state.restoring = 0; /* affects bot() so clear before docrt() */
+#ifdef INSURANCE
+    /* first checkpoint of the restored session; every level file has been
+       written and the current level has been read back in, so recover has
+       something to work with even if the player never changes level */
+    save_currentstate();
+#endif
 
     if (ge.early_raw_messages && !program_state.beyond_savefile_load) {
         /*
