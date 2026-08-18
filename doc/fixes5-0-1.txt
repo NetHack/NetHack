@@ -257,6 +257,7 @@ X11: allow menu scrolling by pageup/pagedown/home/end keys
 X11: toggle off perm_invent if user closes the perm inventory window
 X11: fix menu group accelerators
 X11: implement all text attributes for menus
+X11: fix crash when loading a nonexistent font
 
 
 General New Features
