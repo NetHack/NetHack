@@ -11,6 +11,9 @@
 
 #ifdef USE_XFT
 #include <X11/Xft/Xft.h>
+typedef XftFont X11_Font;
+#else
+typedef XFontStruct X11_Font;
 #endif
 
 #ifndef COLOR_H
@@ -529,6 +532,7 @@ extern void X11_set_attrs(Widget, unsigned);
 extern void X11_set_highlight(Widget, boolean);
 extern void X11_set_percent(Widget, unsigned, Pixel);
 extern void X11_blink_labels(void);
+extern int X11_font_height(X11_Font *);
 
 /*
  * These are for widgets that use the enhanced label services only for text

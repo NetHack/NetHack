@@ -794,7 +794,7 @@ nhFontHeight(Widget w, int win_type)
 #ifdef USE_XFT
 
     XftFont *font = X11_new_font(w, 0, win_type);
-    Dimension height = font->height;
+    Dimension height = X11_font_height(font);
     X11_release_font(w, font);
     return height;
 

@@ -1048,7 +1048,7 @@ get_char_info(struct xwindow *wp)
     struct text_map_info_t *text_map = &map_info->text_map;
     XftFont *font = X11_new_font(wp->w, 0, NHW_MAP);
     text_map->square_width = font->max_advance_width;
-    text_map->square_height = font->height;
+    text_map->square_height = X11_font_height(font);
     text_map->square_ascent = 0;
     text_map->square_lbearing = 0;
     X11_release_font(wp->w, font);
@@ -1546,7 +1546,7 @@ X11_draw_image_string(
 {
     XftDrawRect(draw, bgcolor, x, y,
                 length * font->max_advance_width,
-                font->height);
+                X11_font_height(font));
 
     int xt = x;
     int yt = y + font->ascent;
