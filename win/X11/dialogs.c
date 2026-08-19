@@ -132,6 +132,7 @@ CreateDialog(Widget parent, String name, XtCallbackProc okay_callback,
     XtSetArg(args[num_args], nhStr(XtNborderWidth), 0); num_args++;
     prompt = XtCreateManagedWidget("prompt", labelWidgetClass, form,
                                    args, num_args);
+    X11_wrap_widget_if_Xft(prompt, NHW_MENU);
 
     num_args = 0;
 #ifdef SPECIAL_CMAP
@@ -169,6 +170,7 @@ CreateDialog(Widget parent, String name, XtCallbackProc okay_callback,
              XtParseAcceleratorTable(okay_accelerators)); num_args++;
     okay = XtCreateManagedWidget("okay", commandWidgetClass, form,
                                  args, num_args);
+    X11_wrap_widget_if_Xft(okay, NHW_MENU);
     XtAddCallback(okay, XtNcallback, okay_callback, form);
     XtSetArg(args[0], XtNwidth, &owidth);
     XtGetValues(okay, args, ONE);
@@ -193,6 +195,7 @@ CreateDialog(Widget parent, String name, XtCallbackProc okay_callback,
                  XtParseAcceleratorTable(cancel_accelerators)); num_args++;
         cancel = XtCreateManagedWidget("cancel", commandWidgetClass, form,
                                        args, num_args);
+        X11_wrap_widget_if_Xft(cancel, NHW_MENU);
         XtAddCallback(cancel, XtNcallback, cancel_callback, form);
         XtInstallAccelerators(response, cancel);
         XtSetArg(args[0], XtNwidth, &cwidth);
@@ -241,6 +244,7 @@ SetDialogPrompt(Widget w, String newprompt)
     label = XtNameToWidget(w, "prompt");
     XtSetArg(args[0], nhStr(XtNlabel), newprompt);
     XtSetValues(label, args, ONE);
+    X11_update_label_if_Xft(label);
 }
 
 /* get what the user typed; caller must free the response */

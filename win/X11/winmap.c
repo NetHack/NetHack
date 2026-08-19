@@ -59,19 +59,28 @@ extern int total_tiles_used, Tile_corr;
 #define NH_INVERSE_COLOR  0x40000000
 #define NH_ENHANCED_COLOR 0x80000000
 
+#ifdef USE_XFT
+static void X11_get_color(struct xwindow *wp, X11_color nhcolor, XftColor *color);
+static void X11_draw_image_string(XftDraw *draw, XftFont *font,
+                                  XftColor *fgcolor, XftColor *bgcolor,
+                                  int x, int y,
+                                  const X11_map_symbol *string, int length);
+#else /* !USE_XFT */
 static GC X11_make_gc(struct xwindow *wp, struct text_map_info_t *text_map,
                       X11_color color, boolean inverted);
-#ifdef ENHANCED_SYMBOLS
 static void X11_free_gc(struct xwindow *wp, GC gc, X11_color color);
-#endif
-#ifdef ENHANCED_SYMBOLS
-static void X11_set_map_font(struct xwindow *wp);
-#endif
 static void X11_draw_image_string(Display *display, Drawable d,
                                   GC ggc, int x, int y,
                                   const X11_map_symbol *string, int length);
+#ifdef ENHANCED_SYMBOLS
+static void X11_set_map_font(struct xwindow *wp);
+#endif
+#endif /* ?USE_XFT */
 static Font X11_get_map_font(struct xwindow *wp);
+#ifndef USE_XFT
 static XFontStruct *X11_get_map_font_struct(struct xwindow *wp);
+#endif
+static void get_text_gc(struct xwindow *, Font);
 static boolean init_tiles(struct xwindow *);
 static void set_button_values(Widget, int, int, unsigned);
 static void map_check_size_change(struct xwindow *);
@@ -79,7 +88,6 @@ static void map_update(struct xwindow *, int, int, int, int, boolean);
 static void init_text(struct xwindow *);
 static void map_exposed(Widget, XtPointer, XtPointer);
 static void set_gc(Widget, Font, const char *, Pixel, GC *, GC *);
-static void get_text_gc(struct xwindow *, Font);
 static void map_all_unexplored(struct map_info_t *);
 static void get_char_info(struct xwindow *);
 static void display_cursor(struct xwindow *);
@@ -838,7 +846,11 @@ set_gc(
     GC *regular, GC *inverse)
 {
     XGCValues values;
+#ifdef USE_XFT
+    XtGCMask mask = GCFunction | GCForeground | GCBackground;
+#else
     XtGCMask mask = GCFunction | GCForeground | GCBackground | GCFont;
+#endif
     Pixel curpixel;
     Arg arg[1];
 
@@ -1031,6 +1043,16 @@ clear_map_window(struct xwindow *wp)
 static void
 get_char_info(struct xwindow *wp)
 {
+#ifdef USE_XFT
+    struct map_info_t *map_info = wp->map_information;
+    struct text_map_info_t *text_map = &map_info->text_map;
+    XftFont *font = X11_new_font(wp->w, 0, NHW_MAP);
+    text_map->square_width = font->max_advance_width;
+    text_map->square_height = X11_font_height(font);
+    text_map->square_ascent = 0;
+    text_map->square_lbearing = 0;
+    X11_release_font(wp->w, font);
+#else /* !USE_XFT */
     XFontStruct *fs;
     struct map_info_t *map_info = wp->map_information;
     struct text_map_info_t *text_map = &map_info->text_map;
@@ -1062,6 +1084,7 @@ get_char_info(struct xwindow *wp)
 
     if (fs->min_bounds.width != fs->max_bounds.width)
         X11_raw_print("Warning:  map font is not monospaced!");
+#endif /* ?USE_XFT */
 }
 
 /*
@@ -1400,47 +1423,141 @@ map_update(struct xwindow *wp, int start_row, int stop_row, int start_col, int s
     } else {
         struct text_map_info_t *text_map = &map_info->text_map;
 
-        {
-            X11_color *c_ptr;
-            X11_map_symbol *t_ptr;
-            int cur_col, win_ystart;
-            X11_color color;
-            GC ggc;
+#ifdef USE_XFT
+        /* Set up font and background color */
+        Display *display = XtDisplay(wp->w);
+        Screen *screen = DefaultScreenOfDisplay(display);
+        Visual *visual = DefaultVisualOfScreen(screen);
+        Colormap cmap = DefaultColormapOfScreen(screen);
 
-            for (row = start_row; row <= stop_row; row++) {
-                win_ystart =
-                    text_map->square_ascent + (row * text_map->square_height);
+        Pixel bgpixel;
+        Arg arg[1];
+        XtSetArg(arg[0], XtNbackground, &bgpixel);
+        XtGetValues(wp->w, arg, 1);
 
-                t_ptr = &(text_map->text[row][start_col]);
-                c_ptr = &(text_map->colors[row][start_col]);
-                cur_col = start_col;
-                while (cur_col <= stop_col) {
-                    color = *c_ptr++;
-                    count = 1;
-                    while ((cur_col + count) <= stop_col && *c_ptr == color) {
-                        count++;
-                        c_ptr++;
-                    }
+        XftDraw *draw = XftDrawCreate(display, XtWindow(wp->w), visual, cmap);
+        XftFont *font = X11_new_font(wp->w, 0, NHW_MAP);
+        XftColor bgcolor;
+        X11_new_color(wp->w, bgpixel, &bgcolor);
+#endif /* USE_XFT */
 
-                    ggc = X11_make_gc(wp, text_map, color, inverted);
-                    X11_draw_image_string(XtDisplay(wp->w), XtWindow(wp->w),
-                                          ggc,
-                                          text_map->square_lbearing
-                                              + (text_map->square_width
-                                                 * (cur_col - COL0_OFFSET)),
-                                          win_ystart, t_ptr, count);
-#ifdef ENHANCED_SYMBOLS
-                    X11_free_gc(wp, ggc, color);
-#endif
+        for (row = start_row; row <= stop_row; row++) {
+            int win_ystart =
+                text_map->square_ascent + (row * text_map->square_height);
 
-                    /* move text pointer and column count */
-                    t_ptr += count;
-                    cur_col += count;
-                } /* col loop */
-            }     /* row loop */
-        }
+            X11_map_symbol *t_ptr = &(text_map->text[row][start_col]);
+            X11_color *c_ptr = &(text_map->colors[row][start_col]);
+            int cur_col = start_col;
+            while (cur_col <= stop_col) {
+                X11_color color = *c_ptr++;
+                count = 1;
+                while ((cur_col + count) <= stop_col && *c_ptr == color) {
+                    count++;
+                    c_ptr++;
+                }
+
+#ifdef USE_XFT
+                XftColor fgcolor;
+                X11_get_color(wp, color, &fgcolor);
+                boolean cur_inv = !!inverted ^ ((color & NH_INVERSE_COLOR) != 0);
+                X11_draw_image_string(draw, font,
+                                      cur_inv ? &bgcolor : &fgcolor,
+                                      cur_inv ? &fgcolor : &bgcolor,
+                                      text_map->square_lbearing
+                                          + (text_map->square_width
+                                             * (cur_col - COL0_OFFSET)),
+                                      win_ystart, t_ptr, count);
+                XftColorFree(display, visual, cmap, &fgcolor);
+#else /* !USE_XFT */
+                GC ggc = X11_make_gc(wp, text_map, color, inverted);
+                X11_draw_image_string(XtDisplay(wp->w), XtWindow(wp->w),
+                                      ggc,
+                                      text_map->square_lbearing
+                                          + (text_map->square_width
+                                             * (cur_col - COL0_OFFSET)),
+                                      win_ystart, t_ptr, count);
+                X11_free_gc(wp, ggc, color);
+#endif /* ?USE_XFT */
+
+                /* move text pointer and column count */
+                t_ptr += count;
+                cur_col += count;
+            } /* col loop */
+        }     /* row loop */
+
+#ifdef USE_XFT
+        /* Free resources from Xft */
+        XftColorFree(display, visual, cmap, &bgcolor);
+        X11_release_font(wp->w, font);
+        XftDrawDestroy(draw);
+#endif /* USE_XFT */
     }
 }
+
+#ifdef USE_XFT
+static void
+X11_get_color(struct xwindow *wp, X11_color nhcolor, XftColor *color)
+{
+    Pixel pixel;
+
+    if ((nhcolor & NH_ENHANCED_COLOR) != 0) {
+        pixel = COLORVAL(nhcolor);
+    } else {
+        static struct {
+            const char *name;
+            Pixel rgb;
+        } map_colors[] = {
+            { XtNblack,          0xFFFFFFFF }, /* CLR_BLACK */
+            { XtNred,            0xFFFFFFFF }, /* CLR_RED */
+            { XtNgreen,          0xFFFFFFFF }, /* CLR_GREEN */
+            { XtNbrown,          0xFFFFFFFF }, /* CLR_BROWN */
+            { XtNblue,           0xFFFFFFFF }, /* CLR_BLUE */
+            { XtNmagenta,        0xFFFFFFFF }, /* CLR_MAGENTA */
+            { XtNcyan,           0xFFFFFFFF }, /* CLR_CYAN */
+            { XtNgray,           0xFFFFFFFF }, /* CLR_GRAY */
+            { XtNforeground,     0xFFFFFFFF }, /* NO_COLOR */
+            { XtNorange,         0xFFFFFFFF }, /* CLR_ORANGE */
+            { XtNbright_green,   0xFFFFFFFF }, /* CLR_BRIGHT_GREEN */
+            { XtNyellow,         0xFFFFFFFF }, /* CLR_YELLOW */
+            { XtNbright_blue,    0xFFFFFFFF }, /* CLR_BRIGHT_BLUE */
+            { XtNbright_magenta, 0xFFFFFFFF }, /* CLR_BRIGHT_MAGENTA */
+            { XtNbright_cyan,    0xFFFFFFFF }, /* CLR_BRIGHT_CYAN */
+            { XtNwhite,          0xFFFFFFFF }, /* CLR_WHITE */
+        };
+        pixel = map_colors[nhcolor & 0xF].rgb;
+        if (pixel == 0xFFFFFFFF) {
+            /* Retrieve resource */
+            Arg arg[1];
+            XtSetArg(arg[0], (char *) map_colors[nhcolor & 0xF].name, &pixel);
+            XtGetValues(wp->w, arg, 1);
+            map_colors[nhcolor & 0xF].rgb = pixel;
+        }
+    }
+
+    X11_new_color(wp->w, pixel, color);
+}
+
+static void
+X11_draw_image_string(
+    XftDraw *draw, XftFont *font,
+    XftColor *fgcolor, XftColor *bgcolor,
+    int x, int y,
+    const X11_map_symbol *string, int length)
+{
+    XftDrawRect(draw, bgcolor, x, y,
+                length * font->max_advance_width,
+                X11_font_height(font));
+
+    int xt = x;
+    int yt = y + font->ascent;
+#ifdef ENHANCED_SYMBOLS
+    XftDrawString32(draw, fgcolor, font, xt, yt, string, length);
+#else /* !ENHANCED_SYMBOLS */
+    XftDrawString8(draw, fgcolor, font, xt, yt, string, length);
+#endif /* ?ENHANCED_SYMBOLS */
+}
+
+#else /* !USE_XFT */
 
 static GC
 X11_make_gc(
@@ -1476,10 +1593,16 @@ X11_make_gc(
                 values.background = bgpixel;
             }
             values.function = GXcopy;
+#ifdef USE_XFT
+            ggc = XtGetGC(wp->w,
+                         GCFunction | GCForeground | GCBackground,
+                         &values);
+#else
             values.font = X11_get_map_font(wp);
             ggc = XtGetGC(wp->w,
                          GCFunction | GCForeground | GCBackground | GCFont,
                          &values);
+#endif
         } else {
             ggc = (cur_inv ? text_map->inv_copy_gc : text_map->copy_gc);
         }
@@ -1503,16 +1626,16 @@ X11_make_gc(
     return ggc;
 }
 
-#ifdef ENHANCED_SYMBOLS
 static void
 X11_free_gc(struct xwindow *wp, GC ggc, X11_color color)
 {
+#ifdef ENHANCED_SYMBOLS
     if ((color & NH_ENHANCED_COLOR) != 0 && iflags.use_color) {
         /* X11_make_gc allocated a new GC */
         XtReleaseGC(wp->w, ggc);
     }
-}
 #endif
+}
 
 static void
 X11_draw_image_string(
@@ -1545,6 +1668,8 @@ X11_draw_image_string(
     XDrawImageString(display, d, ggc, x, y, (char *) string, length);
 #endif /* ?ENHANCED_SYMBOLS */
 }
+
+#endif /* ?USE_XFT */
 
 /* Adjust the number of rows and columns on the given map window */
 void
@@ -1671,7 +1796,7 @@ create_map_window(
 
     map_info = wp->map_information =
         (struct map_info_t *) alloc(sizeof (struct map_info_t));
-#ifdef ENHANCED_SYMBOLS
+#if defined(ENHANCED_SYMBOLS) && !defined(USE_XFT)
     X11_set_map_font(wp);
 #endif
 
@@ -1722,7 +1847,7 @@ create_map_window(
     map_all_unexplored(map_info);
 }
 
-#ifdef ENHANCED_SYMBOLS
+#if defined(ENHANCED_SYMBOLS) && !defined(USE_XFT)
 static void
 X11_set_map_font(struct xwindow *wp)
 {
@@ -1740,14 +1865,20 @@ X11_set_map_font(struct xwindow *wp)
         map_info->text_map.font = fs;
     }
 }
-#endif
+#endif /* ENHANCED_SYMBOLS && !USE_XFT */
 
 static Font
 X11_get_map_font(struct xwindow *wp)
 {
+#ifdef USE_XFT
+    nhUse(wp);
+    return 0;
+#else /* !USE_XFT */
     return X11_get_map_font_struct(wp)->fid;
+#endif /* ?USE_XFT */
 }
 
+#ifndef USE_XFT
 static XFontStruct *
 X11_get_map_font_struct(struct xwindow *wp)
 {
@@ -1763,6 +1894,7 @@ X11_get_map_font_struct(struct xwindow *wp)
     return WindowFontStruct(wp->w);
 #endif
 }
+#endif /* USE_XFT */
 
 /*
  * Destroy this map window.
@@ -1787,7 +1919,7 @@ destroy_map_window(struct xwindow *wp)
         }
 
         /* Free the font structure if we allocated one */
-#ifdef ENHANCED_SYMBOLS
+#if defined(ENHANCED_SYMBOLS) && !defined(USE_XFT)
         XFreeFont(XtDisplay(wp->w), text_map->font);
 #endif
 

@@ -98,6 +98,9 @@ additional interfaces. See below.
 |          |       |                 |                                      |
 |          |       |                 | One possible way:                    |
 |          |       |                 |    brew install xquartz              |
+|          |       |                 |    brew install libxft               |
+|          |       |                 |    brew install fontconfig           |
+|          |       |                 |    brew install freetype             |
 |----------+-------+-----------------+--------------------------------------|
 | MacOS    | Qt    | WANT_WIN_QT     | You will need to obtain and          |
 |          |       |                 | install Qt if you want Qt            |

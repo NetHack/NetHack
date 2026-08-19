@@ -17,7 +17,8 @@
 #include <X11/Shell.h>
 #include <X11/Xos.h>
 #include <X11/Xaw/Form.h>
-#include <X11/Xaw/AsciiText.h>
+#include <X11/Xaw/Label.h>
+#include <X11/Xaw/Viewport.h>
 #include <X11/Xaw/Cardinals.h>
 #include <X11/Xatom.h>
 
@@ -43,16 +44,22 @@
                           */
 
 static const char text_translations[] = "#override\n\
-     <BtnDown>: dismiss_text()\n\
+     <Btn1Down>: dismiss_text()\n\
+     <Btn4Down>: scroll(8)\n\
+     <Btn5Down>: scroll(2)\n\
      <Key>: key_dismiss_text()";
 
 #ifdef GRAPHIC_TOMBSTONE
 static const char rip_translations[] = "#override\n\
-     <BtnDown>: rip_dismiss_text()\n\
+     <Btn1Down>: rip_dismiss_text()\n\
+     <Btn4Down>: scroll(8)\n\
+     <Btn5Down>: scroll(2)\n\
      <Key>: rip_dismiss_text()";
 
 static Widget create_ripout_widget(Widget);
 #endif
+
+static void free_text_buffer(struct text_buffer *);
 
 /*ARGSUSED*/
 void
@@ -129,16 +136,10 @@ add_to_text_window(struct xwindow *wp, int attr, /* currently unused */
                    const char *str)
 {
     struct text_info_t *text_info = wp->text_information;
-    int width;
 
     nhUse(attr);
 
     append_text_buffer(&text_info->text, str, FALSE);
-
-    /* Calculate text width and save longest line */
-    width = XTextWidth(text_info->fs, str, (int) strlen(str));
-    if (width > text_info->max_width)
-        text_info->max_width = width;
 }
 
 void
@@ -147,41 +148,12 @@ display_text_window(struct xwindow *wp, boolean blocking)
     struct text_info_t *text_info;
     Arg args[8];
     Cardinal num_args;
-    Dimension width, height, font_height;
-    int nlines;
 
     text_info = wp->text_information;
-    width = text_info->max_width + text_info->extra_width;
     text_info->blocked = blocking;
     text_info->destroy_on_ack = FALSE;
-    font_height = nhFontHeight(wp->w);
-
-    /*
-     * Calculate the number of lines to use.  First, find the number of
-     * lines that would fit on the screen.  Next, remove four of these
-     * lines to give room for a possible window manager titlebar (some
-     * wm's put a titlebar on transient windows).  Make sure we have
-     * _some_ lines.  Finally, use the number of lines in the text if
-     * there are fewer than the max.
-     */
-    nlines = (XtScreen(wp->w)->height - text_info->extra_height) / font_height;
-    nlines -= 4;
-
-    if (nlines > text_info->text.num_lines)
-        nlines = text_info->text.num_lines;
-    if (nlines <= 0)
-        nlines = 1;
-
-    height = nlines * font_height + text_info->extra_height;
 
     num_args = 0;
-
-    if (nlines < text_info->text.num_lines) {
-        /* add on width of scrollbar.  Really should look this up,
-         * but can't until the window is realized.  Chicken-and-egg problem.
-         */
-        width += 20;
-    }
 
 #ifdef GRAPHIC_TOMBSTONE
     if (text_info->is_rip) {
@@ -195,18 +167,10 @@ display_text_window(struct xwindow *wp, boolean blocking)
     }
 #endif
 
-    if (width > (Dimension) XtScreen(wp->w)->width) { /* too wide for screen */
-        /* Back off some amount - we really need to back off the scrollbar */
-        /* width plus some extra.                                          */
-        width = XtScreen(wp->w)->width - 20;
-    }
-    XtSetArg(args[num_args], XtNstring, text_info->text.text);
-    num_args++;
-    XtSetArg(args[num_args], XtNwidth, width);
-    num_args++;
-    XtSetArg(args[num_args], XtNheight, height);
+    XtSetArg(args[num_args], XtNlabel, text_info->text.text);
     num_args++;
     XtSetValues(wp->w, args, num_args);
+    X11_update_label_if_Xft(wp->w);
 
 #ifdef TRANSIENT_TEXT
     XtRealizeWidget(wp->popup);
@@ -216,22 +180,6 @@ display_text_window(struct xwindow *wp, boolean blocking)
 #endif
 
     nh_XtPopup(wp->popup, (int) XtGrabNone, wp->w);
-
-    /* Kludge alert.  Scrollbars are not sized correctly by the Text widget */
-    /* if added before the window is displayed, so do it afterward. */
-    num_args = 0;
-    if (nlines < text_info->text.num_lines) { /* add vert scrollbar */
-        XtSetArg(args[num_args], nhStr(XtNscrollVertical),
-                 XawtextScrollAlways);
-        num_args++;
-    }
-    if (width >= (Dimension)(XtScreen(wp->w)->width - 20)) { /* too wide */
-        XtSetArg(args[num_args], nhStr(XtNscrollHorizontal),
-                 XawtextScrollAlways);
-        num_args++;
-    }
-    if (num_args)
-        XtSetValues(wp->w, args, num_args);
 
     /* We want the user to acknowledge. */
     if (blocking) {
@@ -246,7 +194,6 @@ create_text_window(struct xwindow *wp)
     struct text_info_t *text_info;
     Arg args[8];
     Cardinal num_args;
-    Position top_margin, bottom_margin, left_margin, right_margin;
     Widget form;
 
     wp->type = NHW_TEXT;
@@ -255,9 +202,6 @@ create_text_window(struct xwindow *wp)
         (struct text_info_t *) alloc(sizeof(struct text_info_t));
 
     init_text_buffer(&text_info->text);
-    text_info->max_width = 0;
-    text_info->extra_width = 0;
-    text_info->extra_height = 0;
     text_info->blocked = FALSE;
     text_info->destroy_on_ack = TRUE; /* Ok to destroy before display */
 #ifdef GRAPHIC_TOMBSTONE
@@ -280,46 +224,42 @@ create_text_window(struct xwindow *wp)
         wp->popup,
         XtParseTranslationTable("<Message>WM_PROTOCOLS: delete_text()"));
 
+    /* Create the viewport */
+    num_args = 0;
+    XtSetArg(args[num_args], XtNallowVert, True);
+    num_args++;
+    XtSetArg(args[num_args], XtNallowHoriz, True);
+    num_args++;
+    XtSetArg(args[num_args], XtNtranslations,
+             XtParseTranslationTable(text_translations)), num_args++;
+    Widget viewport = XtCreateManagedWidget(
+        "text_viewport",     /* name */
+        viewportWidgetClass, /* widget class from Window.h */
+        wp->popup,           /* parent widget */
+        args,                /* set some values */
+        num_args);           /* number of values to set */
+
     num_args = 0;
     XtSetArg(args[num_args], XtNallowShellResize, True), num_args++;
     XtSetArg(args[num_args], XtNtranslations,
              XtParseTranslationTable(text_translations)), num_args++;
-    form = XtCreateManagedWidget("form", formWidgetClass, wp->popup, args,
+    form = XtCreateManagedWidget("form", formWidgetClass, viewport, args,
                                  num_args);
 
     num_args = 0;
-    XtSetArg(args[num_args], nhStr(XtNdisplayCaret), False);
-    num_args++;
-    XtSetArg(args[num_args], XtNresize, XawtextResizeBoth);
-    num_args++;
     XtSetArg(args[num_args], XtNtranslations,
              XtParseTranslationTable(text_translations));
     num_args++;
+    XtSetArg(args[num_args], XtNjustify, XtJustifyLeft); num_args++;
 
     wp->w = XtCreateManagedWidget(svk.killer.name[0] && WIN_MAP == WIN_ERR
                                       ? "tombstone"
                                       : "text_text", /* name */
-                                  asciiTextWidgetClass,
+                                  labelWidgetClass,
                                   form,      /* parent widget */
                                   args,      /* set some values */
                                   num_args); /* number of values to set */
-
-    /* Get the font and margin information. */
-    num_args = 0;
-    XtSetArg(args[num_args], XtNfont, &text_info->fs);
-    num_args++;
-    XtSetArg(args[num_args], nhStr(XtNtopMargin), &top_margin);
-    num_args++;
-    XtSetArg(args[num_args], nhStr(XtNbottomMargin), &bottom_margin);
-    num_args++;
-    XtSetArg(args[num_args], nhStr(XtNleftMargin), &left_margin);
-    num_args++;
-    XtSetArg(args[num_args], nhStr(XtNrightMargin), &right_margin);
-    num_args++;
-    XtGetValues(wp->w, args, num_args);
-
-    text_info->extra_width = left_margin + right_margin;
-    text_info->extra_height = top_margin + bottom_margin;
+    X11_wrap_widget_if_Xft(wp->w, NHW_TEXT);
 }
 
 void
@@ -432,7 +372,7 @@ clear_text_buffer(struct text_buffer *tb)
 }
 
 /* Free up allocated memory. */
-void
+static void
 free_text_buffer(struct text_buffer *tb)
 {
     free(tb->text);
@@ -537,12 +477,16 @@ rip_exposed(Widget w, XtPointer client_data UNUSED,
         XDestroyImage(rip_image); /* data bytes free'd also */
     }
 
-    mask = GCFunction | GCForeground | GCGraphicsExposures | GCFont;
     values.graphics_exposures = False;
     XtSetArg(args[0], XtNforeground, &values.foreground);
     XtGetValues(w, args, 1);
     values.function = GXcopy;
+#ifdef USE_XFT
+    mask = GCFunction | GCForeground | GCGraphicsExposures;
+#else
+    mask = GCFunction | GCForeground | GCGraphicsExposures | GCFont;
     values.font = WindowFont(w);
+#endif
     ggc = XtGetGC(w, mask, &values);
 
     if (rip_pixmap != None) {
@@ -552,6 +496,33 @@ rip_exposed(Widget w, XtPointer client_data UNUSED,
 
     x = appResources.tombtext_x;
     y = appResources.tombtext_y;
+#ifdef USE_XFT
+    Display *display = XtDisplay(w);
+    Screen *screen = DefaultScreenOfDisplay(display);
+    Visual *visual = DefaultVisualOfScreen(screen);
+    Colormap cmap = DefaultColormapOfScreen(screen);
+    XftDraw *draw = XftDrawCreate(display, XtWindow(w), visual, cmap);
+    XftFont *font = XftFontOpenName(display, DefaultScreen(display),
+                                    appResources.font_rip);
+    XftColor foreground;
+    X11_new_color(w, values.foreground, &foreground);
+    for (i = 0; i <= YEAR_LINE; i++) {
+        size_t len = strlen(rip_line[i]);
+        XGlyphInfo extents;
+        XftTextExtents8(display, font,
+                        (const FcChar8 *) rip_line[i], len,
+                        &extents);
+        int width = extents.width - extents.x;
+
+        XftDrawString8(draw, &foreground, font, x - width / 2, y,
+                       (const FcChar8 *) rip_line[i], len);
+        x += appResources.tombtext_dx;
+        y += appResources.tombtext_dy;
+    }
+    XftFontClose(display, font);
+    XftDrawDestroy(draw);
+    XftColorFree(display, visual, cmap, &foreground);
+#else /* !USE_XFT */
     for (i = 0; i <= YEAR_LINE; i++) {
         int len = strlen(rip_line[i]);
         XFontStruct *font = WindowFontStruct(w);
@@ -561,6 +532,7 @@ rip_exposed(Widget w, XtPointer client_data UNUSED,
         x += appResources.tombtext_dx;
         y += appResources.tombtext_dy;
     }
+#endif /* ?USE_XFT */
 
     XtReleaseGC(w, ggc);
 }

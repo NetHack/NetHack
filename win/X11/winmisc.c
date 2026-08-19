@@ -124,13 +124,13 @@ static Widget make_menu(const char *, const char *, const char *, const char *,
                         const char **, Widget **, XtCallbackProc, Widget *);
 
 /* Bad Hack alert. Using integers instead of XtPointers */
-XtPointer
+static XtPointer
 i2xtp(int i)
 {
     return (XtPointer) (ptrdiff_t) i;
 }
 
-int
+static int
 xtp2i(XtPointer x)
 {
     return (int) (ptrdiff_t) x;
@@ -328,15 +328,15 @@ algn_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
     exit_x_event = TRUE;
 }
 
-int plsel_n_races, plsel_n_roles;
-Widget *plsel_race_radios = (Widget *) 0;
-Widget *plsel_role_radios = (Widget *) 0;
-Widget *plsel_gend_radios = (Widget *) 0;
-Widget *plsel_align_radios = (Widget *) 0;
+static int plsel_n_races, plsel_n_roles;
+static Widget *plsel_race_radios = (Widget *) 0;
+static Widget *plsel_role_radios = (Widget *) 0;
+static Widget *plsel_gend_radios = (Widget *) 0;
+static Widget *plsel_align_radios = (Widget *) 0;
 
-Widget plsel_name_input;
+static Widget plsel_name_input;
 
-Widget plsel_btn_play;
+static Widget plsel_btn_play;
 
 static void
 plsel_dialog_acceptvalues(void)
@@ -416,6 +416,7 @@ plsel_set_play_button(boolean state)
 
     XtSetArg(args[0], nhStr(XtNsensitive), !state);
     XtSetValues(plsel_btn_play, args, ONE);
+    X11_update_label_if_Xft(plsel_btn_play);
 }
 
 static void
@@ -441,6 +442,7 @@ plsel_set_sensitivities(boolean setcurr)
             c = j;
         XtSetArg(args[0], nhStr(XtNsensitive), v);
         XtSetValues(plsel_role_radios[j], args, ONE);
+        X11_update_label_if_Xft(plsel_role_radios[j]);
         if (valid < 0 && v)
             valid = j;
     }
@@ -459,6 +461,7 @@ plsel_set_sensitivities(boolean setcurr)
             c = j;
         XtSetArg(args[0], nhStr(XtNsensitive), v);
         XtSetValues(plsel_race_radios[j], args, ONE);
+        X11_update_label_if_Xft(plsel_race_radios[j]);
         if (valid < 0 && v)
             valid = j;
     }
@@ -566,6 +569,7 @@ X11_player_selection_setupOthers(void)
             c = j;
         XtSetArg(args[0], nhStr(XtNsensitive), v);
         XtSetValues(plsel_gend_radios[j], args, ONE);
+        X11_update_label_if_Xft(plsel_gend_radios[j]);
         if (valid < 0 && v)
             valid = j;
     }
@@ -583,6 +587,7 @@ X11_player_selection_setupOthers(void)
             c = j;
         XtSetArg(args[0], nhStr(XtNsensitive), v);
         XtSetValues(plsel_align_radios[j], args, ONE);
+        X11_update_label_if_Xft(plsel_align_radios[j]);
         if (valid < 0 && v)
             valid = j;
     }
@@ -619,6 +624,7 @@ racetoggleCallback(Widget w, XtPointer client, XtPointer call)
             c = j;
         XtSetArg(args[0], nhStr(XtNsensitive), v);
         XtSetValues(plsel_role_radios[j], args, ONE);
+        X11_update_label_if_Xft(plsel_role_radios[j]);
         if (valid < 0 && v)
             valid = j;
     }
@@ -658,6 +664,7 @@ roletoggleCallback(Widget w, XtPointer client, XtPointer call)
             c = j;
         XtSetArg(args[0], nhStr(XtNsensitive), v);
         XtSetValues(plsel_race_radios[j], args, ONE);
+        X11_update_label_if_Xft(plsel_race_radios[j]);
         if (valid < 0 && v)
             valid = j;
     }
@@ -688,6 +695,7 @@ gendertoggleCallback(Widget w, XtPointer client, XtPointer call)
             XtSetArg(args[0], XtNlabel,
                      (r < 1) ? roles[i].name.m : roles[i].name.f);
             XtSetValues(plsel_role_radios[i], args, ONE);
+            X11_update_label_if_Xft(plsel_role_radios[i]);
         }
     }
 }
@@ -770,6 +778,7 @@ X11_create_player_selection_name(Widget form)
     namelabel = XtCreateManagedWidget("name_label",
                                       labelWidgetClass, name_form,
                                       args, num_args);
+    X11_wrap_widget_if_Xft(namelabel, NHW_MENU);
 
     num_args = 0;
     XtSetArg(args[num_args], nhStr(XtNfromVert), namelabel); num_args++;
@@ -899,6 +908,7 @@ X11_player_selection_dialog(void)
     racelabel = XtCreateManagedWidget("race_label",
                                       labelWidgetClass, race_form,
                                       args, num_args);
+    X11_wrap_widget_if_Xft(racelabel, NHW_MENU);
 
     num_args = 0;
     XtSetArg(args[num_args], nhStr(XtNtopMargin), 0); num_args++;
@@ -939,6 +949,7 @@ X11_player_selection_dialog(void)
                                            toggleWidgetClass,
                                            race_form2,
                                            args, num_args);
+        X11_wrap_widget_if_Xft(racewidget, NHW_MENU);
         XtAddCallback(racewidget, XtNcallback, racetoggleCallback, i2xtp(i));
         tmpwidget = racewidget;
         plsel_race_radios[i] = racewidget;
@@ -963,6 +974,7 @@ X11_player_selection_dialog(void)
     XtSetArg(args[num_args], nhStr(XtNlabel), "Role"); num_args++;
     rolelabel = XtCreateManagedWidget("role_label", labelWidgetClass,
                                       role_form, args, num_args);
+    X11_wrap_widget_if_Xft(rolelabel, NHW_MENU);
 
     num_args = 0;
     XtSetArg(args[num_args], nhStr(XtNtopMargin), 0); num_args++;
@@ -998,9 +1010,11 @@ X11_player_selection_dialog(void)
                      plsel_role_radios[0]); num_args++;
         }
         XtSetArg(args[num_args], nhStr(XtNradioData), (i + 1)); num_args++;
+        XtSetArg(args[num_args], nhStr(XtNresizable), True); num_args++;
 
         rolewidget = XtCreateManagedWidget(roles[i].name.m, toggleWidgetClass,
                                            role_form2, args, num_args);
+        X11_wrap_widget_if_Xft(rolewidget, NHW_MENU);
         XtAddCallback(rolewidget, XtNcallback, roletoggleCallback, i2xtp(i));
         tmpwidget = rolewidget;
         plsel_role_radios[i] = rolewidget;
@@ -1027,6 +1041,7 @@ X11_player_selection_dialog(void)
     XtSetArg(args[num_args], nhStr(XtNlabel), "Gender"); num_args++;
     gendlabel = XtCreateManagedWidget("gender_label", labelWidgetClass,
                                       gend_form, args, num_args);
+    X11_wrap_widget_if_Xft(gendlabel, NHW_MENU);
 
     num_args = 0;
     XtSetArg(args[num_args], nhStr(XtNtopMargin), 0); num_args++;
@@ -1048,6 +1063,7 @@ X11_player_selection_dialog(void)
     plsel_gend_radios[0] = gend_radio_m
         =  XtCreateManagedWidget("Male", toggleWidgetClass,
                                  gend_form2, args, num_args);
+    X11_wrap_widget_if_Xft(plsel_gend_radios[0], NHW_MENU);
     num_args = 0;
     XtSetArg(args[num_args], nhStr(XtNfromVert), gend_radio_m); num_args++;
     XtSetArg(args[num_args], XtNwidth, cwid); num_args++;
@@ -1057,6 +1073,7 @@ X11_player_selection_dialog(void)
     plsel_gend_radios[1] = gend_radio_f
         =  XtCreateManagedWidget("Female", toggleWidgetClass,
                                  gend_form2, args, num_args);
+    X11_wrap_widget_if_Xft(plsel_gend_radios[1], NHW_MENU);
 
     XawToggleUnsetCurrent(plsel_gend_radios[0]);
 
@@ -1086,6 +1103,7 @@ X11_player_selection_dialog(void)
     XtSetArg(args[num_args], nhStr(XtNlabel), "Alignment"); num_args++;
     alignlabel = XtCreateManagedWidget("align_label", labelWidgetClass,
                                        align_form, args, num_args);
+    X11_wrap_widget_if_Xft(alignlabel, NHW_MENU);
 
     num_args = 0;
     XtSetArg(args[num_args], nhStr(XtNtopMargin), 0); num_args++;
@@ -1106,6 +1124,7 @@ X11_player_selection_dialog(void)
     plsel_align_radios[0] = align_radio_l
         =  XtCreateManagedWidget("Lawful", toggleWidgetClass,
                                  align_form2, args, num_args);
+    X11_wrap_widget_if_Xft(plsel_align_radios[0], NHW_MENU);
     num_args = 0;
     XtSetArg(args[num_args], nhStr(XtNfromVert), align_radio_l); num_args++;
     XtSetArg(args[num_args], XtNwidth, cwid); num_args++;
@@ -1115,6 +1134,7 @@ X11_player_selection_dialog(void)
     plsel_align_radios[1] = align_radio_n
         = XtCreateManagedWidget("Neutral", toggleWidgetClass,
                                 align_form2, args, num_args);
+    X11_wrap_widget_if_Xft(plsel_align_radios[1], NHW_MENU);
     num_args = 0;
     XtSetArg(args[num_args], nhStr(XtNfromVert), align_radio_n); num_args++;
     XtSetArg(args[num_args], XtNwidth, cwid); num_args++;
@@ -1124,6 +1144,7 @@ X11_player_selection_dialog(void)
     plsel_align_radios[2] = align_radio_c
         =  XtCreateManagedWidget("Chaotic", toggleWidgetClass,
                                  align_form2, args, num_args);
+    X11_wrap_widget_if_Xft(plsel_align_radios[2], NHW_MENU);
 
     XawToggleUnsetCurrent(plsel_align_radios[0]);
 
@@ -1159,10 +1180,13 @@ X11_player_selection_dialog(void)
     XtSetArg(args[num_args], nhStr(XtNtop), XtChainTop); num_args++;
     XtSetArg(args[num_args], nhStr(XtNleft), XtChainLeft); num_args++;
     XtSetArg(args[num_args], nhStr(XtNright), XtChainRight); num_args++;
-    XtSetArg(args[num_args], XtNwidth, cwid); num_args++;
     XtSetArg(args[num_args], nhStr(XtNlabel), "Random"); num_args++;
     random_btn = XtCreateManagedWidget("random", commandWidgetClass, btn_form,
                                        args, num_args);
+    X11_wrap_widget_if_Xft(random_btn, NHW_MENU);
+    num_args = 0;
+    XtSetArg(args[num_args], XtNwidth, cwid); num_args++;
+    XtSetValues(random_btn, args, num_args);
     XtAddCallback(random_btn, XtNcallback, plsel_random_btn_callback, form);
 
     /* "Play" button */
@@ -1171,11 +1195,14 @@ X11_player_selection_dialog(void)
     XtSetArg(args[num_args], nhStr(XtNfromVert), random_btn); num_args++;
     XtSetArg(args[num_args], nhStr(XtNleft), XtChainLeft); num_args++;
     XtSetArg(args[num_args], nhStr(XtNright), XtChainRight); num_args++;
-    XtSetArg(args[num_args], XtNwidth, cwid); num_args++;
     XtSetArg(args[num_args], nhStr(XtNlabel), "Play"); num_args++;
     plsel_btn_play = play_btn
         = XtCreateManagedWidget("play", commandWidgetClass, btn_form,
                                 args, num_args);
+    X11_wrap_widget_if_Xft(play_btn, NHW_MENU);
+    num_args = 0;
+    XtSetArg(args[num_args], XtNwidth, cwid); num_args++;
+    XtSetValues(play_btn, args, num_args);
     XtAddCallback(play_btn, XtNcallback, plsel_play_btn_callback, form);
 
     /* "Quit" button */
@@ -1185,10 +1212,13 @@ X11_player_selection_dialog(void)
     XtSetArg(args[num_args], nhStr(XtNbottom), XtChainBottom); num_args++;
     XtSetArg(args[num_args], nhStr(XtNleft), XtChainLeft); num_args++;
     XtSetArg(args[num_args], nhStr(XtNright), XtChainRight); num_args++;
-    XtSetArg(args[num_args], XtNwidth, cwid); num_args++;
     XtSetArg(args[num_args], nhStr(XtNlabel), "Quit"); num_args++;
     quit_btn = XtCreateManagedWidget("quit", commandWidgetClass, btn_form,
                                      args, num_args);
+    X11_wrap_widget_if_Xft(quit_btn, NHW_MENU);
+    num_args = 0;
+    XtSetArg(args[num_args], XtNwidth, cwid); num_args++;
+    XtSetValues(quit_btn, args, num_args);
     XtAddCallback(quit_btn, XtNcallback, plsel_quit_btn_callback, form);
 
     /********************************************/
@@ -2039,6 +2069,7 @@ make_menu(const char *popup_name, const char *popup_label,
     XtSetArg(args[num_args], XtNborderWidth, 0); num_args++;
     label = XtCreateManagedWidget(popup_label, labelWidgetClass, form, args,
                                   num_args);
+    X11_wrap_widget_if_Xft(label, NHW_MENU);
 
     cumulative_height = 0;
     XtSetArg(args[0], XtNheight, &height);
@@ -2058,6 +2089,7 @@ make_menu(const char *popup_name, const char *popup_label,
     Sprintf(btnname, "btn_%s", left_name);
     left = XtCreateManagedWidget(btnname, commandWidgetClass, form, args,
                                  num_args);
+    X11_wrap_widget_if_Xft(left, NHW_MENU);
     XtAddCallback(left, XtNcallback, left_callback, (XtPointer) 0);
     skip = (distance < 4) ? 8 : 2 * distance;
 
@@ -2081,6 +2113,7 @@ make_menu(const char *popup_name, const char *popup_label,
     Sprintf(btnname, "btn_%s", right_name);
     right = XtCreateManagedWidget(btnname, commandWidgetClass, form, args,
                                   num_args);
+    X11_wrap_widget_if_Xft(right, NHW_MENU);
     XtAddCallback(right, XtNcallback, right_callback, (XtPointer) 0);
 
     XtInstallAccelerators(form, left);
@@ -2106,6 +2139,7 @@ make_menu(const char *popup_name, const char *popup_label,
 
         *curr = XtCreateManagedWidget(widget_names[i], commandWidgetClass,
                                       form, args, num_args);
+        X11_wrap_widget_if_Xft(*curr, NHW_MENU);
         XtAddCallback(*curr, XtNcallback, name_callback,
                       (XtPointer) (ptrdiff_t) i);
         above = *curr++;

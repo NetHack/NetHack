@@ -168,6 +168,7 @@ WindowClassRec windowClassRec = {
 
 WidgetClass windowWidgetClass = (WidgetClass) &windowClassRec;
 
+#ifndef USE_XFT
 Font
 WindowFont(Widget w)
 {
@@ -179,3 +180,4 @@ WindowFontStruct(Widget w)
 {
     return ((WindowWidget) w)->window.font;
 }
+#endif

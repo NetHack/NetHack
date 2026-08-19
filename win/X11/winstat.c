@@ -123,12 +123,14 @@ static void create_status_window_fancy(struct xwindow *, boolean, Widget);
 static void create_status_window_tty(struct xwindow *, boolean, Widget);
 static void destroy_status_window_fancy(struct xwindow *);
 static void destroy_status_window_tty(struct xwindow *);
+#ifndef STATUS_HILITES
 static void adjust_status_fancy(struct xwindow *, const char *);
 static void adjust_status_tty(struct xwindow *, const char *);
+#endif
 static void set_percent(int, int, int);
 static void tty_status_exposed(Widget, XtPointer, XtPointer);
 static void tty_status_redraw(Widget);
-static int tty_render_field(Widget, int, int, enum statusfields);
+static int tty_render_field(Widget, int, int, int, enum statusfields);
 static void tty_status_colors(Widget, int, int, Pixel *, Pixel *);
 static int tty_render_text(Widget, const XRectangle *, int, int, const char *,
                            int, int, enum statusfields);
@@ -558,7 +560,7 @@ create_tty_status(Widget parent, Widget top)
     X11_status_widget = XtCreateManagedWidget("status_form", windowWidgetClass,
                                               form, args, num_args);
 
-    int height = nhFontHeight(X11_status_widget) * 3;
+    int height = nhFontHeight(X11_status_widget, NHW_STATUS) * 3;
     num_args = 0;
     XtSetArg(args[num_args], XtNheight, height); num_args++;
     XtSetValues(form, args, num_args);
@@ -618,7 +620,10 @@ tty_status_redraw(Widget w)
     num_args = 0;
     XtSetArg(args[num_args], XtNwidth, &width); num_args++;
     XtGetValues(w, args, num_args);
-    int height = nhFontHeight(w);
+    int height = nhFontHeight(w, NHW_STATUS);
+
+    /* Space between fields. For now, this is equal to one half the height. */
+    int spacing = height/2;
 
     int x = 0;
     int y = 0;
@@ -630,7 +635,7 @@ tty_status_redraw(Widget w)
                 if (fld == BL_FLUSH) {
                     break;
                 }
-                int wid = tty_render_field(w, x, y, fld);
+                int wid = tty_render_field(w, x, y, spacing, fld);
                 if (fld == BL_TITLE) {
                     name_x = x;
                     name_y = y;
@@ -648,7 +653,7 @@ tty_status_redraw(Widget w)
                 if (fld == BL_FLUSH) {
                     break;
                 }
-                int wid = tty_render_field(w, x, y, fld);
+                int wid = tty_render_field(w, x, y, spacing, fld);
                 if (fld == BL_TITLE) {
                     name_x = x;
                     name_y = y;
@@ -686,7 +691,7 @@ tty_status_redraw(Widget w)
 
 /* Render one field of the TTY status */
 static int
-tty_render_field(Widget w, int x, int y, enum statusfields fld)
+tty_render_field(Widget w, int x, int y, int spacing, enum statusfields fld)
 {
     static struct stat_fmt {
         const char *pre;
@@ -731,7 +736,7 @@ tty_render_field(Widget w, int x, int y, enum statusfields fld)
         for (unsigned j = 0; j < SIZE(X11_cond_labels); ++j) {
             struct tty_cond_field const *fldp = &X11_cond_labels[j];
             if (fldp->text != NULL) {
-                width += tty_render_text(w, NULL, x + width, y, " ", NO_COLOR, 0, BL_FLUSH);
+                width += spacing;
                 width += tty_render_text(w, NULL, x + width, y, fldp->text, fldp->color, fldp->attrs, BL_FLUSH);
             }
         }
@@ -742,7 +747,7 @@ tty_render_field(Widget w, int x, int y, enum statusfields fld)
             struct tty_status_field const *fldp = &X11_status_labels[fld];
             if (fldp->text != NULL && fldp->text[0] != '\0') {
                 if (x != 0 && (formats[fld].pre == NULL || strchr("(/", formats[fld].pre[0]) == NULL)) {
-                    width += tty_render_text(w, NULL, x + width, y, " ", NO_COLOR, 0, BL_FLUSH);
+                    width += spacing;
                 }
                 if (formats[fld].pre != NULL) {
                     width += tty_render_text(w, NULL, x + width, y, formats[fld].pre, NO_COLOR, 0, BL_FLUSH);
@@ -770,16 +775,116 @@ tty_render_text(Widget w, const XRectangle *clip, int x, int y,
     nhUse(attr);
 #endif
 
-    Arg args[5];
-    Cardinal num_args;
-    XGCValues values;
-    Pixel fgpixel, bgpixel;
-    XFontStruct *font;
-    XFontStruct *font_italic = NULL; /* custodial */
     int goldwidth = 0;
 
     /* Get the colors */
+    Pixel fgpixel, bgpixel;
     tty_status_colors(w, color, attr, &fgpixel, &bgpixel);
+
+#ifdef USE_XFT
+
+    /* Get the font */
+    XftFont *font = X11_new_font(w, attr, NHW_STATUS);
+    int height = X11_font_height(font);
+
+    /* Get the drawing resources */
+    Display *display = XtDisplay(w);
+    Screen *screen = DefaultScreenOfDisplay(display);
+    Visual *visual = DefaultVisualOfScreen(screen);
+    Colormap cmap = DefaultColormapOfScreen(screen);
+    XftDraw *draw = XftDrawCreate(display, XtWindow(w), visual, cmap);
+
+    /* Convert the colors to Xft form */
+    XftColor fgcolor, bgcolor;
+    X11_new_color(w, fgpixel, &fgcolor);
+    X11_new_color(w, bgpixel, &bgcolor);
+
+    /* If drawing a hitpoint bar, we'll need a clipping rectangle */
+    if (clip != NULL) {
+        XftDrawSetClipRectangles(draw, 0, 0, clip, 1);
+    }
+
+    /* Gold will begin with a glyph string. Convert this to the proper
+       character, which might possibly be Unicode */
+    if (fld == BL_GOLD && memcmp(text, "\\G", 2) == 0) {
+        char *end;
+        unsigned long glyphcode = strtoul(text+2, &end, 16);
+        if ((glyphcode >> 16) == (unsigned) svc.context.rndencode && *end == ':') {
+            /* We have a proper glyph code */
+            glyph_info glyphinfo;
+            glyphcode &= 0xFFFF;
+            map_glyphinfo(0, 0, glyphcode, 0, &glyphinfo);
+            X11_map_symbol goldsym = X11_glyph_char(&glyphinfo);
+
+            /* Get the width of the gold symbol */
+            XGlyphInfo extents;
+#ifdef ENHANCED_SYMBOLS
+            FcChar32 goldch = goldsym;
+            XftTextExtents32(display, font, &goldch, 1, &extents);
+#else /* !ENHANCED_SYMBOLS */
+            FcChar8 goldch = goldsym;
+            XftTextExtents8(display, font, &goldch, 1, &extents);
+#endif /* ?ENHANCED_SYMBOLS */
+            goldwidth = extents.width - extents.x;
+
+            /* Render the gold symbol */
+            XftDrawRect(draw, &bgcolor, x, y, goldwidth, height);
+#ifdef ENHANCED_SYMBOLS
+            XftDrawString32(draw, &fgcolor, font, x, y + font->ascent, &goldch, 1);
+#else /* !ENHANCED_SYMBOLS */
+            XftDrawString8(draw, &fgcolor, font, x, y + font->ascent, &goldch, 1);
+#endif /* ?ENHANCED_SYMBOLS */
+
+            text = end;
+        }
+    }
+
+    /* Get the width of the rendered string, not including goldwidth */
+    XGlyphInfo extents;
+    XftTextExtents8(display, font, (const FcChar8 *) text, strlen(text), &extents);
+    int width = extents.width - extents.x;
+
+    /* Place version on the right */
+    if (fld == BL_VERS) {
+        Cardinal num_args = 0;
+        Arg args[1];
+        Dimension wwidth;
+        XtSetArg(args[num_args], XtNwidth, &wwidth); num_args++;
+        XtGetValues(w, args, num_args);
+        int x2 = wwidth - width;
+        if (x2 > x) {
+            x = x2;
+        }
+    }
+
+    /* Render the string */
+    XftDrawRect(draw, &bgcolor, x + goldwidth, y, width, height);
+    XftDrawString8(draw, &fgcolor, font,
+                   x + goldwidth, y + font->ascent,
+                     (const FcChar8 *) text, strlen(text));
+    width += goldwidth;
+
+#ifdef STATUS_HILITES
+    /* Implement underline */
+    if (attr & HL_ULINE) {
+        XftDrawRect(draw, &fgcolor, x, y + font->ascent, width, 1);
+    }
+#endif /* STATUS_HILITES */
+
+    /* Release resources */
+
+    XftColorFree(display, visual, cmap, &fgcolor);
+    XftColorFree(display, visual, cmap, &bgcolor);
+    XftDrawDestroy(draw);
+    X11_release_font(w, font);
+
+#else /* !USE_XFT */
+
+    Arg args[5];
+    Cardinal num_args;
+    XGCValues values;
+    XFontStruct *font;
+    XFontStruct *font_italic = NULL; /* custodial */
 
     values.foreground = fgpixel;
     values.background = bgpixel;
@@ -805,6 +910,7 @@ tty_render_text(Widget w, const XRectangle *clip, int x, int y,
         }
     }
 
+    /* Get a graphics context */
     values.font = font->fid;
     values.function = GXcopy;
     GC ggc = XtGetGC(w,
@@ -907,6 +1013,7 @@ tty_render_text(Widget w, const XRectangle *clip, int x, int y,
     if (font_italic != NULL) {
         XFreeFont(XtDisplay(w), font_italic);
     }
+#endif /* ?USE_XFT */
 
     /* Caller will advance x by the width */
     return width;
@@ -991,6 +1098,7 @@ destroy_status_window_tty(struct xwindow *wp)
         wp->type = NHW_NONE;
 }
 
+#ifndef STATUS_HILITES
 /*ARGSUSED*/
 void
 adjust_status_tty(struct xwindow *wp UNUSED, const char *str UNUSED)
@@ -998,6 +1106,7 @@ adjust_status_tty(struct xwindow *wp UNUSED, const char *str UNUSED)
     /* nothing */
     return;
 }
+#endif
 
 void
 create_status_window(
@@ -1061,6 +1170,7 @@ destroy_status_window(struct xwindow *wp)
         destroy_status_window_tty(wp);
 }
 
+#ifndef STATUS_HILITES
 void
 adjust_status(struct xwindow *wp, const char *str)
 {
@@ -1069,6 +1179,7 @@ adjust_status(struct xwindow *wp, const char *str)
     else
         adjust_status_tty(wp, str);
 }
+#endif
 
 void
 create_status_window_fancy(struct xwindow *wp, /* window pointer */
@@ -1139,7 +1250,7 @@ create_status_window_fancy(struct xwindow *wp, /* window pointer */
              &right_margin); num_args++;
     XtGetValues(wp->w, args, num_args);
 
-    wp->pixel_height = 2 * nhFontHeight(wp->w) + top_margin + bottom_margin;
+    wp->pixel_height = 2 * nhFontHeight(wp->w, NHW_STATUS) + top_margin + bottom_margin;
     wp->pixel_width = COLNO * fs->max_bounds.width
                     + left_margin + right_margin;
 
@@ -1169,6 +1280,7 @@ destroy_status_window_fancy(struct xwindow *wp)
         wp->type = NHW_NONE;
 }
 
+#ifndef STATUS_HILITES
 /*
  * This assumes several things:
  *      + Status has only 2 lines
@@ -1199,6 +1311,7 @@ adjust_status_fancy(struct xwindow *wp, const char *str)
              wp->status_information->text.text); num_args++;
     XtSetValues(wp->w, args, num_args);
 }
+#endif
 
 /* Fancy ================================================================== */
 extern const char *const hu_stat[];  /* from eat.c */
@@ -2173,7 +2286,7 @@ create_widget(Widget parent, struct X_status_value *sv, int sv_index)
                                          : "dlevel",
                                       labelWidgetClass, parent,
                                       args, num_args);
-        X11_wrap_widget(sv->w);
+        X11_wrap_widget(sv->w, NHW_STATUS);
         break;
     case SV_NAME: {
         char buf[BUFSZ];
@@ -2210,7 +2323,7 @@ create_widget(Widget parent, struct X_status_value *sv, int sv_index)
         XtSetArg(args[num_args], XtNinternalHeight, 0); num_args++;
         sv->w = XtCreateManagedWidget(sv->name, labelWidgetClass, parent,
                                       args, num_args);
-        X11_wrap_widget(sv->w);
+        X11_wrap_widget(sv->w, NHW_STATUS);
         break;
     }
     default:

@@ -9,6 +9,13 @@
 #ifndef WINX_H
 #define WINX_H
 
+#ifdef USE_XFT
+#include <X11/Xft/Xft.h>
+typedef XftFont X11_Font;
+#else
+typedef XFontStruct X11_Font;
+#endif
+
 #ifndef COLOR_H
 #include "color.h"      /* CLR_MAX */
 #endif
@@ -80,7 +87,7 @@ struct text_map_info_t {
         square_ascent, /*   placement of changes.        */
         square_lbearing;
 
-#ifdef ENHANCED_SYMBOLS
+#if defined(ENHANCED_SYMBOLS) && !defined(USE_XFT)
     XFontStruct *font;
 #endif
 };
@@ -127,7 +134,12 @@ struct line_element {
 };
 
 struct mesg_info_t {
+#ifdef USE_XFT
+    Pixel fgpixel;   /* Color for text drawing */
+#else
+    GC gc;           /* GC for text drawing */
     XFontStruct *fs;                 /* Font for the window. */
+#endif
     int num_lines;                   /* line count */
     struct line_element *head;       /* head of circular line queue */
     struct line_element *line_here;  /* current drawn line position */
@@ -135,7 +147,6 @@ struct mesg_info_t {
                                      /*     bottom of screen             */
     struct line_element *last_pause_head; /* pointer to head of previous */
                                           /* turn                        */
-    GC gc;           /* GC for text drawing */
     int char_width,  /* Saved font information so we can  */
         char_height, /*   calculate the correct placement */
         char_ascent, /*   of changes.                     */
@@ -153,7 +164,9 @@ struct mesg_info_t {
 struct status_info_t {
     struct text_buffer text; /* Just a text buffer. */
     Pixel fg, bg;          /* foreground and background */
+#ifndef USE_XFT
     XFontStruct *fs;       /* Status window font structure. */
+#endif
     Dimension spacew;      /* width of one space */
     Position x, y[3];      /* x coord (not used), y for up to three lines */
     Dimension wd, ht;      /* width (not used), height (same for all lines) */
@@ -194,7 +207,9 @@ struct menu_info_t {
     struct menu curr_menu; /* Menu being displayed. */
     struct menu new_menu;  /* New menu being built. */
 
+#ifndef USE_XFT
     XFontStruct *fs;           /* Font for the window. */
+#endif
     long menu_count;           /* number entered by user */
     Dimension line_height;     /* Total height of a line of text. */
     Dimension internal_height; /* Internal height between widget & border */
@@ -217,10 +232,6 @@ struct menu_info_t {
  */
 struct text_info_t {
     struct text_buffer text;
-    XFontStruct *fs;        /* Font for the text window. */
-    int max_width;          /* Width of widest line so far. */
-    int extra_width,        /* Sum of left and right border widths. */
-        extra_height;       /* Sum of top and bottom border widths. */
     boolean blocked;        /*  */
     boolean destroy_on_ack; /* Destroy this window when acknowledged. */
 #ifdef GRAPHIC_TOMBSTONE
@@ -242,8 +253,10 @@ struct xwindow {
 
     boolean nh_colors_inited;
     XColor nh_colors[CLR_MAX];
+#ifndef USE_XFT
     XFontStruct *boldfs;       /* Bold font */
     Display *boldfs_dpy;       /* Bold font display */
+#endif
     char *title;
 
     union {
@@ -317,6 +330,16 @@ typedef struct {
     Pixel pet_mark_color;     /* color of pet mark */
     String pilemark_bitmap;   /* X11 bitmap file used to mark item piles */
     Pixel pilemark_color;     /* color of item pile mark */
+#ifdef USE_XFT
+    String font_map;          /* font for the map */
+    String font_menu;         /* font for menus */
+    String font_message;      /* font for the message window */
+    String font_status;       /* font for the status window */
+    String font_text;         /* font for text windows */
+#ifdef GRAPHIC_TOMBSTONE
+    String font_rip;          /* font for tombstone */
+#endif
+#endif
 #ifdef GRAPHIC_TOMBSTONE
     String tombstone; /* name of XPM file for tombstone */
     int tombtext_x;   /* x-coord of center of first tombstone text */
@@ -343,8 +366,10 @@ extern boolean X11_blink;
     } while (0)
 
 /* ### Window.c ### */
+#ifndef USE_XFT
 extern Font WindowFont(Widget);
 extern XFontStruct *WindowFontStruct(Widget);
+#endif
 
 /* ### dialogs.c ### */
 extern Widget CreateDialog(Widget, String, XtCallbackProc, XtCallbackProc);
@@ -356,23 +381,15 @@ extern void positionpopup(Widget, boolean);
 /* ### winX.c ### */
 extern struct xwindow *find_widget(Widget);
 extern XColor get_nhcolor(struct xwindow *, int);
-extern void init_menu_nhcolors(struct xwindow *);
 extern void load_boldfont(struct xwindow *, Widget);
-extern Boolean nhApproxColor(Screen *, Colormap, char *, XColor *);
-extern Boolean nhCvtStringToPixel(Display *, XrmValuePtr, Cardinal *,
-                                  XrmValuePtr, XrmValuePtr, XtPointer *);
-extern void get_window_frame_extents(Widget, long *, long *, long *, long *);
 extern void get_widget_window_geometry(Widget, int *, int *, int *, int *);
-extern char *fontname_boldify(const char *);
-extern Dimension nhFontHeight(Widget);
+extern Dimension nhFontHeight(Widget, int);
 extern char key_event_to_char(XKeyEvent *);
-extern void msgkey(Widget, XtPointer, XEvent *, Boolean *);
 extern void highlight_yn(boolean);
 extern void nh_XtPopup(Widget, int, Widget);
 extern void nh_XtPopdown(Widget);
 extern void win_X11_init(int);
 extern void find_scrollbars(Widget, Widget, Widget *, Widget *);
-extern void nh_keyscroll(Widget, XEvent *, String *, Cardinal *);
 
 /* ### winmesg.c ### */
 extern void set_message_slider(struct xwindow *);
@@ -402,8 +419,6 @@ extern void create_menu_window(struct xwindow *);
 extern void destroy_menu_window(struct xwindow *);
 
 /* ### winmisc.c ### */
-extern XtPointer i2xtp(int);
-extern int xtp2i(XtPointer);
 extern void ps_key(Widget, XEvent *, String *,
                    Cardinal *); /* player selection action */
 extern void race_key(Widget, XEvent *, String *,
@@ -424,7 +439,9 @@ extern void release_extended_cmds(void);
 /* ### winstatus.c ### */
 extern void create_status_window(struct xwindow *, boolean, Widget);
 extern void destroy_status_window(struct xwindow *);
+#ifndef STATUS_HILITES
 extern void adjust_status(struct xwindow *, const char *);
+#endif
 extern void null_out_status(void);
 extern void check_turn_events(void);
 #ifdef STATUS_HILITES
@@ -447,7 +464,6 @@ extern void append_text_buffer(struct text_buffer *, const char *,
                                boolean); /* text buffer routines */
 extern void init_text_buffer(struct text_buffer *);
 extern void clear_text_buffer(struct text_buffer *);
-extern void free_text_buffer(struct text_buffer *);
 #ifdef GRAPHIC_TOMBSTONE
 extern void calculate_rip_text(int, time_t);
 #endif
@@ -463,75 +479,91 @@ extern int get_value_width(Widget);
 extern void swap_fg_bg(Widget);
 extern void set_value(Widget w, const char *new_value);
 /* external declarations */
-extern char *X11_getmsghistory(boolean);
-extern void X11_putmsghistory(const char *, boolean);
-extern void X11_init_nhwindows(int *, char **);
 extern void X11_player_selection(void);
-extern void X11_askname(void);
-extern void X11_get_nh_event(void);
 extern void X11_exit_nhwindows(const char *);
-extern void X11_suspend_nhwindows(const char *);
-extern void X11_resume_nhwindows(void);
 extern winid X11_create_nhwindow(int);
-extern void X11_clear_nhwindow(winid);
-extern void X11_display_nhwindow(winid, boolean);
 extern void X11_destroy_nhwindow(winid);
-extern void X11_curs(winid, int, int);
-extern void X11_putstr(winid, int, const char *);
-extern void X11_display_file(const char *, boolean);
 extern void X11_start_menu(winid, unsigned long);
 extern void X11_add_menu(winid, const glyph_info *, const ANY_P *, char,
                          char, int, int, const char *, unsigned int);
 extern void X11_end_menu(winid, const char *);
 extern int X11_select_menu(winid, int, MENU_ITEM_P **);
-extern void X11_mark_synch(void);
-extern void X11_wait_synch(void);
 #ifdef CLIPPING
 extern void X11_cliparound(int, int);
 #endif
 extern void X11_print_glyph(winid, coordxy, coordxy, const glyph_info *,
                             const glyph_info *);
 extern void X11_raw_print(const char *);
-extern void X11_raw_print_bold(const char *);
-extern int X11_nhgetch(void);
-extern int X11_nh_poskey(coordxy *, coordxy *, int *);
 extern void X11_nhbell(void);
-extern int X11_doprev_message(void);
 extern char X11_yn_function_core(const char *, const char *, char, unsigned);
-extern char X11_yn_function(const char *, const char *, char);
 extern void X11_getlin(const char *, char *);
 extern int X11_get_ext_cmd(void);
-extern void X11_number_pad(int);
-extern void X11_delay_output(void);
 extern void X11_status_init(void);
 extern void X11_status_finish(void);
 extern void X11_status_enablefield(int, const char *, const char *, boolean);
 extern void X11_status_update(int, genericptr_t, int, int, int,
                               unsigned long *);
 
-#ifdef GRAPHIC_TOMBSTONE
-extern void X11_outrip(winid, int, time_t);
-#else
+#ifndef GRAPHIC_TOMBSTONE
 extern void genl_outrip(winid, int, time_t);
 #endif
 
-extern void X11_preference_update(const char *);
 extern void X11_update_inventory(int);
-extern win_request_info *X11_ctrl_nhwindow(winid, int, win_request_info *);
 extern X11_map_symbol X11_glyph_char(const glyph_info *);
+#ifndef USE_XFT
 extern XFontStruct *X11_bold_font(Display *, XFontStruct *);
 extern XFontStruct *X11_italic_font(Display *, XFontStruct *);
+#endif /* !USE_XFT */
 #ifdef ENHANCED_SYMBOLS
 extern XFontStruct *X11_unicode_font(Display *, XFontStruct *);
 #endif
 
+#ifdef USE_XFT
+extern XftFont *X11_new_font(Widget w, unsigned attrs, int win_type);
+extern void X11_release_font(Widget w, XftFont *font);
+extern void X11_new_color(Widget w, Pixel pixel, XftColor *color);
+#endif
+
 /* ### winlabel.c ### */
 /* Functions for management of enhanced labels */
-extern void X11_wrap_widget(Widget);
+extern void X11_wrap_widget(Widget, int);
 extern void X11_update_label(Widget);
 extern void X11_set_attrs(Widget, unsigned);
 extern void X11_set_highlight(Widget, boolean);
 extern void X11_set_percent(Widget, unsigned, Pixel);
 extern void X11_blink_labels(void);
+extern int X11_font_height(X11_Font *);
+
+/*
+ * These are for widgets that use the enhanced label services only for text
+ * rendering; not for percentage bars, underlines and such. They only need
+ * these services if XFT is in use.
+ */
+#ifdef USE_XFT
+static inline void
+X11_wrap_widget_if_Xft(Widget w, int win_type)
+{
+    X11_wrap_widget(w, win_type);
+}
+
+static inline void
+X11_update_label_if_Xft(Widget w)
+{
+    X11_update_label(w);
+}
+#else /* !USE_XFT */
+static inline void
+X11_wrap_widget_if_Xft(Widget w, int win_type)
+{
+    nhUse(w);
+    nhUse(win_type);
+}
+
+static inline void
+X11_update_label_if_Xft(Widget w)
+{
+    nhUse(w);
+}
+#endif /* ?USE_XFT */
 
 #endif /* WINX_H */

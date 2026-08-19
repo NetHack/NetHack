@@ -37,7 +37,7 @@
 
 static struct line_element *get_previous(struct line_element *);
 static void set_circle_buf(struct mesg_info_t *, int);
-static char *split(char *, XFontStruct *, Dimension);
+static char *split(char *, struct xwindow *, Dimension);
 static void add_line(struct mesg_info_t *, const char *);
 static void redraw_message_window(struct xwindow *);
 static void mesg_check_size_change(struct xwindow *);
@@ -83,7 +83,9 @@ create_message_window(struct xwindow *wp, /* window pointer */
     wp->mesg_information = mesg_info =
         (struct mesg_info_t *) alloc(sizeof (struct mesg_info_t));
 
+#ifndef USE_XFT
     mesg_info->fs = 0;
+#endif
     mesg_info->num_lines = 0;
     mesg_info->head = mesg_info->line_here = mesg_info->last_pause =
         mesg_info->last_pause_head = (struct line_element *) 0;
@@ -151,30 +153,49 @@ create_message_window(struct xwindow *wp, /* window pointer */
      * is appResources.message_lines high and DEFAULT_MESSAGE_WIDTH wide.
      */
 
+    /* Save character information for fast use later. */
+#ifdef USE_XFT
+    XftFont *font = X11_new_font(wp->w, 0, NHW_MESSAGE);
+    XGlyphInfo extents;
+    mesg_info->char_width = font->max_advance_width;
+    mesg_info->char_height = X11_font_height(font);
+    mesg_info->char_ascent = font->ascent;
+    mesg_info->char_lbearing = 0;
+    /* Xft seems to offer no direct way to distinguish proportional from
+       monospaced fonts. Assume that "!" will be narrower than maximum. */
+    XftTextExtents8(XtDisplay(wp->w), font, (const FcChar8*) "!", 1, &extents);
+    int min_width = extents.width - extents.x;
+    /* "Maximum" is likely to include things like Chinese characters that
+     * display at double width. Use the width of "M". */
+    XftTextExtents8(XtDisplay(wp->w), font, (const FcChar8*) "M", 1, &extents);
+    int max_width = extents.width - extents.x;
+    X11_release_font(wp->w, font);
+#else
     /* Get the font information. */
     num_args = 0;
     XtSetArg(args[num_args], XtNfont, &mesg_info->fs);
     num_args++;
     XtGetValues(wp->w, args, num_args);
 
-    /* Save character information for fast use later. */
     mesg_info->char_width = mesg_info->fs->max_bounds.width;
     mesg_info->char_height =
         mesg_info->fs->max_bounds.ascent + mesg_info->fs->max_bounds.descent;
     mesg_info->char_ascent = mesg_info->fs->max_bounds.ascent;
     mesg_info->char_lbearing = -mesg_info->fs->min_bounds.lbearing;
+    int min_width = mesg_info->fs->min_bounds.width;
+    int max_width = mesg_info->fs->max_bounds.width;
+#endif
 
     get_gc(wp->w, mesg_info);
 
     wp->pixel_height = ((int) iflags.msg_history) * mesg_info->char_height;
 
     /* If a variable spaced font, only use 2/3 of the default size */
-    if (mesg_info->fs->min_bounds.width != mesg_info->fs->max_bounds.width) {
+    if (min_width != max_width) {
         wp->pixel_width = ((2 * DEFAULT_MESSAGE_WIDTH) / 3)
-                          * mesg_info->fs->max_bounds.width;
+                          * max_width;
     } else
-        wp->pixel_width =
-            (DEFAULT_MESSAGE_WIDTH * mesg_info->fs->max_bounds.width);
+        wp->pixel_width = (DEFAULT_MESSAGE_WIDTH * max_width);
 
     /* Set the new width and height. */
     num_args = 0;
@@ -250,7 +271,7 @@ append_message(struct xwindow *wp, const char *str)
     remainder = buf;
     do {
         mark = remainder;
-        remainder = split(mark, wp->mesg_information->fs, wp->pixel_width);
+        remainder = split(mark, wp, wp->pixel_width);
         add_line(wp->mesg_information, mark);
     } while (remainder);
 }
@@ -357,10 +378,16 @@ set_circle_buf(struct mesg_info_t *mesg_info, int count)
  * not, back up from the end by words until we find a place to split.
  */
 static char *
-split(char *s,
-      XFontStruct *fs, /* Font for the window. */
+split(
+      char *s,
+      struct xwindow *wp,
       Dimension pixel_width)
 {
+#ifdef USE_XFT
+    XftFont *font = X11_new_font(wp->w, 0, NHW_MESSAGE);
+#else
+    XFontStruct *fs = wp->mesg_information->fs; /* Font for the window. */
+#endif
     char save, *end, *remainder;
 
     save = '\0';
@@ -368,7 +395,18 @@ split(char *s,
     end = eos(s); /* point to null at end of string */
 
     /* assume that if end == s, XXXXXX returns 0) */
-    while ((Dimension) XTextWidth(fs, s, (int) strlen(s)) > pixel_width) {
+    while (TRUE) {
+#ifdef USE_XFT
+        XGlyphInfo extents;
+        XftTextExtents8(XtDisplay(wp->w), font, (const FcChar8*) s, strlen(s), &extents);
+        if (extents.width - extents.x < pixel_width) {
+            break;
+        }
+#else
+        if ((Dimension) XTextWidth(fs, s, (int) strlen(s)) < pixel_width) {
+            break;
+        }
+#endif
         *end-- = save;
         while (*end != ' ') {
             if (end == s)
@@ -379,6 +417,9 @@ split(char *s,
         *end = '\0';
         remainder = end + 1;
     }
+#ifdef USE_XFT
+    X11_release_font(wp->w, font);
+#endif
     return remainder;
 }
 
@@ -466,20 +507,50 @@ redraw_message_window(struct xwindow *wp)
     }
 
     /* For now, just update the whole shootn' match. */
+#ifdef USE_XFT
+    Display *display = XtDisplay(wp->w);
+    Screen *screen = DefaultScreenOfDisplay(display);
+    Visual *visual = DefaultVisualOfScreen(screen);
+    Colormap cmap = DefaultColormapOfScreen(screen);
+    XftDraw *draw = XftDrawCreate(display, XtWindow(wp->w), visual, cmap);
+    XftFont *font = X11_new_font(wp->w, 0, NHW_MESSAGE);
+    XftColor fgcolor;
+    X11_new_color(wp->w, mesg_info->fgpixel, &fgcolor);
+#endif /* USE_XFT */
+
     for (y_base = row = 0, curr = mesg_info->head; row < mesg_info->num_lines;
          row++, y_base += mesg_info->char_height, curr = curr->next) {
+#ifdef USE_XFT
+        if (curr->line != NULL) {
+            XftDrawString8(draw, &fgcolor, font,
+                        mesg_info->char_lbearing, mesg_info->char_ascent + y_base,
+                        (const FcChar8 *) curr->line, curr->str_length);
+        }
+#else /* !USE_XFT */
         XDrawString(XtDisplay(wp->w), XtWindow(wp->w), mesg_info->gc,
                     mesg_info->char_lbearing, mesg_info->char_ascent + y_base,
                     curr->line, curr->str_length);
+#endif /* ?USE_XFT */
         /*
          * This draws a line at the _top_ of the line of text pointed to by
          * mesg_info->last_pause.
          */
         if (appResources.message_line && curr == mesg_info->line_here) {
+#ifdef USE_XFT
+            XftDrawRect(draw, &fgcolor, 0,
+                        y_base, wp->pixel_width, y_base);
+#else /* !USE_XFT */
             XDrawLine(XtDisplay(wp->w), XtWindow(wp->w), mesg_info->gc, 0,
                       y_base, wp->pixel_width, y_base);
+#endif /* ?USE_XFT */
         }
     }
+
+#ifdef USE_XFT
+    XftColorFree(display, visual, cmap, &fgcolor);
+    XftFontClose(display, font);
+    XftDrawDestroy(draw);
+#endif /* USE_XFT */
 
     mesg_info->dirty = False;
 }
@@ -549,6 +620,12 @@ mesg_exposed(Widget w,
 static void
 get_gc(Widget w, struct mesg_info_t *mesg_info)
 {
+#ifdef USE_XFT
+    Arg arg[1];
+
+    XtSetArg(arg[0], XtNforeground, &mesg_info->fgpixel);
+    XtGetValues(w, arg, ONE);
+#else /* !USE_XFT */
     XGCValues values;
     XtGCMask mask = GCFunction | GCForeground | GCBackground | GCFont;
     Pixel fgpixel, bgpixel;
@@ -563,6 +640,7 @@ get_gc(Widget w, struct mesg_info_t *mesg_info)
     values.function = GXcopy;
     values.font = WindowFont(w);
     mesg_info->gc = XtGetGC(w, mask, &values);
+#endif /* ?USE_XFT */
 }
 
 /*

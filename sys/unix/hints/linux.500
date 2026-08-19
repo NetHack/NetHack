@@ -397,6 +397,7 @@ endif   # MAKEFILE_SRC
 
 ifdef WANT_WIN_X11
 USE_XPM=1
+USE_XFT=1
 WINX11LIB = -lXaw -lXmu -lXext -lXt -lX11
 VARDATND0 += x11tiles NetHack.ad pet_mark.xbm pilemark.xbm
 ifndef CROSSCOMPILE
@@ -408,6 +409,11 @@ POSTINSTALL += bdftopcf win/X11/nh10.bdf > $(HACKDIR)/nh10.pcf; ( cd $(HACKDIR);
 X11CFLAGS = -I/opt/X11/include
 # avoid repeated complaints about _X_NONNULL(args...) in <X11/Xfuncproto.h>
 X11CFLAGS += -Wno-variadic-macros
+ifdef USE_XFT
+CFLAGS += -DUSE_XFT
+X11CFLAGS += $(shell pkg-config --cflags xft fontconfig)
+WINX11LIB += $(shell pkg-config --libs xft fontconfig)
+endif
 ifdef USE_XPM
 CFLAGS += -DUSE_XPM
 WINX11LIB += -lXpm
