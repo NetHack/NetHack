@@ -854,7 +854,7 @@ X11_add_menu(winid window,
             impossible("Menu item too long (%d).", len);
             len = BUFSZ - 1;
         }
-        Sprintf(buf, "%c %c ", ch ? ch : ' ', preselected ? '+' : '-');
+        Sprintf(buf, "%c\t%c\t", ch ? ch : ' ', preselected ? '+' : '-');
         (void) strncpy(buf + 4, str, len);
         buf[4 + len] = '\0';
         item->str = copy_of(buf);
@@ -1318,6 +1318,17 @@ menu_create_entries(struct xwindow *wp, struct menu *curr_menu)
     Cardinal num_args;
     Dimension cwidth, maxwidth = 0;
 
+    /* Does any line have a selector? */
+    boolean any_canpick = FALSE;
+    if (how != PICK_NONE) {
+        for (curr = curr_menu->base; curr; curr = curr->next) {
+            if (curr->identifier.a_void != NULL) {
+                any_canpick = TRUE;
+                break;
+            }
+        }
+    }
+
     int *col_widths = NULL;
     unsigned num_cols = 0;
     X11_Font *font;
@@ -1332,6 +1343,23 @@ menu_create_entries(struct xwindow *wp, struct menu *curr_menu)
         int attr = ATR_NONE;
         int color = NO_COLOR;
         boolean canpick = (how != PICK_NONE && curr->identifier.a_void);
+
+        /* Add tabs if needed to align non-selector lines with selector lines */
+        if (any_canpick && !canpick) {
+            char *buf;
+            if (strncmp(str, "    ", 4) == 0) {
+                size_t buf_len = strlen(str);
+                buf = (char *) alloc(buf_len);
+                Snprintf(buf, buf_len, "\t\t%s", str + 4);
+            } else {
+                size_t buf_len = strlen(str) + 3;
+                buf = (char *) alloc(buf_len);
+                Snprintf(buf, buf_len, "\t\t%s", str);
+            }
+            free(curr->str);
+            curr->str = buf;
+            str = buf;
+        }
 
         num_args = 0;
         XtSetArg(args[num_args], nhStr(XtNlabel), str); num_args++;
@@ -1446,6 +1474,8 @@ menu_create_entries(struct xwindow *wp, struct menu *curr_menu)
 static unsigned
 get_col_widths(Widget w, X11_Font *font, const char *str, int **col_widths)
 {
+    int col_spacing = X11_column_width(XtDisplay(w), font, "# ", 2);
+
     /* Determine the number of columns */
     unsigned num_cols = 1;
     size_t i = 0;
@@ -1467,7 +1497,12 @@ get_col_widths(Widget w, X11_Font *font, const char *str, int **col_widths)
     i = 0;
     while (str[i] != '\0') {
         size_t len = strcspn(str + i, "\t");
-        cwidths[col++] = X11_column_width(XtDisplay(w), font, str + i, len);
+        cwidths[col] = X11_column_width(XtDisplay(w), font, str + i, len);
+        if (len > 1) {
+            col_spacing = X11_font_height(font) * 2;
+        }
+        cwidths[col] += col_spacing;
+        ++col;
         i += len;
         if (str[i] == '\t') {
             ++i;

@@ -184,13 +184,12 @@ X11_set_column_widths(Widget w, const int *col_widths, unsigned num_cols)
 {
     WidgetData *data = get_widget_data(w);
     if (data != NULL) {
-        int col_spacing = X11_font_height(data->font[0]) * 2;
         free(data->columns);
         data->columns = (int *) alloc(sizeof(data->columns[0]) * num_cols);
         if (num_cols != 0) {
             data->columns[0] = 0;
             for (unsigned i = 1; i < num_cols; ++i) {
-                data->columns[i] = data->columns[i-1] + col_spacing + col_widths[i-1];
+                data->columns[i] = data->columns[i-1] + col_widths[i-1];
             }
         }
         data->num_cols = num_cols;
