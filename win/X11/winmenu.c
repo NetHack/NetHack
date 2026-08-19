@@ -60,6 +60,7 @@ static unsigned menu_scrollmask(struct xwindow *);
 static void menu_unscroll(struct xwindow *);
 static Widget menu_create_buttons(struct xwindow *, Widget, Widget);
 static void menu_create_entries(struct xwindow *, struct menu *);
+static unsigned get_col_widths(Widget, X11_Font *, const char *, int **);
 static void destroy_menu_entry_widgets(struct xwindow *);
 static void create_menu_translation_tables(void);
 
@@ -1317,6 +1318,13 @@ menu_create_entries(struct xwindow *wp, struct menu *curr_menu)
     Cardinal num_args;
     Dimension cwidth, maxwidth = 0;
 
+    int *col_widths = NULL;
+    unsigned num_cols = 0;
+    X11_Font *font;
+#ifdef USE_XFT
+    font = X11_new_font(wp->w, 0, NHW_MENU);
+#endif
+
     for (curr = curr_menu->base; curr; curr = curr->next) {
         char tmpbuf[BUFSZ];
         Widget linewidget;
@@ -1376,13 +1384,42 @@ menu_create_entries(struct xwindow *wp, struct menu *curr_menu)
                                               wp->w, args, num_args);
         X11_wrap_widget(curr->w, NHW_MENU);
         X11_set_attrs(curr->w, 0x1 << attr);
-        XtManageChild(curr->w);
 
         if (canpick)
             XtAddCallback(linewidget, XtNcallback, menu_select,
                           (XtPointer) curr);
         prevlinewidget = linewidget;
 
+#ifndef USE_XFT /* If Xft, the font is acquired at the start of the loop */
+        num_args = 0;
+        XtSetArg(args[num_args], XtNfont, &font); num_args++;
+        XtGetValues(curr->w, args, num_args);
+#endif
+        /* Get column widths for this line */
+        if (strchr(str, '\t') != NULL) { /* Might be a header if no tab */
+            int *col_widths0;
+            unsigned num_cols0 = get_col_widths(curr->w, font, str, &col_widths0);
+            if (num_cols0 > num_cols) {
+                col_widths = (int *) re_alloc((long *) col_widths, num_cols0 * sizeof(col_widths[0]));
+                memset(col_widths + num_cols, 0, sizeof(col_widths[0]) * (num_cols0 - num_cols));
+                num_cols = num_cols0;
+            }
+            for (unsigned i = 0; i < num_cols0; ++i) {
+                col_widths[i] = max(col_widths[i], col_widths0[i]);
+            }
+            free(col_widths0);
+        }
+    }
+#ifdef USE_XFT
+    X11_release_font(wp->w, font);
+#endif
+
+    /* Set the column widths */
+    for (curr = curr_menu->base; curr; curr = curr->next) {
+        X11_set_column_widths(curr->w, col_widths, num_cols);
+        XtManageChild(curr->w);
+
+        boolean canpick = (how != PICK_NONE && curr->identifier.a_void);
         if (canpick) {
             /* get the current line width */
             XtSetArg(args[0], XtNwidth, &cwidth);
@@ -1392,6 +1429,8 @@ menu_create_entries(struct xwindow *wp, struct menu *curr_menu)
         }
     }
 
+    free(col_widths);
+
     /* set all selectable menu entries to the maximum width */
     if (how != PICK_NONE) {
         XtSetArg(args[0], XtNwidth, maxwidth);
@@ -1399,6 +1438,43 @@ menu_create_entries(struct xwindow *wp, struct menu *curr_menu)
             if (curr->identifier.a_void)
                 XtSetValues(curr->w, args, ONE);
     }
+}
+
+/* Determine widths of columns */
+static unsigned
+get_col_widths(Widget w, X11_Font *font, const char *str, int **col_widths)
+{
+    /* Determine the number of columns */
+    unsigned num_cols = 1;
+    size_t i = 0;
+    while (str[i] != '\0') {
+        size_t len = strcspn(str + i, "\t");
+        if (str[i+len] == '\0') {
+            break;
+        }
+        ++num_cols;
+        i += len + 1;
+    }
+
+    /* Allocate width array */
+    int *cwidths = (int *) alloc(sizeof(cwidths[0]) * num_cols);
+    memset(cwidths, 0, sizeof(cwidths[0]) * num_cols);
+
+    /* Get the widths of the columns */
+    unsigned col = 0;
+    i = 0;
+    while (str[i] != '\0') {
+        size_t len = strcspn(str + i, "\t");
+        cwidths[col++] = X11_column_width(XtDisplay(w), font, str + i, len);
+        i += len;
+        if (str[i] == '\t') {
+            ++i;
+        }
+    }
+
+    /* Return */
+    *col_widths = cwidths;
+    return num_cols;
 }
 
 static void

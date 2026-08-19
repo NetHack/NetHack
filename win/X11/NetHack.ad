@@ -31,7 +31,7 @@ NetHack*text*borderWidth:  0
 ! These correspond to the .nethackrc settings font_map, font_menu,
 ! font_message, font_status and font_text
 NetHack.font_map:     mono-10
-NetHack.font_menu:    mono-10
+NetHack.font_menu:    sans-10
 NetHack.font_message: sans-10
 NetHack.font_status:  sans-10
 NetHack.font_text:    mono-10

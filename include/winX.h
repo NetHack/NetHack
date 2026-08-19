@@ -531,8 +531,10 @@ extern void X11_update_label(Widget);
 extern void X11_set_attrs(Widget, unsigned);
 extern void X11_set_highlight(Widget, boolean);
 extern void X11_set_percent(Widget, unsigned, Pixel);
+extern void X11_set_column_widths(Widget, const int *, unsigned);
 extern void X11_blink_labels(void);
 extern int X11_font_height(X11_Font *);
+extern int X11_column_width(Display *, X11_Font *, const char *, size_t);
 
 /*
  * These are for widgets that use the enhanced label services only for text
