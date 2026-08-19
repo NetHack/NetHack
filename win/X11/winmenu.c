@@ -1416,7 +1416,9 @@ menu_create_entries(struct xwindow *wp, struct menu *curr_menu)
 
     /* Set the column widths */
     for (curr = curr_menu->base; curr; curr = curr->next) {
-        X11_set_column_widths(curr->w, col_widths, num_cols);
+        if (strchr(curr->str, '\t') != NULL) { /* Might be a header if no tab */
+            X11_set_column_widths(curr->w, col_widths, num_cols);
+        }
         XtManageChild(curr->w);
 
         boolean canpick = (how != PICK_NONE && curr->identifier.a_void);
