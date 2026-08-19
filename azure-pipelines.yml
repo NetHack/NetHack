@@ -4,17 +4,13 @@ strategy:
       imageName: 'ubuntu-latest'
       toolchainName: gcc14
       buildTargetName: minimal
-    linux_noble_clang_all:
-      imageName: 'ubuntu-24.04'
+    linux_latest_gcc14:
+      imageName: 'ubuntu-latest'
+      toolchainName: gcc14
+      buildTargetName: all
+    linux_latest_clang_all:
+      imageName: 'ubuntu-latest'
       toolchainName: clang
-      buildTargetName: all
-    linux_jammy_gcc9_all:
-      imageName: 'ubuntu-22.04'
-      toolchainName: gcc9
-      buildTargetName: all
-    linux_noble_gcc13_all:
-      imageName: 'ubuntu-24.04'
-      toolchainName: gcc13
       buildTargetName: all
     macOS_latest_clang_all:
       imageName: 'macOS-latest'
@@ -41,8 +37,8 @@ strategy:
       imageName: 'ubuntu-latest'
       toolchainName: cross
       buildTargetName: msdos
-    linux_noble_docs:
-      imageName: 'ubuntu-24.04'
+    linux_latest_docs:
+      imageName: 'ubuntu-latest'
       toolchainName: docs
       buildTargetName: all
       continueOnError: true
@@ -65,16 +61,6 @@ variables:
 
 steps:
 - bash: |
-    if [ "$(toolchain)" == "gcc9" ]
-    then
-      echo "##vso[task.setvariable variable=CC]gcc-9"
-      echo "##vso[task.setvariable variable=CXX]g++-9"
-    fi
-    if [ "$(toolchain)" == "gcc13" ]
-    then
-      echo "##vso[task.setvariable variable=CC]gcc-13"
-      echo "##vso[task.setvariable variable=CXX]g++-13"
-    fi
     if [ "$(toolchain)" == "gcc14" ]
     then
       echo "##vso[task.setvariable variable=CC]gcc-14"
@@ -172,7 +158,7 @@ steps:
 - bash: |
     sudo apt-get -qq -y update
     sudo apt-get -qq -y install libncurses-dev
-    sudo apt-get -qq -y install libx11-dev libxaw7-dev xfonts-utils qtbase5-dev qtmultimedia5-dev qtbase5-dev-tools
+    sudo apt-get -qq -y install libx11-dev libxaw7-dev libxft-dev fontconfig xfonts-utils qtbase5-dev qtmultimedia5-dev qtbase5-dev-tools
   condition: and(eq( variables['Agent.OS'], 'Linux' ), eq( variables.buildTarget, 'all'))
   workingDirectory: $(Agent.BuildDirectory)/$(netHackPath)
   displayName: 'Getting linux build dependencies'
