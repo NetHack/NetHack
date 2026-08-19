@@ -1084,8 +1084,8 @@ X11_select_menu(winid window, int how, menu_item **menu_list)
     XtSetArg(args[num_args], XtNheight, &v_pixel_height); num_args++;
     XtGetValues(wp->w, args, num_args);
     if ((Dimension) XtScreen(wp->w)->height * 5 / 6 < v_pixel_height) {
-        /* scrollbar is 14 pixels wide.  Widen the form to accommodate it. */
-        v_pixel_width += 14;
+        /* scrollbar is 17 pixels wide.  Widen the form to accommodate it. */
+        v_pixel_width += 17;
 
         /* shrink to fit vertically */
         v_pixel_height = XtScreen(wp->w)->height * 5 / 6;
