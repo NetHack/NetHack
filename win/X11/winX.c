@@ -2170,11 +2170,8 @@ X11_display_file(const char *str, boolean complain)
     dlb *fp;
     winid newwin;
     struct xwindow *wp;
-    anything any;
-    menu_item *menu_list;
 #define LLEN 128
     char line[LLEN];
-    int clr = 0;
 
     /* Use the port-independent file opener to see if the file exists. */
     fp = dlb_fopen(str, RDTMODE);
@@ -2184,14 +2181,11 @@ X11_display_file(const char *str, boolean complain)
         return; /* it doesn't exist, ignore */
     }
 
-    newwin = X11_create_nhwindow(NHW_MENU);
+    newwin = X11_create_nhwindow(NHW_TEXT);
     wp = &window_list[newwin];
-    X11_start_menu(newwin, MENU_BEHAVE_STANDARD);
 
-    any = cg.zeroany;
     while (dlb_fgets(line, LLEN, fp)) {
-        X11_add_menu(newwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-                     clr, line, MENU_ITEMFLAGS_NONE);
+        X11_putstr(newwin, 0, line);
     }
     (void) dlb_fclose(fp);
 
@@ -2199,9 +2193,7 @@ X11_display_file(const char *str, boolean complain)
     if (str)
         wp->title = dupstr(str);
 
-    wp->menu_information->permi = FALSE;
-    wp->menu_information->disable_mcolors = TRUE;
-    (void) X11_select_menu(newwin, PICK_NONE, &menu_list);
+    (void) X11_display_nhwindow(newwin, TRUE);
     X11_destroy_nhwindow(newwin);
 }
 
