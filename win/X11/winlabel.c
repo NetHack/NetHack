@@ -185,11 +185,11 @@ X11_set_column_widths(Widget w, const int *col_widths, unsigned num_cols)
     WidgetData *data = get_widget_data(w);
     if (data != NULL) {
         free(data->columns);
-        data->columns = (int *) alloc(sizeof(data->columns[0]) * num_cols);
+        data->columns = (int *) alloc(sizeof(data->columns[0]) * (num_cols + 1));
+        data->columns[0] = 0;
         if (num_cols != 0) {
-            data->columns[0] = 0;
-            for (unsigned i = 1; i < num_cols; ++i) {
-                data->columns[i] = data->columns[i-1] + col_widths[i-1];
+            for (unsigned i = 0; i < num_cols; ++i) {
+                data->columns[i+1] = data->columns[i] + col_widths[i];
             }
         }
         data->num_cols = num_cols;
@@ -421,7 +421,7 @@ update_label(Widget w, WidgetData *data)
                     pos = 0;
                 } else {
                     line3 = min(strcspn(label + i + j, "\t\n"), line2);
-                    pos = data->columns[min(col, data->num_cols-1)];
+                    pos = data->columns[min(col, data->num_cols)];
                 }
 #ifdef USE_XFT
                 XftDrawString8(draw, &fgcolor, font, x + pos, y,
