@@ -1471,13 +1471,15 @@ menu_create_entries(struct xwindow *wp, struct menu *curr_menu)
 }
 
 /* Determine widths of columns */
+/* The last column is deemed to extend to the right margin, and is not included
+   in the returned array */
 static unsigned
 get_col_widths(Widget w, X11_Font *font, const char *str, int **col_widths)
 {
     int col_spacing = X11_column_width(XtDisplay(w), font, "# ", 2);
 
     /* Determine the number of columns */
-    unsigned num_cols = 1;
+    unsigned num_cols = 0;
     size_t i = 0;
     while (str[i] != '\0') {
         size_t len = strcspn(str + i, "\t");
@@ -1497,16 +1499,16 @@ get_col_widths(Widget w, X11_Font *font, const char *str, int **col_widths)
     i = 0;
     while (str[i] != '\0') {
         size_t len = strcspn(str + i, "\t");
+        if (str[i+len] == '\0') {
+            break;
+        }
         cwidths[col] = X11_column_width(XtDisplay(w), font, str + i, len);
         if (len > 1) {
             col_spacing = X11_font_height(font) * 2;
         }
         cwidths[col] += col_spacing;
         ++col;
-        i += len;
-        if (str[i] == '\t') {
-            ++i;
-        }
+        i += len + 1;
     }
 
     /* Return */
