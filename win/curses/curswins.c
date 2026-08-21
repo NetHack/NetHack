@@ -883,21 +883,25 @@ curses_draw_map(int sx, int sy, int ex, int ey)
 #ifdef MAP_SCROLLBARS
     hsb_back.ch = '-';
     hsb_back.color = SCROLLBAR_BACK_COLOR;
+    hsb_back.color256 = 0;
     hsb_back.framecolor = NO_COLOR;
     hsb_back.attr = A_NORMAL;
     hsb_back.unicode_representation = NULL;
     hsb_bar.ch = '*';
     hsb_bar.color = SCROLLBAR_COLOR;
+    hsb_bar.color256 = 0;
     hsb_bar.framecolor = NO_COLOR;
     hsb_bar.attr = A_NORMAL;
     hsb_bar.unicode_representation = NULL;
     vsb_back.ch = '|';
     vsb_back.color = SCROLLBAR_BACK_COLOR;
+    vsb_back.color256 = 0;
     vsb_back.framecolor = NO_COLOR;
     vsb_back.attr = A_NORMAL;
     vsb_back.unicode_representation = NULL;
     vsb_bar.ch = '*';
     vsb_bar.color = SCROLLBAR_COLOR;
+    vsb_bar.color256 = 0;
     vsb_bar.framecolor = NO_COLOR;
     vsb_bar.attr = A_NORMAL;
     vsb_bar.unicode_representation = NULL;
@@ -965,6 +969,8 @@ clear_map(void)
         for (y = 0; y < ROWNO; y++) {
             map[y][x].ch = ' ';
             map[y][x].color = NO_COLOR;
+            map[y][x].color256 = 0;
+            map[y][x].framecolor = NO_COLOR;
             map[y][x].attr = A_NORMAL;
             map[y][x].unicode_representation = NULL;
         }
