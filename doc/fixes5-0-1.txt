@@ -261,6 +261,7 @@ X11: fix menu group accelerators
 X11: implement all text attributes for menus
 X11: fix crash when loading a nonexistent font
 X11: use xft to render fonts
+X11: support tab-separated menu columns
 Unix: don't complain about MAXPLAYERS with unknown command line param
 
 

@@ -60,6 +60,7 @@ static unsigned menu_scrollmask(struct xwindow *);
 static void menu_unscroll(struct xwindow *);
 static Widget menu_create_buttons(struct xwindow *, Widget, Widget);
 static void menu_create_entries(struct xwindow *, struct menu *);
+static unsigned get_col_widths(Widget, X11_Font *, const char *, int **);
 static void destroy_menu_entry_widgets(struct xwindow *);
 static void create_menu_translation_tables(void);
 
@@ -853,7 +854,7 @@ X11_add_menu(winid window,
             impossible("Menu item too long (%d).", len);
             len = BUFSZ - 1;
         }
-        Sprintf(buf, "%c %c ", ch ? ch : ' ', preselected ? '+' : '-');
+        Sprintf(buf, "%c\t%c\t", ch ? ch : ' ', preselected ? '+' : '-');
         (void) strncpy(buf + 4, str, len);
         buf[4 + len] = '\0';
         item->str = copy_of(buf);
@@ -1083,8 +1084,8 @@ X11_select_menu(winid window, int how, menu_item **menu_list)
     XtSetArg(args[num_args], XtNheight, &v_pixel_height); num_args++;
     XtGetValues(wp->w, args, num_args);
     if ((Dimension) XtScreen(wp->w)->height * 5 / 6 < v_pixel_height) {
-        /* scrollbar is 14 pixels wide.  Widen the form to accommodate it. */
-        v_pixel_width += 14;
+        /* scrollbar is 17 pixels wide.  Widen the form to accommodate it. */
+        v_pixel_width += 17;
 
         /* shrink to fit vertically */
         v_pixel_height = XtScreen(wp->w)->height * 5 / 6;
@@ -1317,6 +1318,24 @@ menu_create_entries(struct xwindow *wp, struct menu *curr_menu)
     Cardinal num_args;
     Dimension cwidth, maxwidth = 0;
 
+    /* Does any line have a selector? */
+    boolean any_canpick = FALSE;
+    if (how != PICK_NONE) {
+        for (curr = curr_menu->base; curr; curr = curr->next) {
+            if (curr->identifier.a_void != NULL) {
+                any_canpick = TRUE;
+                break;
+            }
+        }
+    }
+
+    int *col_widths = NULL;
+    unsigned num_cols = 0;
+    X11_Font *font;
+#ifdef USE_XFT
+    font = X11_new_font(wp->w, 0, NHW_MENU);
+#endif
+
     for (curr = curr_menu->base; curr; curr = curr->next) {
         char tmpbuf[BUFSZ];
         Widget linewidget;
@@ -1324,6 +1343,23 @@ menu_create_entries(struct xwindow *wp, struct menu *curr_menu)
         int attr = ATR_NONE;
         int color = NO_COLOR;
         boolean canpick = (how != PICK_NONE && curr->identifier.a_void);
+
+        /* Add tabs if needed to align non-selector lines with selector lines */
+        if (any_canpick && !canpick) {
+            char *buf;
+            if (strncmp(str, "    ", 4) == 0) {
+                size_t buf_len = strlen(str);
+                buf = (char *) alloc(buf_len);
+                Snprintf(buf, buf_len, "\t\t%s", str + 4);
+            } else {
+                size_t buf_len = strlen(str) + 3;
+                buf = (char *) alloc(buf_len);
+                Snprintf(buf, buf_len, "\t\t%s", str);
+            }
+            free(curr->str);
+            curr->str = buf;
+            str = buf;
+        }
 
         num_args = 0;
         XtSetArg(args[num_args], nhStr(XtNlabel), str); num_args++;
@@ -1376,13 +1412,44 @@ menu_create_entries(struct xwindow *wp, struct menu *curr_menu)
                                               wp->w, args, num_args);
         X11_wrap_widget(curr->w, NHW_MENU);
         X11_set_attrs(curr->w, 0x1 << attr);
-        XtManageChild(curr->w);
 
         if (canpick)
             XtAddCallback(linewidget, XtNcallback, menu_select,
                           (XtPointer) curr);
         prevlinewidget = linewidget;
 
+#ifndef USE_XFT /* If Xft, the font is acquired at the start of the loop */
+        num_args = 0;
+        XtSetArg(args[num_args], XtNfont, &font); num_args++;
+        XtGetValues(curr->w, args, num_args);
+#endif
+        /* Get column widths for this line */
+        if (strchr(str, '\t') != NULL) { /* Might be a header if no tab */
+            int *col_widths0;
+            unsigned num_cols0 = get_col_widths(curr->w, font, str, &col_widths0);
+            if (num_cols0 > num_cols) {
+                col_widths = (int *) re_alloc((long *) col_widths, num_cols0 * sizeof(col_widths[0]));
+                memset(col_widths + num_cols, 0, sizeof(col_widths[0]) * (num_cols0 - num_cols));
+                num_cols = num_cols0;
+            }
+            for (unsigned i = 0; i < num_cols0; ++i) {
+                col_widths[i] = max(col_widths[i], col_widths0[i]);
+            }
+            free(col_widths0);
+        }
+    }
+#ifdef USE_XFT
+    X11_release_font(wp->w, font);
+#endif
+
+    /* Set the column widths */
+    for (curr = curr_menu->base; curr; curr = curr->next) {
+        if (strchr(curr->str, '\t') != NULL) { /* Might be a header if no tab */
+            X11_set_column_widths(curr->w, col_widths, num_cols);
+        }
+        XtManageChild(curr->w);
+
+        boolean canpick = (how != PICK_NONE && curr->identifier.a_void);
         if (canpick) {
             /* get the current line width */
             XtSetArg(args[0], XtNwidth, &cwidth);
@@ -1392,6 +1459,8 @@ menu_create_entries(struct xwindow *wp, struct menu *curr_menu)
         }
     }
 
+    free(col_widths);
+
     /* set all selectable menu entries to the maximum width */
     if (how != PICK_NONE) {
         XtSetArg(args[0], XtNwidth, maxwidth);
@@ -1399,6 +1468,52 @@ menu_create_entries(struct xwindow *wp, struct menu *curr_menu)
             if (curr->identifier.a_void)
                 XtSetValues(curr->w, args, ONE);
     }
+}
+
+/* Determine widths of columns */
+/* The last column is deemed to extend to the right margin, and is not included
+   in the returned array */
+static unsigned
+get_col_widths(Widget w, X11_Font *font, const char *str, int **col_widths)
+{
+    int col_spacing = X11_column_width(XtDisplay(w), font, "# ", 2);
+
+    /* Determine the number of columns */
+    unsigned num_cols = 0;
+    size_t i = 0;
+    while (str[i] != '\0') {
+        size_t len = strcspn(str + i, "\t");
+        if (str[i+len] == '\0') {
+            break;
+        }
+        ++num_cols;
+        i += len + 1;
+    }
+
+    /* Allocate width array */
+    int *cwidths = (int *) alloc(sizeof(cwidths[0]) * num_cols);
+    memset(cwidths, 0, sizeof(cwidths[0]) * num_cols);
+
+    /* Get the widths of the columns */
+    unsigned col = 0;
+    i = 0;
+    while (str[i] != '\0') {
+        size_t len = strcspn(str + i, "\t");
+        if (str[i+len] == '\0') {
+            break;
+        }
+        cwidths[col] = X11_column_width(XtDisplay(w), font, str + i, len);
+        if (len > 1) {
+            col_spacing = X11_font_height(font) * 2;
+        }
+        cwidths[col] += col_spacing;
+        ++col;
+        i += len + 1;
+    }
+
+    /* Return */
+    *col_widths = cwidths;
+    return num_cols;
 }
 
 static void

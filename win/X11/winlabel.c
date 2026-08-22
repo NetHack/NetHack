@@ -19,7 +19,8 @@
 #include "winX.h"
 
 /* Declarations depending on Xft support or none */
-static int X11_text_width(Display *, X11_Font *, const char *, size_t);
+static int X11_text_width(Display *, X11_Font *, const char *, size_t,
+                          const int *, unsigned);
 
 /* Data attached to a wrapped widget */
 typedef struct WidgetData {
@@ -41,6 +42,10 @@ typedef struct WidgetData {
     /* Percentage bar */
     unsigned percent;
     Pixel bar_color;
+
+    /* Columns */
+    int *columns;
+    unsigned num_cols;
 } WidgetData;
 
 /* Bits for WidgetData::font */
@@ -119,6 +124,7 @@ delete_callback(Widget w, XtPointer client_data, XtPointer call_data)
             XFreePixmap(display, data->pixmap);
         }
         free_fonts(w, data);
+        free(data->columns);
         free(data);
     }
 
@@ -169,6 +175,24 @@ X11_set_percent(Widget w, unsigned percent, Pixel color)
     if (data != NULL) {
         data->percent = percent;
         data->bar_color = color;
+        update_label(w, data);
+    }
+}
+
+void
+X11_set_column_widths(Widget w, const int *col_widths, unsigned num_cols)
+{
+    WidgetData *data = get_widget_data(w);
+    if (data != NULL) {
+        free(data->columns);
+        data->columns = (int *) alloc(sizeof(data->columns[0]) * (num_cols + 1));
+        data->columns[0] = 0;
+        if (num_cols != 0) {
+            for (unsigned i = 0; i < num_cols; ++i) {
+                data->columns[i+1] = data->columns[i] + col_widths[i];
+            }
+        }
+        data->num_cols = num_cols;
         update_label(w, data);
     }
 }
@@ -235,7 +259,8 @@ update_label(Widget w, WidgetData *data)
             }
 
             /* Get the width of the line */
-            int lwidth = X11_text_width(display, font, label + i, line2);
+            int lwidth = X11_text_width(display, font, label + i, line2,
+                                        data->columns, data->num_cols);
 
             /* Update pixmap dimensions */
             width = max(lwidth, width);
@@ -301,6 +326,7 @@ update_label(Widget w, WidgetData *data)
         if ((attrs & HL_BLINK) && X11_blink) {
             values.foreground = values.background;
         }
+
 #ifdef USE_XFT
         Visual *visual = DefaultVisualOfScreen(screen);
         Colormap cmap = DefaultColormapOfScreen(screen);
@@ -357,7 +383,8 @@ update_label(Widget w, WidgetData *data)
             }
 
             /* Get the width of the line */
-            int lwidth = X11_text_width(display, font, label + i, line2);
+            int lwidth = X11_text_width(display, font, label + i, line2,
+                                        data->columns, data->num_cols);
 
             /* Place the line horizontally */
             int x = 0;
@@ -378,13 +405,38 @@ update_label(Widget w, WidgetData *data)
             /* Render the line */
 #ifdef USE_XFT
             XftDrawRect(draw, &bgcolor, x, y - font->ascent, lwidth, X11_font_height(font));
-            XftDrawString8(draw, &fgcolor, font, x, y,
-                           (const FcChar8 *) (label + i), line2);
 #else
-            XDrawImageString(display, new_pixmap, ggc,
-                             x, y,
-                             label + i, line2);
+            XSetForeground(display, ggc, values.background);
+            XFillRectangle(display, new_pixmap, ggc, x, y - font->ascent, lwidth, X11_font_height(font));
+            XSetForeground(display, ggc, values.foreground);
 #endif
+            size_t j = 0;
+            unsigned col = 0;
+            while (j < line2) {
+                size_t line3;
+                int pos;
+                if (data->num_cols == 0) {
+                    /* Columns not set */
+                    line3 = line2;
+                    pos = 0;
+                } else {
+                    line3 = min(strcspn(label + i + j, "\t\n"), line2);
+                    pos = data->columns[min(col, data->num_cols)];
+                }
+#ifdef USE_XFT
+                XftDrawString8(draw, &fgcolor, font, x + pos, y,
+                               (const FcChar8 *) (label + i + j), line3);
+#else
+                XDrawString(display, new_pixmap, ggc,
+                            x + pos, y,
+                            label + i + j, line3);
+#endif
+                j += line3;
+                if (j < line2) {
+                    ++j;
+                }
+                ++col;
+            }
 
             /* Draw the underline if requested */
             if (attrs & HL_ULINE) {
@@ -488,13 +540,41 @@ free_fonts(Widget w, WidgetData *data)
     }
 }
 
+static int
+X11_text_width(Display *display, X11_Font *font, const char *text, size_t length,
+               const int *columns, unsigned num_cols)
+{
+    if (num_cols == 0) {
+        /* Columns have not been set */
+        return X11_column_width(display, font, text, length);
+    }
+
+    /* Width is the position of the last column, plus the width of the string
+       in the last column */
+
+    unsigned col = 0;
+    size_t i = 0;
+    while (col < num_cols) {
+        size_t len = strcspn(text + i, "\t\n");
+        if (i+len >= length || text[i+len] != '\t') {
+            break;
+        }
+        ++col;
+        i += len + 1;
+    }
+
+    int pos = columns[col] + X11_column_width(display, font, text + i, length - i);
+
+    return pos;
+}
+
 //////////////////////////////////////////////////////////////////////////////
 //             Functions that depend on the font rendering API              //
 //////////////////////////////////////////////////////////////////////////////
 
 #ifdef USE_XFT
-static int
-X11_text_width(Display *display, X11_Font *font, const char *text, size_t length)
+int
+X11_column_width(Display *display, X11_Font *font, const char *text, size_t length)
 {
     XGlyphInfo extents;
     XftTextExtents8(display, font, (const FcChar8*) text, length, &extents);
@@ -507,8 +587,8 @@ X11_font_height(X11_Font *font)
     return max(font->height, font->ascent + font->descent);
 }
 #else /* !USE_XFT */
-static int
-X11_text_width(Display *display, X11_Font *font, const char *text, size_t length)
+int
+X11_column_width(Display *display, X11_Font *font, const char *text, size_t length)
 {
     nhUse(display);
     return XTextWidth(font, text, length);

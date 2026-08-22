@@ -328,7 +328,7 @@ main(int argc, char *argv[])
 static void
 process_options(int argc, char *argv[])
 {
-    char *arg, *origarg;
+    char *arg, *origarg = 0;
     int i, l;
 
     config_error_init(FALSE, "command line", FALSE);
@@ -454,7 +454,7 @@ process_options(int argc, char *argv[])
         }
     }
 
-    if (argc > 1)
+    if (argc > 1 && origarg)
         config_error_add("Unknown option: %.60s", origarg);
 #ifdef MAX_NR_OF_PLAYERS
     /* limit to compile-time limit */
