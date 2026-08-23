@@ -259,11 +259,14 @@ WINCURSESOBJ ?= $(TARGETPFX)cursmain.o $(TARGETPFX)curswins.o \
 WINX11SRC ?= ../win/X11/Window.c ../win/X11/dialogs.c ../win/X11/winX.c \
 	../win/X11/winmap.c  ../win/X11/winmenu.c ../win/X11/winmesg.c \
 	../win/X11/winmisc.c ../win/X11/winstat.c ../win/X11/wintext.c \
-	../win/X11/winval.c ../win/X11/winlabel.c $(GENTILECFILE)
+	../win/X11/winval.c ../win/X11/winlabel.c \
+	../win/share/tileset.c ../win/share/bmptiles.c ../win/share/giftiles.c \
+    $(GENTILECFILE)
 WINX11OBJ ?= $(TARGETPFX)Window.o $(TARGETPFX)dialogs.o $(TARGETPFX)winX.o \
 	$(TARGETPFX)winmap.o $(TARGETPFX)winmenu.o $(TARGETPFX)winmesg.o \
 	$(TARGETPFX)winmisc.o $(TARGETPFX)winstat.o $(TARGETPFX)wintext.o \
-	$(TARGETPFX)winval.o $(TARGETPFX)winlabel.o
+	$(TARGETPFX)winval.o $(TARGETPFX)winlabel.o \
+	$(TARGETPFX)tileset.o $(TARGETPFX)bmptiles.o $(TARGETPFX)giftiles.o
 #
 # Files for a Qt 3 interface (renamed since nethack 3.6.x)
 #
@@ -1101,6 +1104,15 @@ $(TARGETPFX)wintext.o: ../win/X11/wintext.c $(HACK_H) ../include/winX.h \
 	$(TARGET_CC) $(TARGET_CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/wintext.c
 $(TARGETPFX)winval.o: ../win/X11/winval.c $(HACK_H) ../include/winX.h
 	$(TARGET_CC) $(TARGET_CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/winval.c
+$(TARGETPFX)tileset.o: ../win/share/tileset.c $(CONFIG_H) \
+		../include/objclass.h ../include/flag.h ../include/tileset.h
+	$(TARGET_CC) $(TARGET_CFLAGS) $(X11CFLAGS) -c -o $@ ../win/share/tileset.c
+$(TARGETPFX)bmptiles.o: ../win/share/bmptiles.c $(CONFIG_H) \
+		../include/objclass.h ../include/tileset.h
+	$(TARGET_CC) $(TARGET_CFLAGS) $(X11CFLAGS) -c -o $@ ../win/share/bmptiles.c
+$(TARGETPFX)giftiles.o: ../win/share/giftiles.c $(CONFIG_H) \
+		../include/objclass.h ../include/tileset.h
+	$(TARGET_CC) $(TARGET_CFLAGS) $(X11CFLAGS) -c -o $@ ../win/share/giftiles.c
 $(TARGETPFX)wc_chainin.o: ../win/chain/wc_chainin.c $(HACK_H)
 	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/chain/wc_chainin.c
 $(TARGETPFX)wc_chainout.o: ../win/chain/wc_chainout.c $(HACK_H)

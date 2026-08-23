@@ -10,10 +10,15 @@
 #include "flag.h"
 #include "tileset.h"
 
+/* Define this for systems that use the tile-splitting functions */
+#if defined(MSDOS)
+#define USE_TILE_SPLITTING
+#endif
+
 static void get_tile_map(const char *);
+#ifdef USE_TILE_SPLITTING
 static unsigned gcd(unsigned, unsigned);
 static void split_tiles(const struct TileSetImage *);
-static void free_image(struct TileSetImage *);
 
 static struct TileImage *tiles;
 static unsigned num_tiles;
@@ -25,25 +30,57 @@ static struct Pixel palette[256];
 boolean
 read_tiles(const char *filename, boolean true_color)
 {
-    static const unsigned char png_sig[] = {
-        0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A
-    };
     struct TileSetImage image;
-    FILE *fp;
-    char header[16];
-    boolean ok;
 
     if (tiles != NULL)
         return TRUE;
 
+    if (!read_tile_image(&image, filename, true_color)) {
+        return FALSE;
+    }
+
+    /* Save the palette if present */
+    have_palette = image.indexes != NULL;
+    memcpy(palette, image.palette, sizeof(palette));
+
+    /* Set the tile dimensions if the user has not done so */
+    if (iflags.wc_tile_width == 0) {
+        iflags.wc_tile_width = image.tile_width;
+    }
+    if (iflags.wc_tile_height == 0) {
+        iflags.wc_tile_height = image.tile_height;
+    }
+
+    /* Split the image into tiles */
+    split_tiles(&image);
+
+    free_tile_image(&image);
+    return TRUE;
+}
+#endif /* USE_TILE_SPLITTING */
+
+boolean
+read_tile_image(struct TileSetImage *image, const char *filename, boolean true_color)
+{
+    static const unsigned char png_sig[] = {
+        0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A
+    };
+    FILE *fp;
+    char header[16];
+    boolean ok;
+
     /* Fill the image structure with known values */
-    image.width = 0;
-    image.height = 0;
-    image.pixels = NULL;        /* custodial */
-    image.indexes = NULL;       /* custodial */
-    image.image_desc = NULL;    /* custodial */
-    image.tile_width = 0;
-    image.tile_height = 0;
+    image->width = 0;
+    image->height = 0;
+    image->pixels = NULL;       /* custodial, returned */
+    image->indexes = NULL;      /* custodial, returned */
+    image->image_desc = NULL;   /* custodial, returned */
+    image->tile_width = 0;
+    image->tile_height = 0;
+
+    if (filename == NULL || filename[0] == '\0') {
+        filename = "nhtiles.bmp";
+    }
 
     /* Identify the image type */
     fp = fopen(filename, "rb");
@@ -55,12 +92,12 @@ read_tiles(const char *filename, boolean true_color)
 
     /* Call the loader appropriate for the image */
     if (memcmp(header, "BM", 2) == 0) {
-        ok = read_bmp_tiles(filename, &image);
+        ok = read_bmp_tiles(filename, image);
     } else if (memcmp(header, "GIF87a", 6) == 0
            ||  memcmp(header, "GIF89a", 6) == 0) {
-        ok = read_gif_tiles(filename, &image);
+        ok = read_gif_tiles(filename, image);
     } else if (memcmp(header, png_sig, sizeof(png_sig)) == 0) {
-        ok = read_png_tiles(filename, &image);
+        ok = read_png_tiles(filename, image);
     } else {
         ok = FALSE;
     }
@@ -69,44 +106,30 @@ read_tiles(const char *filename, boolean true_color)
 
     /* Reject if the interface cannot handle direct color and the image does
        not use a palette */
-    if (!true_color && image.indexes == NULL)
+    if (!true_color && image->indexes == NULL)
         goto error;
 
-    /* Save the palette if present */
-    have_palette = image.indexes != NULL;
-    memcpy(palette, image.palette, sizeof(palette));
+    /* Parse the tile map */
+    get_tile_map(image->image_desc);
 
     /* Set defaults for tile metadata */
-    if (image.tile_width == 0) {
-        image.tile_width = image.width / 40;
+    if (image->tile_width == 0) {
+        image->tile_width = image->width / 40;
     }
-    if (image.tile_height == 0) {
-        image.tile_height = image.tile_width;
-    }
-    /* Set the tile dimensions if the user has not done so */
-    if (iflags.wc_tile_width == 0) {
-        iflags.wc_tile_width = image.tile_width;
-    }
-    if (iflags.wc_tile_height == 0) {
-        iflags.wc_tile_height = image.tile_height;
+    if (image->tile_height == 0) {
+        image->tile_height = image->tile_width;
     }
 
-    /* Parse the tile map */
-    get_tile_map(image.image_desc);
-
-    /* Split the image into tiles */
-    split_tiles(&image);
-
-    free_image(&image);
     return TRUE;
 
 error:
     if (fp)
         fclose(fp);
-    free_image(&image);
+    free_tile_image(image);
     return FALSE;
 }
 
+#ifdef USE_TILE_SPLITTING
 /* Free tile memory not required by the chosen display mode */
 void
 set_tile_type(boolean true_color)
@@ -134,6 +157,7 @@ get_palette(void)
 {
     return have_palette ? palette : NULL;
 }
+#endif /* USE_TILE_SPLITTING */
 
 /* TODO: derive tile_map from image_desc */
 static void
@@ -142,6 +166,7 @@ get_tile_map(const char *image_desc UNUSED)
     return;
 }
 
+#ifdef USE_TILE_SPLITTING
 void
 free_tiles(void)
 {
@@ -161,9 +186,10 @@ free_tiles(void)
     if (blank_tile.indexes)
         free((genericptr_t) blank_tile.indexes), blank_tile.indexes = NULL;
 }
+#endif /* USE_TILE_SPLITTING */
 
-static void
-free_image(struct TileSetImage *image)
+void
+free_tile_image(struct TileSetImage *image)
 {
     if (image->pixels)
         free((genericptr_t) image->pixels), image->pixels = NULL;
@@ -173,6 +199,7 @@ free_image(struct TileSetImage *image)
         free((genericptr_t) image->image_desc), image->image_desc = NULL;
 }
 
+#ifdef USE_TILE_SPLITTING
 const struct TileImage *
 get_tile(unsigned tile_index)
 {
@@ -292,10 +319,10 @@ split_tiles(const struct TileSetImage *image)
     unsigned x1, y1, y2;
 
     /* Get the number of tiles */
-    tile_rows = image->height / iflags.wc_tile_height;
-    tile_cols = image->width / iflags.wc_tile_width;
+    tile_rows = image->height / image->tile_height;
+    tile_cols = image->width / image->tile_width;
     num_tiles = tile_rows * tile_cols;
-    tile_size = (size_t) iflags.wc_tile_height * (size_t) iflags.wc_tile_width;
+    tile_size = (size_t) image->tile_height * (size_t) image->tile_width;
 
     /* Allocate the tile array */
     tiles = (struct TileImage *) alloc(num_tiles * sizeof(tiles[0]));
@@ -306,31 +333,31 @@ split_tiles(const struct TileSetImage *image)
         for (x1 = 0; x1 < tile_cols; ++x1) {
             struct TileImage *tile = &tiles[y1 * tile_cols + x1];
 
-            tile->width = iflags.wc_tile_width;
-            tile->height = iflags.wc_tile_height;
+            tile->width = image->tile_width;
+            tile->height = image->tile_height;
             tile->pixels = (struct Pixel *)
                     alloc(tile_size * sizeof (struct Pixel));
             if (image->indexes != NULL) {
                 tile->indexes = (unsigned char *) alloc(tile_size);
             }
-            for (y2 = 0; y2 < (unsigned) iflags.wc_tile_height; ++y2) {
-                unsigned y = y1 * iflags.wc_tile_height + y2;
-                unsigned x = x1 * iflags.wc_tile_width;
+            for (y2 = 0; y2 < (unsigned) image->tile_height; ++y2) {
+                unsigned y = y1 * image->tile_height + y2;
+                unsigned x = x1 * image->tile_width;
                 i = y * image->width;
                 j = y2 * tile->width;
                 memcpy(tile->pixels + j, image->pixels + i + x,
-                        sizeof(tile->pixels[0]) * iflags.wc_tile_width);
+                        sizeof(tile->pixels[0]) * image->tile_width);
                 if (image->indexes != NULL) {
                     memcpy(tile->indexes + j, image->indexes + i + x,
-                            iflags.wc_tile_width);
+                            image->tile_width);
                 }
             }
         }
     }
 
     /* Create a blank tile for use when the tile index is invalid */
-    blank_tile.width = iflags.wc_tile_width;
-    blank_tile.height = iflags.wc_tile_height;
+    blank_tile.width = image->tile_width;
+    blank_tile.height = image->tile_height;
     blank_tile.pixels = (struct Pixel *)
             alloc(tile_size * sizeof (struct Pixel));
     for (i = 0; i < tile_size; ++i) {
@@ -344,12 +371,15 @@ split_tiles(const struct TileSetImage *image)
         memset(blank_tile.indexes, 0, tile_size);
     }
 }
+#endif /* USE_TILE_SPLITTING */
 
+#ifndef USE_PNG
 boolean
 read_png_tiles(const char *filename UNUSED, struct TileSetImage *image UNUSED)
 {
     /* stub */
     return FALSE;
 }
+#endif /* !USE_PNG */
 
 #endif /* TILES_IN_GLYPHMAP */

@@ -129,7 +129,6 @@ static XtSignalId X11_sig_id;
 #endif
 
 static void init_menu_nhcolors(struct xwindow *);
-static Boolean nhApproxColor(Screen *, Colormap, char *, XColor *);
 static Boolean nhCvtStringToPixel(Display *, XrmValuePtr, Cardinal *,
                                   XrmValuePtr, XrmValuePtr, XtPointer *);
 static void get_window_frame_extents(Widget, long *, long *, long *, long *);
@@ -460,7 +459,7 @@ static XtConvertArgRec const nhcolorConvertArgs[] = {
  * The approximate color found is returned in color as well.
  * Return True if something close was found.
  */
-static Boolean
+Boolean
 nhApproxColor(
     Screen *screen,    /* screen to use */
     Colormap colormap, /* the colormap to use */
