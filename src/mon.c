@@ -5554,20 +5554,25 @@ maybe_set_terrain_effects(struct monst *mtmp, struct permonst *oldmdat)
     if (is_pool(mtmp->mx, mtmp->my) || Is_waterlevel(&u.uz)
          || is_lava(mtmp->mx, mtmp->my)
          || IS_FOUNTAIN(levl[mtmp->mx][mtmp->my].typ)) {
-
-        /* mtmp is a non-flyer/floater/levitator */
-        if (!is_flyer(mdat)) {
-            changed = (!oldmdat ||
-                       (((is_flyer(oldmdat) != is_flyer(mdat))
-                            || (is_floater(oldmdat) != is_floater(mdat)))
-                           && !(mtmp == u.usteed && (Flying || Levitation))));
+            /* mtmp is a non-flyer/floater/levitator */
+        boolean above_water =
+                    ((is_flyer(mdat) || is_floater(mdat))
+                     && !(mtmp == u.usteed && (Flying || Levitation))),
+                was_above_water =
+                    (oldmdat
+                     && ((is_flyer(oldmdat) || is_floater(oldmdat))
+                         && !(mtmp == u.usteed && (Flying || Levitation))));
+        if (!above_water) {
+                changed = (!oldmdat || (above_water != was_above_water));
             gp.pending_terrain_effects |= nonflyer_vs_liquid;
             mtmp->mstate |= (long) nonflyer_vs_liquid;
         }
 
         /* swimmer/amphibious/breathless to something that is not */
         if (!cant_drown(mdat)) {
-            changed = (!oldmdat || ((cant_drown(oldmdat) != cant_drown(mdat))));
+            if (!changed)
+                changed =
+                    (!oldmdat || ((cant_drown(oldmdat) != cant_drown(mdat))));
             gp.pending_terrain_effects |= candrown_vs_liquid;
             mtmp->mstate |= (long) candrown_vs_liquid;
         }
