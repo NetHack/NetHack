@@ -1571,7 +1571,7 @@ static XtResource resources[] = {
     { nhStr("font_map"), nhStr("Font_map"), XtRString, sizeof(String),
       XtOffset(AppResources *, font_map), XtRString, nhStr("mono-10") },
     { nhStr("font_menu"), nhStr("Font_menu"), XtRString, sizeof(String),
-      XtOffset(AppResources *, font_menu), XtRString, nhStr("mono-10") },
+      XtOffset(AppResources *, font_menu), XtRString, nhStr("sans-10") },
     { nhStr("font_message"), nhStr("Font_message"), XtRString, sizeof(String),
       XtOffset(AppResources *, font_message), XtRString, nhStr("sans-10") },
     { nhStr("font_status"), nhStr("Font_status"), XtRString, sizeof(String),
