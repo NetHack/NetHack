@@ -204,6 +204,11 @@ moveloop_core(void)
             encumber_msg();
 
             svc.context.mon_moving = TRUE;
+            /* call terrain_effects during mon_moving phase */
+            if (gp.pending_terrain_effects) {
+                terrain_effects();
+                gp.pending_terrain_effects = no_terrain_effects;
+            }
             do {
                 monscanmove = movemon();
                 if (u.umovement >= NORMAL_SPEED)

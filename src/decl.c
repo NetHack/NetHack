@@ -637,6 +637,8 @@ static const struct instance_globals_p g_init_p = {
     /* pline.c */
     0U, /* pline_flags */
     UNDEFINED_VALUES, /* prevmsg */
+    /* mon.c */
+    no_terrain_effects, /* pending_terrain_effects */
     /* potion.c */
     UNDEFINED_VALUE, /* potion_nothing */
     UNDEFINED_VALUE, /* potion_unkn */

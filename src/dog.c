@@ -427,6 +427,7 @@ mon_arrive(struct monst *mtmp, int when)
     stairway *stway;
     d_level fromdlev;
 
+    mtmp->mstate &= ~TERRAIN_FALLOUT_MASK;  /* shouldn't be set anyway */
     mtmp->mstate |= MON_STILL_ARRIVING;
     mtmp->nmon = fmon;
     fmon = mtmp;
@@ -905,6 +906,7 @@ migrate_to_level(
     /* prepare to take mtmp off the map */
     num_segs = mon_leave(mtmp);
     /* take off map and move mtmp from fmon list to migrating_mons */
+    mtmp->mstate &= ~TERRAIN_FALLOUT_MASK;
     relmon(mtmp, &gm.migrating_mons); /* mtmp->mx,my retain their value */
     mtmp->mstate |= MON_MIGRATING;
 

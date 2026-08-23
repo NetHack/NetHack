@@ -55,17 +55,23 @@ enum m_ap_types {
     M_AP_MONSTER   = 3  /* a monster; mostly used for cloned Wizard */
 };
 
-#define MON_FLOOR          0x0000
-#define MON_OFFMAP         0x0001
-#define MON_DETACH         0x0002
-#define MON_MIGRATING      0x0004
-#define MON_LIMBO          0x0008
-#define MON_BUBBLEMOVE     0x0010
-#define MON_ENDGAME_FREE   0x0020
-#define MON_ENDGAME_MIGR   0x0040
-#define MON_OBLITERATE     0x0080
-#define MON_STILL_ARRIVING 0x0100
-#define MON_PARKED         0x0200
+#define MON_FLOOR          0x00000000
+#define MON_OFFMAP         0x00000001
+#define MON_DETACH         0x00000002
+#define MON_MIGRATING      0x00000004
+#define MON_LIMBO          0x00000008
+#define MON_BUBBLEMOVE     0x00000010
+#define MON_ENDGAME_FREE   0x00000020
+#define MON_ENDGAME_MIGR   0x00000040
+#define MON_OBLITERATE     0x00000080
+#define MON_STILL_ARRIVING 0x00000100
+#define MON_PARKED         0x00000200
+/* 0x10000000 through 0x40000000 match enum pending_terrain_effects   */
+/*                         0x10000000 */ /* nonflyer_vs_liquid  */
+/*                         0x20000000 */ /* candrown_vs_liquid */
+/*                         0x40000000 */
+#define TERRAIN_FALLOUT_MASK   0x70000000
+
 
 #define M_AP_TYPMASK  0x7
 #define M_AP_F_DKNOWN 0x8
