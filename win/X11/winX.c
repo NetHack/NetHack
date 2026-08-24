@@ -2792,7 +2792,7 @@ init_standard_windows(void)
      * Resize to at most full-screen.
      */
     {
-#define TITLEBAR_SPACE 18 /* Leave SOME screen for window decorations */
+#define TITLEBAR_SPACE 100 /* Leave SOME screen for window decorations and task bar */
 
         int screen_width = WidthOfScreen(XtScreen(wp->w));
         int screen_height = HeightOfScreen(XtScreen(wp->w)) - TITLEBAR_SPACE;
