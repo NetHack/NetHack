@@ -450,10 +450,11 @@ restmonchn(NHFILE *nhfp)
             restpriest(mtmp, ghostly);
         if (mtmp->isgd) {
             /* fixup for new bit MON_PARKED added post 5.0.0 */
-            if (!mtmp->mx
-                && (mtmp->mstate & MON_PARKED) == 0L
-                && (mtmp->mstate & MON_MIGRATING) == 0L)
+            if (!mtmp->mx && (mtmp->mstate & MON_PARKED) == 0L
+                && (mtmp->mstate & MON_MIGRATING) == 0L) {
+                mtmp->mstate &= ~TERRAIN_FALLOUT_MASK;
                 mtmp->mstate |= MON_PARKED;
+            }
         }
 
         if (!ghostly) {
@@ -1210,6 +1211,8 @@ getlev(NHFILE *nhfp, int pid, xint8 lev)
         for (y = 0; y < ROWNO; y++)
             svl.level.monsters[x][y] = (struct monst *) 0;
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+        if ((mtmp->mstate & TERRAIN_FALLOUT_MASK) != 0)
+            gp.pending_terrain_effects |= (mtmp->mstate & TERRAIN_FALLOUT_MASK);
         if (mtmp->isshk)
             set_residency(mtmp, FALSE);
         /* set some monst fields to sane values when coming from a bones file */

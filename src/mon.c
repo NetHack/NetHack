@@ -2790,9 +2790,9 @@ m_detach(
         shkgone(mtmp);
     if (mtmp->wormno)
         wormgone(mtmp);
+    mtmp->mstate &= ~TERRAIN_FALLOUT_MASK;
     if (In_endgame(&u.uz))
         mtmp->mstate |= MON_ENDGAME_FREE;
-
     if ((mtmp->mstate & MON_DETACH) != 0) {
         impossible("m_detach: %s is already detached?",
                    minimal_monnam(mtmp, FALSE));
@@ -3936,6 +3936,7 @@ elemental_clog(struct monst *mon)
         if (mtmp) {
             int mx = mtmp->mx, my = mtmp->my;
 
+            mtmp->mstate &= ~TERRAIN_FALLOUT_MASK;
             mtmp->mstate |= MON_OBLITERATE;
             mongone(mtmp);
             /* places in the code might still reference mtmp->mx, mtmp->my */
@@ -4055,6 +4056,7 @@ mnearto(
            but for the moment it is leaving */
         mon_leaving_level(othermon);
         othermon->mx = othermon->my = 0; /* 'othermon' is not on the map */
+        othermon->mstate &= ~TERRAIN_FALLOUT_MASK;
         othermon->mstate |= MON_OFFMAP;
     }
 
@@ -5493,6 +5495,7 @@ newcham(
     if (!(mtmp->misc_worn_check & W_ARMG))
         mselftouch(mtmp, "No longer petrify-resistant, ",
                    !svc.context.mon_moving);
+    (void) maybe_set_terrain_effects(mtmp, olddata);
     check_gear_next_turn(mtmp);
 
     /* This ought to re-test can_carry() on each item in the inventory
@@ -5539,6 +5542,69 @@ newcham(
     }
 
     return 1;
+}
+
+boolean
+maybe_set_terrain_effects(struct monst *mtmp, struct permonst *oldmdat)
+{
+    struct permonst *mdat = mtmp->data;
+    boolean changed = FALSE;
+
+    /* mtmp is in liquid */
+    if (is_pool(mtmp->mx, mtmp->my) || Is_waterlevel(&u.uz)
+         || is_lava(mtmp->mx, mtmp->my)
+         || IS_FOUNTAIN(levl[mtmp->mx][mtmp->my].typ)) {
+            /* mtmp is a non-flyer/floater/levitator */
+        boolean above_water =
+                    ((is_flyer(mdat) || is_floater(mdat))
+                     && !(mtmp == u.usteed && (Flying || Levitation))),
+                was_above_water =
+                    (oldmdat
+                     && ((is_flyer(oldmdat) || is_floater(oldmdat))
+                         && !(mtmp == u.usteed && (Flying || Levitation))));
+        if (!above_water) {
+                changed = (!oldmdat || (above_water != was_above_water));
+            gp.pending_terrain_effects |= nonflyer_vs_liquid;
+            mtmp->mstate |= (long) nonflyer_vs_liquid;
+        }
+
+        /* swimmer/amphibious/breathless to something that is not */
+        if (!cant_drown(mdat)) {
+            if (!changed)
+                changed =
+                    (!oldmdat || ((cant_drown(oldmdat) != cant_drown(mdat))));
+            gp.pending_terrain_effects |= candrown_vs_liquid;
+            mtmp->mstate |= (long) candrown_vs_liquid;
+        }
+    }
+    /* TODO: handle other terrains that could be harmful to a
+       revived mon or polymorphed mon */
+
+    return changed;
+}
+
+/*
+ * The terrain is what it is, but the monster changed
+ * in some way (polymorphed or newly revived), and has
+ * been flagged as problematic with the terrain.
+ */
+void
+terrain_effects(void)
+{
+    struct monst *mtmp, *mtmp2;
+
+    for (mtmp = fmon; mtmp; mtmp = mtmp2) {
+        mtmp2 = mtmp->nmon;
+        if ((mtmp->mstate & TERRAIN_FALLOUT_MASK) != 0) {
+            /* nonflyer_vs_liquid */
+            if (!DEADMONSTER(mtmp)
+                && ((mtmp->mstate & (long) (nonflyer_vs_liquid | candrown_vs_liquid)) != 0))
+                (void) minliquid(mtmp);
+
+            /* always clear these bits, even if DEADMONSTER */
+            mtmp->mstate &= ~TERRAIN_FALLOUT_MASK;
+        }
+    }
 }
 
 /* sometimes an egg will be special */

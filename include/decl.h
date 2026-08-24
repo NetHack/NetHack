@@ -786,6 +786,9 @@ struct instance_globals_p {
     unsigned pline_flags;
     char prevmsg[BUFSZ];
 
+    /* mon.c */
+    enum mon_terrain_effects pending_terrain_effects;
+
     /* potion.c */
     int potion_nothing;
     int potion_unkn;

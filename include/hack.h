@@ -725,6 +725,14 @@ struct plinemsg_type {
 /* bitmask for callers of hide_unhide_msgtypes() */
 #define MSGTYP_MASK_REP_SHOW ((1 << MSGTYP_NOREP) | (1 << MSGTYP_NOSHOW))
 
+enum mon_terrain_effects {
+    no_terrain_effects = 0x00000000,
+    /* these bit values must be beyond the MON_ ranges in monst.h
+       since they get set on mon->mstate */
+    nonflyer_vs_liquid  = 0x10000000,
+    candrown_vs_liquid = 0x20000000,
+};
+
 /* polyself flags */
 enum polyself_flags {
     POLY_NOFLAGS    = 0x00,

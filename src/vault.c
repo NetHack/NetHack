@@ -164,6 +164,7 @@ parkguard(struct monst *grd)
         newsym(grd->mx, grd->my);
     }
     if (m_at(0, 0) != grd) {
+        grd->mstate &= ~TERRAIN_FALLOUT_MASK;
         grd->mstate |= MON_PARKED;
         place_monster(grd, 0, 0);
     }
