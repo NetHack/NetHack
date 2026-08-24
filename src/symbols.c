@@ -979,8 +979,6 @@ symparse_find(const void *bstr_, const void *rec_)
     return 0;
 }
 
-DISABLE_WARNING_FORMAT_NONLITERAL
-
 /*
  * this is called from options.c to do the symset work.
  */
@@ -994,7 +992,7 @@ do_symset(boolean rogueflag)
     menu_item *symset_pick = (menu_item *) 0;
     boolean ready_to_switch = FALSE,
             nothing_to_do = FALSE;
-    char *symset_name, fmtstr[20];
+    char *symset_name;
     struct symsetentry *sl;
     int res, which_set, setcount = 0, chosen = -2, defindx = 0;
     int clr = NO_COLOR;
@@ -1041,7 +1039,6 @@ do_symset(boolean rogueflag)
             return TRUE;
         }
 
-        Sprintf(fmtstr, "%%-%ds %%s", biggest + 2);
         tmpwin = create_nhwindow(NHW_MENU);
         start_menu(tmpwin, MENU_BEHAVE_STANDARD);
         any = cg.zeroany;
@@ -1072,7 +1069,11 @@ do_symset(boolean rogueflag)
                 any.a_int = sl->idx + 2;
                 if (symset_name && !strcmpi(sl->name, symset_name))
                     defindx = any.a_int;
-                Sprintf(buf, fmtstr, sl->name, sl->desc ? sl->desc : "");
+                if (iflags.menu_tab_sep) {
+                    Sprintf(buf, "%s\t%s", sl->name, sl->desc ? sl->desc : "");
+                } else {
+                    Sprintf(buf, "%-*s %s", biggest + 2, sl->name, sl->desc ? sl->desc : "");
+                }
                 add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
                          ATR_NONE, clr, buf,
                          (any.a_int == defindx) ? MENU_ITEMFLAGS_SELECTED
@@ -1176,7 +1177,5 @@ do_symset(boolean rogueflag)
     preference_update("symset");
     return TRUE;
 }
-
-RESTORE_WARNING_FORMAT_NONLITERAL
 
 /*symbols.c*/

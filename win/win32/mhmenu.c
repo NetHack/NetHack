@@ -684,11 +684,16 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
                 DrawText(hDC, NH_A2W(p1, wbuf, BUFSZ), strlen(p1), &drawRect,
                          DT_CALCRECT | DT_LEFT | DT_VCENTER | DT_EXPANDTABS
                              | DT_SINGLELINE);
-                data->menui.menu.tab_stop_size[column] =
-                    max(data->menui.menu.tab_stop_size[column],
-                        drawRect.right - drawRect.left);
-
-                menuitemwidth += data->menui.menu.tab_stop_size[column];
+                int width = drawRect.right - drawRect.left;
+                /* The last column overhangs any subsequent columns in other
+                   lines */
+                if (p != NULL) {
+                    data->menui.menu.tab_stop_size[column] =
+                        max(data->menui.menu.tab_stop_size[column], width);
+                    menuitemwidth += data->menui.menu.tab_stop_size[column];
+                } else {
+                    menuitemwidth += width;
+                }
 
                 if (p != NULL)
                     *p = '\t';
@@ -1182,7 +1187,8 @@ onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
     p = strchr(item->str, '\t');
     column = 0;
     SetRect(&drawRect, x, lpdis->rcItem.top,
-            min(x + data->menui.menu.tab_stop_size[0], lpdis->rcItem.right),
+            p != NULL ? x + data->menui.menu.tab_stop_size[0]
+                      : lpdis->rcItem.right,
             lpdis->rcItem.bottom);
     for (;;) {
         TCHAR wbuf2[BUFSZ];
@@ -1199,8 +1205,8 @@ onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
         p = strchr(p1, '\t');
         drawRect.left = drawRect.right + TAB_SEPARATION;
         ++column;
-        drawRect.right = min(drawRect.left + data->menui.menu.tab_stop_size[column],
-                             lpdis->rcItem.right);
+        drawRect.right = p != NULL ? drawRect.left + data->menui.menu.tab_stop_size[column]
+                                   : lpdis->rcItem.right;
     }
 
     /* draw focused item */
