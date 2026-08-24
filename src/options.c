@@ -5703,8 +5703,13 @@ handler_disclose(void)
     start_menu(tmpwin, MENU_BEHAVE_STANDARD);
     any = cg.zeroany;
     for (i = 0; i < NUM_DISCLOSURE_OPTIONS; i++) {
-        Sprintf(buf, "%-12s[%c%c]", disclosure_names[i],
-                flags.end_disclose[i], disclosure_options[i]);
+        if (iflags.menu_tab_sep) {
+            Sprintf(buf, "%s\t[%c%c]", disclosure_names[i],
+                    flags.end_disclose[i], disclosure_options[i]);
+        } else {
+            Sprintf(buf, "%-12s[%c%c]", disclosure_names[i],
+                    flags.end_disclose[i], disclosure_options[i]);
+        }
         any.a_int = i + 1;
         add_menu(tmpwin, &nul_glyphinfo, &any, disclosure_options[i],
                  0, ATR_NONE, clr, buf, MENU_ITEMFLAGS_NONE);

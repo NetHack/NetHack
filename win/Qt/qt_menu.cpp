@@ -165,7 +165,7 @@ NetHackQtMenuWindow::NetHackQtMenuWindow(QWidget *parent) :
 {
     // setFont() was in SelectMenu(), in time to be rendered but too late
     // when measuring the width and height that will be needed
-    QFont tablefont(qt_settings->normalFixedFont());
+    QFont tablefont(qt_settings->normalFont());
     table->setFont(tablefont);
 
     QGridLayout *grid = new QGridLayout();
@@ -400,9 +400,8 @@ void NetHackQtMenuWindow::PadMenuColumns(bool split_descr)
                 continue;
             // determine column widths of sub-fields within description
             QStringList columns = itemlist[row].str.split("\t");
-            for (int fld = 0; fld < (int) columns.size(); ++fld) {
-                bool lastcol = (fld == (int) columns.size() - 1);
-                int w = fm.QFM_WIDTH(columns[fld] + (lastcol ? "" : "  "));
+            for (int fld = 0; fld < (int) columns.size() - 1; ++fld) {
+                int w = fm.QFM_WIDTH(columns[fld] + "  ");
                 if (fld >= (int) col_widths.size()) {
                     col_widths.push_back(w); // add another element
                 } else if (col_widths[fld] < w) {
@@ -432,12 +431,21 @@ void NetHackQtMenuWindow::PadMenuColumns(bool split_descr)
             continue;
         QString text = twi->text();
         if (split_descr) {
+            static const QChar u_200A(0x200A); // U+200A HAIR SPACE
             QStringList columns = text.split("\t");
+            int spc0020_width = fm.QFM_WIDTH(" ");
+            int spc200A_width = fm.QFM_WIDTH(u_200A);
+            // Track errors in column widths and adjust subsequent columns so
+            // that these errors do not accumulate across a row
+            int error = 0;
             for (int fld = 0; fld < (int) columns.size() - 1; ++fld) {
                 //columns[fld] += "\t"; /* (used to pad with tabs) */
                 int width = col_widths[fld];
-                while (fm.QFM_WIDTH(columns[fld]) < width)
+                while (fm.QFM_WIDTH(columns[fld]) + error + spc0020_width <= width)
                     columns[fld] += " "; //"\t";
+                while (fm.QFM_WIDTH(columns[fld]) + error + spc200A_width/2 < width)
+                    columns[fld] += u_200A;
+                error += fm.QFM_WIDTH(columns[fld]) - width;
             }
             text = columns.join("");
             twi->setText(text);
