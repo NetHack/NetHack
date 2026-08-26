@@ -358,8 +358,13 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(
 	genderbox->layout()->addWidget(gender[i]);
 	gendergroup->addButton(gender[i], i);
     }
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+    connect(gendergroup, SIGNAL(idClicked(int)),
+            this, SLOT(selectGender(int)));
+#else
     connect(gendergroup, SIGNAL(buttonClicked(int)),
             this, SLOT(selectGender(int)));
+#endif
 
     QLabel *alignlabel = new QLabel("Alignment");
     alignbox->layout()->addWidget(alignlabel);
@@ -369,8 +374,13 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(
 	alignbox->layout()->addWidget(alignment[i]);
 	aligngroup->addButton(alignment[i], i);
     }
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+    connect(aligngroup, SIGNAL(idClicked(int)),
+            this, SLOT(selectAlignment(int)));
+#else
     connect(aligngroup, SIGNAL(buttonClicked(int)),
             this, SLOT(selectAlignment(int)));
+#endif
 
     l->addWidget(rand_btn, 4, 2);
     connect(rand_btn, SIGNAL(clicked()), this, SLOT(Randomize()));
