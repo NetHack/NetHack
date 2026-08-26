@@ -559,7 +559,10 @@ void NetHackQtPlayerSelector::plnamePlayVsQuit()
 // the line edit widget for the name field has received input
 void NetHackQtPlayerSelector::selectName(const QString& n)
 {
-    const char *name_str = n.toLatin1().constData();
+    // the QByteArray has to outlive name_str; calling constData() on
+    // the temporary returned by toLatin1() leaves it dangling
+    QByteArray name_bytes = n.toLatin1();
+    const char *name_str = name_bytes.constData();
     // skip any leading spaces
     // (it would be better to set up a validator that rejects leading spaces)
     while (*name_str == ' ')
