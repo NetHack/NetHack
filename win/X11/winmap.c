@@ -90,6 +90,7 @@ static void set_button_values(Widget, int, int, unsigned);
 static void map_check_size_change(struct xwindow *);
 static void map_update(struct xwindow *, int, int, int, int, boolean);
 static void init_text(struct xwindow *);
+static void report_callback(Widget, XtPointer, XtPointer);
 static void map_exposed(Widget, XtPointer, XtPointer);
 static void set_gc(Widget, Font, const char *, Pixel, GC *, GC *);
 static void map_all_unexplored(struct map_info_t *);
@@ -1420,6 +1421,21 @@ set_button_values(Widget w, int x, int y, unsigned int button)
     click_button = (button == Button1) ? CLICK_1 : CLICK_2;
 }
 
+/* This ensures that the cursor is visible when we first see the map */
+static void
+report_callback(Widget w, XtPointer client_data,
+            XtPointer widget_data)
+{
+    nhUse(w);
+    XawPannerReport *report = (XawPannerReport *) widget_data;
+    if (report->changed & (XawPRSliderWidth | XawPRSliderHeight)) {
+        struct xwindow *wp = (struct xwindow *) client_data;
+        if (wp->map_information != NULL) {
+            check_cursor_visibility(wp);
+        }
+    }
+}
+
 /*
  * Map window expose callback.
  */
@@ -1990,6 +2006,7 @@ create_map_window(
         num_args);         /* number of values to set */
 
     XtAddCallback(map, XtNexposeCallback, map_exposed, (XtPointer) 0);
+    XtAddCallback(viewport, XtNreportCallback, report_callback, wp);
 
     map_info = wp->map_information =
         (struct map_info_t *) alloc(sizeof (struct map_info_t));
