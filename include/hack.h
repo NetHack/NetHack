@@ -1417,10 +1417,10 @@ typedef uint32_t mmflags_nht;     /* makemon MM_ flags */
 #define HEALTHY_TIN (-3)
 
 /* Corpse aging */
-#define INEDIBLE_AGE (50L)        /* age when corpses go bad */
-#define TAINT_AGE (100L)      /* This was the 3.6 value */
+#define INEDIBLE_AGE  (50L)    /* age when corpse becomes unsafe to eat */
+#define TAINT_AGE    (100L)    /* age when corpse becomes tainted */
+#define ROT_AGE      (250L)    /* age when corpse rots away */
 #define TROLL_REVIVE_CHANCE 37 /* 1/37 chance for 50 turns ~ 75% chance */
-#define ROT_AGE (250L)         /* age when corpses rot away */
 
 /* Some misc definitions */
 #define POTION_OCCUPANT_CHANCE(n) (13 + 2 * (n))
