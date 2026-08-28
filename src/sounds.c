@@ -1538,7 +1538,7 @@ tiphat(void)
     return res;
 }
 
-char *sounddir = 0; /* set in files.c */
+char *sounddir = 0;
 
 #ifdef USER_SOUNDS
 
