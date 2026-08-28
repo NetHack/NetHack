@@ -1538,6 +1538,8 @@ tiphat(void)
     return res;
 }
 
+char *sounddir = 0;
+
 #ifdef USER_SOUNDS
 
 typedef struct audio_mapping_rec {
@@ -1551,7 +1553,6 @@ typedef struct audio_mapping_rec {
 static audio_mapping *soundmap = 0;
 static audio_mapping *sound_matches_message(const char *);
 
-char *sounddir = 0; /* set in files.c */
 
 /* adds a sound file mapping, returns 0 on failure, 1 on success */
 int
