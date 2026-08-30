@@ -148,7 +148,7 @@ additional interfaces. See below.
 |          |       |                  | sudo dnf install mkfontscale        |
 |          |       |                  |                                     |
 |----------+-------+------------------+-------------------------------------|
-| Linux    | Qt    | WANT_WIN_QT=1    | Here is one possible way to obtain  |
+| Linux    | Qt    | WANT_WIN_QT6=1   | Here is one possible way to obtain  |
 | (Ubuntu) |       |                  | the required packages:              |
 |          |       |                  |                                     |
 |          |       |                  |sudo apt install qt6-base-dev        |
