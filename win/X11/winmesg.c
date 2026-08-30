@@ -520,16 +520,42 @@ redraw_message_window(struct xwindow *wp)
 
     for (y_base = row = 0, curr = mesg_info->head; row < mesg_info->num_lines;
          row++, y_base += mesg_info->char_height, curr = curr->next) {
-#ifdef USE_XFT
-        if (curr->line != NULL) {
-            XftDrawString8(draw, &fgcolor, font,
-                        mesg_info->char_lbearing, mesg_info->char_ascent + y_base,
-                        (const FcChar8 *) curr->line, curr->str_length);
+        if (curr->line == NULL) {
+            continue;
         }
+        /* Deal with any tabs in the output. These will just be single strings,
+         * not needing to align columns, so just convert to spaces */
+        const char *str = curr->line;
+        int str_length = curr->str_length;
+        char buf[BUFSZ];
+        if (memchr(str, '\t', str_length) != NULL) {
+            int i2 = 0;
+            for (int i1 = 0; i1 < str_length; ++i1) {
+                if (str[i1] == '\t') {
+                    if (i2 + 4 > BUFSZ) {
+                        break;
+                    }
+                    memcpy(buf + i2, "    ", 4);
+                    i2 += 4;
+                } else {
+                    if (i2 >= BUFSZ) {
+                        break;
+                    }
+                    buf[i2++] = str[i1];
+                }
+            }
+            /* buf does not need to be null terminated */
+            str = buf;
+            str_length = i2;
+        }
+#ifdef USE_XFT
+        XftDrawString8(draw, &fgcolor, font,
+                    mesg_info->char_lbearing, mesg_info->char_ascent + y_base,
+                    (const FcChar8 *) str, str_length);
 #else /* !USE_XFT */
         XDrawString(XtDisplay(wp->w), XtWindow(wp->w), mesg_info->gc,
                     mesg_info->char_lbearing, mesg_info->char_ascent + y_base,
-                    curr->line, curr->str_length);
+                    str, str_length);
 #endif /* ?USE_XFT */
         /*
          * This draws a line at the _top_ of the line of text pointed to by
