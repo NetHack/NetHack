@@ -610,9 +610,9 @@ typedef struct WidgetBucket {
     WidgetData *data;
 } WidgetBucket;
 
-#define MAX_WIDGETS 1024
-static WidgetBucket widget_table[MAX_WIDGETS];
-static unsigned num_widgets;
+static WidgetBucket *widget_table = NULL;
+static unsigned num_widgets = 0;
+static unsigned max_widgets = 0;
 
 /* bsearch compare function to search widget-table */
 static int
@@ -653,9 +653,12 @@ get_widget_data(Widget w)
 static WidgetData *
 add_widget(Widget w)
 {
-    /* Panic rather than overflow the array */
-    if (num_widgets >= MAX_WIDGETS) {
-        panic("Widget table is full\n");
+    /* If the array is full (or unallocated), add some new space to it */
+    if (num_widgets >= max_widgets) {
+        max_widgets = num_widgets + 1024;
+        widget_table = (WidgetBucket *) re_alloc(
+                (long *) widget_table,
+                max_widgets * sizeof(widget_table[0]));
     }
 
     /* Insert the widget into the table, maintaining its order */
@@ -688,7 +691,7 @@ delete_widget(Widget w)
 
     /* Remove the widget from the table */
     for (unsigned i = (unsigned)(bucket - widget_table);
-         i + 1 < MAX_WIDGETS;
+         i + 1 < num_widgets;
          ++i) {
         widget_table[i] = widget_table[i+1];
     }
