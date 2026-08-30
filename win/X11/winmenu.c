@@ -1320,12 +1320,10 @@ menu_create_entries(struct xwindow *wp, struct menu *curr_menu)
 
     /* Does any line have a selector? */
     boolean any_canpick = FALSE;
-    if (how != PICK_NONE) {
-        for (curr = curr_menu->base; curr; curr = curr->next) {
-            if (curr->identifier.a_void != NULL) {
-                any_canpick = TRUE;
-                break;
-            }
+    for (curr = curr_menu->base; curr; curr = curr->next) {
+        if (curr->identifier.a_void != NULL) {
+            any_canpick = TRUE;
+            break;
         }
     }
 
@@ -1342,7 +1340,7 @@ menu_create_entries(struct xwindow *wp, struct menu *curr_menu)
         String str = (String) curr->str;
         int attr = ATR_NONE;
         int color = NO_COLOR;
-        boolean canpick = (how != PICK_NONE && curr->identifier.a_void);
+        boolean canpick = curr->identifier.a_void != NULL;
 
         /* Add tabs if needed to align non-selector lines with selector lines */
         if (any_canpick && !canpick) {
