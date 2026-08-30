@@ -54,6 +54,7 @@ enum { font_bold = 1, font_italic = 2 };
 static boolean check_label(Widget);
 static void delete_callback(Widget, XtPointer, XtPointer);
 static void update_label(Widget, WidgetData *);
+static void set_tab_stops(Widget, WidgetData *, const char *);
 static void allocate_font(Widget, WidgetData *, unsigned);
 static void free_fonts(Widget, WidgetData *);
 
@@ -240,6 +241,11 @@ update_label(Widget w, WidgetData *data)
     unsigned attrs = data->attrs;
     if (!sens) {
         attrs |= HL_DIM;
+    }
+
+    /* Set the tab stops if needed */
+    if (data->columns == NULL && strchr(label, '\t') != NULL) {
+        set_tab_stops(w, data, label);
     }
 
     /* Dimensions of pixmap */
@@ -494,6 +500,66 @@ update_label(Widget w, WidgetData *data)
         XFreePixmap(display, data->pixmap);
     }
     data->pixmap = new_pixmap;
+}
+
+/* Set tab stops for text window */
+static void
+set_tab_stops(Widget w, WidgetData *data, const char *label)
+{
+    /* Count columns */
+    unsigned col = 0;
+    unsigned num_cols = 0;
+    size_t i = 0;
+    while (label[i] != '\0') {
+        size_t len = strcspn(label + i, "\t\n");
+        ++col;
+        i += len;
+        if (label[i] != '\t') {
+            /* The last column on its line */
+            num_cols = max(num_cols, col);
+            col = 0;
+        }
+        if (label[i] != '\0') {
+            ++i;
+        }
+    }
+
+    int *columns = (int *) alloc(num_cols * sizeof(columns[0]));
+    memset(columns, 0, num_cols * sizeof(columns[0]));
+
+    /* Determine column sizes */
+    col = 0;
+    i = 0;
+    Display *display = XtDisplay(w);
+    while (label[i] != '\0') {
+        size_t len = strcspn(label + i, "\t\n");
+        if (label[i+len] == '\t') {
+            /* A column from label+i to label+i+len */
+            int width = X11_column_width(display, data->font[0], label + i, len);
+            columns[col] = max(columns[col], width);
+            ++col;
+        } else {
+            /* Last column of the line */
+            /* This does not participate in sizing the column */
+            col = 0;
+        }
+        i += len;
+        if (label[i] != '\0') {
+            ++i;
+        }
+    }
+
+    /* Convert to column positions */
+    int pos = 0;
+    for (unsigned j = 0; j < num_cols; ++j) {
+        int rpos = pos + columns[j];
+        columns[j] = pos;
+        pos = rpos;
+    }
+
+    free(data->columns);
+    data->columns = columns;
+    data->num_cols = num_cols;
 }
 
 /* Allocate a bold or italic font */
