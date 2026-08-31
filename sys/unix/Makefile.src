@@ -153,7 +153,7 @@ SYSOBJ ?= $(TARGETPFX)ioctl.o $(TARGETPFX)unixmain.o $(TARGETPFX)unixtty.o \
 # flags for Linux
 #   compile normally
 # CFLAGS = -O2 -fomit-frame-pointer -I../include
-# LFLAGS = -L/usr/X11R6/lib
+# LFLAGS = -L/usr/lib64
 #   OR compile backwards compatible a.out format
 # CFLAGS = -O2 -b i486-linuxaout -fomit-frame-pointer -I../include
 # LFLAGS = -b i486-linuxaout -L/usr/X11R6/lib
