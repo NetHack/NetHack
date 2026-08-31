@@ -33,3 +33,13 @@ des.monster({ id = "soldier", peaceful = 0 })
 des.monster({ id = "soldier", peaceful = 0 })
 des.monster({ class = "H", peaceful = 0 })
 des.monster({ class = "C", peaceful = 0 })
+-- Ankh-Morpork citizens
+des.monster({ id = "dwarf", peaceful = 1})
+if percent(50) then
+	des.monster({ id = "dwarf", peaceful = 1})
+	des.monster({ id = "dwarf", peaceful = 1})
+end;
+if percent(50) then
+	des.monster({ id = "rock troll", peaceful = 1})
+	des.monster({ id = "rock troll", peaceful = 1})
+end;
