@@ -642,8 +642,10 @@ DATE_O = $(TARGETPFX)date.o
 all:	$(GAME)
 	@echo ""
 
-create_responsefiles:
+../src/nethack_cc.rsp:
 	echo $(CC_COMPILER_SWITCHES) >$(CC_RESPONSEFILE)
+
+../src/nethack_cxx.rsp:
 	echo $(CXX_COMPILER_SWITCHES) >$(CXX_RESPONSEFILE)
 
 pregame: $(RESPONSEFILES)
@@ -752,7 +754,7 @@ qt3tableview.moc: ../win/Qt3/qt3tableview.h
 	$(QTDIR)/bin/moc -o qt3tableview.moc ../win/Qt3/qt3tableview.h
 
 #	build monst.o and objects.o before executing '$(MAKE) makedefs'
-$(MAKEDEFS): $(FIRSTOBJ) \
+$(MAKEDEFS): $(RESPONSEFILES) $(FIRSTOBJ) \
 		../util/makedefs.c ../src/mdlib.c $(CONFIG_H) \
 		../include/permonst.h ../include/monsters.h \
 		../include/objclass.h ../include/objects.h ../include/sym.h \
@@ -770,7 +772,7 @@ $(MAKEDEFS): $(FIRSTOBJ) \
 	@( cd ../util ; $(MAKE) ../include/pm.h )
 #	Created at build time for configurations which support tiles,
 #	but not by makedefs so not connected to the others.
-../src/tile.c: ../win/share/tilemap.c $(HACK_H)
+../src/tile.c: $(RESPONSEFILES) ../win/share/tilemap.c $(HACK_H)
 	@( cd ../util ; $(MAKE) ../src/tile.c )
 
 #
@@ -799,7 +801,7 @@ $(TARGETPFX)date.o: date.c $(GENTILECFILE) $(HACK_H) $(HACKCSRC)  $(HOBJ) $(TARG
 #	Do NOT include ../dat/gitinfo.txt as either a prerequisite or target.
 #	'makedefs -v' processes it when present and ignores it if not.
 #
-../include/date.h: ../util/makedefs $(VERSOURCES) $(HACK_H)
+../include/date.h: $(RESPONSEFILES) ../util/makedefs $(VERSOURCES) $(HACK_H)
 	-$(SHELL) ../sys/unix/gitinfo.sh $(GITINFO) #before 'makedefs -v'
 	../util/makedefs -v
 

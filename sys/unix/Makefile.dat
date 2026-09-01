@@ -95,6 +95,8 @@ GEM_RSC.RSC:
 	# cp ../win/gem/GEM_RSC.RSC GEM_RSC.RSC
 	$(UUDECODE) ../win/gem/gem_rsc.uu
 
+nhdat: $(DATDLB)
+	( LC_ALL=C ; ../util/dlb cf nhdat $(DATDLB) )
 
 data:	data.base ../util/makedefs
 	../util/makedefs -d
