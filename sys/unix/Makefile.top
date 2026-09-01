@@ -278,7 +278,7 @@ check-dlb: options
 
 dlb:
 	( cd util ; $(MAKE) dlb )
-	( cd dat ; LC_ALL=C ; ../util/dlb cf nhdat $(DATDLB) )
+	( cd dat ; $(MAKE) DATDLB="$(DATDLB)" nhdat )
 
 wasm:
 	( cd src ; $(MAKE) CROSS_TO_WASM=1 ../targets/wasm/nethack.js )
