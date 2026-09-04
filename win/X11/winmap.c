@@ -39,6 +39,7 @@
 #include "hack.h"
 #include "dlb.h"
 #include "winX.h"
+#include "tileset.h"
 
 #ifdef USE_XPM
 #include <X11/xpm.h>
@@ -82,15 +83,26 @@ static XFontStruct *X11_get_map_font_struct(struct xwindow *wp);
 #endif
 static void get_text_gc(struct xwindow *, Font);
 static boolean init_tiles(struct xwindow *);
+static unsigned long color_to_rgb(unsigned, unsigned, unsigned,
+                                  const Visual *);
+static unsigned long shift_color(unsigned color, unsigned long mask);
 static void set_button_values(Widget, int, int, unsigned);
 static void map_check_size_change(struct xwindow *);
 static void map_update(struct xwindow *, int, int, int, int, boolean);
 static void init_text(struct xwindow *);
+static void report_callback(Widget, XtPointer, XtPointer);
 static void map_exposed(Widget, XtPointer, XtPointer);
 static void set_gc(Widget, Font, const char *, Pixel, GC *, GC *);
 static void map_all_unexplored(struct map_info_t *);
 static void get_char_info(struct xwindow *);
 static void display_cursor(struct xwindow *);
+
+static boolean read_any_tiles(const char *tile_file);
+#ifdef USE_XPM
+static boolean read_xpm_tiles(const char *tile_file);
+#else
+static boolean read_binary_tiles(const char *tile_file);
+#endif
 
 /* Global functions ======================================================= */
 
@@ -315,22 +327,6 @@ post_process_tiles(void)
 static boolean
 init_tiles(struct xwindow *wp)
 {
-#ifdef USE_XPM
-    XpmAttributes attributes;
-    int errorcode;
-#else
-    FILE *fp = (FILE *) 0;
-    x11_header header;
-    unsigned char *cp, *colormap = (unsigned char *) 0;
-    unsigned char *tb, *tile_bytes = (unsigned char *) 0;
-    int size;
-    XColor *colors = (XColor *) 0;
-    unsigned i;
-    int x, y;
-    int bitmap_pad;
-    int ddepth;
-#endif
-    char buf[BUFSZ];
     Display *dpy = XtDisplay(toplevel);
     Screen *screen = DefaultScreenOfDisplay(dpy);
     struct map_info_t *map_info = (struct map_info_t *) 0;
@@ -339,10 +335,18 @@ init_tiles(struct xwindow *wp)
     boolean result = TRUE;
     XGCValues values;
     XtGCMask mask;
+    const char *tile_file;
 
     /* already have tile information */
     if (tile_pixmap != None)
         goto tiledone;
+
+    /* honor the user's tile file setting */
+    if (iflags.wc_tile_file != NULL && iflags.wc_tile_file[0] != '\0') {
+        tile_file = iflags.wc_tile_file;
+    } else {
+        tile_file = appResources.tile_file;
+    }
 
     map_info = wp->map_information;
     tile_info = &map_info->tile_map;
@@ -350,42 +354,266 @@ init_tiles(struct xwindow *wp)
                   sizeof (struct tile_map_info_t));
 
     /* no tile file name, no tile information */
-    if (!appResources.tile_file[0]) {
+    if (!tile_file[0]) {
         result = FALSE;
         goto tiledone;
     }
 
+    result = read_any_tiles(tile_file);
+    if (!result) {
 #ifdef USE_XPM
+        result = read_xpm_tiles(tile_file);
+    #else
+        result = read_binary_tiles(tile_file);
+#endif
+    }
+
+    if (!result)
+        goto tiledone;
+
+    /* fake an inverted tile by drawing a border around the edges */
+#ifdef USE_WHITE
+    /* use white or black as the border */
+    mask = GCFunction | GCForeground | GCGraphicsExposures;
+    values.graphics_exposures = False;
+    values.foreground = WhitePixelOfScreen(screen);
+    values.function = GXcopy;
+    tile_info->white_gc = XtGetGC(wp->w, mask, &values);
+    values.graphics_exposures = False;
+    values.foreground = BlackPixelOfScreen(screen);
+    values.function = GXcopy;
+    tile_info->black_gc = XtGetGC(wp->w, mask, &values);
+#else
+    /*
+     * Use xor so we don't have to check for special colors.  Xor white
+     * against the upper left pixel of the corridor so that we have a
+     * white rectangle when in a corridor.
+     */
+    mask = GCFunction | GCForeground | GCGraphicsExposures;
+    values.graphics_exposures = False;
+    values.foreground =
+        WhitePixelOfScreen(screen)
+        ^ XGetPixel(tile_image, 0,
+                    tile_height * T_corr);
+    values.function = GXxor;
+    tile_info->white_gc = XtGetGC(wp->w, mask, &values);
+
+    mask = GCFunction | GCGraphicsExposures;
+    values.function = GXCopy;
+    values.graphics_exposures = False;
+    tile_info->black_gc = XtGetGC(wp->w, mask, &values);
+#endif /* USE_WHITE */
+
+ tiledone:
+    if (result) { /* succeeded */
+        tile_info->square_height = tile_height;
+        tile_info->square_width = tile_width;
+        tile_info->square_ascent = 0;
+        tile_info->square_lbearing = 0;
+        tile_info->image_width = image_width;
+        tile_info->image_height = image_height;
+    }
+
+    return result;
+}
+
+static boolean
+read_any_tiles(const char *tile_file)
+{
+    Display *dpy = XtDisplay(toplevel);
+    int ddepth = DefaultDepth(dpy, DefaultScreen(dpy));
+
+    /* Read the image */
+    struct TileSetImage image;
+    boolean result = read_tile_image(&image, tile_file, ddepth >= 15);
+    if (!result) {
+        /* Format not recognized */
+        return FALSE;
+    }
+
+    /* Set the tile dimensions */
+    unsigned image_width = image.width;
+    unsigned image_height = image.height;
+    tile_width = (iflags.wc_tile_width != 0)
+               ? iflags.wc_tile_width
+               : (int) image.tile_width;
+    tile_height = (iflags.wc_tile_height != 0)
+                ? iflags.wc_tile_height
+                : (int) image.tile_height;
+
+    /* Set the tile count */
+    int tile_cols = image.width / tile_width;
+    int tile_rows = image.height / tile_height;
+    tile_count = tile_cols * tile_rows;
+
+    /* Double the size if requested */
+    if (appResources.double_tile_size) {
+        tile_width *= 2;
+        tile_height *= 2;
+        image_height *= 2;
+        image_width *= 2;
+    }
+
+    /* calculate bitmap_pad */
+    int bitmap_pad;
+    if (ddepth > 16)
+        bitmap_pad = 32;
+    else if (ddepth > 8)
+        bitmap_pad = 16;
+    else
+        bitmap_pad = 8;
+
+    /* Convert to XImage */
+    Screen *screen = DefaultScreenOfDisplay(dpy);
+    Visual *visual = DefaultVisualOfScreen(screen);
+    tile_image = XCreateImage(
+            dpy, visual,
+            ddepth,       /* depth */
+            ZPixmap,      /* format */
+            0,            /* offset */
+            (char *) 0,   /* data */
+            image_width,  /* width */
+            image_height, /* height */
+            bitmap_pad,   /* bit pad */
+            0);           /* bytes_per_line */
+
+    if (tile_image == NULL) {
+        X11_raw_print("Failed to allocate XImage");
+        goto tile_error;
+    }
+
+    /* now we know the physical memory requirements, we can allocate space */
+    tile_image->data =
+        (char *) alloc((unsigned) tile_image->bytes_per_line * image_height);
+
+    unsigned char *tile_bytes = image.indexes;
+    XColor colors[256];
+    if (tile_bytes != NULL) { /* tileset uses a palette */
+        size_t size = (size_t) image.width * (size_t) image.height;
+        unsigned num_colors = 0;
+        for (unsigned j = 0; j < size; ++j) {
+            num_colors = max(num_colors, tile_bytes[j] + 1U);
+        }
+        for (unsigned i = 0; i < num_colors; i++) {
+            struct Pixel *cp = &image.palette[i];
+            colors[i].red = cp->r * 256;
+            colors[i].green = cp->g * 256;
+            colors[i].blue = cp->b * 256;
+            colors[i].flags = 0;
+            colors[i].pixel = 0;
+
+            if (!XAllocColor(dpy, DefaultColormapOfScreen(screen), &colors[i])
+                && !nhApproxColor(screen, DefaultColormapOfScreen(screen),
+                                  (char *) 0, &colors[i])) {
+                char buf[BUFSZ];
+                Snprintf(buf, sizeof (buf), "%dth of %u color allocation failed", i,
+                         num_colors);
+                X11_raw_print(buf);
+                goto tile_error;
+            }
+        }
+    }
+
+    /* Convert the pixels */
+    unsigned char *tb = image.indexes;
+    struct Pixel *cp = image.pixels;
+    for (unsigned y = 0; y < image.height; y++) {
+        for (unsigned x = 0; x < image.width; x++) {
+            unsigned long pixel;
+            if (tb == NULL) {
+                pixel = color_to_rgb(cp->r, cp->g, cp->b, visual);
+                ++cp;
+            } else {
+                pixel = colors[*tb++].pixel;
+            }
+            if (appResources.double_tile_size) {
+                XPutPixel(tile_image, x * 2 + 0, y * 2 + 0, pixel);
+                XPutPixel(tile_image, x * 2 + 1, y * 2 + 0, pixel);
+                XPutPixel(tile_image, x * 2 + 0, y * 2 + 1, pixel);
+                XPutPixel(tile_image, x * 2 + 1, y * 2 + 1, pixel);
+            } else {
+                XPutPixel(tile_image, x, y, pixel);
+            }
+        }
+    }
+
+    free_tile_image(&image);
+    return TRUE;
+
+tile_error:
+    free_tile_image(&image);
+    return FALSE;
+}
+
+static unsigned long
+color_to_rgb(unsigned red, unsigned green, unsigned blue, const Visual *visual)
+{
+    return shift_color(red,   visual->red_mask  )
+         | shift_color(green, visual->green_mask)
+         | shift_color(blue,  visual->blue_mask );
+}
+
+static unsigned long
+shift_color(unsigned color, unsigned long mask)
+{
+    unsigned long mask1;
+    unsigned long color1;
+
+    /* Shift color to match mask */
+    mask1 = mask;
+    color1 = color;
+    while (mask1 > 0xFF) {
+        mask1 >>= 1;
+        color1 <<= 1;
+    }
+    while (mask1 < 0x80) {
+        mask1 <<= 1;
+        color1 >>= 1;
+    }
+
+    return mask & color1;
+}
+
+#ifdef USE_XPM
+static boolean
+read_xpm_tiles(const char *tile_file)
+{
+    XpmAttributes attributes;
+    int errorcode;
+
+    char buf[BUFSZ];
+    Display *dpy = XtDisplay(toplevel);
+    unsigned int image_height = 0, image_width = 0;
+
     attributes.valuemask = XpmCloseness;
     attributes.closeness = 25000;
 
-    errorcode = XpmReadFileToImage(dpy, appResources.tile_file, &tile_image,
+    errorcode = XpmReadFileToImage(dpy, tile_file, &tile_image,
                                    0, &attributes);
 
     if (errorcode == XpmColorFailed) {
         Sprintf(buf, "Insufficient colors available to load %s.",
-                appResources.tile_file);
+                tile_file);
         X11_raw_print(buf);
         X11_raw_print("Try closing other colorful applications and restart.");
         X11_raw_print("Attempting to load with inferior colors.");
         attributes.closeness = 50000;
-        errorcode = XpmReadFileToImage(dpy, appResources.tile_file,
+        errorcode = XpmReadFileToImage(dpy, tile_file,
                                        &tile_image, 0, &attributes);
     }
 
     if (errorcode != XpmSuccess) {
         if (errorcode == XpmColorFailed) {
             Sprintf(buf, "Insufficient colors available to load %s.",
-                    appResources.tile_file);
+                    tile_file);
             X11_raw_print(buf);
         } else {
-            Sprintf(buf, "Failed to load %s: %s", appResources.tile_file,
+            Sprintf(buf, "Failed to load %s: %s", tile_file,
                     XpmGetErrorString(errorcode));
             X11_raw_print(buf);
         }
-        result = FALSE;
         X11_raw_print("Switching to text-based mode.");
-        goto tiledone;
+        return FALSE;
     }
 
     /* assume a fixed number of tiles per row */
@@ -393,12 +621,11 @@ init_tiles(struct xwindow *wp)
         || tile_image->width <= TILES_PER_ROW) {
         Sprintf(buf,
                "%s is not a multiple of %d (number of tiles/row) pixels wide",
-                appResources.tile_file, TILES_PER_ROW);
+                tile_file, TILES_PER_ROW);
         X11_raw_print(buf);
         XDestroyImage(tile_image);
         tile_image = 0;
-        result = FALSE;
-        goto tiledone;
+        return FALSE;
     }
 
     /* infer tile dimensions from image size and TILES_PER_ROW */
@@ -411,25 +638,47 @@ init_tiles(struct xwindow *wp)
     }
     tile_width = image_width / TILES_PER_ROW;
     tile_height = image_height / (tile_count / TILES_PER_ROW);
+
+    return TRUE;
+}
+
 #else /* !USE_XPM */
+
+static boolean
+read_binary_tiles(const char *tile_file)
+{
+    FILE *fp = (FILE *) 0;
+    x11_header header;
+    unsigned char *cp, *colormap = (unsigned char *) 0;
+    unsigned char *tb, *tile_bytes = (unsigned char *) 0;
+    int size;
+    XColor *colors = (XColor *) 0;
+    unsigned i;
+    int x, y;
+    int bitmap_pad;
+    int ddepth;
+
+    char buf[BUFSZ];
+    Display *dpy = XtDisplay(toplevel);
+    Screen *screen = DefaultScreenOfDisplay(dpy);
+    unsigned int image_height = 0, image_width = 0;
+    boolean result = FALSE;
+
     /* any less than 16 colours makes tiles useless */
     ddepth = DefaultDepthOfScreen(screen);
     if (ddepth < 4) {
         X11_raw_print("need a screen depth of at least 4");
-        result = FALSE;
         goto tiledone;
     }
 
-    fp = fopen_datafile(appResources.tile_file, RDBMODE, FALSE);
+    fp = fopen_datafile(tile_file, RDBMODE, FALSE);
     if (!fp) {
         X11_raw_print("can't open tile file");
-        result = FALSE;
         goto tiledone;
     }
 
     if ((int) fread((char *) &header, sizeof(header), 1, fp) != 1) {
         X11_raw_print("read of header failed");
-        result = FALSE;
         goto tiledone;
     }
 
@@ -437,7 +686,6 @@ init_tiles(struct xwindow *wp)
         Sprintf(buf, "Wrong tile file version, expected 2, got %lu",
                 header.version);
         X11_raw_print(buf);
-        result = FALSE;
         goto tiledone;
     }
 #ifdef VERBOSE
@@ -453,7 +701,6 @@ ntiles %ld\n",
     colormap = (unsigned char *) alloc((unsigned) size);
     if ((int) fread((char *) colormap, 1, size, fp) != size) {
         X11_raw_print("read of colormap failed");
-        result = FALSE;
         goto tiledone;
     }
 
@@ -472,7 +719,6 @@ ntiles %ld\n",
             Sprintf(buf, "%dth out of %ld color allocation failed", i,
                     header.ncolors);
             X11_raw_print(buf);
-            result = FALSE;
             goto tiledone;
         }
     }
@@ -490,7 +736,6 @@ ntiles %ld\n",
     if ((int) fread((char *) tile_bytes, size, tile_count, fp)
         != tile_count) {
         X11_raw_print("read of tile bytes failed");
-        result = FALSE;
         goto tiledone;
     }
 
@@ -498,7 +743,6 @@ ntiles %ld\n",
         Sprintf(buf, "tile file incomplete, expecting %d tiles, found %lu",
                 total_tiles_used, header.ntiles);
         X11_raw_print(buf);
-        result = FALSE;
         goto tiledone;
     }
 
@@ -534,7 +778,6 @@ ntiles %ld\n",
     if (!tile_image) {
         impossible("init_tiles: insufficient memory to create image");
         X11_raw_print("Resorting to text map.");
-        result = FALSE;
         goto tiledone;
     }
 
@@ -566,47 +809,10 @@ ntiles %ld\n",
             for (x = 0; x < (int) image_width; x++, tb++)
                 XPutPixel(tile_image, x, y, colors[*tb].pixel);
     }
-#endif /* ?USE_XPM */
 
-    /* fake an inverted tile by drawing a border around the edges */
-#ifdef USE_WHITE
-    /* use white or black as the border */
-    mask = GCFunction | GCForeground | GCGraphicsExposures;
-    values.graphics_exposures = False;
-    values.foreground = WhitePixelOfScreen(screen);
-    values.function = GXcopy;
-    tile_info->white_gc = XtGetGC(wp->w, mask, &values);
-    values.graphics_exposures = False;
-    values.foreground = BlackPixelOfScreen(screen);
-    values.function = GXcopy;
-    tile_info->black_gc = XtGetGC(wp->w, mask, &values);
-#else
-    /*
-     * Use xor so we don't have to check for special colors.  Xor white
-     * against the upper left pixel of the corridor so that we have a
-     * white rectangle when in a corridor.
-     */
-    mask = GCFunction | GCForeground | GCGraphicsExposures;
-    values.graphics_exposures = False;
-    values.foreground =
-        WhitePixelOfScreen(screen)
-        ^ XGetPixel(tile_image, 0,
-#if 0
-                    tile_height * glyph2tile[cmap_to_glyph(S_corr)]);
-#else
-                    tile_height * T_corr);
-#endif
-    values.function = GXxor;
-    tile_info->white_gc = XtGetGC(wp->w, mask, &values);
-
-    mask = GCFunction | GCGraphicsExposures;
-    values.function = GXCopy;
-    values.graphics_exposures = False;
-    tile_info->black_gc = XtGetGC(wp->w, mask, &values);
-#endif /* USE_WHITE */
+    result = TRUE;
 
  tiledone:
-#ifndef USE_XPM
     if (fp)
         (void) fclose(fp);
     if (colormap)
@@ -615,19 +821,11 @@ ntiles %ld\n",
         free((genericptr_t) tile_bytes);
     if (colors)
         free((genericptr_t) colors);
-#endif
-
-    if (result) { /* succeeded */
-        tile_info->square_height = tile_height;
-        tile_info->square_width = tile_width;
-        tile_info->square_ascent = 0;
-        tile_info->square_lbearing = 0;
-        tile_info->image_width = image_width;
-        tile_info->image_height = image_height;
-    }
 
     return result;
 }
+
+#endif /* ?USE_XPM */
 
 /*
  * Make sure the map's cursor is always visible.
@@ -1223,6 +1421,21 @@ set_button_values(Widget w, int x, int y, unsigned int button)
     click_button = (button == Button1) ? CLICK_1 : CLICK_2;
 }
 
+/* This ensures that the cursor is visible when we first see the map */
+static void
+report_callback(Widget w, XtPointer client_data,
+            XtPointer widget_data)
+{
+    nhUse(w);
+    XawPannerReport *report = (XawPannerReport *) widget_data;
+    if (report->changed & (XawPRSliderWidth | XawPRSliderHeight)) {
+        struct xwindow *wp = (struct xwindow *) client_data;
+        if (wp->map_information != NULL) {
+            check_cursor_visibility(wp);
+        }
+    }
+}
+
 /*
  * Map window expose callback.
  */
@@ -1793,6 +2006,7 @@ create_map_window(
         num_args);         /* number of values to set */
 
     XtAddCallback(map, XtNexposeCallback, map_exposed, (XtPointer) 0);
+    XtAddCallback(viewport, XtNreportCallback, report_callback, wp);
 
     map_info = wp->map_information =
         (struct map_info_t *) alloc(sizeof (struct map_info_t));
