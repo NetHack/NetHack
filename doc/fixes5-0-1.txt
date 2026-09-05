@@ -88,6 +88,8 @@ upon return to a level, catch up on remaining nutrition value by the same
 after polymorph or revival from corpse, monsters were not interacting with
 	the terrain until that monster's next move
 fix undead corpses (zombies, etc.) now being edible
+alias rings of constitution, strength, and damage, spellbook/scroll of
+	identification
 
 
 Platform- and/or Interface-Specific Fixes
