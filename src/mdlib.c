@@ -588,9 +588,6 @@ static const char *const build_opts[] = {
 #ifdef PREFIXES_IN_USE
     "variable playground",
 #endif
-#ifdef VISION_TABLES
-    "vision tables",
-#endif
 #ifdef SYSCF
     "system configuration at run-time",
 #endif
