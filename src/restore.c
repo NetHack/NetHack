@@ -1219,6 +1219,12 @@ getlev(NHFILE *nhfp, int pid, xint8 lev)
         if (ghostly) {
             mtmp->movement = 0;
         }
+        /* movement is a short; a monster that banked movement points for
+           a long time (5.0.0 steeds could, see "off-map monsters banking
+           turns") can arrive from an older save with a wrapped-around
+           negative value and then be unable to act for hundreds of turns */
+        if (mtmp->movement < 0)
+            mtmp->movement = 0;
         if (mtmp->m_id == u.usteed_mid) {
             /* steed is kept on fmon list but off the map */
             u.usteed = mtmp;
