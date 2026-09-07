@@ -3239,6 +3239,7 @@ traditional_loot(boolean put_in)
     int (*actionfunc)(OBJ_P), (*checkfunc)(OBJ_P);
     struct obj **objlist;
     char selection[MAXOCLASSES + 10]; /* +10: room for B,U,C,X plus slop */
+    char actbuf[QBUFSZ];
     const char *action;
     boolean one_by_one, allflag;
     int used = ECMD_OK, menu_on_request = 0;
@@ -3256,7 +3257,10 @@ traditional_loot(boolean put_in)
         gp.pickup_encumbrance = 0; /* used to limit verbosity */
     }
 
-    if (query_classes(selection, &one_by_one, &allflag, action, *objlist,
+    /* prompt names the container; per-item prompts keep the short verb */
+    (void) safe_qbuf(actbuf, put_in ? "put into " : "take out of ", "",
+                     gc.current_container, doname, ansimpleoname, "it");
+    if (query_classes(selection, &one_by_one, &allflag, actbuf, *objlist,
                       FALSE, &menu_on_request)) {
         if (askchain(objlist, (one_by_one ? (char *) 0 : selection), allflag,
                      actionfunc, checkfunc, 0, action))
@@ -3275,7 +3279,6 @@ menu_loot(int retry, boolean put_in)
     boolean all_categories = TRUE, loot_everything = FALSE, autopick = FALSE;
     char buf[BUFSZ];
     boolean loot_justpicked = FALSE;
-    const char *action = put_in ? "Put in" : "Take out";
     struct obj *otmp, *otmp2;
     menu_item *pick_list;
     int mflags, res;
@@ -3287,7 +3290,11 @@ menu_loot(int retry, boolean put_in)
         all_categories = (retry == -2);
     } else if (flags.menu_style == MENU_FULL) {
         all_categories = FALSE;
-        Sprintf(buf, "%s what type of objects?", action);
+        /* name the container so it's clear what is being loaded/unloaded */
+        (void) safe_qbuf(buf, put_in ? "Put what type of objects into "
+                                     : "Take what type of objects out of ",
+                         "?", gc.current_container, doname, ansimpleoname,
+                         "it");
         mflags = (ALL_TYPES | UNPAID_TYPES | BUCX_TYPES | CHOOSE_ALL
                   | JUSTPICKED );
         n = query_category(buf,
@@ -3365,7 +3372,9 @@ menu_loot(int retry, boolean put_in)
             mflags |= JUSTPICKED;
         if (!put_in)
             gc.current_container->cknown = 1;
-        Sprintf(buf, "%s what?", action);
+        (void) safe_qbuf(buf, put_in ? "Put what into " : "Take what out of ",
+                         "?", gc.current_container, doname, ansimpleoname,
+                         "it");
         n = query_objlist(buf,
                           put_in ? &gi.invent : &(gc.current_container->cobj),
                           mflags, &pick_list, PICK_ANY,
