@@ -311,10 +311,10 @@ endif	# WANT_WIN_X11
 
 ifdef WANT_WIN_QT
 LINK = $(CXX)
-ifdef WANT_WIN_QT5
 ifndef CROSSCOMPILE
 GENTILEOFILE = $(SRCDIR)/tile.o
 endif
+ifdef WANT_WIN_QT5
 # Qt5 requires C++11
 QTCXXFLAGS += $(sort $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig \
 		pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --cflags))
