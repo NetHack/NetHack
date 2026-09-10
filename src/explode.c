@@ -643,10 +643,14 @@ explode(
                 rehumanize();
             } else {
                 if (olet == MON_EXPLODE) {
-                    if (generic) /* explosion was unseen; str=="explosion", */
-                        ; /* svk.killer.name=="gas spore's explosion". */
-                    else if (str != svk.killer.name && str != hallu_buf)
+                    if (generic) {
+                        /* explosion was unseen; str=="explosion", */
+                        /* svk.killer.name=="gas spore's explosion" */
+                        if (!strcmp(str, "explosion"))
+                            Strcpy(svk.killer.name, str);
+                    } else if (str != svk.killer.name && str != hallu_buf) {
                         Strcpy(svk.killer.name, str);
+                    }
                     svk.killer.format = KILLED_BY_AN;
                 } else if (olet == TRAP_EXPLODE) {
                     svk.killer.format = NO_KILLER_PREFIX;
