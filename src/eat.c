@@ -644,19 +644,20 @@ eat_brains(
                 make_stoned(5L, (char *) 0, KILLED_BY_AN,
                             pmname(pd, Mgender(mdef)));
         } else {
-            /* no need to check for poly_when_stoned or Stone_resistance;
-               mind flayers don't have those capabilities */
-            if (visflag && canseemon(magr))
-                pline("%s turns to stone!", Monnam(magr));
-            monstone(magr);
-            if (!DEADMONSTER(magr)) {
-                /* life-saved; don't continue eating the brains */
-                return M_ATTK_MISS;
-            } else {
-                if (magr->mtame && !visflag)
-                    /* parallels mhitm.c's brief_feeling */
-                    You("have a sad thought for a moment, then it passes.");
-                return M_ATTK_AGR_DIED;
+            /* mind flayers can wear yellow dragon scales and gain stone resistance */
+            if (!resists_ston(magr)) {
+                if (visflag && canseemon(magr))
+                    pline("%s turns to stone!", Monnam(magr));
+                monstone(magr);
+                if (!DEADMONSTER(magr)) {
+                    /* life-saved; don't continue eating the brains */
+                    return M_ATTK_MISS;
+                } else {
+                    if (magr->mtame && !visflag)
+                        /* parallels mhitm.c's brief_feeling */
+                        You("have a sad thought for a moment, then it passes.");
+                    return M_ATTK_AGR_DIED;
+                }
             }
         }
     }
