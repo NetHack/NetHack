@@ -390,6 +390,7 @@ extern void nh_XtPopup(Widget, int, Widget);
 extern void nh_XtPopdown(Widget);
 extern void win_X11_init(int);
 extern void find_scrollbars(Widget, Widget, Widget *, Widget *);
+extern Boolean nhApproxColor(Screen *, Colormap, char *, XColor *);
 
 /* ### winmesg.c ### */
 extern void set_message_slider(struct xwindow *);

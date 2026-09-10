@@ -9,6 +9,9 @@ struct Pixel {
     unsigned char r, g, b, a;
 };
 
+/* To let the tileset interface split the tiles into separate images, use
+ * these functions */
+
 struct TileImage {
     /* Image data */
     unsigned width, height;
@@ -22,12 +25,8 @@ void set_tile_type(boolean true_color);
 void free_tiles(void);
 const struct TileImage *get_tile(unsigned tile_index);
 
-/* For resizing tiles */
-struct TileImage *stretch_tile(const struct TileImage *, unsigned,
-                               unsigned);
-void free_tile(struct TileImage *);
+/* To read the tileset as a single image, use these functions */
 
-/* Used internally by the tile set code */
 struct TileSetImage {
     /* Image data */
     unsigned width, height;
@@ -42,6 +41,16 @@ struct TileSetImage {
     unsigned tile_width, tile_height;
 };
 
+boolean read_tile_image(struct TileSetImage *image,
+            const char *filename, boolean true_color);
+void free_tile_image(struct TileSetImage *image);
+
+/* For resizing tiles */
+struct TileImage *stretch_tile(const struct TileImage *, unsigned,
+                               unsigned);
+void free_tile(struct TileImage *);
+
+/* Used internally by the tile set code */
 boolean read_bmp_tiles(const char *filename, struct TileSetImage *image);
 boolean read_gif_tiles(const char *filename, struct TileSetImage *image);
 boolean read_png_tiles(const char *filename, struct TileSetImage *image);

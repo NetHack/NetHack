@@ -170,7 +170,7 @@ display_text_window(struct xwindow *wp, boolean blocking)
     XtSetArg(args[num_args], XtNlabel, text_info->text.text);
     num_args++;
     XtSetValues(wp->w, args, num_args);
-    X11_update_label_if_Xft(wp->w);
+    X11_update_label(wp->w);
 
 #ifdef TRANSIENT_TEXT
     XtRealizeWidget(wp->popup);
@@ -259,7 +259,7 @@ create_text_window(struct xwindow *wp)
                                   form,      /* parent widget */
                                   args,      /* set some values */
                                   num_args); /* number of values to set */
-    X11_wrap_widget_if_Xft(wp->w, NHW_TEXT);
+    X11_wrap_widget(wp->w, NHW_TEXT);
 }
 
 void
