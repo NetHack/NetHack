@@ -542,9 +542,8 @@ savelev_core(NHFILE *nhfp, xint8 lev)
             Sfo_schar(nhfp, &svl.lastseentyp[c][r], "lastseentyp");
         }
     }
-    /* Match getlev()'s monster catch-up guard: copying an inactive level
-       must preserve the time it was last simulated, both when packing a
-       save file and when unpacking it during restore. */
+    /* Preserve idle time when copying levels; match getlev()'s
+       monster catch-up guard. */
     timestamp = (!u.uz.dlevel || program_state.restoring == REST_LEVELS)
                     ? svo.omoves : svm.moves;
     Sfo_long(nhfp, &timestamp, "lev-timestmp");
