@@ -542,8 +542,8 @@ savelev_core(NHFILE *nhfp, xint8 lev)
             Sfo_schar(nhfp, &svl.lastseentyp[c][r], "lastseentyp");
         }
     }
-    /* Preserve idle time when copying levels; match getlev()'s
-       monster catch-up guard. */
+    /* preserve idle time when copying levels; match getlev()'s
+       monster catch-up guard */
     timestamp = (!u.uz.dlevel || program_state.restoring == REST_LEVELS)
                     ? svo.omoves : svm.moves;
     Sfo_long(nhfp, &timestamp, "lev-timestmp");
@@ -602,7 +602,7 @@ savelev_core(NHFILE *nhfp, xint8 lev)
 void
 save_adjust_levelflags(long timestamp)
 {
-    /* Level flags use the same time base as lev-timestmp. */
+    /* use the same time base as lev-timestmp */
     svl.level.flags.stasis_until -= timestamp;
 }
 
