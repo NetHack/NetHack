@@ -422,13 +422,15 @@ fetch-Lua:
 		    CHKSUMS=../submodules/CHKSUMS; \
 		    CHKSUMSTMP=../submodules/CHKSUMS.tmp; \
 		    fgrep $$luafile < $$CHKSUMS > $$CHKSUMSTMP; \
-		    if [ -z $$CHKSUMSTMP ]; then \
+		    if [ ! -s $$CHKSUMSTMP ]; then \
+			rm -f $$CHKSUMSTMP; \
 			echo "Cannot check $$luafile - no checksum known"; \
 			echo "Rerun with 'NOCHKSUM=1' to skip this check"; \
 			exit 1; \
 		    else \
 			echo "Checksum found"; \
 			chksum_or_fail $$luafile; \
+			rm -f $$CHKSUMSTMP; \
 		    fi; \
 		fi; \
                     `: If we can unpack it, we are done.`; \
@@ -436,7 +438,7 @@ fetch-Lua:
 		`: fallthrough to next source `; \
 	    fi; \
 	done; \
-	echo "Unable to find a valid source - STOPPING" \
+	echo "Unable to find a valid source - STOPPING"; \
 	exit 1; \
 	)
 # remove include/nhlua.h in case it was created for some other Lua version
