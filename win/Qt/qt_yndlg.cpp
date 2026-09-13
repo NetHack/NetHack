@@ -292,7 +292,13 @@ char NetHackQtYnDialog::Exec()
 	    bgroup->addButton(button, i);
 	}
 
-        connect(bgroup, SIGNAL(buttonClicked(int)), this, SLOT(doneItem(int)));
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+        connect(bgroup, SIGNAL(idClicked(int)), this,
+                SLOT(doneItem(int)));
+#else
+        connect(bgroup, SIGNAL(buttonClicked(int)), this,
+                SLOT(doneItem(int)));
+#endif
 
         QLabel *lb = 0;
         if (allow_count) {

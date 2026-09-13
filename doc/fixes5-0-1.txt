@@ -338,3 +338,5 @@ switch to using LUA_VERSION_NUM instead of LUA_VERSION_RELEASE_NUM for Lua
 	version checking
 include a set of decals (petmark and pilemark) in win/share/decals.txt
 	and adjust tile processing to include it
+preserve inactive level timestamps across saving and restoring so that
+	monster catch-up, including tameness loss, retains time spent away
