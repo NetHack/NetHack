@@ -90,6 +90,8 @@ after polymorph or revival from corpse, monsters were not interacting with
 fix undead corpses (zombies, etc.) now being edible
 alias rings of constitution, strength, and damage, spellbook/scroll of
 	identification
+pets left on another level no longer have their hunger postponed by the
+	time spent away
 
 
 Platform- and/or Interface-Specific Fixes

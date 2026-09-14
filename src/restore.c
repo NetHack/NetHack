@@ -1246,6 +1246,9 @@ getlev(NHFILE *nhfp, int pid, xint8 lev)
                                   : peace_minded(mtmp->data);
             set_malign(mtmp);
         } else if (elapsed > 0L) {
+            /* restmon() based hunger on now; account for time away */
+            if (has_edog(mtmp))
+                EDOG(mtmp)->hungrytime -= elapsed;
             mon_catchup_elapsed_time(mtmp, elapsed);
         }
         /* update shape-changers in case protection against
