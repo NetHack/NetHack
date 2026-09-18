@@ -29,6 +29,7 @@ staticfn void drop_weapon(int);
 staticfn int armor_to_dragon(int);
 staticfn void newman(void);
 staticfn void polysense(void);
+staticfn void uasmon_light(int);
 
 static const char no_longer_petrify_resistant[] =
     "No longer petrify-resistant, you";
@@ -193,6 +194,27 @@ check_strangling(boolean on)
     }
 }
 
+/* update the hero's light source to match the form set_uasmon() has just
+   installed; 'old_light' is emits_light() for the form being replaced.
+   Every place which changes gy.youmonst.data calls this immediately, so
+   that "the form emits light" and "a light source exists" can never
+   disagree -- not even for the duration of a re-entrant callback. */
+staticfn void
+uasmon_light(int old_light)
+{
+    int new_light = emits_light(gy.youmonst.data);
+
+    if (old_light != new_light) {
+        if (old_light)
+            del_light_source(LS_MONSTER, monst_to_any(&gy.youmonst));
+        if (new_light == 1)
+            ++new_light; /* otherwise it's undetectable */
+        if (new_light)
+            new_light_source(u.ux, u.uy, new_light, LS_MONSTER,
+                             monst_to_any(&gy.youmonst));
+    }
+}
+
 DISABLE_WARNING_FORMAT_NONLITERAL
 
 /* make a (new) human out of the player */
@@ -203,6 +225,7 @@ polyman(const char *fmt, const char *arg)
             was_mimicking = (U_AP_TYPE != M_AP_NOTHING);
     boolean was_blind = !!Blind,
             had_see_invis = !!See_invisible;
+    int old_light = emits_light(gy.youmonst.data);
 
     if (Upolyd) {
         u.acurr = u.macurr; /* restore old attribs */
@@ -211,6 +234,7 @@ polyman(const char *fmt, const char *arg)
         flags.female = u.mfemale;
     }
     set_uasmon();
+    uasmon_light(old_light);
 
     u.mh = u.mhmax = 0;
     u.mtimedone = 0;
@@ -469,7 +493,7 @@ void
 polyself(int psflags)
 {
     char buf[BUFSZ];
-    int old_light, new_light, mntmp, class, tryct, gvariant = NEUTRAL;
+    int mntmp, class, tryct, gvariant = NEUTRAL;
     boolean forcecontrol = ((psflags & POLY_CONTROLLED) != 0),
             low_control = ((psflags & POLY_LOW_CTRL) != 0),
             monsterpoly = ((psflags & POLY_MONSTER) != 0),
@@ -494,7 +518,6 @@ polyself(int psflags)
             return;
         }
     }
-    old_light = emits_light(gy.youmonst.data);
     mntmp = NON_PM;
 
     if (formrevert) {
@@ -578,8 +601,7 @@ polyself(int psflags)
                 /* in wizard mode, picking own role while poly'd reverts to
                    normal without newman()'s chance of level or sex change */
                 rehumanize();
-                old_light = 0; /* rehumanize() extinguishes u-as-mon light */
-                goto made_change;
+                return;
             } else if (iswere && (were_beastie(mntmp) == u.ulycn
                                   || mntmp == counter_were(u.ulycn)
                                   || (Upolyd && mntmp == PM_HUMAN))) {
@@ -692,7 +714,7 @@ polyself(int psflags)
             newman(); /* werecritter */
         else
             (void) polymon(mntmp);
-        goto made_change; /* maybe not, but this is right anyway */
+        return;
     }
 
     if (mntmp < LOW_PM) {
@@ -716,18 +738,6 @@ polyself(int psflags)
         (void) polymon(mntmp);
     }
     gs.sex_change_ok--; /* reset */
-
- made_change:
-    new_light = emits_light(gy.youmonst.data);
-    if (old_light != new_light) {
-        if (old_light)
-            del_light_source(LS_MONSTER, monst_to_any(&gy.youmonst));
-        if (new_light == 1)
-            ++new_light; /* otherwise it's undetectable */
-        if (new_light)
-            new_light_source(u.ux, u.uy, new_light, LS_MONSTER,
-                             monst_to_any(&gy.youmonst));
-    }
 }
 
 /* (try to) make a mntmp monster out of the player; return 1 if successful */
@@ -738,7 +748,7 @@ polymon(int mntmp)
     boolean sticking = sticks(gy.youmonst.data) && u.ustuck && !u.uswallow,
             was_blind = !!Blind, dochange = FALSE, was_expelled = FALSE,
             was_hiding_under = u.uundetected && hides_under(gy.youmonst.data);
-    int mlvl, newMaxStr;
+    int mlvl, newMaxStr, old_light;
 
     if (svm.mvitals[mntmp].mvflags & G_GENOD) { /* allow G_EXTINCT */
         You_feel("rather %s-ish.",
@@ -811,8 +821,10 @@ polymon(int mntmp)
     }
 
     u.mtimedone = rn1(500, 500);
+    old_light = emits_light(gy.youmonst.data);
     u.umonnum = mntmp;
     set_uasmon();
+    uasmon_light(old_light);
 
     /* New stats for monster, to last only as long as polymorphed.
      * Currently only strength gets changed.
@@ -1410,8 +1422,6 @@ rehumanize(void)
      * reverts to human rather than to vampire.
      */
 
-    if (emits_light(gy.youmonst.data))
-        del_light_source(LS_MONSTER, monst_to_any(&gy.youmonst));
     polyman("You return to %s form!", gu.urace.adj);
 
     if (u.uhp < 1) {
