@@ -1288,6 +1288,16 @@ break_armor(void)
             /* Glib manipulation (ends immediately) handled by Gloves_off */
             dropp(otmp);
         }
+        /* drop_weapon() above can release an artifact whose #invoked
+           levitation is keeping the hero up; freeinv() then ends it and
+           float_down() can land the hero in water or lava, whose damage
+           reverts the form through losehp() -> rehumanize().  Every test
+           below asks about 'uptr' -- the form the hero no longer has --
+           so stop here rather than strip a human's gear by a monster's
+           rules.  (Checked at sub-block boundaries so that no item is
+           left half-removed.) */
+        if (gy.youmonst.data != uptr)
+            return;
         if ((otmp = uarms) != 0) {
             You("can no longer hold your shield!");
             (void) Shield_off();
@@ -1302,6 +1312,8 @@ break_armor(void)
             dropp(otmp);
         }
     }
+    if (gy.youmonst.data != uptr)
+        return; /* as above */
     if (nohands(uptr) || verysmall(uptr)
         || slithy(uptr) || uptr->mlet == S_CENTAUR) {
         if ((otmp = uarmf) != 0) {
@@ -1320,6 +1332,9 @@ break_armor(void)
        it/them on (should also come off if head is too tiny or too huge,
        but putting accessories on doesn't reject those cases [yet?]);
        amulet stays worn */
+    if (gy.youmonst.data != uptr)
+        return; /* as above; Boots_off() -> spoteffects() is another
+                   re-entrant boundary */
     if ((otmp = ublindf) != 0 && !has_head(uptr)) {
         int l;
         const char *eyewear = simpleonames(otmp); /* blindfold|towel|lenses */
