@@ -318,8 +318,10 @@ extern int midnight(void);
 
 /* ### cfgfiles.c ### */
 
+#ifndef __cplusplus
 #if !defined(CROSSCOMPILE) || defined(CROSSCOMPILE_TARGET)
 extern int l_get_config_errors(lua_State *) NONNULLARG1;
+#endif
 #endif
 extern int do_write_config_file(void);
 extern boolean parse_config_line(char *) NONNULLARG1;
@@ -2092,6 +2094,8 @@ extern void awaken_soldiers(struct monst *) NONNULLARG1;
 extern int do_play_instrument(struct obj *) NONNULLARG1;
 enum instruments obj_to_instr(struct obj *) NONNULLARG1;
 
+#ifndef __cplusplus
+
 /* ### nhlsel.c ### */
 
 #if !defined(CROSSCOMPILE) || defined(CROSSCOMPILE_TARGET)
@@ -2160,11 +2164,12 @@ extern int get_table_boolean_opt(lua_State *, const char *, int) NONNULLARG12;
 extern int get_table_option(lua_State *, const char *, const char *,
                             const char *const *) NO_NNARGS;
 /* extern int str_lines_max_width(const char *); */
-extern const char *get_lua_version(void);
 extern void nhl_pushhooked_open_table(lua_State *L) NONNULLARG1;
 extern void free_tutorial(void);
 extern void tutorial(boolean);
 #endif /* !CROSSCOMPILE || CROSSCOMPILE_TARGET */
+#endif /* not __cplusplus */
+extern const char *get_lua_version(void);
 
 #endif /* MAKEDEFS_C MDLIB_C CPPREGEX_C */
 
@@ -3066,6 +3071,7 @@ extern enum soundlib_ids soundlib_id_from_opt(char *);
 
 /* ### sp_lev.c ### */
 
+#ifndef __cplusplus
 #if !defined(CROSSCOMPILE) || defined(CROSSCOMPILE_TARGET)
 extern boolean match_maptyps(xint16, xint16);
 extern void create_des_coder(void);
@@ -3106,6 +3112,7 @@ extern void l_register_des(lua_State *) NONNULLARG1;
 extern int get_table_objclass(lua_State *) NONNULLARG1;
 extern int get_table_objtype(lua_State *) NONNULLARG1;
 #endif /* !CROSSCOMPILE || CROSSCOMPILE_TARGET */
+#endif /* not __cplusplus */
 
 /* ### spell.c ### */
 
