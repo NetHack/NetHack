@@ -887,6 +887,18 @@ polymon(int mntmp)
         skinback(FALSE);
     break_armor();
     drop_weapon(1);
+    /* Several of the calls between set_uasmon() above and the end of this
+       function can re-enter code which changes the hero's form again --
+       rehumanize() through losehp(), or another polymon() through
+       petrification.  Once that has happened, everything below is
+       configuring a form the hero no longer has, and worse, it redoes
+       cleanup (encumber_msg(), retouch_equipment()) which the nested
+       change has already performed.  Stop at each such boundary.
+       break_armor() -> Boots_off() -> spoteffects() and drop_weapon()
+       losing an invoked levitation artifact are both documented in the
+       comments of those functions. */
+    if (u.umonnum != mntmp)
+        return 1;
     find_ac(); /* (repeated below) */
     /* if hiding under something and can't hide anymore, unhide now;
        but don't auto-hide when not already hiding-under */
@@ -928,8 +940,9 @@ polymon(int mntmp)
             }
             expels(u.ustuck, u.ustuck->data, expels_mesg);
             was_expelled = TRUE;
-            /* FIXME? if expels() triggered rehumanize then we should
-               return early */
+            /* expels() ends in spoteffects(), which can revert the hero */
+            if (u.umonnum != mntmp)
+                return 1;
         }
 
     /* [note:  this 'sticking' handling is only sufficient for changing from
@@ -963,6 +976,10 @@ polymon(int mntmp)
         if (!can_ride(u.usteed))
             dismount_steed(DISMOUNT_POLY);
     }
+    /* dismount_steed() -> teleds() -> spoteffects(), and instapetrify()
+       above can call polymon() directly */
+    if (u.umonnum != mntmp)
+        return 1;
 
     find_ac();
     if (((!Levitation && !u.ustuck && !Flying && is_pool_or_lava(u.ux, u.uy))
@@ -970,8 +987,8 @@ polymon(int mntmp)
         /* if expelled above, expels() already called spoteffects() */
         && !was_expelled) {
         spoteffects(TRUE);
-        /* FIXME? if spoteffects() triggered rehumanize then we should
-           return early */
+        if (u.umonnum != mntmp)
+            return 1;
     }
     if (Passes_walls && u.utrap
         && (u.utraptype == TT_INFLOOR || u.utraptype == TT_BURIEDBALL)) {
@@ -1022,7 +1039,10 @@ polymon(int mntmp)
     /* this might trigger a recursive call to polymon() [stone golem
        wielding cockatrice corpse and hit by stone-to-flesh, becomes
        flesh golem above, now gets transformed back into stone golem;
-       fortunately neither form uses #monster] */
+       fortunately neither form uses #monster] -- and a cross-aligned
+       artifact blast here can take u.mh below 1 and rehumanize() */
+    if (u.umonnum != mntmp)
+        return 1;
     if (!uarmg)
         selftouch(no_longer_petrify_resistant);
 
