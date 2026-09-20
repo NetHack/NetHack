@@ -1000,7 +1000,7 @@ gd_move(struct monst *grd)
                 gd_letknow(grd);
                 return -1;
             } else {
-                if (!Deaf) {
+                if (!Deaf && mdistu(grd) <= 10*10) {
                     SetVoice(grd, 0, 80, 0);
                     verbalize("Well, begone.");
                 }

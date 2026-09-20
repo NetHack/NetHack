@@ -1605,6 +1605,7 @@ when starting a new game as a monk, newsym(0,0) was being called (adjabil ->
 incorporate a fix to prevent segfault due to rolling boulder trap
 wands of digging generate less often lategame
 more strict checking of dishonourable attacks
+vault guard verbalization shouldn't be heard from too far away
 
 
 Fixes to 5.0.0-x General Problems Exposed Via git Repository
