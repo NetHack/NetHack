@@ -30,6 +30,16 @@ staticfn int armor_to_dragon(int);
 staticfn void newman(void);
 staticfn void polysense(void);
 staticfn void uasmon_light(int);
+static unsigned long uasmon_generation;
+
+/* Every completed semantic hero-form installation gets a distinct serial.
+   Overflow must not make a new generation look like an old one. */
+staticfn void
+note_uasmon_install(void)
+{
+    if (++uasmon_generation == 0UL)
+        panic("hero form generation overflow");
+}
 
 static const char no_longer_petrify_resistant[] =
     "No longer petrify-resistant, you";
@@ -123,6 +133,7 @@ set_uasmon(void)
     if (VIA_WINDOWPORT())
         status_initialize(REASSESS_ONLY);
 #endif
+    note_uasmon_install();
     /* we can reset this now, having just done what it is meant to trigger */
     gw.were_changes = 0L;
 }
@@ -749,6 +760,7 @@ polymon(int mntmp)
             was_blind = !!Blind, dochange = FALSE, was_expelled = FALSE,
             was_hiding_under = u.uundetected && hides_under(gy.youmonst.data);
     int mlvl, newMaxStr, old_light;
+    unsigned long my_generation;
 
     if (svm.mvitals[mntmp].mvflags & G_GENOD) { /* allow G_EXTINCT */
         You_feel("rather %s-ish.",
@@ -825,6 +837,7 @@ polymon(int mntmp)
     u.umonnum = mntmp;
     set_uasmon();
     uasmon_light(old_light);
+    my_generation = uasmon_generation;
 
     /* New stats for monster, to last only as long as polymorphed.
      * Currently only strength gets changed.
@@ -909,7 +922,7 @@ polymon(int mntmp)
        break_armor() -> Boots_off() -> spoteffects() and drop_weapon()
        losing an invoked levitation artifact are both documented in the
        comments of those functions. */
-    if (u.umonnum != mntmp)
+    if (uasmon_generation != my_generation)
         return 1;
     find_ac(); /* (repeated below) */
     /* if hiding under something and can't hide anymore, unhide now;
@@ -953,7 +966,7 @@ polymon(int mntmp)
             expels(u.ustuck, u.ustuck->data, expels_mesg);
             was_expelled = TRUE;
             /* expels() ends in spoteffects(), which can revert the hero */
-            if (u.umonnum != mntmp)
+            if (uasmon_generation != my_generation)
                 return 1;
         }
 
@@ -990,7 +1003,7 @@ polymon(int mntmp)
     }
     /* dismount_steed() -> teleds() -> spoteffects(), and instapetrify()
        above can call polymon() directly */
-    if (u.umonnum != mntmp)
+    if (uasmon_generation != my_generation)
         return 1;
 
     find_ac();
@@ -999,7 +1012,7 @@ polymon(int mntmp)
         /* if expelled above, expels() already called spoteffects() */
         && !was_expelled) {
         spoteffects(TRUE);
-        if (u.umonnum != mntmp)
+        if (uasmon_generation != my_generation)
             return 1;
     }
     if (Passes_walls && u.utrap
@@ -1053,7 +1066,7 @@ polymon(int mntmp)
        flesh golem above, now gets transformed back into stone golem;
        fortunately neither form uses #monster] -- and a cross-aligned
        artifact blast here can take u.mh below 1 and rehumanize() */
-    if (u.umonnum != mntmp)
+    if (uasmon_generation != my_generation)
         return 1;
     if (!uarmg)
         selftouch(no_longer_petrify_resistant);
@@ -1190,6 +1203,7 @@ break_armor(void)
 {
     struct obj *otmp;
     struct permonst *uptr = gy.youmonst.data;
+    unsigned long my_generation = uasmon_generation;
 
     if (breakarm(uptr)) {
         if ((otmp = uarm) != 0) {
@@ -1296,7 +1310,7 @@ break_armor(void)
            so stop here rather than strip a human's gear by a monster's
            rules.  (Checked at sub-block boundaries so that no item is
            left half-removed.) */
-        if (gy.youmonst.data != uptr)
+        if (uasmon_generation != my_generation)
             return;
         if ((otmp = uarms) != 0) {
             You("can no longer hold your shield!");
@@ -1312,7 +1326,7 @@ break_armor(void)
             dropp(otmp);
         }
     }
-    if (gy.youmonst.data != uptr)
+    if (uasmon_generation != my_generation)
         return; /* as above */
     if (nohands(uptr) || verysmall(uptr)
         || slithy(uptr) || uptr->mlet == S_CENTAUR) {
@@ -1332,7 +1346,7 @@ break_armor(void)
        it/them on (should also come off if head is too tiny or too huge,
        but putting accessories on doesn't reject those cases [yet?]);
        amulet stays worn */
-    if (gy.youmonst.data != uptr)
+    if (uasmon_generation != my_generation)
         return; /* as above; Boots_off() -> spoteffects() is another
                    re-entrant boundary */
     if ((otmp = ublindf) != 0 && !has_head(uptr)) {
