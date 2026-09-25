@@ -1573,8 +1573,10 @@ typedef uint32_t mmflags_nht;     /* makemon MM_ flags */
 #define DEVTEAM_EMAIL "devteam@nethack.org"
 #define DEVTEAM_URL "https://www.nethack.org/"
 
+#ifndef __cplusplus
 #if !defined(CROSSCOMPILE) || defined(CROSSCOMPILE_TARGET)
 #include "nhlua.h"
+#endif
 #endif
 
 #if !defined(RECOVER_C)

@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		056E43C62C810EE800FD1F52 /* coloratt.c in Sources */ = {isa = PBXBuildFile; fileRef = 056E43BC2C810EE800FD1F52 /* coloratt.c */; };
 		056E43C72C810EE800FD1F52 /* nhmd4.c in Sources */ = {isa = PBXBuildFile; fileRef = 056E43C02C810EE800FD1F52 /* nhmd4.c */; };
-		056E43C82C810EE800FD1F52 /* Makefile in Sources */ = {isa = PBXBuildFile; fileRef = 056E43BF2C810EE800FD1F52 /* Makefile */; };
 		056E43C92C810EE800FD1F52 /* report.c in Sources */ = {isa = PBXBuildFile; fileRef = 056E43C12C810EE800FD1F52 /* report.c */; };
 		056E43CA2C810EE800FD1F52 /* selvar.c in Sources */ = {isa = PBXBuildFile; fileRef = 056E43C22C810EE800FD1F52 /* selvar.c */; };
 		056E43CB2C810EE800FD1F52 /* calendar.c in Sources */ = {isa = PBXBuildFile; fileRef = 056E43BB2C810EE800FD1F52 /* calendar.c */; };
@@ -166,6 +165,7 @@
 		54BD340D2D8B70350073C484 /* hacklib.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A36421A238040055BD01 /* hacklib.c */; };
 		54FB2B4B246310A600397C0E /* symbols.c in Sources */ = {isa = PBXBuildFile; fileRef = 54FB2B4A246310A600397C0E /* symbols.c */; };
 		54FCE8292223261F00F393C8 /* isaac64.c in Sources */ = {isa = PBXBuildFile; fileRef = 54FCE8282223261F00F393C8 /* isaac64.c */; };
+		872AE36F30642123002F3E28 /* revision.c in Sources */ = {isa = PBXBuildFile; fileRef = 872AE36E30642123002F3E28 /* revision.c */; };
 		BAB57DB527C1C3E200FCF150 /* libnhlua.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BAE8010A27B97760002B3786 /* libnhlua.a */; };
 		BAE8013627B99CAD002B3786 /* lopcodes.c in Sources */ = {isa = PBXBuildFile; fileRef = BAE8011427B99CAB002B3786 /* lopcodes.c */; };
 		BAE8013727B99CAD002B3786 /* linit.c in Sources */ = {isa = PBXBuildFile; fileRef = BAE8011527B99CAB002B3786 /* linit.c */; };
@@ -563,6 +563,7 @@
 		54EBA6D22DDED3F100CD20EC /* cfgfiles.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = cfgfiles.c; path = ../../src/cfgfiles.c; sourceTree = "<absolute>"; };
 		54FB2B4A246310A600397C0E /* symbols.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = symbols.c; path = ../../src/symbols.c; sourceTree = "<group>"; };
 		54FCE8282223261F00F393C8 /* isaac64.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = isaac64.c; path = ../../src/isaac64.c; sourceTree = "<group>"; };
+		872AE36E30642123002F3E28 /* revision.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = revision.c; path = ../../src/revision.c; sourceTree = "<group>"; };
 		BAE8010A27B97760002B3786 /* libnhlua.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libnhlua.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BAE8011427B99CAB002B3786 /* lopcodes.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = lopcodes.c; path = "../../lib/lua-5.4.8/src/lopcodes.c"; sourceTree = "<group>"; };
 		BAE8011527B99CAB002B3786 /* linit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = linit.c; path = "../../lib/lua-5.4.8/src/linit.c"; sourceTree = "<group>"; };
@@ -697,6 +698,7 @@
 		3189576821A1FCC100FB2ABE = {
 			isa = PBXGroup;
 			children = (
+				872AE36E30642123002F3E28 /* revision.c */,
 				F5E1A4CE2FA2F74C0014D115 /* macuuid.m */,
 				F5E66A212F7D4B30000E30B7 /* earlyarg.c */,
 				F50818302F6F564300D2AAFA /* iactions.c */,
@@ -1862,6 +1864,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				872AE36F30642123002F3E28 /* revision.c in Sources */,
 				F5857AA62DED03BB00A8CB4F /* sfbase.c in Sources */,
 				F5857AA42DED032D00A8CB4F /* cfgfiles.c in Sources */,
 				BAE8015A27B9C872002B3786 /* date.c in Sources */,
@@ -1910,7 +1913,6 @@
 				31B8A3C821A238060055BD01 /* options.c in Sources */,
 				056E43C62C810EE800FD1F52 /* coloratt.c in Sources */,
 				056E43C72C810EE800FD1F52 /* nhmd4.c in Sources */,
-				056E43C82C810EE800FD1F52 /* Makefile in Sources */,
 				056E43C92C810EE800FD1F52 /* report.c in Sources */,
 				056E43CA2C810EE800FD1F52 /* selvar.c in Sources */,
 				056E43CB2C810EE800FD1F52 /* calendar.c in Sources */,
@@ -2329,6 +2331,7 @@
 				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
 				OTHER_CFLAGS = (
 					"-Wno-ambiguous-macro",
+					"-Wno-enum-enum-conversion",
 					"-DNOMAIL",
 					"-DDEFAULT_WINDOW_SYS=\\\"tty\\\"",
 					"-DDLB",
@@ -2362,6 +2365,7 @@
 				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
 				OTHER_CFLAGS = (
 					"-Wno-ambiguous-macro",
+					"-Wno-enum-enum-conversion",
 					"-DNOMAIL",
 					"-DDEFAULT_WINDOW_SYS=\\\"tty\\\"",
 					"-DDLB",
