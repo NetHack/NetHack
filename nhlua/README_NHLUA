@@ -1,0 +1,27 @@
+WHAT'S HERE
+    README_NHLUA    this file
+    nhlua          The NetHack source tree for Lua.
+    nhlua-update.sh Update this tree from a release tarball.
+    nhlua-update.sh.tmp	   Do not commit.
+    lua-*.tar.gz    A release tarball.
+                   This is NOT shipped with NetHack; only used when
+                   updating nhlua.  Do not commit.
+    lua-*          Unpacked version of above; only used when updating nhlua.
+
+HOW TO:
+Update to a new version of Lua:
+    Download lua-XXX.tar.gz from https://www.lua.org/download.html
+    Verify the checksum.
+    git checkout WHATEVER-BRANCH
+    cd nhlua
+    ./nhlua-update.sh DOWNLOADPATH/lua-XXX.tar.gz
+
+Add a local change to Lua:
+    Just make it like any other change: clone, new branch, edit in this
+     directory, commit.
+
+Q&A
+    Q: Why isn't this based on the git repo?
+    A: The git repo doesn't include everything that's contained in a release
+       tarball.
+

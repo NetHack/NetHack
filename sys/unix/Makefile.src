@@ -505,11 +505,9 @@ TARGET_HACKLIB ?= $(TARGETPFX)hacklib.a
 MAKEDEFS ?= ../util/makedefs
 
 # -lm required by lua
-LUA_VERSION ?=5.4.8
-LUABASE ?= liblua-$(LUA_VERSION).a
-LUALIB ?= ../lib/lua/$(LUABASE)
+LUATOPLIB = nhlua/lua/src/libnhlua.a
+LUALIB ?= ../nhlua/lua/src/libnhlua.a
 LUALIBS ?= $(LUALIB) -lm $(DLLIB)
-LUAHEADERS ?= lib/lua-$(LUA_VERSION)/src
 
 # timestamp files to reduce `make' overhead and shorten .o dependency lists
 CONFIG_H = ../src/config.h-t
@@ -732,8 +730,8 @@ DUMB.Setup:	../include/extern.h
 	cp ../include/extern.DUMB ../include/extern.h
 	@touch DUMB.Setup
 
-$(LUALIB) ../include/nhlua.h:
-	@( cd .. ; $(MAKE) lua_support )
+$(LUALIB):
+	@( cd .. ; $(MAKE) $(LUATOPLIB) )
 
 #	dependencies for makedefs and its outputs, which the util
 #	Makefile is responsible for keeping up to date
@@ -832,7 +830,6 @@ clean:
 
 spotless: clean
 	-rm -f a.out core $(HACKLIB) $(GAMEBIN) Sys* 
-	-rm -f ../include/nhlua.h
 	-rm -f ../include/date.h #created but no longer used, at least by core
 	-rm -f ../include/onames.h ../include/pm.h #obsolete generated files
 	-rm -f $(GENTILECFILE) *.moc Qt*.h-t
@@ -848,7 +845,7 @@ updatedepend: updatedepend-setup
 	cp Makefile.src ../../src && \
 	make -C ../../src MAKEFILE_NAME=Makefile.src -f Makefile.src depend2 && \
 	mv ../../src/Makefile.src .
-	@rm -f ../$(HACK_H) ../../include/nhlua.h
+	@rm -f ../$(HACK_H)
 
 # check pwd, create bogus derived files
 updatedepend-setup:
@@ -858,15 +855,6 @@ updatedepend-setup:
 		echo "updatedepend must be run in sys/unix"; exit 1; \
 	fi
 	touch ../$(HACK_H)
-	@	# generate bogus files
-	echo "Generating bogus include/nhlua.h"
-	(HFILE=../../include/nhlua.h && \
-	echo '/* bogus nhlua.h for updatedepend ONLY */' > $$HFILE && \
-	echo '#error bogus include/nhlua.h' >> $$HFILE && \
-	echo '#include "../$(LUAHEADERS)/lua.h"' >> $$HFILE && \
-	echo '#include "../$(LUAHEADERS)/lualib.h"' >> $$HFILE && \
-	echo '#include "../$(LUAHEADERS)/lauxlib.h"' >> $$HFILE && \
-	echo '/*nhlua.h*/' >> $$HFILE )
 	@echo "Generating bogus $(GENTILECFILE)"
 	@echo '#error bogus include/nhlua.h' > ../../src/tile.c
 	@echo "#include \"hack.h\"" >> ../../src/tile.c
@@ -892,7 +880,7 @@ depend2:	$(WINQTMOC)
 	@echo '# see make depend above' >> $(MAKEFILE_NAME)
 	- diff Makefile.bak $(MAKEFILE_NAME)
 	@rm -f Makefile.bak
-	@rm -f ../include/nhlua.h $(GENTILECFILE)
+	@rm -f $(GENTILECFILE)
 
 
 # DO NOT DELETE THIS LINE OR CHANGE ANYTHING BEYOND IT

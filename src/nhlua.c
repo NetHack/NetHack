@@ -5,29 +5,14 @@
 #include "hack.h"
 #include "dlb.h"
 
-/* minimum and maximum LUA_VERSION_NUM expected by this version of NetHack */
-#ifndef NHL_MIN_VERSION_NUM_EXPECTED
-#define NHL_MIN_VERSION_NUM_EXPECTED 504
-#endif
-#ifndef NHL_MAX_VERSION_NUM_EXPECTED
+/* Sanity check: sandbox may be version specific.  Minimum and maximum LUA_VERSION_NUM
+ * expected by this version of NetHack. */
+#define NHL_MIN_VERSION_NUM_EXPECTED 505
 #define NHL_MAX_VERSION_NUM_EXPECTED 505
-#endif
-
-#ifndef LUA_VERSION_RELEASE_NUM
-#ifdef NHL_SANDBOX
-#undef NHL_SANDBOX
-#endif
-#endif
 
 #ifdef NHL_SANDBOX
 #include <setjmp.h>
 #endif
-
-/*
-#- include <lua5.3/lua.h>
-#- include <lua5.3/lualib.h>
-#- include <lua5.3/lauxlib.h>
-*/
 
 /*  */
 
@@ -2307,6 +2292,7 @@ lua_State *
 nhl_init(nhl_sandbox_info *sbi)
 {
 #ifdef NHL_SANDBOX
+    /* Sanity check */
 #define SANDBOX_DOESNT_KNOW "sandbox doesn't know this Lua version: "
 if (LUA_VERSION_NUM < NHL_MIN_VERSION_NUM_EXPECTED
     || LUA_VERSION_NUM > NHL_MAX_VERSION_NUM_EXPECTED) {
@@ -2425,50 +2411,15 @@ DISABLE_WARNING_CONDEXPR_IS_CONSTANT
 const char *
 get_lua_version(void)
 {
-    nhl_sandbox_info sbi = { NHL_SB_VERSION, 1 * 1024 * 1024, 0,
-                             1 * 1024 * 1024 };
-
     if (gl.lua_ver[0] == 0) {
-        lua_State *L = nhl_init(&sbi);
-
-        if (L) {
-            size_t len = 0;
-            const char *vs = (const char *) 0;
-
-            /* LUA_VERSION yields "<major>.<minor>" although we check to see
-               whether it is "Lua-<major>.<minor>" and strip prefix if so;
-               LUA_RELEASE is <LUA_VERSION>.<LUA_VERSION_RELEASE> but doesn't
-               get set up as a lua global */
-            lua_getglobal(L, "_RELEASE");
-            if (lua_isstring(L, -1))
-                vs = lua_tolstring(L, -1, &len);
-#ifdef LUA_RELEASE
-            else
-                vs = LUA_RELEASE, len = strlen(vs);
-#endif
-            if (!vs) {
-                lua_getglobal(L, "_VERSION");
-                if (lua_isstring(L, -1))
-                    vs = lua_tolstring(L, -1, &len);
-#ifdef LUA_VERSION
-                else
-                    vs = LUA_VERSION, len = strlen(vs);
-#endif
-            }
-            if (vs && len < sizeof gl.lua_ver) {
-                if (!strncmpi(vs, "Lua", 3)) {
-                    vs += 3;
-                    if (*vs == '-' || *vs == ' ')
-                        vs += 1;
-                }
-                Strcpy(gl.lua_ver, vs);
-            }
-        }
-        nhl_done(L);
-#ifdef LUA_COPYRIGHT
+	nh_snprintf(__func__, __LINE__, gl.lua_ver, sizeof(gl.lua_ver),
+		"%d.%d.%d",
+		LUA_VERSION_MAJOR_N,
+		LUA_VERSION_MINOR_N,
+		LUA_VERSION_RELEASE_N
+	);
         if (sizeof LUA_COPYRIGHT <= sizeof gl.lua_copyright)
             Strcpy(gl.lua_copyright, LUA_COPYRIGHT);
-#endif
     }
     return (const char *) gl.lua_ver;
 }
@@ -3073,19 +3024,13 @@ nhlL_newstate(nhl_sandbox_info *sbi, const char *name)
         nud->sid = ++gl.lua_sid;
     }
 
-    lua_State *L = lua_newstate(nhl_alloc, nud
-#if LUA_VERSION_NUM >= 505
-                               , 0
-#endif
-                               );
+    lua_State *L = lua_newstate(nhl_alloc, nud , 0);
     if (!L)
         panic("NULL lua_newstate");
 
     if(nud) nud->L = L;
     lua_atpanic(L, nhl_panic);
-#if LUA_VERSION_NUM == 504
     lua_setwarnf(L, nhl_warn, L);
-#endif
 
 #ifdef NHL_SANDBOX
     if (nud && (sbi->steps || sbi->perpcall)) {

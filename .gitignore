@@ -29,7 +29,8 @@ core
 .*.swp
 
 # We generate makefiles by shell script
-Makefile
+**/Makefile
+!nhlua/**/Makefile
 
 # Win32-specific ignores
 Debug/

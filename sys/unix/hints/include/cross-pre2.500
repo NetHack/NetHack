@@ -7,18 +7,13 @@
 ifdef BUILD_TARGET_LUA
 #===============-=================================================
 # LUA library
-# Source from http://www.lua.org/ftp/lua-5.4.8.tar.gz
 #=================================================================
-LUA_VERSION ?=5.4.8
-LUATOP ?= ../lib/lua-$(LUA_VERSION)
-LUASRCDIR ?= $(LUATOP)/src
+LUATOP ?= nhlua/lua/src
+LUASRCDIR ?= ../nhlua/lua/src
 LUAOBJFILES1 =  $(TARGETPFX)lapi.o $(TARGETPFX)lauxlib.o \
 		$(TARGETPFX)lbaselib.o $(TARGETPFX)lcode.o \
 		$(TARGETPFX)lcorolib.o $(TARGETPFX)lctype.o \
 		$(TARGETPFX)ldblib.o
-ifeq "$(LUA_VERSION)" "5.3.5"
-LUAOBJFILES1 += $(TARGETPFX)lbitlib.o
-endif
 LUAOBJFILES2 =  $(TARGETPFX)ldebug.o $(TARGETPFX)ldo.o $(TARGETPFX)ldump.o \
 		$(TARGETPFX)lfunc.o $(TARGETPFX)lgc.o $(TARGETPFX)linit.o \
 		$(TARGETPFX)liolib.o $(TARGETPFX)llex.o
@@ -31,7 +26,7 @@ LUAOBJFILES4 =  $(TARGETPFX)lstring.o $(TARGETPFX)lstrlib.o \
 		$(TARGETPFX)ltm.o $(TARGETPFX)lundump.o \
 		$(TARGETPFX)lutf8lib.o $(TARGETPFX)lvm.o $(TARGETPFX)lzio.o
 LUALIBOBJS = $(LUAOBJFILES1) $(LUAOBJFILES2) $(LUAOBJFILES3) $(LUAOBJFILES4)
-LUACROSSLIB = $(TARGETPFX)lua$(subst .,,$(LUA_VERSION)).a
+LUACROSSLIB = $(TARGETPFX)lua.a
 LUAINCL  = -I$(LUASRCDIR)
 override BUILDMORE += $(LUACROSSLIB)
 override CLEANMORE += rm -f $(LUACROSSLIB) ;
@@ -200,7 +195,7 @@ else ifdef NO_TILES
 else
     MSDOS_GRAPH_CONFIG = -DTILES_IN_GLYPHMAP
 endif
-MSDOS_TARGET_CFLAGS = -c -O $(DBGFLAGS) -I../include -I../sys/msdos -I../win/share \
+MSDOS_TARGET_CFLAGS = -c -O $(DBGFLAGS) -I../include -I../nhlua/lua/src -I../sys/msdos -I../win/share \
 	$(LUAINCL) -DDLB $(PDCURSESDEF) $(MSDOS_GRAPH_CONFIG) \
 	-DCROSSCOMPILE -DCROSSCOMPILE_TARGET -DCROSS_TO_MSDOS \
 	-D_NAIVE_DOS_REGS \
@@ -226,7 +221,7 @@ FONTTARGETS = $(DOSFONT)/ter-u16b.psf $(DOSFONT)/ter-u16v.psf \
 		$(DOSFONT)/ter-u22b.psf $(DOSFONT)/ter-u24b.psf \
 		$(DOSFONT)/ter-u28b.psf $(DOSFONT)/ter-u32b.psf
 endif
-LUABIN = ../lib/lua-$(LUA_VERSION)/src/lua
+LUABIN = ../nhlua/lua/src/nhlua
 LUA_TARGET_CFLAGS = $(MSDOS_TARGET_CFLAGS)
 override TARGET_CFLAGS = $(MSDOS_TARGET_CFLAGS) $(MSDOS_PEDANTIC)
 override TARGET_CXXFLAGS = $(MSDOS_TARGET_CXXFLAGS)
@@ -374,7 +369,7 @@ WASM_CFLAGS += -Wshadow
 WASM_CFLAGS += $(WINCFLAGS)   #WINCFLAGS set from multiw-2.500
 WASM_CFLAGS += -DSYSCF -DSYSCF_FILE=\"/sysconf\" -DSECURE -DNHUUID
 #WASM_CFLAGS += -g -I../include
-WASM_CFLAGS += -I../include
+WASM_CFLAGS += -I../include -I../nhlua/lua/src
 # NetHack sources control
 WASM_CFLAGS += -DDLB
 WASM_CFLAGS += -DHACKDIR=\"$(HACKDIR)\"
@@ -456,7 +451,7 @@ override TARGET_CXX = CXX=mipsel-linux-gnu-g++
 override TARGET_AR = mipsel-linux-gnu-ar
 MIPS_TARGET = $(TARGETPFX)nethack
 #override TARGET_LINK = mipsel-linux-gnu-ld
-MIPS_TARGET_CFLAGS = -c -O -I../include -I../sys/unix -I../win/share \
+MIPS_TARGET_CFLAGS = -c -O -I../include -I../nhlua/lua/src -I../sys/unix -I../win/share \
 	$(LUAINCL) -DDLB \
 	-DCROSSCOMPILE -DCROSSCOMPILE_TARGET \
 	-DCROSS_TO_MIPS \
@@ -538,7 +533,7 @@ override TARGET_AR = $(TOOLTOP)/m68k-amigaos-ar
 override TARGET_STUBEDIT=
 override TARGET_CFLAGS = -c -O2 -noixemul $(TOOLARCH) \
 	-include sys/types.h \
-	-I../include \
+	-I../include -I../nhlua/lua/src \
 	-I../sys/amiga -I../win/share \
 	$(LUAINCL) -DAMIGA -DNOTTYGRAPHICS -DNO_TERMS -DNO_SIGNAL \
 	-DTILES_IN_GLYPHMAP $(PDCURSESDEF) \
@@ -615,7 +610,7 @@ endif  # CROSS_SHARED
 
 ifdef BUILD_TARGET_LUA
 # Rule for LUA files
-$(TARGETPFX)%.o : $(LUATOP)/src/%.c
+$(TARGETPFX)%.o : $(LUASRCDIR)/%.c
 	$(TARGET_CC) $(LUA_TARGET_CFLAGS) -c $(LUA_FLAGS) -o$@ $<
 endif  # BUILD_TARGET_LUA
 #

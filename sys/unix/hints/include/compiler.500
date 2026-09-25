@@ -12,6 +12,8 @@ CCFLAGS = -g
 #	rules for compiling C code; specifying a value for that on the
 #	'make' command line should be avoided.
 
+# Be able to find the Lua includes
+CCFLAGS += -I../nhlua/lua/src
 ifdef CPLUSPLUS_NEEDED
 CCXXFLAGS = -g -I../include
 endif
@@ -137,6 +139,7 @@ endif  # clang-specific ends here
 
 ifdef MAKEFILE_SRC
 ifdef CPLUSPLUS_NEEDED
+CCXXFLAGS = -g -I../include -I../nhlua/lua/src
 CCXXFLAGS+=-Wall -Wextra -Wno-missing-field-initializers \
         -Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wwrite-strings
 CCXXFLAGS+=-pedantic

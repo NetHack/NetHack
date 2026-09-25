@@ -36,8 +36,6 @@ WINCHAIN=[-.win.chain]
 
 # Lua
 LUAVER=548
-LUADOTVER=5.4.8
-LUAUNDERVER=5_4_8
 # Lua location relative to src
 LUAINC=[-.lib.lua.lua$(LUAVER).src]
 LUALIB=[-.lib.lua]lua$(LUAVER).olb
@@ -286,7 +284,6 @@ SPOTLESSFILES    = $(addsuffix ;*$(comma), $(LUASPOTLESSOBJS) \
 
 # targets
 .PHONY: SysVMS all pregame $(GAME) clean spotless package
-.PHONY: tell-fetch-lua fetch-lua
 
 # first target is also the default target for 'make' without any arguments
 all:	$(GAME)
@@ -387,25 +384,6 @@ luaplaceholder.c:
 
 [-]lib.dir:
 	create/directory [-.lib]
-
-[-.lib.lua]lua$(LUAVER).dir:
-	@echo You need to make fetch-lua
-	false
-
-fetch-lua: [-]lib.dir [-.lib]lua.dir
-	if f$$search("[-.lib.lua]lua$(LUAVER).tgz").eqs."" then \
-	curl http://www.lua.org/ftp/lua-$(LUADOTVER).tar.gz \
-		--output [-.lib.lua]lua$(LUAVER).tgz
-	if f$$search("[-.lib.lua]lua$(LUAVER).tgz").nes."" then \
-		gzip --force -d [-.lib.lua]lua$(LUAVER).tgz
-	if f$$search("[-.lib.lua]lua$(LUAVER).tar").nes."" then \
-		pipe set def [-.lib.lua] && \
-		     tar -xf lua$(LUAVER).tar && \
-		     set def [--.src]
-	if (f$$search("[-.lib.lua]lua-$(LUAUNDERVER).DIR;1").nes."" \
-		.AND. f$$search("[-.lib.lua]lua$(LUAVER).dir;1").eqs."") then \
-	  rename [-.lib.lua]lua-$(LUAUNDERVER).DIR;1 \
-		 [-.lib.lua]lua$(LUAVER).dir;1
 
 tile.c: $(WINSHR)tilemap.c $(HACK_H)
 	@( cd $(UTIL) ; $(MAKE) $(SRC)tile.c )

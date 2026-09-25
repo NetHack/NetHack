@@ -81,7 +81,6 @@ Cross-compilation from Linux using bebbo's m68k-amigaos-gcc toolchain
     # Clone NetHack 5.0 source
     cd NetHack
     sys/unix/setup.sh sys/unix/hints/linux.500
-    make fetch-lua
     make CROSS_TO_AMIGA=1 fetch-regex
     make CROSS_TO_AMIGA=1 all
     make CROSS_TO_AMIGA=1 package

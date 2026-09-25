@@ -21,7 +21,6 @@ WHICH_OS=macOS
 HINTSVERSION := 500
 
 ifdef MAKEFILE_TOP
-LUA_VERSION=5.4.8
 ifeq ($(MAKELEVEL),0)
 PRECHECK+=checkmakefiles
 # all files included from this hints file get listed
@@ -379,7 +378,7 @@ endif
 endif  # WANT_LIBNH
 
 # Lua
-# when building liblua.a, avoid warning that use of tmpnam() should be
+# when building libnhlua.a, avoid warning that use of tmpnam() should be
 # replaced by mkstemp(); the lua code doesn't use nethack's config.h so
 # this needs to be passed via make rather than defined in unixconf.h
 ifdef GITSUBMODULES
@@ -561,7 +560,7 @@ ifdef WANT_LIBNH
 # Build libnh.a by merging the engine objects, the shim windowport,
 # date.o (separate from $(HOBJ) per Makefile.src), hacklib.a, and Lua's
 # static archive.  Use libtool -static rather than ar so hacklib.a and
-# liblua-$(LUA_VERSION).a have their members merged in -- ar would archive
+# libnhlua.a have their members merged in -- ar would archive
 # them as opaque .a members and macOS ld can't dereference those.
 # Depending on $(LUALIB) triggers the lua_support build (which generates
 # include/nhlua.h); without it, $(HOBJ) won't compile.

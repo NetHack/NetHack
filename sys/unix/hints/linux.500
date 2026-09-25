@@ -18,7 +18,6 @@ WHICH_OS=Linux
 HINTSVERSION := 500
 
 ifdef MAKEFILE_TOP
-LUA_VERSION=5.4.8
 ifeq ($(MAKELEVEL),0)
 PRECHECK+=checkmakefiles
 # all files included from this hints file get listed
@@ -87,11 +86,6 @@ endif   # WANT_WIN_QT6
 #-INCLUDE compiler.500
 
 ifdef WANT_SYSTEM_LUA
-ifndef LUA_VERSION
-LUA_VERSION := 5.4.8
-endif
-LUASUBDELIM := $(subst ., ,$(LUA_VERSION))
-LUASHVER := $(word 1, $(LUASUBDELIM)).$(word 2, $(LUASUBDELIM))
 
 ifeq ($(LINUX_DISTRO),alpine)
 # prereq: doas apk add lua5.4-dev
@@ -160,27 +154,23 @@ $(info Existance of package $(LUAPKGNAME) verified)
 ifeq ($(LINUX_DISTRO),fedora)
 LUACFLAGS := $(shell pkg-config --cflags lua-$(LUASHVER))
 LUALIBS := $(shell pkg-config --libs lua-$(LUASHVER))
-LUAHEADERS := /usr/include/lua$(LUASHVER)
+LUAHEADERS := $(NHSROOT)/nhlua/lua/src
 LUATESTTARGET := $(LUAHEADERS)/lua.h
 #
 else ifeq ($(LINUX_DISTRO),ubuntu)
-LUACFLAGS := -I/usr/include/lua$(LUASHVER)
+LUACFLAGS := -I$(NHSROOT)/nhlua/lua/src
 LUALIBS := -llua$(LUASHVER) -lm -ldl
-LUAHEADERS := /usr/include/lua$(LUASHVER)
+LUAHEADERS := $(NHSROOT)/nhlua/lua/src
 LUATESTTARGET := $(LUAHEADERS)/lua.h
 #
 else ifeq ($(SHELLPKG),pkg-config)
 LUACFLAGS := $(shell pkg-config --cflags lua-$(LUASHVER))
 LUALIBS := $(shell pkg-config --libs lua-$(LUASHVER))
-LUAHEADERS := /usr/include/lua$(LUASHVER)
+LUAHEADERS := $(NHSROOT)/nhlua/lua/src
 LUATESTTARGET := $(LUAHEADERS)/lua.h
 endif
 #
 LUAHPREFIX=
-#LUATOP=
-#LUAMAKEFLAGS=
-#LUA2NHTOP=
-#LUABASELIB=
 LUATOPLIB=
 LUALIBBUILT=
 LUALIB=
@@ -599,8 +589,8 @@ endif
 endif
 
 ifdef WANT_LIBNH
-$(TARGETPFX)libnh.a: $(HOBJ) $(LIBNHSYSOBJ) ../lib/lua/liblua-$(LUA_VERSION).a
-	$(AR) rcs $@ $(HOBJ) $(LIBNHSYSOBJ) ../lib/lua/liblua-$(LUA_VERSION).a
+$(TARGETPFX)libnh.a: $(HOBJ) $(LIBNHSYSOBJ) ../lib/lua/liblua.a
+	$(AR) rcs $@ $(HOBJ) $(LIBNHSYSOBJ) ../lib/lua/liblua.a
 	@echo "$@ built."
 $(TARGETPFX)libnhmain.o : ../sys/libnh/libnhmain.c $(HACK_H)
 	$(CC) $(CFLAGS) -c -o$@ $<

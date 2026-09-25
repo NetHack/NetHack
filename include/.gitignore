@@ -1,5 +1,3 @@
-# generated at build time so not managed by git
-nhlua.h
 # obsolete but still built by 'makedefs' in conjunction with dat/options for
 # potential use by old port-specific code that isn't being actively maintained
 date.h

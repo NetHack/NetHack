@@ -110,7 +110,7 @@ SRCDIR = $(NHSROOT)/src
 #fallback defaults if not set
 CFLAGS ?= -I../include
 
-# -lm required by lua
+# -lm required by Lua
 LFLAGS += -lm
 
 # we specify C preprocessor flags via CFLAGS; files built with default rules
@@ -603,8 +603,6 @@ $(OBJDIR)/dlb.o: $(CCRESP) ../src/dlb.c $(CONFIG_H) ../include/dlb.h
 # this differs substantially from what Makefile.src specifies
 $(OBJDIR)/date.o: $(CCRESP) ../src/date.c $(CONFIG_H)
 	$(CC) $(CFLAGS) $(CSTD) -c ../src/date.c -o $@
-../include/nhlua.h:
-	@( cd .. ; $(MAKE) lua_support )
 # make sure hack.h dependencies get transitive information
 $(HACK_H): $(CONFIG_H)
 	@( cd ../src ; $(MAKE) $(HACK_H) )
