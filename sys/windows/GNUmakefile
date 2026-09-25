@@ -188,7 +188,7 @@ endif
 #==============================================================================
 
 #  The version of the game this Makefile was designed for
-NETHACK_VERSION="5.0.0"
+NETHACK_VERSION="5.0.1"
 
 # A brief version for use in macros
 NHV1=$(subst .,,$(NETHACK_VERSION))
@@ -316,7 +316,8 @@ endif
 
 ifeq "$(GCC_EXTRA_WARNINGS)" "Y"
 #
-# These match the warnings enabled on the linux.500 and macOS.500 hints builds
+# These match the warnings enabled on the linux.501 and macOS.501 hints builds,
+# or at lease they did at time of writing this.
 #
 CFLAGSXTRA = -Wall -Wextra -Wreturn-type -Wunused -Wswitch -Wshadow \
 	     -Wwrite-strings -pedantic -Wmissing-declarations \

@@ -1,4 +1,3 @@
-#
 # NetHack 5.0 unix $NHDT-Date: 1778708083 2026/05/13 21:34:43 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.0 $
 # Copyright 2026 by Anthony C Howe.
 # NetHack may be freely redistributed.  See license for details.
@@ -15,7 +14,7 @@
 #
 # note: '#-INCLUDE' is not just a comment. setup.sh inserts the contents of
 #       a file found in sys/unix/hints/include
-#-INCLUDE whichbsd.500
+#-INCLUDE whichbsd.501
 
 PREFIX=/usr/local
 

@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------
-# NetHack 5.0  compiler.500 $NHDT-Date: 1668359835 2022/11/13 17:17:15 $  $NHDT-Branch: NetHack-5.0 $
+# NetHack 5.0  compiler $NHDT-Date: 1668359835 2022/11/13 17:17:15 $  $NHDT-Branch: NetHack-5.0 $
 
 # compiler flags:  CCFLAGS is used to construct a value for CFLAGS with
 #	various -I, -D, and -W settings appended below;
@@ -279,5 +279,5 @@ ifneq "$(HAVECSTD)" ""
 CSTD = -std=$(HAVECSTD)
 endif
 
-#end of compiler.500
+#end of compiler
 #------------------------------------------------------------------------------

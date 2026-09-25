@@ -100,7 +100,7 @@ Only available if NetHack was compiled with DUMPLOG.
 | %T | current time, timestamp
 | %d | game start, YYYYMMDDhhmmss
 | %D | current time, YYYYMMDDhhmmss
-| %v | game version, eg. '5.0.0-0'
+| %v | game version, eg. '5.0.1-0'
 | %u | UID
 | %n | player name
 | %N | first character of player name

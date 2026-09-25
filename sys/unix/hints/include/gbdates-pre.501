@@ -1,4 +1,4 @@
-# NetHack 5.0  gbdates-pre.500 $NHDT-Date: 1599687610 2020/09/09 21:40:10 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.11 $
+# NetHack 5.0  gbdates-pre $NHDT-Date: 1599687610 2020/09/09 21:40:10 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.11 $
 
 ifdef MAKEFILE_DOC
 ifneq "$(GIT)" "0"

@@ -136,7 +136,7 @@ RANDOBJ = isaac64.obj,random.obj
 # Other things that have to be reconfigured are in vmsconf.h,
 # and config.h
 
-VERSION  = 5.0.0
+VERSION  = 5.0.1
 
 MAKEDEFS = $(UTL)makedefs.exe;
 

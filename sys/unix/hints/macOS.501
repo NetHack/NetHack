@@ -1,4 +1,4 @@
-# NetHack 5.0  macOS.500 $NHDT-Date: 1693359574 2023/08/30 01:39:34 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.138 $
+# NetHack 5.0  macOS hints $NHDT-Date: 1693359574 2023/08/30 01:39:34 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.138 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015.
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -18,7 +18,7 @@
 #
 
 WHICH_OS=macOS
-HINTSVERSION := 500
+HINTSVERSION := 501
 
 ifdef MAKEFILE_TOP
 ifeq ($(MAKELEVEL),0)
@@ -36,11 +36,11 @@ endif
 endif
 
 # note: '#-INCLUDE' is not just a comment; multiw-1 contains sections 1 to 2
-#-INCLUDE multiw-1.500
+#-INCLUDE multiw-1.501
 
 # note: '#-INCLUDE' is not just a comment
-#        it pulls in the contents of dirs-perms.500
-#-INCLUDE dirs-perms.500
+#        it pulls in the contents of dirs-perms.501
+#-INCLUDE dirs-perms.501
 
 ifneq "$(USEMACPORTS)" "1"
 HAVE_HOMEBREW := $(shell expr `which -s brew; echo $$?` = 0)
@@ -62,14 +62,14 @@ endif
 # you're reading this in Makefile augmented by hints, that may not be true).
 #
 
-#-INCLUDE cross-pre1.500
+#-INCLUDE cross-pre1.501
 
-#-INCLUDE multiw-2.500
+#-INCLUDE multiw-2.501
 
-# compiler.500 contains compiler detection and adjustments common
+# compiler.501 contains compiler detection and adjustments common
 # to both linux and macOS
 
-#-INCLUDE compiler.500
+#-INCLUDE compiler.501
 
 ifdef WANT_WIN_QT
 ifeq "$(HAVE_HOMEBREW)" "1"
@@ -101,10 +101,10 @@ CCXXFLAGS +=-Wno-c++20-attribute-extensions
 endif
 endif
 
-# misc.500 must come after compiler.500
+# misc.501 must come after compiler.501
 # and after QTDIR is defined
 
-#-INCLUDE misc.500
+#-INCLUDE misc.501
 
 # manpages directory
 MANDIR=/usr/local/share/man/man6
@@ -239,11 +239,11 @@ endif
 endif  #MAKEFILE_SRC
 
 #
-#-INCLUDE multisnd1-pre.500
+#-INCLUDE multisnd1-pre.501
 #
 
 # although not currently doing anything for macOS, this is
-# kept in for consistency with layout of linux.500
+# kept in for consistency with layout of linux.501
 ifeq "$(CCISCLANG)" "1"
 # clang-specific starts
 # clang-specific ends
@@ -253,15 +253,15 @@ else
 # gcc-specific ends
 endif
 
-# WINCFLAGS set from multiw-2.500
-# SNDCFLAGS set from multisnd-pre.500
+# WINCFLAGS set from multiw-2.501
+# SNDCFLAGS set from multisnd-pre.501
 CFLAGS+= $(PKGCFLAGS) $(WINCFLAGS)
 CFLAGS+= $(SNDCFLAGS)
 CFLAGS+= $(NHCFLAGS)
 CFLAGS+= $(LIBCFLAGS)
 
-# WINCFLAGS set from multiw-2.500
-# SNDCFLAGS set from multisnd-pre.500
+# WINCFLAGS set from multiw-2.501
+# SNDCFLAGS set from multisnd-pre.501
 CCXXFLAGS+= $(WINCFLAGS)
 CCXXFLAGS+= $(SNDCFLAGS)
 CCXXFLAGS+= $(NHCFLAGS)
@@ -457,16 +457,16 @@ SYSCONFENSURE = (if ! test -f $(INSTDIR)/sysconf ; then \
 # Install.Qt mentions a patch for macos - it's not there (it seems to be in the Qt binary
 # package under the docs directory).
 #
-#-INCLUDE cross-pre2.500
+#-INCLUDE cross-pre2.501
 #
 #
-#-INCLUDE gbdates-pre.500
+#-INCLUDE gbdates-pre.501
 #
 #
-#-INCLUDE multisnd2-pre.500
+#-INCLUDE multisnd2-pre.501
 #
 #
-#-INCLUDE response.500
+#-INCLUDE response.501
 #
 
 ifdef MAKEFILE_TOP
@@ -536,10 +536,10 @@ endif   # MAKEFILE_SRC
 #-POST
 
 #
-#-INCLUDE gbdates-post.500
+#-INCLUDE gbdates-post.501
 #
 #
-#-INCLUDE multisnd-post.500
+#-INCLUDE multisnd-post.501
 #
 
 ifdef MAKEFILE_TOP
@@ -670,9 +670,9 @@ $(BUNDLE_INFOPLIST):
 	@echo '<key>CFBundleName</key>' >>$@
 	@echo '<string>$(BUNDLE_NAME)</string>' >>$@
 	@echo '<key>CFBundleVersion</key>' >>$@
-	@echo '<string>NetHack 5.0.0b73</string>' >>$@
+	@echo '<string>NetHack 5.0.1b73</string>' >>$@
 	@echo '<key>CFBundleShortVersionString</key>' >>$@
-	@echo '<string>NetHack 5.0.0</string>' >>$@
+	@echo '<string>NetHack 5.0.1</string>' >>$@
 	@echo '<key>NSHumanReadableCopyright</key>' >>$@
 	@echo '<string>©By Stichting Mathematisch Centrum and M. Stephenson 1985-2026</string>' >>$@
 	@echo '<key>LSApplicationCategoryType</key>' >>$@
@@ -711,7 +711,7 @@ endif   # WANT_BUNDLE
 # --- end of bundle ---
 #
 #
-#-INCLUDE cross-post.500
+#-INCLUDE cross-post.501
 #
 
 ifdef MAKEFILE_TOP

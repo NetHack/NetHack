@@ -25,13 +25,13 @@ if [ "$(uname)" = "Darwin" ]; then
     #Mac
     DJGPP_FILE="djgpp-osx-$GCCVER.tar.bz2"
     if [ -z "HINTS" ]; then
-        export HINTS=macOS.500
+        export HINTS=macOS.501
     fi
 elif [ "$(expr substr $(uname -s) 1 5)" = "Linux" ]; then
     #Linux
     DJGPP_FILE="djgpp-linux64-$GCCVER.tar.bz2"
     if [ -z "$HINTS" ]; then
-        export HINTS=linux.500
+        export HINTS=linux.501
     fi
 elif [ "$(expr substr $(uname -s) 1 10)" = "MINGW32_NT" ]; then
     #mingw

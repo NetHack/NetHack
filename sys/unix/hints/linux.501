@@ -1,4 +1,4 @@
-# NetHack 5.0  linux.500 $NHDT-Date: 1693519390 2023/08/31 22:03:10 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.61 $
+# NetHack 5.0  linux hints $NHDT-Date: 1693519390 2023/08/31 22:03:10 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.61 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2007.
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -15,7 +15,7 @@
 #-PRE xxxx
 
 WHICH_OS=Linux
-HINTSVERSION := 500
+HINTSVERSION := 501
 
 ifdef MAKEFILE_TOP
 ifeq ($(MAKELEVEL),0)
@@ -33,18 +33,18 @@ HINTSINCLFILES := $(addsuffix .$(HINTSVERSION), $(HINTSINCLNAMES))
 endif
 endif
 
-# linux.500 hints file provides a single-user build for Linux (such
+# linux.501 hints file provides a single-user build for Linux (such
 # as Ubuntu focal).
 
 # note: '#-INCLUDE' is not just a comment
-#        multiw-1.500 contains sections 1 to 2
-#-INCLUDE multiw-1.500
+#        multiw-1.501 contains sections 1 to 2
+#-INCLUDE multiw-1.501
 
 # note: '#-INCLUDE' is not just a comment
-#        it pulls in the contents of dirs-perms.500
-#-INCLUDE dirs-perms.500
+#        it pulls in the contents of dirs-perms.501
+#-INCLUDE dirs-perms.501
 
-#-INCLUDE linuxdistro.500
+#-INCLUDE linuxdistro.501
 
 ifndef LIBXPM
 LIBXPM= -L/opt/X11/lib -lXpm
@@ -63,7 +63,7 @@ USE_NOSTATICFN = 1
 #USE_NONOSTATICFN = 1
 
 #-----------------------------------------------------------------------------
-#-INCLUDE cross-pre1.500
+#-INCLUDE cross-pre1.501
 
 
 #-----------------------------------------------------------------------------
@@ -71,7 +71,7 @@ USE_NOSTATICFN = 1
 # you're reading this in Makefile augmented by hints, that may not be true).
 #
 
-#-INCLUDE multiw-2.500
+#-INCLUDE multiw-2.501
 
 #QT6 prior to compiler include
 ifdef WANT_WIN_QT6
@@ -80,10 +80,11 @@ ADDITIONAL_NO_WARN_GPPCCX=-Wno-sfinae-incomplete
 ADDITIONAL_NO_WARN_CLANGCCX=-Wno-c++26-extensions
 endif   # WANT_WIN_QT6
 
-# compiler.500 contains compiler detection and adjustments common
+# compiler.501 contains compiler detection and adjustments common
 # to both linux and macOS
 
-#-INCLUDE compiler.500
+#-INCLUDE compiler.501
+
 
 ifdef WANT_SYSTEM_LUA
 
@@ -193,10 +194,10 @@ endif    # g++ greater than or equal to 14
 endif   # WANT_WIN_QT6
 endif  # WANT_WIN_QT
 
-# misc.500 must come after compiler.500
+# misc.501 must come after compiler.501
 # and after QTDIR is defined.
 #
-#-INCLUDE misc.500
+#-INCLUDE misc.501
 
 ifeq "$(USE_ASAN)" "1"
 CFLAGS+=-fsanitize=address
@@ -303,7 +304,7 @@ endif   #HAVE_NCURSESW
 endif   #USE_CURSESLIB
 
 #
-#-INCLUDE multisnd1-pre.500
+#-INCLUDE multisnd1-pre.501
 #
 
 ifeq "$(CCISCLANG)" "1"
@@ -318,15 +319,15 @@ endif
 # gcc-specific ends
 endif
 
-# WINCFLAGS set from multiw-2.500
-# SNDCFLAGS set from multisnd-pre.500
+# WINCFLAGS set from multiw-2.501
+# SNDCFLAGS set from multisnd-pre.501
 CFLAGS+= $(WINCFLAGS)
 CFLAGS+= $(SNDCFLAGS)
 CFLAGS+= $(NHCFLAGS)
 CFLAGS+= $(LIBCFLAGS)
 
-# WINCFLAGS set from multiw-2.500
-# SNDCFLAGS set from multisnd-pre.500
+# WINCFLAGS set from multiw-2.501
+# SNDCFLAGS set from multisnd-pre.501
 CCXXFLAGS+= $(WINCFLAGS)
 CCXXFLAGS+= $(SNDCFLAGS)
 CCXXFLAGS+= $(NHCFLAGS)
@@ -555,28 +556,28 @@ CHGRP=true
 # manpages directory
 MANDIR=/usr/share/man/man6
 #
-#-INCLUDE cross-pre2.500
+#-INCLUDE cross-pre2.501
 #
 
 #
-#-INCLUDE gbdates-pre.500
+#-INCLUDE gbdates-pre.501
 #
 
 #
-#-INCLUDE multisnd2-pre.500
+#-INCLUDE multisnd2-pre.501
 #
 
 #
-#-INCLUDE response.500
+#-INCLUDE response.501
 #
 
 #-POST
 
 #
-#-INCLUDE gbdates-post.500
+#-INCLUDE gbdates-post.501
 #
 #
-#-INCLUDE multisnd-post.500
+#-INCLUDE multisnd-post.501
 #
 
 ifdef MAKEFILE_TOP
@@ -600,6 +601,6 @@ $(TARGETPFX)libnhmain.o : ../sys/libnh/libnhmain.c $(HACK_H)
 endif  # WANT_LIBNH
 
 #
-#-INCLUDE cross-post.500
+#-INCLUDE cross-post.501
 #
 

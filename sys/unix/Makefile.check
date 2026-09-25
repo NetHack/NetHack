@@ -8,7 +8,7 @@ MKINCLPATH := $(SUPATH)hints/include/
 # Expectations:
 #
 # HINTSFILE and HINTSINCLFILES are passed from the calling Makefile
-# which is the case with the hints/*.500 and hints/include/*.500
+# which is the case with the hints/*.501 and hints/include/*.501
 # set.
 #
 ifneq ("$(HINTSFILE)","")

@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------
-# NetHack 5.0  response.500 $NHDT-Date: 1668359835 2022/11/13 17:17:15 $  $NHDT-Branch: NetHack-5.0 $
+# NetHack 5.0  response $NHDT-Date: 1668359835 2022/11/13 17:17:15 $  $NHDT-Branch: NetHack-5.0 $
 
 ifeq "$(RESP)" "1"
 USE_RESPONSEFILE=1
@@ -29,5 +29,5 @@ CLEAN_CC_RESPONSEFILE=rm -f $(CC_RESPONSEFILE);
 CLEAN_CXX_RESPONSEFILE=rm -f $(CXX_RESPONSEFILE);
 endif
 
-#end of response.500
+#end of response
 #------------------------------------------------------------------------------

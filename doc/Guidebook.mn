@@ -56,7 +56,7 @@
 .ds h0 NetHack Guidebook
 .ds h1 \" empty
 .ds h2 %
-.ds vr NetHack 5.0.0
+.ds vr NetHack 5.0.1
 .ds f0 \*(vr
 .ds f1 \" empty
 .\"DO NOT REMOVE NH_DATESUB .ds f2 Date(%B %-d, %Y)
@@ -5701,7 +5701,7 @@ An entry that maps a sound file to a user-specified message pattern.
 Each SOUND entry is broken down into the following parts:
 .PS "sound index"
 .PL MESG
-message window mapping (the only one supported in 5.0.0);
+message window mapping (the only one supported in 5.0.0 and beyond);
 .PL msgtype
 optional; message type to use, see \(lqConfiguring Message Types\(rq
 .PL pattern

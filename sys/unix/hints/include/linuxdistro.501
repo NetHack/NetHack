@@ -1,4 +1,4 @@
-# ----- linuxdistro.500 --------
+# ----- linuxdistro --------
 
 LINUX_DISTRO=
 OS_ID := $(shell grep -E '^ID=' /etc/os-release 2>/dev/null | cut -d= -f2)
@@ -22,4 +22,4 @@ LINUX_DISTRO=fedora
 USE_SYSTEM_LUA=1
 endif
 #$(info LINUX_DIST=$(LINUX_DISTRO))
-# ----- end of linuxdistro.500 --------
+# ----- end of linuxdistro --------

@@ -366,7 +366,7 @@ WASM_CFLAGS += -Wshadow
 # WASM_CFLAGS += -Wwrite-strings
 # WASM_CFLAGS += -Werror
 # Nethack C flags
-WASM_CFLAGS += $(WINCFLAGS)   #WINCFLAGS set from multiw-2.500
+WASM_CFLAGS += $(WINCFLAGS)   #WINCFLAGS set from multiw-2
 WASM_CFLAGS += -DSYSCF -DSYSCF_FILE=\"/sysconf\" -DSECURE -DNHUUID
 #WASM_CFLAGS += -g -I../include
 WASM_CFLAGS += -I../include -I../nhlua/lua/src
@@ -509,7 +509,7 @@ ifdef CROSS_TO_AMIGA
 #
 # Cross-compiler: https://franke.ms/git/bebbo/amiga-gcc
 # Install to /opt/amiga, then:
-#     sys/unix/setup.sh sys/unix/hints/linux.500
+#     sys/unix/setup.sh sys/unix/hints/linux.501
 #     make fetch-lua
 #     make CROSS_TO_AMIGA=1 fetch-regex
 #     make CROSS_TO_AMIGA=1 all
@@ -538,7 +538,7 @@ override TARGET_CFLAGS = -c -O2 -noixemul $(TOOLARCH) \
 	$(LUAINCL) -DAMIGA -DNOTTYGRAPHICS -DNO_TERMS -DNO_SIGNAL \
 	-DTILES_IN_GLYPHMAP $(PDCURSESDEF) \
 	-DCROSSCOMPILE -DCROSSCOMPILE_TARGET -DCROSS_TO_AMIGA \
-	-DAMIGA_VERSION_STRING=\""VER: NetHack 5.0.0"\"
+	-DAMIGA_VERSION_STRING=\""VER: NetHack 5.0.1"\"
 override TARGET_CXXFLAGS = $(TARGET_CFLAGS)
 override GENTILEOFILE = $(TARGETPFX)tile.o
 LUA_TARGET_CFLAGS = $(TARGET_CFLAGS)

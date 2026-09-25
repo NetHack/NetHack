@@ -1,4 +1,4 @@
-Copyright (c) NetHack Development Team 1990-2024
+Copyright (c) NetHack Development Team 1990-2026
 NetHack may be freely redistributed.  See license for details.
 ==============================================================
   Instructions for compiling NetHack 5.0 on a Windows system
@@ -13,7 +13,7 @@ See file dat\History for credits and history of NetHack for Windows.
 \----------------------------------------------------------- -----------/
 
   In your web browser, navigate to
-      https://www.nethack.org/v500/ports/download-win.html
+      https://www.nethack.org/v501/ports/download-win.html
   and follow the instructions there.
 
 /-----------------------------------------------------------------------\

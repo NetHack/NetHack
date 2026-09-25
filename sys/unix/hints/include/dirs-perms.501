@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------
-# NetHack 5.0  directories.500 $NHDT-Date: 1668359835 2022/11/13 17:17:15 $  $NHDT-Branch: NetHack-5.0 $
+# NetHack 5.0  directories $NHDT-Date: 1668359835 2022/11/13 17:17:15 $  $NHDT-Branch: NetHack-5.0 $
 
 ifndef WANT_SHARED_INSTALL
 PREFIX=$(abspath $(NHSROOT))
@@ -118,6 +118,6 @@ endif  # WHICH_OS?
 endif  # WANT_SHARED_INSTALL
 endif  # SOURCEINSTALL != 1
 
-#end of dirs-perms.500
+#end of dirs-perms
 #--------------------------------------
 

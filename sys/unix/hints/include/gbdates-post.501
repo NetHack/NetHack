@@ -1,4 +1,4 @@
-# NetHack 5.0  gbdates-post.500 $NHDT-Date: 1599687610 2020/09/09 21:40:10 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.11 $
+# NetHack 5.0  gbdates-post $NHDT-Date: 1599687610 2020/09/09 21:40:10 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.11 $
 ifdef MAKEFILE_DOC
 ifdef GB_DATESTAMP
 Guidebook.dated.mn: $(GUIDEBOOK_MN_SRC)

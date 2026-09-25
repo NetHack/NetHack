@@ -1,11 +1,11 @@
 #------------------------------------------------------------------------------
-# NetHack 5.0  multiw-2.500 $NHDT-Date: 1599337709 2020/09/05 20:28:29 $  $NHDT-Branch: NetHack-5.0 $
+# NetHack 5.0  multiw-2 $NHDT-Date: 1599337709 2020/09/05 20:28:29 $  $NHDT-Branch: NetHack-5.0 $
 #
 # Sorts out support for multiple window ports (interfaces) to included in the build.
 #
 # Included from:
-#           hints/linux.500
-#           hints/macOS.500
+#           hints/linux.NNN
+#           hints/macOS.NNN
 #
 # The following will be set appropriately following this:
 #     - WANT_WIN_XXX  (at least one will be set; default is TTY)
@@ -209,6 +209,6 @@ ifeq "$(NOCRASHREPORT)" "1"
 WINCFLAGS += -DNOCRASHREPORT
 endif
 
-#end of hints/include/multiw-2.500
+#end of hints/include/multiw-2
 #------------------------------------------------------------------------------
 

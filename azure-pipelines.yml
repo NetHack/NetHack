@@ -164,7 +164,7 @@ steps:
 
 - bash: |
     cd sys/unix
-    sh setup.sh hints/linux.500
+    sh setup.sh hints/linux.501
     cd ../..
     make WANT_WIN_ALL=1 QT_SELECT=5 MOC=moc all
   condition: and(eq( variables['Agent.OS'], 'Linux' ), eq( variables.buildTarget, 'all'))
@@ -204,7 +204,7 @@ steps:
 - bash: |
     brew install groff
     cd sys/unix
-    sh setup.sh hints/macos.500
+    sh setup.sh hints/macos.501
     cd ../..
     make WANT_MACSOUND=1 all
   condition: eq( variables['Agent.OS'], 'Darwin' )
@@ -216,7 +216,7 @@ steps:
     export GCCVER=gcc1220
     export IN_CI=SKIP_FONTS_IN_CI=1
     cd sys/unix
-    sh setup.sh hints/linux.500
+    sh setup.sh hints/linux.501
     cd ../..
     sys/msdos/fetch-cross-compiler.sh
     retVal=$?

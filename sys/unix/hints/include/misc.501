@@ -1,11 +1,11 @@
 #------------------------------------------------------------------------------
-# NetHack 5.0  misc.500 $NHDT-Date: 1668359836 2022/11/13 17:17:16 $  $NHDT-Branch: NetHack-5.0 $
+# NetHack 5.0  misc $NHDT-Date: 1668359836 2022/11/13 17:17:16 $  $NHDT-Branch: NetHack-5.0 $
 #
-# Further set-up  for miscellaneous odds and ends (after compiler.500)
+# Further set-up  for miscellaneous odds and ends (after compiler.NNN)
 #
 # Included from:
-#           hints/linux.500
-#           hints/macOS.500
+#           hints/linux.NNN
+#           hints/macOS.NNN
 #
 
 # This ensures that .moc files are compatible with the version of Qt chosen.
@@ -105,6 +105,6 @@ endif  # end groff less than 1.23
 endif  # end groff-specific
 endif  # not USE_MANDOC
 
-#end of hints/include/misc.500
+#end of hints/include/misc
 #------------------------------------------------------------------------------
 
