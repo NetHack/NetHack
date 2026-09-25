@@ -55,8 +55,8 @@ enum statusfields {
     BL_ENE, BL_ENEMAX, BL_XP, BL_AC, BL_HD,     /* 11..15 */
     BL_TIME, BL_HUNGER, BL_HP, BL_HPMAX,        /* 16..19 */
     BL_LEVELDESC, BL_EXP, BL_CONDITION,         /* 20..22 */
-    BL_WEAPON, BL_ARMOR, BL_TERRAIN,            /* 23..25 */
-    BL_VERS,                                    /*   26   */
+    BL_VERS, BL_WEAPON, BL_ARMOR,               /* 23..25 */
+    BL_TERRAIN,                                 /*   26   */
     MAXBLSTATS /* [27] */
 };
 
