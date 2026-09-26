@@ -200,6 +200,7 @@ static const struct instance_globals_a g_init_a = {
 
     /* trap.c */
     { 0, 0, FALSE }, /* acid_ctx */
+    0L,  /* articulo_mortis */
     TRUE, /* havestate*/
 };
 

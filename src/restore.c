@@ -1138,13 +1138,15 @@ getlev(NHFILE *nhfp, int pid, xint8 lev)
         }
     }
     Sfi_long(nhfp, &svo.omoves, "lev-timestmp");
+    if (ghostly)
+        ga.articulo_mortis = svo.omoves;
     elapsed = (svm.moves - svo.omoves);
 
     rest_stairs(nhfp);
     Sfi_dest_area(nhfp, &svu.updest, "lev-updest");
     Sfi_dest_area(nhfp, &svd.dndest, "lev-dndest");
     Sfi_levelflags(nhfp, &svl.level.flags, "lev-level_flags");
-    rest_adjust_levelflags(elapsed);
+    rest_adjust_levelflags(elapsed, ghostly);
     if (svd.doors) {
         free(svd.doors);
         svd.doors = 0;
@@ -1347,6 +1349,8 @@ getlev(NHFILE *nhfp, int pid, xint8 lev)
     if (ghostly)
         clear_id_mapping();
 #endif
+    if (ghostly)
+        ga.articulo_mortis = 0L;
     level_status.loading = 0, level_status.ready = 1;
     program_state.in_getlev = FALSE;
 #ifdef SFCTOOL
@@ -1356,11 +1360,15 @@ getlev(NHFILE *nhfp, int pid, xint8 lev)
 }
 
 void
-rest_adjust_levelflags(long elapsed)
+rest_adjust_levelflags(long elapsed, boolean ghostly)
 {
     /* adjust timestamps */
-    relative_time_to_moves(&svl.level.flags.stasis_until);
-    svl.level.flags.stasis_until -= elapsed;
+    if (!ghostly) {
+        relative_time_to_moves(&svl.level.flags.stasis_until);
+        svl.level.flags.stasis_until -= elapsed;
+    } else {
+        bones_time_adjust(&svl.level.flags.stasis_until);
+    }
 }
 
 void
@@ -1378,6 +1386,17 @@ relative_time_to_moves(long *timestamp)
 
     *timestamp = svm.moves + prevts;
 }
+
+void
+bones_time_adjust(long *timestamp)
+{
+    long prevts = *timestamp;
+
+    *timestamp =
+        svm.moves
+        + ((prevts >= ga.articulo_mortis) ? prevts - ga.articulo_mortis : 0L);
+}
+
 
 /* "name-role-race-gend-algn" occurs very early in a save file; sometimes we
    want the whole thing, other times just "name" (for svp.plname[]) */
