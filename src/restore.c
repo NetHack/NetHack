@@ -1392,9 +1392,9 @@ bones_time_adjust(long *timestamp)
 {
     long prevts = *timestamp;
 
-    *timestamp =
-        svm.moves
-        + ((prevts >= ga.articulo_mortis) ? prevts - ga.articulo_mortis : 0L);
+    /* svl.level.flags.stasis_until was already converted to relative offset
+     * from ga.articulo_mortis on bones save */
+    *timestamp = svm.moves + prevts;
 }
 
 
