@@ -848,8 +848,8 @@ mon_wield_item(struct monst *mon)
     if (obj && obj != &hands_obj) {
         struct obj *mw_tmp = MON_WEP(mon);
 
-        if (mw_tmp && mw_tmp->otyp == obj->otyp) {
-            /* already wielding it */
+        if (mw_tmp == obj) {
+            /* Already wielding this object, not merely the same type. */
             mon->weapon_check = NEED_WEAPON;
             return 0;
         }
