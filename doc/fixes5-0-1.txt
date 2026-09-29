@@ -4,6 +4,8 @@ General Fixes and Modified Features
 -----------------------------------
 allow travel across visibly harmless traps and preserve travel during
 	airborne flyovers of floor-triggered traps
+allow travel from land onto lava with known fireproof water-walking
+	boots and fire resistance
 fix some cross-compile package filenames that still referenced 370 instead
 	of 500
 Use NHV macro (NHV=500) for filenames in Makefiles and/or hints files to make
