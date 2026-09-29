@@ -825,18 +825,16 @@ keepdogs(
             int num_segs;
             boolean stay_behind = FALSE;
 
-            if (mtmp->mtrapped)
+            if (mtmp->mtrapped && !(u.utotype & UTOTYPE_LEVEL_TELE))
                 (void) mintrap(mtmp, NO_TRAP_FLAGS); /* try to escape */
-            /* Only level teleportation carries along an eating pet. */
+            /* Level teleportation bypasses eating and trapping. */
             if (mtmp == u.usteed) {
                 /* make sure steed is eligible to accompany hero */
                 mtmp->mtrapped = 0;       /* escape trap */
                 mtmp->meating = 0;        /* terminate eating */
                 mdrop_special_objs(mtmp); /* drop Amulet */
-            } else if ((mtmp->meating
-                        && !(mtmp->mtame
-                             && (u.utotype & UTOTYPE_LEVEL_TELE)))
-                       || mtmp->mtrapped) {
+            } else if ((mtmp->meating || mtmp->mtrapped)
+                       && !(u.utotype & UTOTYPE_LEVEL_TELE)) {
                 if (canseemon(mtmp))
                     pline_mon(mtmp, "%s is still %s.", Monnam(mtmp),
                              mtmp->mtrapped ? "trapped" : "eating");
@@ -864,6 +862,10 @@ keepdogs(
                 continue;
             }
 
+            if (mtmp->mtrapped) {
+                mtmp->mtrapped = 0;
+                fill_pit(mtmp->mx, mtmp->my);
+            }
             /* prepare to take mtmp off the map */
             num_segs = mon_leave(mtmp);
             /* take off map and move mtmp from fmon list to mydogs */
