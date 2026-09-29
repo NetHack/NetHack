@@ -12,6 +12,10 @@ CCFLAGS = -g
 #	rules for compiling C code; specifying a value for that on the
 #	'make' command line should be avoided.
 
+ifdef CPLUSPLUS_NEEDED
+CCXXFLAGS = -g -I../include
+endif
+
 #If you want to force use of one particular set of compilers, do it
 #here, ahead of the detection, so that the detection will match your
 #choice and set variables CCISCLANG, CCISGCC, GCCGTEQ, CLANGPPGTEQ9 etc.
@@ -133,7 +137,6 @@ endif  # clang-specific ends here
 
 ifdef MAKEFILE_SRC
 ifdef CPLUSPLUS_NEEDED
-CCXXFLAGS = -g -I../include
 CCXXFLAGS+=-Wall -Wextra -Wno-missing-field-initializers \
         -Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wwrite-strings
 CCXXFLAGS+=-pedantic
