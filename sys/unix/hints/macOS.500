@@ -76,10 +76,10 @@ ifdef WANT_WIN_QT
 ifeq "$(HAVE_HOMEBREW)" "1"
 ifdef WANT_WIN_QT5
 # Qt5 installed via homebrew
-QTDIR :=$(shell brew --prefix)/opt/qt@5
+QTDIR :=$(shell brew --prefix)/opt/qt5
 endif   # WANT_WIN_QT5
 ifdef WANT_WIN_QT6
-QTDIR :=$(shell brew --prefix)/opt/qt@6
+QTDIR :=$(shell brew --prefix)/opt/qt6
 endif   # WANT_WIN_QT6
 endif   # HAVE_HOMEBREW
 ifndef QTDIR

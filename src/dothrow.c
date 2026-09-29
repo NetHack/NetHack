@@ -2207,6 +2207,8 @@ thitmonst(
 
     dieroll = rnd(20);
 
+    check_caitiff(mon);
+
     if (obj->oclass == WEAPON_CLASS || is_weptool(obj)
         || obj->oclass == GEM_CLASS) {
         if (hmode == HMON_KICKED) {
