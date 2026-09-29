@@ -837,7 +837,7 @@ keepdogs(
                        && !(u.utotype & UTOTYPE_LEVEL_TELE)) {
                 if (canseemon(mtmp))
                     pline_mon(mtmp, "%s is still %s.", Monnam(mtmp),
-                             mtmp->mtrapped ? "trapped" : "eating");
+                             mtmp->meating ? "eating" : "trapped");
                 stay_behind = TRUE;
             } else if (mon_has_amulet(mtmp)) {
                 if (canseemon(mtmp))
