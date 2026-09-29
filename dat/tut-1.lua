@@ -60,12 +60,18 @@ des.teleport_region({ region = { 9,3, 9,3 } });
 
 -- TODO:
 --  - save (more of) hero state when entering
---  - quit-command should maybe exit the tutorial?
 
 -- turn on some newbie-friendly options
 nh.parse_config("OPTIONS=mention_walls");
 nh.parse_config("OPTIONS=mention_decor");
 nh.parse_config("OPTIONS=lit_corridor");
+
+-- BUG? this sets the movement-hint engraving to HJKL or 4286 depending on
+-- the setting of number_pad at the time the level is created, but it doesn't
+-- change to match new value if the player uses 'm O' to change number_pad
+-- while in the tutorial.
+-- [Don't bother with a complex fix; a player who can use 'm O' doesn't need
+-- the tutorial.]
 
 local movekeys = tut_key("movewest") .. " " ..
    tut_key("movesouth") .. " " ..
