@@ -2449,7 +2449,7 @@ avoid_moving_on_trap(coordxy x, coordxy y, boolean msg)
         && trap->ttyp != VIBRATING_SQUARE
         /* Travel can cross known harmless traps.  Keep ordinary running
            unchanged, and avoid guessing trap types while hallucinating.
-           immune_to_trap() includes the normal airborne trigger bypass. */
+           immune_to_trap() includes the bypass for flying and levitation. */
         && (svc.context.run != 8 || Hallucination
             || immune_to_trap(&gy.youmonst, trap->ttyp)
                    != TRAP_CLEARLY_IMMUNE)) {
