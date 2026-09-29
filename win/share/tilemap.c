@@ -587,6 +587,8 @@ int lastmontile, lastobjtile, lastothtile;
 /* Number of tiles for invisible monsters */
 #define NUM_INVIS_TILES 1
 
+#define TILEMAPPINGS_LST "tilemappings.lst"
+
 /*
  * set up array to map glyph numbers to tile numbers
  *
@@ -606,7 +608,11 @@ init_tilemap(void)
     int file_entry = 0;
 
 #if defined(OBTAIN_TILEMAP)
-    tilemap_file = fopen("tilemappings.lst", "w");
+    tilemap_file = fopen(TILEMAPPINGS_LST, "w");
+    if (!tilemap_file) {
+        Fprintf(stderr, "ERROR: Cannot write to file %s.", TILEMAPPINGS_LST);
+        return;
+    }
     Fprintf(tilemap_file, "NUMMONS = %d\n", NUMMONS);
     Fprintf(tilemap_file, "NUM_OBJECTS = %d\n", NUM_OBJECTS);
     Fprintf(tilemap_file, "MAXEXPCHARS = %d\n", MAXEXPCHARS);
