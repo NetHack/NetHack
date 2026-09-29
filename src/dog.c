@@ -827,13 +827,16 @@ keepdogs(
 
             if (mtmp->mtrapped)
                 (void) mintrap(mtmp, NO_TRAP_FLAGS); /* try to escape */
-            /* Tame followers can carry on eating after changing levels. */
+            /* Only level teleportation carries along an eating pet. */
             if (mtmp == u.usteed) {
                 /* make sure steed is eligible to accompany hero */
                 mtmp->mtrapped = 0;       /* escape trap */
                 mtmp->meating = 0;        /* terminate eating */
                 mdrop_special_objs(mtmp); /* drop Amulet */
-            } else if ((mtmp->meating && !mtmp->mtame) || mtmp->mtrapped) {
+            } else if ((mtmp->meating
+                        && !(mtmp->mtame
+                             && (u.utotype & UTOTYPE_LEVEL_TELE)))
+                       || mtmp->mtrapped) {
                 if (canseemon(mtmp))
                     pline_mon(mtmp, "%s is still %s.", Monnam(mtmp),
                              mtmp->mtrapped ? "trapped" : "eating");
