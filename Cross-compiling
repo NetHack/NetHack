@@ -707,7 +707,8 @@ Cross-compiler url:
     Ubuntu system and building NetHack with it.
 
     For Ubuntu, the build prerequisite packages for building the compiler can
-    be easily obtained:
+    be obtained, but be advised that the last Ubuntu release to include the
+    necessary packages was Ubuntu 24.04:
         sudo apt install gcc-mipsel-linux-gnu
         sudo apt install g++-mipsel-linux-gnu
 
