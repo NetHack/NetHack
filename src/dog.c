@@ -825,7 +825,7 @@ keepdogs(
             int num_segs;
             boolean stay_behind = FALSE;
 
-            if (mtmp->mtrapped && !(u.utotype & UTOTYPE_LEVEL_TELE))
+            if (mtmp->mtrapped)
                 (void) mintrap(mtmp, NO_TRAP_FLAGS); /* try to escape */
             /* Level teleportation bypasses eating and trapping. */
             if (mtmp == u.usteed) {
