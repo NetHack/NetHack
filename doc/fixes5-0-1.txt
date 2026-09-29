@@ -2,8 +2,8 @@ NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.36 $ $NHDT-Date: 1781062909 2026/06
 	
 General Fixes and Modified Features
 -----------------------------------
-allow monsters to switch to an artifact weapon when already wielding
-	an ordinary weapon of the same type
+allow monsters to switch to a different artifact weapon of the same
+	type, while retaining their current weapon for non-artifact choices
 fix some cross-compile package filenames that still referenced 370 instead
 	of 500
 Use NHV macro (NHV=500) for filenames in Makefiles and/or hints files to make
