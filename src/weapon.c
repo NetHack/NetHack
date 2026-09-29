@@ -848,9 +848,8 @@ mon_wield_item(struct monst *mon)
     if (obj && obj != &hands_obj) {
         struct obj *mw_tmp = MON_WEP(mon);
 
-        if (mw_tmp == obj
-            || (mw_tmp && mw_tmp->otyp == obj->otyp
-                && (mw_tmp->oartifact || !obj->oartifact))) {
+        if (mw_tmp && mw_tmp->otyp == obj->otyp
+            && (mw_tmp->oartifact || !obj->oartifact)) {
             /* Same type: only upgrade an ordinary weapon to an artifact. */
             mon->weapon_check = NEED_WEAPON;
             return 0;
