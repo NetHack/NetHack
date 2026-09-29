@@ -862,10 +862,6 @@ keepdogs(
                 continue;
             }
 
-            if (mtmp->mtrapped) {
-                mtmp->mtrapped = 0;
-                fill_pit(mtmp->mx, mtmp->my);
-            }
             /* prepare to take mtmp off the map */
             num_segs = mon_leave(mtmp);
             /* take off map and move mtmp from fmon list to mydogs */
