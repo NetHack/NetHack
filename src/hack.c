@@ -1189,9 +1189,11 @@ test_move(
                  || levl[x][y].typ == LAVAWALL)
                 /* don't enter pool or lava (must be one of the two to
                    get here) unless flying or levitating or have known
-                   water-walking for pools or known lava-walking */
+                   water-walking for pool or known lava-walking and
+                   already be on/over lava for lava */
                 || !(Levitation || Flying
-                     || (is_pool(x, y) ? Known_wwalking : Known_lwalking))))
+                     || (is_pool(x, y) ? Known_wwalking
+                         : (Known_lwalking && is_lava(u.ux, u.uy))))))
             return (mode == TEST_TRAP);
     }
 
