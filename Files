@@ -138,10 +138,6 @@ ltm.c       ltm.h       lua.c       lua.h       lua.hpp     luac.c
 luaconf.h   lualib.h    lundump.c   lundump.h   lutf8lib.c  lvm.c
 lvm.h       lzio.c      lzio.h
 
-outdated:
-(files that are no longer maintained for current game code)
-.travis.yml
-
 outdated/dat:
 (files that are no longer maintained for current game code)
 symbols
