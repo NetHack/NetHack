@@ -50,7 +50,7 @@ WEVENT lastevent;
 struct Library *DiskfontBase;
 #endif
 
-#define KBDBUFFER 10
+#define KBDBUFFER 32
 static unsigned char KbdBuffer[KBDBUFFER];
 int KbdBuffered;
 
@@ -132,13 +132,30 @@ CloseShWindow(struct Window *win)
     /* Flush all messages for all windows to avoid typeahead and other
      * similar problems...
      */
-    while (msg = (struct IntuiMessage *) GetMsg(win->UserPort))
+    while ((msg = (struct IntuiMessage *) GetMsg(win->UserPort)) != NULL)
         ReplyMsg((struct Message *) msg);
     KbdBuffered = 0;
     win->UserPort = (struct MsgPort *) 0;
     ModifyIDCMP(win, 0L);
     Permit();
     CloseWindow(win);
+}
+
+void
+CloseShWindowKeepKbd(struct Window *win)
+{
+    unsigned char savebuf[KBDBUFFER];
+    int saved;
+
+    (void) amikbhit();
+    saved = KbdBuffered;
+    if (saved > 0)
+        memcpy(savebuf, KbdBuffer, saved);
+    CloseShWindow(win);
+    if (saved > 0) {
+        memcpy(KbdBuffer, savebuf, saved);
+        KbdBuffered = saved;
+    }
 }
 
 static int
@@ -183,7 +200,7 @@ ConvertKey(struct IntuiMessage *message)
     ULONG qualifier;
     char numeric_pad, shift, control, alt;
 
-    if (amii_wins[WIN_MAP])
+    if (WIN_MAP != WIN_ERR && amii_wins[WIN_MAP])
         w = amii_wins[WIN_MAP]->win;
     qualifier = message->Qualifier;
 
@@ -376,7 +393,8 @@ ProcessMessage(struct IntuiMessage *message)
             break;
         }
 
-        if (!amii_wins[WIN_MAP] || w != amii_wins[WIN_MAP]->win)
+        if (WIN_MAP == WIN_ERR
+            || !amii_wins[WIN_MAP] || w != amii_wins[WIN_MAP]->win)
             break;
 
         if (message->Code == SELECTDOWN) {
@@ -398,7 +416,7 @@ ProcessMessage(struct IntuiMessage *message)
         while (thismenu != MENUNULL) {
             item = ItemAddress(MenuStrip, (ULONG) thismenu);
             if (KbdBuffered < KBDBUFFER)
-                BufferQueueChar((char) (GTMENUITEM_USERDATA(item)));
+                BufferQueueChar((char) (ULONG) GTMENUITEM_USERDATA(item));
             thismenu = item->NextSelect;
         }
     } break;
@@ -560,6 +578,7 @@ amikbhit(void)
 int
 WindowGetchar(void)
 {
+    amii_flush_msgscroll();
     while ((lastevent.type = WEUNK), amikbhit() <= 0) {
         WaitPort(HackPort);
     }
@@ -569,6 +588,7 @@ WindowGetchar(void)
 WETYPE
 WindowGetevent(void)
 {
+    amii_flush_msgscroll();
     lastevent.type = WEUNK;
     while (amikbhit() == 0) {
         WaitPort(HackPort);
@@ -608,7 +628,7 @@ amii_cleanup(void)
     /* Strip messages before deleting the port */
     if (HackPort) {
         Forbid();
-        while (msg = (struct IntuiMessage *) GetMsg(HackPort))
+        while ((msg = (struct IntuiMessage *) GetMsg(HackPort)) != NULL)
             ReplyMsg((struct Message *) msg);
         Permit();
         kill_nhwindows(1);
@@ -630,7 +650,7 @@ amii_cleanup(void)
                     sizeof(struct EasyStruct), 0, "Nethack Problem",
                     "Can't Close Screen, Close Visiting Windows", "Okay"
                 };
-                EasyRequest(NULL, &easy, NULL, NULL);
+                EasyRequestArgs(NULL, &easy, NULL, NULL);
             }
         } else {
             CloseScreen(HackScreen);
@@ -725,14 +745,15 @@ GetFMsg(struct MsgPort *port)
 {
     struct IntuiMessage *msg, *succ, *succ1;
 
-    if (msg = (struct IntuiMessage *) GetMsg(port)) {
+    if ((msg = (struct IntuiMessage *) GetMsg(port)) != NULL) {
         if (!sysflags.amiflush)
             return ((struct Message *) msg);
         if (msg->Class == RAWKEY) {
             Forbid();
             succ = (struct IntuiMessage *) (port->mp_MsgList.lh_Head);
-            while (succ1 = (struct IntuiMessage *) (succ->ExecMessage.mn_Node
-                                                        .ln_Succ)) {
+            while ((succ1 = (struct IntuiMessage *) (succ->ExecMessage
+                                                         .mn_Node.ln_Succ))
+                   != NULL) {
                 if (succ->Class == RAWKEY) {
                     Remove((struct Node *) succ);
                     ReplyMsg((struct Message *) succ);

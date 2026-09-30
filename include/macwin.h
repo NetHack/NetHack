@@ -1,0 +1,300 @@
+/* NetHack 5.0	macwin.h	$NHDT-Date: 1596498543 2020/08/03 23:49:03 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.14 $ */
+/* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Kevin Hugo, 2003. */
+/* NetHack may be freely redistributed.  See license for details. */
+
+#ifndef MACWIN_H
+#define MACWIN_H
+
+#include <Windows.h>
+#include <Dialogs.h>
+
+#if defined(CROSS_TO_MAC68K) || defined(CROSS_TO_MACPPC)
+#include "maccompat.h"
+#endif
+
+/* resources */
+#define PLAYER_NAME_RES_ID 1001
+
+/* working dirs structure */
+typedef struct macdirs {
+    Str32 dataName;
+    short dataRefNum;
+    long dataDirID;
+
+    Str32 saveName;
+    short saveRefNum;
+    long saveDirID;
+
+    Str32 levelName;
+    short levelRefNum;
+    long levelDirID;
+} MacDirs;
+
+typedef struct macflags {
+    Bitfield(color, 1);       /* Color QuickDraw (8-bit or better) present */
+    Bitfield(hasDebugger, 1); /* MacsBug etc. installed (see mac_dprintf) */
+    Bitfield(hasAE, 1);       /* Apple Events available */
+    Bitfield(gotOpen, 1);     /* launched by opening a save file */
+} MacFlags;
+
+extern MacDirs theDirs; /* used in macfile.c */
+extern MacFlags macFlags;
+
+/*
+ * Mac windows
+ */
+#define NUM_MACWINDOWS 15
+#define TEXT_BLOCK 512L
+
+/* Window constants.  These index the position/size records in the
+   "NetHack Preferences" file (maccurs.c).  kMapTileWindow is a pseudo-kind:
+   the map window saves a separate SIZE per display mode (text vs tile),
+   while its POSITION always lives in the kMapWindow record. */
+#define kMapWindow 0
+#define kStatusWindow 1
+#define kMessageWindow 2
+#define kTextWindow 3
+#define kMenuWindow 4
+#define kMapTileWindow 5
+#define kInvenWindow 6 /* perm-invent windoid; separate from kMenuWindow
+                          so dragging it doesn't move future menus */
+#define kOverviewWindow 7 /* map overview windoid (macmap.c) */
+#define kLastWindowKind kOverviewWindow
+
+/* WIND resource IDs (templates in sys/mac68k/nhmapwind.r) */
+#define kWindMapDocument      200 /* map, decorated (scrollbars + grow box) */
+#define kWindMapBorderless    201 /* map, compact screens */
+#define kWindStatusBorderless 210 /* status/base tty window */
+#define kWindMsgBorderless    211 /* message window */
+
+/*
+ * This determines the minimum logical line length in text windows
+ * That is; even if physical width is less, this is where line breaks
+ * go at the minimum. 350 is about right for score lines with a
+ * geneva 10 pt font.
+ */
+#define MIN_RIGHT 350
+
+typedef struct {
+    anything id;
+    char accelerator;
+    char groupAcc;
+    Boolean preselected;      /* MENU_ITEMFLAGS_SELECTED at build time */
+    short line;
+    short tileidx;            /* sheet tile for the row; -1 = none */
+} MacMHMenuItem;
+
+typedef struct NhWindow {
+    WindowPtr its_window;
+
+    short font_number;
+    short font_size;
+    short char_width;
+    short row_height;
+    short ascent_height;
+
+    short x_size;
+    short y_size;
+    short x_curs;
+    short y_curs;
+
+    short last_more_lin; /* Used by message window */
+    short save_lin;      /* Used by message window */
+
+    short miSize;             /* size of menu items arrays */
+    short miLen;              /* number of menu items in array */
+    MacMHMenuItem **menuInfo; /* Used by menus (array handle) */
+    char menuChar;            /* next menu accelerator to use */
+    short **menuSelected;     /* list of selected elements from list */
+    long **menuCounts;        /* per-ITEM typed counts (-1 = whole stack);
+                                 lifecycle mirrors menuSelected */
+    long pendingCount;        /* typed count being accumulated in MenwKey */
+    char hasPending;          /* nonzero while pendingCount is live */
+    short miSelLen;           /* number of items selected */
+    short how;                /* menu mode */
+    Handle menuStyle;         /* per-line {attr,color} bytes for styled menu draw */
+    char menuTiles;           /* nonzero: rows carry item tiles (taller rows,
+                                 text indented by MACTILE_DIM+2); decided in
+                                 mac_end_menu */
+
+    char drawn;
+    Handle windowText;
+    long windowTextLen;
+    short scrollPos;
+    ControlHandle scrollBar;
+    ControlHandle hScrollBar; /* perm-invent windoid only: horizontal */
+    short hScrollPos;         /* pixels scrolled left */
+
+    Boolean tile_mode;        /* tile rendering enabled (map window only) */
+} NhWindow;
+
+extern Boolean CheckNhWin(WindowPtr mac_win);
+
+#define QUEUE_LEN 24
+
+extern NhWindow *theWindows;
+
+extern struct window_procs mac_procs;
+
+#define NHW_BASE 0
+extern winid BASE_WINDOW, WIN_MAP, WIN_MESSAGE, WIN_INVEN, WIN_STATUS;
+
+/*
+ * External declarations for the window routines.
+ */
+
+#define E extern
+
+/* ### dprintf.c ### */
+
+extern void mac_dprintf(char *, ...);
+
+/* ### maccurs.c ### */
+
+extern Boolean RetrievePosition(short, short *, short *);
+extern Boolean RetrieveSize(short, short, short, short *, short *);
+extern void SaveWindowPos(WindowPtr);
+extern void SaveWindowSize(WindowPtr);
+extern void SaveSizeForKind(short kind, short height, short width);
+
+/* UI settings persisted in the "NetHack Preferences" file after the
+   window-position records; written by the Preferences dialog (macprefs.c)
+   and applied at startup AFTER initoptions(), so they override the
+   NetHack Defaults file.  valid==0 (never saved / "Forget Settings")
+   leaves the config-file values alone. */
+/* Bumped whenever UiPrefs or the savePos[] layout changes; a stored
+   record with any other version is discarded (maccurs.c InitWinFile),
+   so there is no migration path. */
+#define UIPREFS_VERSION 4
+enum uiprefs_fonts {
+    uiFontMap = 0, uiFontStatus, uiFontMessage, uiFontMenu, uiFontText,
+    UIPREFS_NFONTS
+};
+typedef struct UiPrefs {
+    short version;               /* UIPREFS_VERSION */
+    char valid;                  /* 0 => record unused */
+    char tiled_map;              /* startup map display mode */
+    char hitpointbar;
+    char statuslines;            /* 2 or 3 */
+    char menutiles;              /* item tiles in menu rows */
+    char perminv_open;           /* windoid was open at last save */
+    char sounds;                 /* soundlib on/off (iflags.sounds) */
+    char overview_open;          /* map overview windoid open at last save */
+    Str31 fonts[UIPREFS_NFONTS]; /* fonts[i][0]==0 => port default */
+    short sizes[UIPREFS_NFONTS]; /* 0 => port default */
+} UiPrefs;
+extern Boolean RetrieveUiPrefs(UiPrefs *);
+extern void StoreUiPrefs(const UiPrefs *);
+
+/* ### macprefs.c ### */
+
+extern void macprefs_dialog(void);
+extern void macprefs_apply_startup(void);
+extern void macprefs_note_perminv(Boolean); /* persist windoid open/closed */
+extern void macprefs_note_overview(Boolean); /* ditto, overview windoid */
+
+/* macwin.c: update-event dispatch for movable-modal dialog filters */
+extern void mac_handle_update_event(EventRecord *);
+
+/* macwin.c: Game > Save Window Positions */
+extern void mac_save_window_positions(void);
+extern Boolean RetrieveWinPos(WindowPtr, short *, short *);
+
+/* ### macerrs.c ### */
+/* error() is declared in hack.h */
+/* ### macfile.c ### */
+
+extern void C2P(const char *c, unsigned char *p);
+extern void mac_fsspec(FSSpec *spec, short vol, long dir,
+                       ConstStr255Param name);
+extern void P2C(const unsigned char *p, char *c);
+
+/* P_STRING_CONV (compile-time Pascal string from a C literal) lives in
+   maccompat.h, included above, so standalone tools (mrecover.c) and
+   light-include files (mactty.c) can use it without pulling in macwin.h. */
+
+/* ### mmodal.c ### */
+
+extern void FlashButton(DialogRef, short);
+
+/* ### macmenu.c ### */
+
+extern void DoMenuEvt(long);
+extern void InitMenuRes(void);
+extern void AdjustMenus(short);
+#define DimMenuBar() AdjustMenus(1)
+#define UndimMenuBar() AdjustMenus(0)
+extern void mactile_menu_refresh(void);
+
+/* ### macmain.c ### */
+
+extern void process_openfile(FSSpec *fss, OSType ft);
+
+/* ### mttymain.c ### */
+
+extern void clear_screen(void);
+
+/* ### macwin.c ### */
+
+extern void AddToKeyQueue(unsigned char, Boolean);
+extern short KeyQueueFree(void);
+extern unsigned char GetFromKeyQueue(void);
+extern void InitMac(void);
+int try_key_queue(char *);
+void enter_topl_mode(char *);
+void leave_topl_mode(char *);
+void topl_set_resp(char *, char);
+Boolean topl_key(unsigned char, Boolean);
+E void HandleEvent(EventRecord *); /* used in mmodal.c */
+extern void port_help(void);
+extern int SanePositions(void);
+extern void ResetWindowPositions(void); /* "Reposition Windows": reset stack */
+
+extern Boolean small_screen;
+
+E void mac_init_nhwindows(int *, char **);
+E void mac_askname(void);
+E void mac_get_nh_event(void);
+E void mac_exit_nhwindows(const char *);
+E winid mac_create_nhwindow(int);
+E void mac_clear_nhwindow(winid);
+E void mac_display_nhwindow(winid, boolean);
+E void mac_destroy_nhwindow(winid);
+E void mac_curs(winid, int, int);
+E void mac_putstr(winid, int, const char *);
+E void mac_start_menu(winid, unsigned long);
+E void mac_add_menu(winid, const glyph_info *, const anything *, char, char,
+                    int, int, const char *, unsigned int);
+E void mac_end_menu(winid, const char *);
+E int mac_select_menu(winid, int, menu_item **);
+#ifdef CLIPPING
+E void mac_cliparound(int, int);
+#endif
+E int mac_nhgetch(void);
+E int mac_nh_poskey(coordxy *, coordxy *, int *);
+E int mac_doprev_message(void);
+E char mac_yn_function(const char *, const char *, char);
+E void mac_getlin(const char *, char *);
+E int mac_get_ext_cmd(void);
+E void mac_number_pad(int);
+E void mac_delay_output(void);
+
+/* macwin.c: palette-safe text color, shared by menus and status */
+extern void mac_set_text_color(int);
+extern short mac_main_depth(void); /* main-device pixel depth (1 = B&W) */
+extern WindowPtr FrontGameWindow(void); /* FrontWindow() minus the
+                                           floating overview windoid */
+
+/* macstat.c: native status renderer */
+extern void mac_status_init(void);
+extern void mac_status_finish(void);
+extern void mac_status_enablefield(int, const char *, const char *, boolean);
+extern void mac_status_update(int, genericptr_t, int, int, int,
+                              unsigned long *);
+extern void macstat_redraw(void);
+extern Boolean macstat_active(void);
+
+#undef E
+
+#endif /* ! MACWIN_H */

@@ -2655,16 +2655,17 @@ extern void com_pager(const char *);
 extern void qt_pager(const char *);
 extern struct permonst *qt_montype(void);
 extern void deliver_splev_message(void);
+extern void free_questpager(void);
 
 /* ### random.c ### */
 
 #if defined(RANDOM) && !defined(__GO32__) /* djgpp has its own random */
-#ifndef CROSS_TO_AMIGA
+#if !defined(CROSS_TO_AMIGA) && !defined(CROSS_TO_ATARI)
 extern void srandom(unsigned);
 extern char *initstate(unsigned, char *, int);
 extern char *setstate(char *);
 extern long random(void);
-#endif /* CROSS_TO_AMIGA */
+#endif /* !CROSS_TO_AMIGA && !CROSS_TO_ATARI */
 #endif /* RANDOM */
 
 /* ### read.c ### */

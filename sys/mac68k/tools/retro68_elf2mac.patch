@@ -1,0 +1,34 @@
+Elf2Mac: handle cross-section jump-table references instead of aborting
+
+NetHack keeps function-pointer tables in .data (windowprocs, sound
+interface, ...).  Each entry is a relocation from .data into a code
+section; upstream Elf2Mac asserts that jump-table relocations stay
+within their own section and aborts the link.  Treat the cross-section
+case as a regular jump-table relocation.
+
+Not yet merged upstream (checked against autc04/Retro68 master,
+2026-06).  Apply to the Retro68 source tree and rebuild Elf2Mac; no
+other component of the toolchain needs patching or rebuilding.
+
+diff --git a/Elf2Mac/Section.cc b/Elf2Mac/Section.cc
+index eb0097cbf9..2842deda14 100644
+--- a/Elf2Mac/Section.cc
++++ b/Elf2Mac/Section.cc
+@@ -229,13 +229,11 @@ void Section::FixRelocs(bool allowDirectCodeRefs)
+                     {
+                         if(sym.section.get() != this)
+                         {
+-                            std::cerr << "Invalid ref from "
+-                                      << name << ":" << std::hex << rela.r_offset-shdr.sh_addr << std::dec
+-                                      << " to " << sym.section->name
+-                                      << "(" << sym.name << ")"
+-                                      << "+" << rela.r_offset << std::endl;
++                            /* Cross-section JT ref with addend (e.g. function
++                               pointer in .data referencing .code).
++                               Treat as a regular relocation instead of aborting. */
++                            relocBase = RelocBase::jumptable;
+                         }
+-                        assert(sym.section.get() == this);
+                     }
+                 }
+                 else if(allowDirectCodeRefs)

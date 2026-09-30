@@ -20,7 +20,7 @@
 int main(int, char **);
 struct BitMap *MyAllocBitMap(int, int, int, long);
 void MyFreeBitMap(struct BitMap *);
-BitMapHeader ReadImageFile(const char *, struct BitMap **);
+boolean ReadImageFile(const char *, struct BitMap **, BitMapHeader *);
 void FreeImageFile(struct BitMap **);
 void amiv_flush_glyph_buffer(struct Window *);
 void amiv_lprint_glyph(winid, int, int);
@@ -71,15 +71,17 @@ struct PDAT pictdata;
 char *tilefile;
 struct BitMap *tileimg, *tile;
 
+static char image_error[BUFSZ];
+
 /*
  * Read a single BMAP IFF file into a BitMap.
- * Returns the BitMapHeader; *bmp receives the bitmap.
+ * Returns TRUE on success; *bmp receives the bitmap, *bmhdp the header.
  * Caller frees via FreeImageFile().
  */
-BitMapHeader
-ReadImageFile(const char *filename, struct BitMap **bmp)
+boolean
+ReadImageFile(const char *filename, struct BitMap **bmp, BitMapHeader *bmhdp)
 {
-    BitMapHeader *bmhd, bmhds = { 0 };
+    BitMapHeader *bmhd;
     int j, np;
     long err;
     struct IFFHandle *iff = NULL;
@@ -89,8 +91,10 @@ ReadImageFile(const char *filename, struct BitMap **bmp)
     long errcode = 0;
 
     IFFParseBase = OpenLibrary("iffparse.library", 0L);
-    if (!IFFParseBase)
-        panic("No iffparse.library");
+    if (!IFFParseBase) {
+        Strcpy(image_error, "No iffparse.library");
+        return FALSE;
+    }
 
     iff = AllocIFF();
     if (!iff) {
@@ -141,7 +145,7 @@ ReadImageFile(const char *filename, struct BitMap **bmp)
     if (prop) {
         unsigned char *cmap = prop->sp_Data;
         for (j = 0; j < (1UL << np) * 3; j += 3) {
-            amii_initmap[j / 3] =
+            amii_workmap[j / 3] =
                 amiv_init_map[j / 3] =
                     ((cmap[j+0] >> 4) << 8)
                   | ((cmap[j+1] >> 4) << 4)
@@ -165,7 +169,7 @@ ReadImageFile(const char *filename, struct BitMap **bmp)
         ReadChunkBytes(iff, (*bmp)->Planes[j],
                        RASSIZE(bmhd->w, bmhd->h));
 
-    bmhds = *bmhd;
+    *bmhdp = *bmhd;
 
 cleanup:
     if (iff_opened)
@@ -177,10 +181,13 @@ cleanup:
     CloseLibrary(IFFParseBase);
     IFFParseBase = NULL;
 
-    if (errfmt)
-        panic(errfmt, filename, errcode);
+    if (errfmt) {
+        Snprintf(image_error, sizeof image_error, errfmt, filename,
+                 errcode);
+        return FALSE;
+    }
 
-    return bmhds;
+    return TRUE;
 }
 
 void
@@ -197,7 +204,8 @@ ReadTileImageFiles(void)
 {
     BitMapHeader bmhds;
 
-    bmhds = ReadImageFile(tilefile, &tileimg);
+    if (!ReadImageFile(tilefile, &tileimg, &bmhds))
+        panic("%s", image_error);
 
     tile = MyAllocBitMap(pictdata.xsize, pictdata.ysize,
                 pictdata.nplanes + amii_extraplanes,
@@ -393,34 +401,45 @@ amiv_flush_glyph_buffer(struct Window *vw)
         /* Go ahead and start dumping the stuff */
         for (i = 0; i < glyph_node_index; ++i) {
             /* Do it */
-            int offx, offy, j;
+            int offx, offy, j, visible;
             struct BitMap *nodebm = amiv_g_nodes[i].bitmap;
 
             /* Get the unclipped coordinates */
             x = amiv_g_nodes[i].odstx;
             y = amiv_g_nodes[i].odsty;
 
+            visible = (!clipping || (x >= clipx && y >= clipy && x < clipxmax
+                                     && y < clipymax));
+            if (!visible && !(bm && w && reclip != 2))
+                continue;
+
             /* If image is not in CHIP. copy each plane into tile line by line
              */
 
             offx = amiv_g_nodes[i].srcx / 8; /* 8 is bits per byte */
             offy = amiv_g_nodes[i].srcy * nodebm->BytesPerRow;
-            for (j = 0; j < pictdata.nplanes + amii_extraplanes; ++j) {
-                for (k = 0; k < pictdata.ysize; ++k) {
-                    /* For a 16x16 tile, this could just be short assignments,
-                     * but
-                     * this code is generalized to handle any size tile
-                     * image...
-                     */
-                    memcpy(tile->Planes[j] + k * tile->BytesPerRow,
-                           nodebm->Planes[j] + offx + offy
-                               + (nodebm->BytesPerRow * k),
-                           pictdata.xsize / 8);
+            if (pictdata.xsize == 16 && tile->BytesPerRow == 2) {
+                for (j = 0; j < pictdata.nplanes + amii_extraplanes; ++j) {
+                    short *dp = (short *) tile->Planes[j];
+                    char *sp = (char *) nodebm->Planes[j] + offx + offy;
+
+                    for (k = 0; k < pictdata.ysize; ++k) {
+                        *dp++ = *(short *) sp;
+                        sp += nodebm->BytesPerRow;
+                    }
+                }
+            } else {
+                for (j = 0; j < pictdata.nplanes + amii_extraplanes; ++j) {
+                    for (k = 0; k < pictdata.ysize; ++k) {
+                        memcpy(tile->Planes[j] + k * tile->BytesPerRow,
+                               nodebm->Planes[j] + offx + offy
+                                   + (nodebm->BytesPerRow * k),
+                               pictdata.xsize / 8);
+                    }
                 }
             }
 
-            if (!clipping || (x >= clipx && y >= clipy && x < clipxmax
-                              && y < clipymax)) {
+            if (visible) {
                 /* scaling is needed, do it */
                 if (scaling_needed) {
                     BitMapScale(&bsm);
@@ -513,6 +532,10 @@ amiv_lprint_glyph(winid window, int color_index, int glyph)
     }
 
     if (cw->type == NHW_MAP) {
+        if (clipping && (WIN_OVER == WIN_ERR || !amii_wins[WIN_OVER])
+            && (cw->curx < clipx || cw->cury < clipy
+                || cw->curx >= clipxmax || cw->cury >= clipymax))
+            return;
         curx = cw->curx - clipx;
         cury = cw->cury - clipy;
 
@@ -838,7 +861,7 @@ amii_lprint_glyph(winid window, int color_index, int glyph)
         amii_g_nodes[glyph_node_index].bg_color = bg_color;
         amii_g_nodes[glyph_node_index].buffer =
             &amii_glyph_buffer[glyph_buffer_index];
-        amii_glyph_buffer[glyph_buffer_index] = glyph;
+        amii_glyph_buffer[glyph_buffer_index] = (char) glyph;
         ++glyph_buffer_index;
         ++glyph_node_index;
     }

@@ -1,0 +1,1634 @@
+/* NetHack 5.0	macmap.c	*/
+/* Copyright (c) Ingo Paschke, 2026. */
+/* NetHack may be freely redistributed.  See license for details. */
+/* macmap.c: separate map window for the Mac 68k port. See macmap.h. */
+#include "hack.h"
+#include "macwin.h"
+#include "mactty.h"
+#include "macmap.h"
+#include "mactile.h"
+#include <Resources.h>
+#include <QDOffscreen.h>
+#include <Palettes.h>
+#include <Controls.h>
+#include <Menus.h> /* GetMBarHeight, for the overview default spot */
+
+/* src/tile.c reserves a tile slot per statue-monster, but our PICT sheet has
+   only the one generic statue tile; remap any out-of-sheet index to it. */
+extern int maxothtile;
+extern glyph_map glyphmap[MAX_GLYPH];
+
+short
+remap_tile_idx(int idx) /* also used by macwin.c for menu tiles */
+{
+    if (idx <= maxothtile) return (short) idx;
+    static short statue_tile = -1;
+    if (statue_tile < 0)
+        statue_tile = glyphmap[GLYPH_OBJ_OFF + STATUE].tileidx;
+    return statue_tile;
+}
+
+typedef struct {
+    NhWindow      *owner;
+    Boolean        tile_mode;
+    GWorldPtr      backing;
+    PaletteHandle  palette;
+    short          cell_w, cell_h;
+    short          vis_cols, vis_rows;
+    short          scroll_col, scroll_row;
+    short          tile_cache[ROWNO][COLNO];
+    unsigned char  text_cache[ROWNO][COLNO];
+    unsigned char  text_color[ROWNO][COLNO];
+    unsigned char  pet_cache[ROWNO][COLNO];   /* MG_PET, for hilite_pet */
+    /* software cursor for getpos/farlook: track the framed cell to un-frame it */
+    Boolean        cursor_on;
+    short          cursor_x, cursor_y;
+    ControlHandle  vscroll, hscroll;   /* functional scrollbars (decorated only) */
+    Boolean        decorated;          /* documentProc with chrome/strips */
+    short          inset_r, inset_b;   /* reserved strip widths (0 = borderless) */
+    /* Per-cell draws paint the backing and union this dirty rect; macmap_flush
+       blits it to the window once per frame (at display_nhwindow / curs) instead
+       of one CopyBits per cell. Coords are backing/window-local. */
+    Rect           dirty;
+    Boolean        has_dirty;
+    /* print_glyph doesn't paint; it queues cells and macmap_flush
+       repaints them from cache in one batch, so the per-call
+       LockPixels/SetGWorld/GetFontInfo/color setup is paid once a frame.
+       Exact cells are kept up to PEND_MAX; past that (bulk redraws like
+       ^R/level entry) only the bounding box is kept and the whole strip
+       repaints.  Tracking the box alone would repaint thousands of
+       unchanged cells on an ordinary turn, since a hero step plus a
+       far-away monster update already span most of the map. */
+#define PEND_MAX 256
+    Boolean        cells_pending;
+    Boolean        pend_overflow;
+    short          pend_n;
+    unsigned char  pend_x[PEND_MAX], pend_y[PEND_MAX];
+    short          pend_c0, pend_r0, pend_c1, pend_r1; /* end exclusive */
+} MacMapState;
+
+static MacMapState gMap = {0};
+
+/* action proc for live scrollbar tracking; created lazily in macmap_click */
+static ControlActionUPP gMapScrollUPP = NULL;
+
+static void repaint_full_viewport(void);
+static void scroll_viewport_to(short new_col, short new_row);
+static void draw_cursor_border(int col, int row);
+static void queue_cell(int x, int y);
+static void flush_pending_cells(void);
+
+/* Overview windoid; see the block above its implementation below. */
+#define OV_SCALE 3
+#define OV_COLS (COLNO - 1) /* col 0 is unused, so it gets no pixels */
+static WindowPtr gOvWindow = NULL;
+static Boolean gOvHasPalette = false; /* tile palette attached to it */
+static void ov_draw_cell(short x, short y);
+static void ov_repaint_range(short c0, short r0, short c1, short r1);
+static void ov_repaint_all(void);
+static void ov_mirror_pending(void);
+
+/* Union a backing-local cell rect into the pending dirty region. */
+static void
+mark_dirty(const Rect *cell)
+{
+    if (!gMap.has_dirty) { gMap.dirty = *cell; gMap.has_dirty = true; }
+    else UnionRect(cell, &gMap.dirty, &gMap.dirty);
+}
+
+/* Mark the whole viewport dirty (a scroll/full repaint changed every pixel). */
+static void
+mark_dirty_all(void)
+{
+    SetRect(&gMap.dirty, 0, 0,
+            gMap.vis_cols * gMap.cell_w, gMap.vis_rows * gMap.cell_h);
+    gMap.has_dirty = true;
+}
+
+/* Drawable map area = port bounds minus the scrollbar strips (0 when borderless). */
+static void
+map_content_bounds(Rect *out)
+{
+    if (!gMap.owner || !gMap.owner->its_window) { SetRect(out, 0, 0, 0, 0); return; }
+    GetWindowPortBounds(gMap.owner->its_window, out);
+    out->right  -= gMap.inset_r;
+    out->bottom -= gMap.inset_b;
+}
+
+/* Position the scrollbar controls in the right/bottom strips; call after any
+   SizeWindow (no-op when borderless). The bars stop short of the grow-box corner. */
+static void
+layout_scroll_controls(void)
+{
+    Rect b;
+    if (!gMap.decorated || !gMap.vscroll || !gMap.hscroll || !gMap.owner
+        || !gMap.owner->its_window)
+        return;
+    GetWindowPortBounds(gMap.owner->its_window, &b);
+    HideControl(gMap.vscroll); HideControl(gMap.hscroll);
+    MoveControl(gMap.vscroll, b.right - 15, b.top - 1);
+    SizeControl(gMap.vscroll, 16, (b.bottom - 14) - (b.top - 1));
+    MoveControl(gMap.hscroll, b.left - 1, b.bottom - 15);
+    SizeControl(gMap.hscroll, (b.right - 14) - (b.left - 1), 16);
+    ShowControl(gMap.vscroll); ShowControl(gMap.hscroll);
+}
+
+/* Reflect the viewport position in the scrollbar thumbs (no-op when borderless).
+   Vertical = rows; horizontal = cols 1..COLNO-1 (col 0 unused). */
+static void
+update_scroll_controls(void)
+{
+    short vmax, vval, hmax, hval;
+    if (!gMap.decorated || !gMap.vscroll || !gMap.hscroll) return;
+    vmax = ROWNO - gMap.vis_rows;
+    if (vmax < 0) vmax = 0;
+    vval = gMap.scroll_row;
+    if (vval > vmax) vval = vmax;
+    if (vval < 0) vval = 0;
+    SetControlMaximum(gMap.vscroll, vmax);
+    SetControlValue(gMap.vscroll, vval);
+    hmax = (COLNO - 1) - gMap.vis_cols;
+    if (hmax < 0) hmax = 0;
+    hval = gMap.scroll_col - 1;   /* scroll_col is 1-based (col 0 unused) */
+    if (hval > hmax) hval = hmax;
+    if (hval < 0) hval = 0;
+    SetControlMaximum(gMap.hscroll, hmax);
+    SetControlValue(gMap.hscroll, hval);
+}
+
+/* NetHack color indices to RGB. Values are 16-bit per channel (Mac
+   QuickDraw convention; 8-bit values multiplied by 257 for full range). */
+#define R16(v) ((unsigned short)((v) * 257))
+static const RGBColor gNhColorRGB[16] = {
+    {R16(0x00), R16(0x00), R16(0x00)},   /* 0  CLR_BLACK   */
+    {R16(0xC0), R16(0x00), R16(0x00)},   /* 1  CLR_RED     */
+    {R16(0x00), R16(0x80), R16(0x00)},   /* 2  CLR_GREEN   */
+    {R16(0x80), R16(0x80), R16(0x00)},   /* 3  CLR_BROWN   */
+    {R16(0x00), R16(0x00), R16(0xC0)},   /* 4  CLR_BLUE    */
+    {R16(0x80), R16(0x00), R16(0x80)},   /* 5  CLR_MAGENTA */
+    {R16(0x00), R16(0x80), R16(0x80)},   /* 6  CLR_CYAN    */
+    {R16(0xC0), R16(0xC0), R16(0xC0)},   /* 7  CLR_GRAY    */
+    {R16(0x80), R16(0x80), R16(0x80)},   /* 8  NO_COLOR    */
+    {R16(0xFF), R16(0x80), R16(0x00)},   /* 9  CLR_ORANGE  */
+    {R16(0x00), R16(0xFF), R16(0x00)},   /* 10 CLR_BRIGHT_GREEN */
+    {R16(0xFF), R16(0xFF), R16(0x00)},   /* 11 CLR_YELLOW  */
+    {R16(0x00), R16(0x80), R16(0xFF)},   /* 12 CLR_BRIGHT_BLUE */
+    {R16(0xFF), R16(0x00), R16(0xFF)},   /* 13 CLR_BRIGHT_MAGENTA */
+    {R16(0x00), R16(0xFF), R16(0xFF)},   /* 14 CLR_BRIGHT_CYAN */
+    {R16(0xFF), R16(0xFF), R16(0xFF)}    /* 15 CLR_WHITE   */
+};
+
+/* The effective RGB set_nh_color draws a NetHack color in: color 0
+   (black) would be invisible on the black map bg, so it shows as dark
+   gray. */
+static void
+nh_color_rgb(int color, RGBColor *out)
+{
+    *out = gNhColorRGB[color];
+    if (color == 0)
+        out->red = out->green = out->blue = R16(0x55);
+}
+
+static void
+set_nh_color(int color)
+{
+    RGBColor c;
+
+    if (color < 0 || color >= 16) color = 8;   /* NO_COLOR */
+    nh_color_rgb(color, &c);
+    RGBForeColor(&c);
+}
+
+/* Nearest tile-palette entry for each NetHack color, resolved once when
+   the palette is built.  Drawing by index (PmForeColor) never asks the
+   Palette Manager to match an RGB, so it can never reassign a
+   pmTolerant entry out from under the tiles. */
+static short gNhColorIdx[16];
+
+static void
+build_nh_color_index(PaletteHandle pal)
+{
+    int c, j;
+
+    for (c = 0; c < 16; c++) {
+        RGBColor want;
+        long best = 0x7FFFFFFFL;
+        short bestj = 0;
+
+        nh_color_rgb(c, &want);
+        for (j = 0; j < TILE_PALETTE_ENTRIES; j++) {
+            RGBColor e;
+            long dr, dg, db, d;
+
+            GetEntryColor(pal, (short) j, &e);
+            /* compare at 8-bit precision: squaring three full 16-bit
+               deltas would overflow a signed long */
+            dr = ((long) e.red - want.red) / 256;
+            dg = ((long) e.green - want.green) / 256;
+            db = ((long) e.blue - want.blue) / 256;
+            d = dr * dr + dg * dg + db * db;
+            if (d < best) {
+                best = d;
+                bestj = (short) j;
+            }
+        }
+        gNhColorIdx[c] = bestj;
+    }
+}
+
+static Boolean
+allocate_backing(void)
+{
+    if (gMap.backing) {
+        DisposeGWorld(gMap.backing);
+        gMap.backing = NULL;
+    }
+    Rect r;
+    SetRect(&r, 0, 0,
+            gMap.vis_cols * gMap.cell_w,
+            gMap.vis_rows * gMap.cell_h);
+
+    short depth;
+    if (gMap.tile_mode) {
+        depth = mactile_sheet_depth();
+        if (depth < 4) depth = 8;
+    } else {
+        GDHandle gd = GetMainDevice();
+        depth = (*(*gd)->gdPMap)->pixelSize;
+        if (depth > 8) depth = 8;
+        if (depth < 1) depth = 1;
+    }
+
+    QDErr err = NewGWorld(&gMap.backing, depth, &r, NULL, NULL, 0);
+    if (err != noErr || !gMap.backing) {
+        mac_dprintf("macmap: NewGWorld failed err=%d (depth=%d)\n",
+                    (int) err, (int) depth);
+        gMap.backing = NULL;
+        return false;
+    }
+
+    /* pin the backing so the Memory Manager can't purge it under CopyBits */
+    {
+        PixMapHandle pm = GetGWorldPixMap(gMap.backing);
+        NoPurgePixels(pm);
+    }
+    /* fg=black/bg=white is REQUIRED so the tile CopyBits isn't tinted; the map
+       font lets DrawChar render real glyphs. (text path flips bg per cell.) */
+    GWorldPtr saveW; GDHandle saveD;
+    GetGWorld(&saveW, &saveD);
+    SetGWorld(gMap.backing, NULL);
+    PixMapHandle pm = GetGWorldPixMap(gMap.backing);
+    if (!LockPixels(pm)) {
+        /* pixels purged: tear down and fail rather than draw into bad memory */
+        mac_dprintf("macmap: LockPixels failed in allocate_backing\n");
+        SetGWorld(saveW, saveD);
+        DisposeGWorld(gMap.backing);
+        gMap.backing = NULL;
+        return false;
+    }
+    {
+        RGBColor white = {0xFFFF, 0xFFFF, 0xFFFF};
+        RGBColor black = {0, 0, 0};
+        RGBBackColor(&white);
+        RGBForeColor(&black);
+        {
+            short fn = (gMap.owner && gMap.owner->font_number > 0)
+                       ? gMap.owner->font_number : kFontIDMonaco;
+            short fs = (gMap.owner && gMap.owner->font_size > 0)
+                       ? gMap.owner->font_size : 9;
+            TextFont(fn);
+            TextSize(fs);
+            TextFace(0);
+            TextMode(srcCopy);
+        }
+    }
+    EraseRect(&r);
+    UnlockPixels(pm);
+    SetGWorld(saveW, saveD);
+    return true;
+}
+
+/* Copy a rect from the backing GWorld to the map window.  The two share a
+   coordinate space -- both origin at the content top-left, one cell per
+   gMap.cell_w/cell_h -- which is why callers can pass the SAME rect for
+   src and dst. */
+static void
+blit_backing_to_window(const Rect *src_rect, const Rect *dst_rect)
+{
+    if (!gMap.backing || !gMap.owner || !gMap.owner->its_window) return;
+    PixMapHandle pm = GetGWorldPixMap(gMap.backing);
+    if (!LockPixels(pm)) {
+        /* pixels purged: skip the blit */
+        mac_dprintf("macmap: blit_backing_to_window: LockPixels failed\n");
+        return;
+    }
+    GrafPtr saveP; GetPort(&saveP);
+    SetPort(gMap.owner->its_window);
+    CopyBits((BitMap *) *pm,
+             GetPortBitMapForCopyBits(GetWindowPort(gMap.owner->its_window)),
+             src_rect, dst_rect, srcCopy, NULL);
+    SetPort(saveP);
+    UnlockPixels(pm);
+}
+
+Boolean
+macmap_create(NhWindow *map)
+{
+    if (!map) return false;
+    if (gMap.owner) return true;   /* idempotent */
+
+    short wind_id = small_screen ? kWindMapBorderless : kWindMapDocument;
+
+    WindowPtr w = (WindowPtr) GetNewCWindow(wind_id, NULL, (WindowPtr) -1L);
+    if (!w) {
+        mac_dprintf("macmap: GetNewCWindow(%d) returned NULL\n", (int) wind_id);
+        return false;
+    }
+    SetWRefCon(w, MACMAP_REFCON);
+    SetWindowKind(w, WIN_BASE_KIND + NHW_MAP);
+    map->its_window = w;
+    ShowWindow(w);
+
+    gMap.owner     = map;   /* set early so map_content_bounds is usable */
+    gMap.decorated = !small_screen;
+    gMap.inset_r   = gMap.decorated ? 15 : 0;
+    gMap.inset_b   = gMap.decorated ? 15 : 0;
+    if (gMap.decorated) {
+        Rect b, vr, hr;
+        GetWindowPortBounds(w, &b);
+        SetRect(&vr, b.right - 15, b.top - 1,  b.right + 1, b.bottom - 14);
+        SetRect(&hr, b.left - 1,  b.bottom - 15, b.right - 14, b.bottom + 1);
+        /* nominal range until update_scroll_controls sets the real one.
+           procID 16 == scrollBarProc */
+        gMap.vscroll = NewControl(w, &vr, P_EMPTY_STRING, true, 0, 0, 1, 16, 0);
+        gMap.hscroll = NewControl(w, &hr, P_EMPTY_STRING, true, 0, 0, 1, 16, 0);
+    } else {
+        gMap.vscroll = gMap.hscroll = NULL;
+    }
+
+    /* apply the saved text-mode size from the prefs file; position is
+       deferred to SanePositions() (called at startup from allmain.c) */
+    {
+        Rect b; short sw, sh;
+        GetWindowPortBounds(w, &b);
+        if (RetrieveSize(kMapWindow, b.top, b.left, &sh, &sw))
+            SizeWindow(w, sw, sh, false);
+    }
+    layout_scroll_controls();
+
+    gMap.tile_mode   = false;
+    gMap.backing     = NULL;
+    gMap.palette     = NULL;
+    /* safe defaults; macmap_finalize re-derives them from the NhWindow */
+    gMap.cell_w      = 6;
+    gMap.cell_h      = 14;
+    gMap.vis_cols    = 80;
+    gMap.vis_rows    = 21;
+    gMap.scroll_col  = 1;   /* col 0 is unused */
+    gMap.scroll_row  = 0;
+    /* seed cache to -1 (empty): tile 0 is a real tile (giant ant), so zero-init
+       would paint ants before the first print_glyph */
+    {
+        int rr, cc;
+        for (rr = 0; rr < ROWNO; ++rr)
+            for (cc = 0; cc < COLNO; ++cc)
+                gMap.tile_cache[rr][cc] = -1;
+    }
+    /* Backing + tile-mode init deferred to macmap_finalize. */
+
+    return true;
+}
+
+/* Called from mac_create_nhwindow AFTER get_tty_metrics has populated
+   aWin->char_width / row_height / font_number. Re-derive cell metrics,
+   recompute the viewport from actual window size, allocate the backing
+   GWorld, and apply tile mode if NHDeflts asks. */
+void
+macmap_finalize(NhWindow *map)
+{
+    if (!map || gMap.owner != map || !map->its_window) return;
+    if (map->char_width  > 0) gMap.cell_w = map->char_width;
+    if (map->row_height  > 0) gMap.cell_h = map->row_height;
+    {
+        Rect cr; map_content_bounds(&cr);
+        gMap.vis_cols = (cr.right - cr.left) / gMap.cell_w;
+        gMap.vis_rows = (cr.bottom - cr.top) / gMap.cell_h;
+        if (gMap.vis_cols < 1) gMap.vis_cols = 1;
+        if (gMap.vis_rows < 1) gMap.vis_rows = 1;
+    }
+    if (!allocate_backing()) {
+        mac_dprintf("macmap: backing alloc failed at finalize\n");
+    }
+    if (iflags.wc_tiled_map && mactile_available()) {
+        macmap_set_mode(map, true);
+    }
+    /* centering happens lazily in macmap_print_glyph; u.ux/u.uy may be unset here */
+}
+
+void
+macmap_destroy(NhWindow *map)
+{
+    if (!map || gMap.owner != map) return;
+    if (gOvWindow) { /* before the shared palette goes away */
+        SetPalette(gOvWindow, (PaletteHandle) 0, false);
+        DisposeWindow(gOvWindow);
+        gOvWindow = NULL;
+        gOvHasPalette = false;
+    }
+    if (gMap.backing) { DisposeGWorld(gMap.backing); gMap.backing = NULL; }
+    if (gMap.palette) { DisposePalette(gMap.palette); gMap.palette = NULL; }
+    if (map->its_window) {
+        /* DisposeWindow disposes attached controls; just drop our handles */
+        gMap.vscroll = gMap.hscroll = NULL;
+        DisposeWindow(map->its_window);
+        map->its_window = NULL;
+    }
+    if (gMapScrollUPP) {   /* lazily recreated in macmap_click if needed */
+        DisposeControlActionUPP(gMapScrollUPP);
+        gMapScrollUPP = NULL;
+    }
+    gMap.owner = NULL;
+}
+
+Boolean
+macmap_set_mode(NhWindow *map, Boolean tile_mode)
+{
+    if (!map || gMap.owner != map) return false;
+
+    if (tile_mode && !mactile_init()) return false;
+    gMap.tile_mode = tile_mode;
+    map->tile_mode = tile_mode;   /* keep NhWindow field in sync for macwin/mactty */
+    if (tile_mode) {
+        gMap.cell_w = MACTILE_DIM;
+        gMap.cell_h = MACTILE_DIM;
+        if (map->its_window) {
+            Rect b; short sw, sh;
+            GetWindowPortBounds(map->its_window, &b);
+            if (RetrieveSize(kMapTileWindow, b.top, b.left, &sh, &sw))
+                SizeWindow(map->its_window, sw, sh, false);
+        }
+        layout_scroll_controls();
+        /* derive the viewport dims from the actual window size */
+        if (map->its_window) {
+            Rect cr; map_content_bounds(&cr);
+            gMap.vis_cols = (cr.right - cr.left) / gMap.cell_w;
+            gMap.vis_rows = (cr.bottom - cr.top) / gMap.cell_h;
+        }
+        if (gMap.vis_cols < 1) gMap.vis_cols = 1;
+        if (gMap.vis_rows < 1) gMap.vis_rows = 1;
+        if (!allocate_backing()) {
+            mac_dprintf("macmap: backing alloc failed in tile mode; using fallback\n");
+        }
+        /* 8bpp: anchor the sheet's dominant colors with a pmTolerant palette
+           (tolerance 0x1000 of 0xFFFF, ~6%); colors beyond the first entries
+           map to their nearest match in the default CLUT.  32 entries -- not
+           256 -- so reserved system slots and other windows' colors survive. */
+#define TILE_PALETTE_TOLERANCE 0x1000   /* TILE_PALETTE_ENTRIES: mactile.h */
+        if (mactile_sheet_depth() == 8) {
+            if (!gMap.palette) {
+                CTabHandle ct = mactile_sheet_ctable();
+                if (ct)
+                    gMap.palette = NewPalette(TILE_PALETTE_ENTRIES, ct,
+                                              pmTolerant,
+                                              TILE_PALETTE_TOLERANCE);
+                if (gMap.palette)
+                    build_nh_color_index(gMap.palette);
+            }
+            if (gMap.palette) {
+                SetPalette(map->its_window, gMap.palette, true);
+                ActivatePalette(map->its_window);
+            }
+        }
+    } else {
+        if (gMap.owner) {
+            gMap.cell_w = gMap.owner->char_width;
+            gMap.cell_h = gMap.owner->row_height;
+            if (gMap.cell_w < 1) gMap.cell_w = 6;
+            if (gMap.cell_h < 1) gMap.cell_h = 14;
+        }
+        if (map->its_window) {
+            Rect b; short sw, sh;
+            GetWindowPortBounds(map->its_window, &b);
+            if (RetrieveSize(kMapWindow, b.top, b.left, &sh, &sw))
+                SizeWindow(map->its_window, sw, sh, false);
+        }
+        layout_scroll_controls();
+        if (map->its_window) {
+            Rect cr; map_content_bounds(&cr);
+            gMap.vis_cols = (cr.right - cr.left) / gMap.cell_w;
+            gMap.vis_rows = (cr.bottom - cr.top) / gMap.cell_h;
+        }
+        if (gMap.vis_cols < 1) gMap.vis_cols = 1;
+        if (gMap.vis_rows < 1) gMap.vis_rows = 1;
+        /* dispose the palette; a re-enable rebuilds it */
+        if (gMap.palette) {
+            SetPalette(map->its_window, NULL, false);
+            DisposePalette(gMap.palette);
+            gMap.palette = NULL;
+        }
+        if (!allocate_backing()) {
+            mac_dprintf("macmap: backing alloc failed in text mode; using fallback\n");
+        }
+    }
+    /* repopulate the backing and invalidate; the update event does the blit
+       (a synchronous blit here gets clipped; port not settled in menu context) */
+    repaint_full_viewport();
+    if (map->its_window) {
+        Rect b; GetWindowPortBounds(map->its_window, &b);
+        InvalWindowRect(map->its_window, &b);
+    }
+    return true;
+}
+
+Boolean
+macmap_get_mode(NhWindow *map)
+{
+    return (map && gMap.owner == map) ? gMap.tile_mode : false;
+}
+
+/* Cell-draw batch: one LockPixels + SetGWorld around the repaint loops
+   instead of per cell (an 80x21 repaint otherwise pays thousands of traps
+   on a 16 MHz 030). During a batch the cell painters draw in place;
+   LockPixels is a flag, not a count, so nested pairs would clear the
+   batch's lock. */
+static struct {
+    Boolean   active;
+    GWorldPtr saveW;
+    GDHandle  saveD;
+    short     ascent;     /* text mode: cached GetFontInfo */
+    short     last_fg;    /* text mode: fg color already set on the backing
+                             port; -1 = unknown (skips a Color Manager
+                             round-trip per unchanged-color cell) */
+} gBatch;
+
+static Boolean
+begin_cell_batch(void)
+{
+    if (gBatch.active || !gMap.backing)
+        return false;
+    PixMapHandle pm = GetGWorldPixMap(gMap.backing);
+    if (!LockPixels(pm))
+        return false;
+    GetGWorld(&gBatch.saveW, &gBatch.saveD);
+    SetGWorld(gMap.backing, NULL);
+    if (!gMap.tile_mode) {
+        FontInfo fi;
+        RGBColor black = { 0, 0, 0 };
+
+        GetFontInfo(&fi);
+        gBatch.ascent = fi.ascent;
+        RGBBackColor(&black); /* every text cell wants the dark bg; set
+                                 once, not per cell */
+    }
+    gBatch.last_fg = -1;
+    gBatch.active = true;
+    return true;
+}
+
+static void
+end_cell_batch(void)
+{
+    if (!gBatch.active)
+        return;
+    {
+        /* restore fg=black/bg=white so a later tile blit isn't tinted
+           (in a batch the colors stay dirty until here) */
+        RGBColor black = { 0, 0, 0 };
+        RGBColor white = { 0xFFFF, 0xFFFF, 0xFFFF };
+        RGBForeColor(&black);
+        RGBBackColor(&white);
+    }
+    SetGWorld(gBatch.saveW, gBatch.saveD);
+    UnlockPixels(GetGWorldPixMap(gMap.backing));
+    gBatch.active = false;
+}
+
+static void
+draw_cell_text(int col, int row, char ch, int color)
+{
+    if (!gMap.owner || !gMap.owner->its_window) return;
+    if (col < 0 || col >= COLNO || row < 0 || row >= ROWNO) return;
+
+    short dx = (col - gMap.scroll_col) * gMap.cell_w;
+    short dy = (row - gMap.scroll_row) * gMap.cell_h;
+    if (dx < 0 || dy < 0
+        || dx >= gMap.vis_cols * gMap.cell_w
+        || dy >= gMap.vis_rows * gMap.cell_h) {
+        return;   /* off-viewport, cache only */
+    }
+
+    RGBColor black = {0, 0, 0};
+    RGBColor white = {0xFFFF, 0xFFFF, 0xFFFF};
+
+    if (gMap.backing) {
+        /* paint into backing; macmap_flush blits the dirty region once */
+        Boolean own = !gBatch.active;
+        PixMapHandle pm = GetGWorldPixMap(gMap.backing);
+        GWorldPtr saveW; GDHandle saveD;
+        short ascent;
+
+        if (own) {
+            if (!LockPixels(pm)) {
+                mac_dprintf("macmap: draw_cell_text: LockPixels failed\n");
+                return;
+            }
+            GetGWorld(&saveW, &saveD);
+            SetGWorld(gMap.backing, NULL);
+            FontInfo fi; GetFontInfo(&fi);
+            ascent = fi.ascent;
+        } else {
+            ascent = gBatch.ascent;
+        }
+
+        Rect cell = { dy, dx, dy + gMap.cell_h, dx + gMap.cell_w };
+        if (own)                       /* a batch sets the dark bg once */
+            RGBBackColor(&black);      /* NetHack's colors want a dark bg */
+        EraseRect(&cell);
+        if (own || color != gBatch.last_fg) {
+            set_nh_color(color);
+            gBatch.last_fg = (short) color;
+        }
+        MoveTo(dx, dy + ascent);       /* baseline = top + ascent (no top clip) */
+        DrawChar(ch);
+        if (iflags.hilite_pet && gMap.pet_cache[row][col]) {
+            RGBForeColor(&white);      /* pet ring; map bg is black */
+            FrameRect(&cell);
+            gBatch.last_fg = -1;       /* fg no longer matches the cache */
+        }
+        if (own) {
+            RGBForeColor(&black);      /* restore fg=black/bg=white so a */
+            RGBBackColor(&white);      /* later tile blit isn't tinted */
+            SetGWorld(saveW, saveD);
+            UnlockPixels(pm);
+        } /* in a batch, end_cell_batch restores the colors once */
+        mark_dirty(&cell);
+    } else {
+        /* fallback: direct to window */
+        GrafPtr saveP; GetPort(&saveP);
+        SetPort(gMap.owner->its_window);
+        FontInfo fi; GetFontInfo(&fi);
+        Rect cell = { dy, dx, dy + gMap.cell_h, dx + gMap.cell_w };
+        RGBBackColor(&black);
+        EraseRect(&cell);
+        set_nh_color(color);
+        MoveTo(dx, dy + fi.ascent);
+        DrawChar(ch);
+        if (iflags.hilite_pet && gMap.pet_cache[row][col]) {
+            RGBForeColor(&white);      /* pet ring; map bg is black */
+            FrameRect(&cell);
+        }
+        RGBForeColor(&black);
+        RGBBackColor(&white);
+        SetPort(saveP);
+    }
+}
+
+/* Pet highlight ring for tile mode (hilite_pet), like the farlook cursor.
+   Backing variant: bright sheet color via RGBForeColor (safe offscreen);
+   window variant: PmForeColor by index, like draw_cursor_border. */
+static void
+draw_pet_ring_backing(const Rect *cell)
+{
+    Boolean own = !gBatch.active;
+    PixMapHandle pm = GetGWorldPixMap(gMap.backing);
+    GWorldPtr saveW; GDHandle saveD;
+    RGBColor ring = { 0xFFFF, 0xFFFF, 0xFFFF };
+    RGBColor black = { 0, 0, 0 };
+    short ci = mactile_cursor_clut_index();
+    CTabHandle ct = mactile_sheet_ctable();
+
+    if (own) {
+        if (!LockPixels(pm))
+            return;
+        GetGWorld(&saveW, &saveD);
+        SetGWorld(gMap.backing, NULL);
+    } /* in a batch the backing is already current and locked */
+    if (ci >= 0 && ct && *ct)
+        ring = (**ct).ctTable[ci].rgb;
+    PenState savePen; GetPenState(&savePen);
+    PenSize(1, 1);
+    PenMode(srcCopy);
+    RGBForeColor(&ring);
+    FrameRect(cell);
+    RGBForeColor(&black);
+    SetPenState(&savePen);
+    if (own) {
+        SetGWorld(saveW, saveD);
+        UnlockPixels(pm);
+    }
+}
+
+static void
+draw_pet_ring_window(const Rect *cell)
+{
+    RGBColor black = { 0, 0, 0 };
+    GrafPtr saveP; GetPort(&saveP);
+    SetPortWindowPort(gMap.owner->its_window);
+    PenState savePen; GetPenState(&savePen);
+    PenSize(1, 1);
+    PenMode(srcCopy);
+    if (gMap.palette) {
+        short ci = mactile_cursor_clut_index();
+        if (ci >= 0) {
+            PmForeColor(ci);
+            FrameRect(cell);
+        }
+    } else {
+        RGBColor white = { 0xFFFF, 0xFFFF, 0xFFFF };
+        RGBForeColor(&white);
+        FrameRect(cell);
+    }
+    RGBForeColor(&black);
+    SetPenState(&savePen);
+    SetPort(saveP);
+}
+
+static void
+draw_cell_tile(int col, int row, int tile_idx)
+{
+    if (!gMap.owner || !gMap.owner->its_window) return;
+    if (col < 0 || col >= COLNO || row < 0 || row >= ROWNO) return;
+
+    short dx = (col - gMap.scroll_col) * gMap.cell_w;
+    short dy = (row - gMap.scroll_row) * gMap.cell_h;
+    if (dx < 0 || dy < 0
+        || dx >= gMap.vis_cols * gMap.cell_w
+        || dy >= gMap.vis_rows * gMap.cell_h) {
+        return;   /* off-viewport, cached only */
+    }
+
+    Rect cell = { dy, dx, dy + gMap.cell_h, dx + gMap.cell_w };
+    if (gMap.backing) {
+        if (gBatch.active)
+            mactile_blit_in_place(tile_idx, dx, dy);
+        else
+            mactile_blit_to(gMap.backing, tile_idx, dx, dy);
+        if (iflags.hilite_pet && gMap.pet_cache[row][col])
+            draw_pet_ring_backing(&cell);
+        mark_dirty(&cell);
+    } else {
+        mactile_blit_to_window(gMap.owner->its_window, tile_idx, dx, dy);
+        if (iflags.hilite_pet && gMap.pet_cache[row][col])
+            draw_pet_ring_window(&cell);
+    }
+}
+
+/* Cell cursor for getpos/farlook. TILE mode: a bright inner ring via PmForeColor
+   by INDEX (index-direct, avoids the Palette Manager recoloring the map) plus a
+   black outer ring for light tiles. TEXT mode: a white frame (the map bg is black). */
+static void
+draw_cursor_border(int col, int row)
+{
+    if (!gMap.owner || !gMap.owner->its_window) return;
+    if (col < 1 || col >= COLNO || row < 0 || row >= ROWNO) return;
+    short dx = (col - gMap.scroll_col) * gMap.cell_w;
+    short dy = (row - gMap.scroll_row) * gMap.cell_h;
+    if (dx < 0 || dy < 0
+        || dx >= gMap.vis_cols * gMap.cell_w
+        || dy >= gMap.vis_rows * gMap.cell_h) return;
+    Rect cell = { dy, dx, dy + gMap.cell_h, dx + gMap.cell_w };
+    GrafPtr saveP; GetPort(&saveP);
+    SetPortWindowPort(gMap.owner->its_window);
+    PenState savePen; GetPenState(&savePen);
+    PenSize(1, 1);
+    PenMode(srcCopy);
+    RGBColor black = {0, 0, 0};
+    if (gMap.palette) {
+        short cidx = mactile_cursor_clut_index();
+        if (cidx >= 0) {
+            Rect inner = cell;
+            InsetRect(&inner, 1, 1);
+            if (inner.right > inner.left && inner.bottom > inner.top) {
+                PmForeColor(cidx);
+                FrameRect(&inner);
+            }
+        }
+        RGBForeColor(&black);
+        FrameRect(&cell);
+    } else {
+        RGBColor white = {0xFFFF, 0xFFFF, 0xFFFF};
+        RGBForeColor(&white);
+        FrameRect(&cell);
+        RGBForeColor(&black);
+    }
+    SetPenState(&savePen);
+    SetPort(saveP);
+}
+
+/* Repaint one cell from cache (also erases the cursor border). */
+static void
+redraw_cell_from_cache(int col, int row)
+{
+    if (col < 1 || col >= COLNO || row < 0 || row >= ROWNO) return;
+    if (gMap.tile_mode) {
+        short idx = gMap.tile_cache[row][col];
+        if (idx >= 0)                  /* -1 = no glyph yet; 0 is a real tile */
+            draw_cell_tile(col, row, (int) idx);
+    } else {
+        char ch  = (char) gMap.text_cache[row][col];
+        int  color = (int) gMap.text_color[row][col];
+        if (ch == 0) ch = ' ';
+        draw_cell_text(col, row, ch, color);
+    }
+}
+
+/* Blit the accumulated dirty region to the window in one CopyBits, then draw
+   the hero/cursor highlight on top (it's a window-only overlay, never in the
+   backing, so the blit would otherwise erase it). Called at the per-frame flush
+   boundary (display_nhwindow / curs); a no-op blit when nothing is dirty. */
+void
+macmap_flush(void)
+{
+    if (!gMap.owner || !gMap.owner->its_window) return;
+    {
+        /* reopen the overview at the first frame if it was open last
+           launch (game windows don't exist yet at prefs-apply time) */
+        static Boolean ov_startup_checked = false;
+
+        if (!ov_startup_checked) {
+            UiPrefs up;
+
+            ov_startup_checked = true;
+            if (RetrieveUiPrefs(&up) && up.overview_open)
+                macmap_overview_show();
+        }
+    }
+    flush_pending_cells(); /* paint queued print_glyph cells (batched) */
+    if (gMap.has_dirty && gMap.backing) {
+        Rect r = gMap.dirty, b;
+        SetRect(&b, 0, 0, gMap.vis_cols * gMap.cell_w, gMap.vis_rows * gMap.cell_h);
+        if (SectRect(&r, &b, &r))
+            blit_backing_to_window(&r, &r);
+    }
+    gMap.has_dirty = false;
+    if (gMap.cursor_on)
+        draw_cursor_border(gMap.cursor_x, gMap.cursor_y);
+}
+
+void
+macmap_curs(NhWindow *map, int x, int y)
+{
+    if (!map || gMap.owner != map) return;
+    /* repaint the old cursor cell from cache so the flush erases its border */
+    if (gMap.cursor_on
+        && (gMap.cursor_x != x || gMap.cursor_y != y)) {
+        queue_cell(gMap.cursor_x, gMap.cursor_y);
+    }
+    gMap.cursor_x  = (short) x;
+    gMap.cursor_y  = (short) y;
+    gMap.cursor_on = true;
+    /* blit any pending cells and draw the new border on top (immediate so
+       interactive cursor moves in getpos/farlook show without a frame flush) */
+    macmap_flush();
+}
+
+void
+macmap_print_glyph(NhWindow *map, int x, int y,
+                    const glyph_info *gi)
+{
+    if (!map || gMap.owner != map) return;
+    if (!gi) return;
+    if (x < 0 || x >= COLNO || y < 0 || y >= ROWNO) return;
+
+    /* Auto-center the viewport on the hero. NetHack core only calls
+       cliparound() between turns from moveloop; the very first frame
+       (and the frame after a resize) doesn't get one, so without this
+       the viewport stays at (0,0) and the visible area is unexplored
+       stone tiles, which looks like a black window. */
+    if ((int) x == (int) u.ux && (int) y == (int) u.uy) {
+        macmap_cliparound(map, x, y);
+    }
+
+    char ch = gi->ttychar;
+    int  color = gi->gm.sym.color;
+    int  idx = remap_tile_idx(gi->gm.tileidx);
+
+    /* update both caches so a mode toggle can repaint */
+    gMap.text_cache[y][x] = (unsigned char) ch;
+    gMap.text_color[y][x] = (unsigned char) color;
+    gMap.tile_cache[y][x] = (short) idx;
+    gMap.pet_cache[y][x] = (gi->gm.glyphflags & MG_PET) ? 1 : 0;
+
+    /* cache only; macmap_flush paints the whole pending range batched */
+    queue_cell(x, y);
+}
+
+void
+macmap_update_event(NhWindow *map)
+{
+    /* Called inside HandleUpdate's BeginUpdate/EndUpdate; don't call BeginUpdate
+       here or the second call empties the visRgn and clips out every draw. */
+    if (!map || gMap.owner != map || !map->its_window) return;
+
+    flush_pending_cells(); /* the full-backing blit below must be current */
+    gMap.cursor_on = false;   /* the repaint wipes the software cursor */
+
+    GrafPtr saveP; GetPort(&saveP);
+    SetPort(map->its_window);
+
+    /* erase only the margins the repaint won't cover; HandleUpdate no
+       longer pre-erases the whole map window (a white flash the blit
+       immediately overwrote) */
+    {
+        Rect wr, covered, m;
+        GetWindowPortBounds(map->its_window, &wr);
+        OffsetRect(&wr, -wr.left, -wr.top);
+        if (gMap.backing)
+            covered = ((CGrafPtr) gMap.backing)->portRect;
+        else
+            map_content_bounds(&covered);
+        if (wr.right > covered.right) {
+            m = wr;
+            m.left = covered.right;
+            EraseRect(&m);
+        }
+        if (wr.bottom > covered.bottom) {
+            m = wr;
+            m.top = covered.bottom;
+            m.right = covered.right;
+            EraseRect(&m);
+        }
+    }
+
+    if (gMap.backing) {
+        Rect bbox; bbox = ((CGrafPtr) gMap.backing)->portRect;
+        Rect dst = bbox;
+        blit_backing_to_window(&bbox, &dst);
+    } else {
+        /* fallback: cache-replay redraw */
+        Rect content; map_content_bounds(&content);
+        EraseRect(&content);
+        int r, c;
+        for (r = gMap.scroll_row; r < gMap.scroll_row + gMap.vis_rows && r < ROWNO; ++r)
+            for (c = gMap.scroll_col; c < gMap.scroll_col + gMap.vis_cols && c < COLNO; ++c) {
+                if (gMap.tile_mode) {
+                    short idx = gMap.tile_cache[r][c];
+                    if (idx >= 0) draw_cell_tile(c, r, (int) idx);
+                } else {
+                    char ch  = (char) gMap.text_cache[r][c];
+                    int  col = (int)  gMap.text_color[r][c];
+                    if (ch != 0) draw_cell_text(c, r, ch, col);
+                }
+            }
+    }
+
+    gMap.has_dirty = false;   /* the full-backing blit subsumes any pending dirty */
+
+    /* draw the scrollbars and grow box on top of the blit */
+    if (gMap.decorated) {
+        update_scroll_controls();
+        DrawControls(map->its_window);
+        DrawGrowIcon(map->its_window);
+    }
+
+    SetPort(saveP);
+}
+
+void
+macmap_clear(NhWindow *map)
+{
+    if (!map || gMap.owner != map) return;
+    int r, c;
+    for (r = 0; r < ROWNO; ++r)
+        for (c = 0; c < COLNO; ++c) {
+            gMap.text_cache[r][c] = ' ';
+            gMap.text_color[r][c] = 8; /* NO_COLOR */
+            gMap.tile_cache[r][c] = -1;  /* -1 = no glyph (tile 0 is the ant) */
+            gMap.pet_cache[r][c] = 0;
+        }
+    /* reset scroll so the next hero print_glyph recenters (col 0 unused) */
+    gMap.scroll_col = 1;
+    gMap.scroll_row = 0;
+    gMap.cursor_on  = false;
+    gMap.cells_pending = false;
+    /* Deliberately no erase: the old frame stays up while the core
+       reprints the level, and the next flush blits the complete new
+       frame in one step, so there is no white gap in between.  Marking
+       everything dirty guarantees that blit covers the full viewport
+       even if the core repaints only part of it after the clear. */
+    mark_dirty_all();
+    /* clear the backing, or that blit shows stale pixels where the new
+       level has nothing */
+    if (gMap.backing) {
+        PixMapHandle pm = GetGWorldPixMap(gMap.backing);
+        if (LockPixels(pm)) {
+            GWorldPtr saveW; GDHandle saveD;
+            GetGWorld(&saveW, &saveD);
+            SetGWorld(gMap.backing, NULL);
+            Rect bb; bb = ((CGrafPtr) gMap.backing)->portRect;
+            EraseRect(&bb);
+            SetGWorld(saveW, saveD);
+            UnlockPixels(pm);
+        } else {
+            mac_dprintf("macmap: macmap_clear: LockPixels failed\n");
+        }
+    }
+}
+
+#define MT_EDGE_MARGIN 3
+
+static void
+recompute_scroll_for_center(int x, int y, short *new_col, short *new_row)
+{
+    short c = (short) x - gMap.vis_cols / 2;
+    short r = (short) y - gMap.vis_rows / 2;
+    /* clamp so col 0 never enters the viewport (cols [1,COLNO-1], rows [0,ROWNO)) */
+    if (c < 1) c = 1;
+    if (r < 0) r = 0;
+    if (c + gMap.vis_cols > COLNO) c = COLNO - gMap.vis_cols;
+    if (r + gMap.vis_rows > ROWNO) r = ROWNO - gMap.vis_rows;
+    if (c < 1) c = 1;
+    if (r < 0) r = 0;
+    *new_col = c;
+    *new_row = r;
+}
+
+static void
+repaint_full_viewport(void)
+{
+    if (!gMap.owner) return;
+    gMap.cursor_on = false;   /* full repaint wipes the inverted-cell cursor */
+    gMap.cells_pending = false; /* every visible cell repaints below;
+                                   off-viewport cells are cache-only */
+    Boolean batched = begin_cell_batch();
+    if (gMap.backing) {
+        /* erase happens while bg is still white (the cells set a black
+           bg later); covers the area outside the level */
+        if (batched) {
+            Rect bbox; bbox = ((CGrafPtr) gMap.backing)->portRect;
+            EraseRect(&bbox);
+        } else {
+            PixMapHandle pm = GetGWorldPixMap(gMap.backing);
+            if (LockPixels(pm)) {
+                Rect bbox; bbox = ((CGrafPtr) gMap.backing)->portRect;
+                GWorldPtr saveW; GDHandle saveD;
+                GetGWorld(&saveW, &saveD);
+                SetGWorld(gMap.backing, NULL);
+                EraseRect(&bbox);
+                SetGWorld(saveW, saveD);
+                UnlockPixels(pm);
+            }
+        }
+    }
+    int r, c;
+    /* skip col 0 (unused); its stale cache would paint as tile 0, a real glyph */
+    int c_first = gMap.scroll_col < 1 ? 1 : gMap.scroll_col;
+    int c_last  = gMap.scroll_col + gMap.vis_cols;
+    if (c_last > COLNO) c_last = COLNO;
+    for (r = gMap.scroll_row; r < gMap.scroll_row + gMap.vis_rows && r < ROWNO; ++r)
+        for (c = c_first; c < c_last; ++c)
+            redraw_cell_from_cache(c, r);
+    if (batched)
+        end_cell_batch();
+    /* Mark the whole viewport dirty (incl. erased empty cells); macmap_flush
+       blits it. Callers not followed by a core flush call macmap_flush themselves. */
+    if (gMap.backing)
+        mark_dirty_all();
+}
+
+static void
+backing_self_scroll(int dx_cells, int dy_cells)
+{
+    if (!gMap.backing) return;
+    PixMapHandle pm = GetGWorldPixMap(gMap.backing);
+    if (!LockPixels(pm)) {
+        /* pixels purged: skip; CopyBits here reads and writes the backing */
+        mac_dprintf("macmap: backing_self_scroll: LockPixels failed\n");
+        return;
+    }
+    GWorldPtr saveW; GDHandle saveD;
+    GetGWorld(&saveW, &saveD);
+    SetGWorld(gMap.backing, NULL);
+
+    Rect bbox; bbox = ((CGrafPtr) gMap.backing)->portRect;
+    Rect src = bbox, dst = bbox;
+    OffsetRect(&dst, (short)(-dx_cells * gMap.cell_w), (short)(-dy_cells * gMap.cell_h));
+    CopyBits((BitMap *) *pm, (BitMap *) *pm, &src, &dst, srcCopy, NULL);
+
+    SetGWorld(saveW, saveD);
+    UnlockPixels(pm);
+}
+
+static void
+repaint_strip(int col_start, int row_start, int col_end, int row_end)
+{
+    int r, c;
+    if (col_start < 0) col_start = 0;
+    if (row_start < 0) row_start = 0;
+    if (col_end > COLNO) col_end = COLNO;
+    if (row_end > ROWNO) row_end = ROWNO;
+    if (col_start < 1) col_start = 1;   /* col 0 unused */
+    Boolean batched = begin_cell_batch();
+    for (r = row_start; r < row_end; ++r)
+        for (c = col_start; c < col_end; ++c)
+            redraw_cell_from_cache(c, r);
+    if (batched) /* close only a batch this scope opened */
+        end_cell_batch();
+}
+
+/* Accumulate a print_glyph cell: exact list while it fits, bounding box
+   after overflow. */
+static void
+queue_cell(int x, int y)
+{
+    if (!gMap.cells_pending) {
+        gMap.cells_pending = true;
+        gMap.pend_overflow = false;
+        gMap.pend_n = 0;
+        gMap.pend_c0 = (short) x;
+        gMap.pend_c1 = (short) (x + 1);
+        gMap.pend_r0 = (short) y;
+        gMap.pend_r1 = (short) (y + 1);
+    } else {
+        if (x < gMap.pend_c0)
+            gMap.pend_c0 = (short) x;
+        if (x + 1 > gMap.pend_c1)
+            gMap.pend_c1 = (short) (x + 1);
+        if (y < gMap.pend_r0)
+            gMap.pend_r0 = (short) y;
+        if (y + 1 > gMap.pend_r1)
+            gMap.pend_r1 = (short) (y + 1);
+    }
+    if (!gMap.pend_overflow) {
+        if (gMap.pend_n >= PEND_MAX) {
+            gMap.pend_overflow = true; /* bulk redraw: box takes over */
+        } else {
+            gMap.pend_x[gMap.pend_n] = (unsigned char) x;
+            gMap.pend_y[gMap.pend_n] = (unsigned char) y;
+            gMap.pend_n++;
+        }
+    }
+}
+
+/* Repaint the queued cells from cache in one batch: exactly the listed
+   cells on a normal turn, the whole bounding box after an overflow
+   (bulk redraws repaint most of it anyway). */
+static void
+flush_pending_cells(void)
+{
+    if (!gMap.cells_pending)
+        return;
+    gMap.cells_pending = false;
+    if (gMap.pend_overflow) {
+        repaint_strip(gMap.pend_c0, gMap.pend_r0, gMap.pend_c1,
+                      gMap.pend_r1);
+    } else {
+        short i;
+        Boolean batched = begin_cell_batch();
+
+        for (i = 0; i < gMap.pend_n; i++)
+            redraw_cell_from_cache(gMap.pend_x[i], gMap.pend_y[i]);
+        if (batched)
+            end_cell_batch();
+    }
+    ov_mirror_pending(); /* pend fields are still intact here */
+}
+
+/* Move the viewport to (new_col,new_row), clamped, repainting via soft-scroll
+   (small move) or full redraw (big jump / no backing). Updates the thumbs.
+   Shared by macmap_cliparound and the scrollbar handlers. */
+static void
+scroll_viewport_to(short new_col, short new_row)
+{
+    short old_col = gMap.scroll_col, old_row = gMap.scroll_row;
+    short dx, dy;
+
+    /* clamp so col 0 never enters the viewport and the last row/col isn't passed */
+    if (new_col + gMap.vis_cols > COLNO) new_col = COLNO - gMap.vis_cols;
+    if (new_row + gMap.vis_rows > ROWNO) new_row = ROWNO - gMap.vis_rows;
+    if (new_col < 1) new_col = 1;
+    if (new_row < 0) new_row = 0;
+    if (new_col == old_col && new_row == old_row) return;
+
+    dx = new_col - old_col;
+    dy = new_row - old_row;
+
+    gMap.cursor_on = false;   /* the repaint wipes the software cursor */
+
+    gMap.scroll_col = new_col;
+    gMap.scroll_row = new_row;
+    update_scroll_controls();
+
+    /* big jump or no backing: full redraw */
+    if (!gMap.backing
+        || abs(dx) > gMap.vis_cols / 2 || abs(dy) > gMap.vis_rows / 2) {
+        repaint_full_viewport();
+        return;
+    }
+
+    /* soft-scroll: shift backing pixels, re-render the exposed strip */
+    backing_self_scroll(dx, dy);
+
+    if (dx > 0)
+        repaint_strip(new_col + gMap.vis_cols - dx, new_row,
+                      new_col + gMap.vis_cols, new_row + gMap.vis_rows);
+    else if (dx < 0)
+        repaint_strip(new_col, new_row,
+                      old_col, new_row + gMap.vis_rows);
+
+    if (dy > 0)
+        repaint_strip(new_col, new_row + gMap.vis_rows - dy,
+                      new_col + gMap.vis_cols, new_row + gMap.vis_rows);
+    else if (dy < 0)
+        repaint_strip(new_col, new_row,
+                      new_col + gMap.vis_cols, old_row);
+
+    /* the self-scroll shifted every pixel, so the whole viewport is dirty */
+    mark_dirty_all();
+}
+
+void
+macmap_cliparound(NhWindow *map, int x, int y)
+{
+    if (!map || gMap.owner != map)
+        return;
+
+    /* don't scroll while the hero stays inside the edge margin */
+    short hero_in_view_x = (short) x - gMap.scroll_col;
+    short hero_in_view_y = (short) y - gMap.scroll_row;
+    if (hero_in_view_x >= MT_EDGE_MARGIN
+        && hero_in_view_x <  gMap.vis_cols - MT_EDGE_MARGIN
+        && hero_in_view_y >= MT_EDGE_MARGIN
+        && hero_in_view_y <  gMap.vis_rows - MT_EDGE_MARGIN) {
+        return;
+    }
+
+    short new_col, new_row;
+    recompute_scroll_for_center(x, y, &new_col, &new_row);
+    scroll_viewport_to(new_col, new_row);
+}
+
+void
+macmap_grow_event(NhWindow *map, long newSize)
+{
+    if (!map || gMap.owner != map || !map->its_window) return;
+    SizeWindow(map->its_window, (short)(newSize & 0xffff), (short)(newSize >> 16), true);
+    layout_scroll_controls();
+    Rect full; GetWindowPortBounds(map->its_window, &full);
+    Rect cr; map_content_bounds(&cr);
+    gMap.vis_cols = (cr.right - cr.left) / gMap.cell_w;
+    gMap.vis_rows = (cr.bottom - cr.top) / gMap.cell_h;
+    if (gMap.vis_cols < 1) gMap.vis_cols = 1;
+    if (gMap.vis_rows < 1) gMap.vis_rows = 1;
+    /* not persisted here: Game > Save Window Positions snapshots the
+       per-mode size (text and tile sizes are independent there) */
+    if (!allocate_backing()) {
+        mac_dprintf("macmap: backing realloc failed on grow\n");
+    }
+    /* recenter on the hero, then repaint from cache; allocate_backing
+       just wiped the backing, so the repaint must be full and
+       unconditional (cliparound/scroll_viewport_to skip an unchanged
+       scroll) */
+    if (u.ux > 0 || u.uy > 0) {
+        recompute_scroll_for_center((int) u.ux, (int) u.uy,
+                                    &gMap.scroll_col, &gMap.scroll_row);
+    }
+    repaint_full_viewport();
+    update_scroll_controls();
+    macmap_flush();   /* a grow isn't followed by a core frame flush */
+}
+
+/* Size the map window to fit as much map as fits in avail_w x avail_h, snapped
+   to whole cells and never larger than the full map. Placement stays with
+   SanePositions(). honor_saved caps the fit at the size saved in the prefs
+   file (per display mode), so a manual resize survives a restart; reset and
+   small screens pass false for the plain max-fit. */
+void
+macmap_fit(short avail_w, short avail_h, Boolean honor_saved)
+{
+    long full_w, full_h;
+    short w, h, cols, rows;
+    short map_cols = COLNO - 1;   /* col 0 unused */
+    if (!gMap.owner || !gMap.owner->its_window) return;
+    if (gMap.cell_w < 1 || gMap.cell_h < 1) return;
+    if (honor_saved) {
+        Rect b; short sh, sw;
+        GetWindowPortBounds(gMap.owner->its_window, &b);
+        if (RetrieveSize(gMap.tile_mode ? kMapTileWindow : kMapWindow,
+                         b.top, b.left, &sh, &sw)) {
+            if (sw < avail_w) avail_w = sw;
+            if (sh < avail_h) avail_h = sh;
+        }
+    }
+    if (avail_w < gMap.cell_w + gMap.inset_r) avail_w = gMap.cell_w + gMap.inset_r;
+    if (avail_h < gMap.cell_h + gMap.inset_b) avail_h = gMap.cell_h + gMap.inset_b;
+    full_w = (long) map_cols * gMap.cell_w + gMap.inset_r;
+    full_h = (long) ROWNO * gMap.cell_h + gMap.inset_b;
+    w = (full_w < (long) avail_w) ? (short) full_w : avail_w;
+    h = (full_h < (long) avail_h) ? (short) full_h : avail_h;
+    cols = (short) ((w - gMap.inset_r) / gMap.cell_w);
+    rows = (short) ((h - gMap.inset_b) / gMap.cell_h);
+    if (cols < 1) cols = 1;
+    if (cols > map_cols) cols = map_cols;
+    if (rows < 1) rows = 1;
+    if (rows > ROWNO) rows = ROWNO;
+    w = (short) (cols * gMap.cell_w + gMap.inset_r);
+    h = (short) (rows * gMap.cell_h + gMap.inset_b);
+    macmap_grow_event(gMap.owner, ((long) h << 16) | ((long) w & 0xffffL));
+}
+
+/* Set the viewport from the scrollbar values (vscroll=row, hscroll=col; scroll_col
+   is 1-based so +1). */
+static void
+apply_scroll_from_controls(void)
+{
+    short new_row, new_col;
+    if (!gMap.vscroll || !gMap.hscroll) return;
+    new_row = GetControlValue(gMap.vscroll);
+    new_col = GetControlValue(gMap.hscroll) + 1;
+    scroll_viewport_to(new_col, new_row);
+    macmap_flush();   /* live scrollbar feedback; not followed by a core flush */
+}
+
+/* TrackControl action proc: 1 cell per arrow, one page-minus-one per page click. */
+static pascal void
+macmap_scroll_action(ControlHandle ctl, short part)
+{
+    short now, max, page, amt, val;
+    Boolean vert;
+    if (!part || !ctl) return;
+    vert = (ctl == gMap.vscroll);
+    now  = GetControlValue(ctl);
+    max  = GetControlMaximum(ctl);
+    page = vert ? gMap.vis_rows : gMap.vis_cols;
+    if (page > 1) page -= 1;   /* keep a row/col of context across a page jump */
+    switch (part) {
+    case kControlUpButtonPart:   amt = -1;     break;
+    case kControlDownButtonPart: amt =  1;     break;
+    case kControlPageUpPart:     amt = -page;  break;
+    case kControlPageDownPart:   amt =  page;  break;
+    default: return;
+    }
+    val = now + amt;
+    if (val < 0)   val = 0;
+    if (val > max) val = max;
+    if (val == now) return;
+    SetControlValue(ctl, val);
+    apply_scroll_from_controls();
+}
+
+/* Handle a click on the map chrome: track the scrollbars and swallow strip/grow
+   clicks. Returns true if handled, so click-to-move is suppressed; false for the
+   real map area. Called from BaseClick. */
+Boolean
+macmap_click(NhWindow *map, Point pt, UInt32 mod UNUSED)
+{
+    if (!gMap.decorated || !map || !map->its_window)
+        return false;
+    {
+        ControlHandle c; short part;
+        part = FindControl(pt, map->its_window, &c);
+        if (part && (c == gMap.vscroll || c == gMap.hscroll)) {
+            if (GetControlMaximum(c) > 0) {   /* only if there's a hidden range */
+                if (part == kControlIndicatorPart) {
+                    /* thumb: apply the landing value on release */
+                    if (TrackControl(c, pt, NULL) == kControlIndicatorPart)
+                        apply_scroll_from_controls();
+                } else {
+                    /* arrows / page gutters: scroll live via the action proc */
+                    if (!gMapScrollUPP)
+                        gMapScrollUPP = NewControlActionUPP(macmap_scroll_action);
+                    (void) TrackControl(c, pt, gMapScrollUPP);
+                }
+            }
+            return true;
+        }
+    }
+    {   /* the reserved strips (incl. the grow-box corner) */
+        Rect b;
+        GetWindowPortBounds(map->its_window, &b);
+        if (pt.h >= b.right - gMap.inset_r || pt.v >= b.bottom - gMap.inset_b)
+            return true;
+    }
+    return false;
+}
+
+void
+macmap_pixel_to_cell(NhWindow *map, Point pt, int *col, int *row)
+{
+    if (col) *col = (pt.h / gMap.cell_w) + gMap.scroll_col;
+    if (row) *row = (pt.v / gMap.cell_h) + gMap.scroll_row;
+    (void) map;
+}
+
+/**********************************************************************
+ * Overview windoid: the whole level at OV_SCALE px per cell.
+ * Rendered from the text_cache/text_color caches (mode-independent),
+ * so it works in both text and tile map display.  Toggled from the
+ * Game menu; the close box hides it (both persist through
+ * UiPrefs.overview_open); position persists as kOverviewWindow.
+ */
+
+/* Color scheme depends on the live screen depth, not macFlags.color:
+   Color QD stays present when the monitor is switched to B&W, but the
+   black-background scheme would paint black on black there.  Refreshed
+   at the start of every repaint pass. */
+static Boolean gOvUseColor = false;
+
+/* The tile palette outlives any one display mode, but it may not exist
+   yet when the overview is first shown (text mode builds none).  Attach
+   it on the first repaint pass that finds one, so PmForeColor below
+   always indexes a palette this window owns. */
+static void
+ov_sync_palette(void)
+{
+    if (gOvHasPalette || !gOvWindow || !gMap.palette || !macFlags.color)
+        return;
+    NSetPalette(gOvWindow, gMap.palette, pmNoUpdates);
+    gOvHasPalette = true;
+}
+
+/* Color select for the overview, which unlike the map draws straight
+   into an on-screen window carrying the tile palette.  Name the entry
+   by index so the Palette Manager is never asked to match an RGB and
+   can never reassign a pmTolerant slot.  Without a palette (text mode,
+   or a sheet that isn't 8bpp) there is nothing to protect and the RGB
+   path applies. */
+static void
+ov_set_color(int color)
+{
+    if (color < 0 || color >= 16)
+        color = 8; /* NO_COLOR, same fallback as set_nh_color */
+    if (gOvHasPalette)
+        PmForeColor(gNhColorIdx[color]);
+    else
+        set_nh_color(color);
+}
+
+/* caller has set the port to gOvWindow */
+static void
+ov_draw_cell(short x, short y)
+{
+    Rect r;
+    unsigned char ch = gMap.text_cache[y][x];
+    Boolean is_hero = ((int) x == (int) u.ux && (int) y == (int) u.uy);
+
+    SetRect(&r, (x - 1) * OV_SCALE, y * OV_SCALE,
+            x * OV_SCALE, (y + 1) * OV_SCALE);
+    if (gOvUseColor) {
+        if (ch == ' ' || ch == '\0') {
+            ForeColor(blackColor); /* unexplored: matches the map bg */
+        } else if (is_hero) {
+            ForeColor(whiteColor);
+        } else {
+            ov_set_color(gMap.text_color[y][x]);
+        }
+        PaintRect(&r);
+        ForeColor(blackColor);
+    } else {
+        /* B&W / low depth: white background, explored cells black */
+        if (ch == ' ' || ch == '\0')
+            EraseRect(&r);
+        else
+            PaintRect(&r);
+    }
+}
+
+/* end-exclusive cell range */
+static void
+ov_repaint_range(short c0, short r0, short c1, short r1)
+{
+    short x, y;
+
+    ov_sync_palette();
+    gOvUseColor = macFlags.color && mac_main_depth() >= 4;
+    if (c0 < 1) c0 = 1; /* col 0 unused, and not part of the content */
+    if (r0 < 0) r0 = 0;
+    if (c1 > COLNO) c1 = COLNO;
+    if (r1 > ROWNO) r1 = ROWNO;
+    for (y = r0; y < r1; y++)
+        for (x = c0; x < c1; x++)
+            ov_draw_cell(x, y);
+}
+
+static void
+ov_repaint_all(void)
+{
+    ov_repaint_range(0, 0, COLNO, ROWNO);
+}
+
+/* mirror the cells flush_pending_cells just repainted; called at the
+   per-frame flush boundary, so it's one port switch per frame */
+static void
+ov_mirror_pending(void)
+{
+    GrafPtr saveP;
+
+    if (!gOvWindow || !IsWindowVisible(gOvWindow))
+        return;
+    GetPort(&saveP);
+    SetPortWindowPort(gOvWindow);
+    if (gMap.pend_overflow) {
+        ov_repaint_range(gMap.pend_c0, gMap.pend_r0,
+                         gMap.pend_c1, gMap.pend_r1);
+    } else {
+        short i;
+
+        ov_sync_palette();
+        gOvUseColor = macFlags.color && mac_main_depth() >= 4;
+        for (i = 0; i < gMap.pend_n; i++)
+            ov_draw_cell(gMap.pend_x[i], gMap.pend_y[i]);
+    }
+    SetPort(saveP);
+}
+
+void
+macmap_overview_show(void)
+{
+    if (!gOvWindow) {
+        Rect b;
+        Str255 title;
+        short top = 0, left = 0;
+
+        if (!RetrievePosition(kOverviewWindow, &top, &left)) {
+            /* default: the screen's top-right corner (same spot the
+               Reposition Windows layout uses) */
+            left = qd.screenBits.bounds.right - OV_COLS * OV_SCALE - 4;
+            if (left < 0)
+                left = 0;
+            top = GetMBarHeight() + 24; /* menu bar + our title bar */
+        }
+        SetRect(&b, left, top,
+                left + OV_COLS * OV_SCALE, top + ROWNO * OV_SCALE);
+        C2P("Overview", title);
+        gOvWindow = macFlags.color
+            ? (WindowPtr) NewCWindow(0L, &b, title, false, noGrowDocProc,
+                                     (WindowPtr) -1L, true,
+                                     MACOVERVIEW_REFCON)
+            : NewWindow(0L, &b, title, false, noGrowDocProc,
+                        (WindowPtr) -1L, true, MACOVERVIEW_REFCON);
+        if (!gOvWindow)
+            return;
+        ov_sync_palette();
+    }
+    ShowWindow(gOvWindow);
+    {
+        GrafPtr saveP;
+
+        GetPort(&saveP);
+        SetPortWindowPort(gOvWindow);
+        ov_repaint_all();
+        SetPort(saveP);
+    }
+}
+
+void
+macmap_overview_hide(void)
+{
+    if (gOvWindow)
+        HideWindow(gOvWindow);
+}
+
+Boolean
+macmap_overview_visible(void)
+{
+    return gOvWindow && IsWindowVisible(gOvWindow);
+}
+
+WindowPtr
+macmap_overview_window(void)
+{
+    return gOvWindow;
+}
+
+/* content size, valid whether or not the window exists yet; the
+   default window layout reserves the right column from it */
+short
+macmap_overview_width(void)
+{
+    return OV_COLS * OV_SCALE;
+}
+
+short
+macmap_overview_height(void)
+{
+    return ROWNO * OV_SCALE;
+}
+
+/* Floating layer, which System 7 does not provide: whenever another
+   window got in front of the overview, put it back on top, hilited
+   active.  Called after every event (macwin.c HandleEvent), so a
+   SelectWindow elsewhere is undone on the next tick. */
+void
+macmap_overview_float(void)
+{
+    if (gOvWindow && IsWindowVisible(gOvWindow)
+        && FrontWindow() != gOvWindow) {
+        BringToFront(gOvWindow);
+        HiliteWindow(gOvWindow, true);
+    }
+}
+
+/* called from HandleUpdate inside BeginUpdate/EndUpdate */
+void
+macmap_overview_update_event(WindowPtr w)
+{
+    GrafPtr saveP;
+
+    if (!gOvWindow || w != gOvWindow)
+        return;
+    GetPort(&saveP);
+    SetPortWindowPort(gOvWindow);
+    ov_repaint_all();
+    SetPort(saveP);
+}

@@ -33,13 +33,13 @@ static struct Gadget ClipCancel = {
     NULL,                /* next gadget */
     240, 59,             /* origin XY of hit box relative to window TopLeft */
     75, 10,              /* hit box width and height */
-    NULL,                /* gadget flags */
+    0,                   /* gadget flags */
     RELVERIFY,           /* activation flags */
     BOOLGADGET,          /* gadget type flags */
     (APTR) &ClipBorder1, /* gadget border or image to be rendered */
     NULL,                /* alternate imagery for selection */
     &ClipIText1,         /* first IntuiText structure */
-    NULL,                /* gadget mutual-exclude long word */
+    0,                   /* gadget mutual-exclude long word */
     NULL,                /* SpecialInfo structure */
     GADCANCEL,           /* user-definable data */
     NULL                 /* pointer to user-definable data */
@@ -66,13 +66,13 @@ static struct Gadget ClipOkay = {
     &ClipCancel,         /* next gadget */
     17, 60,              /* origin XY of hit box relative to window TopLeft */
     77, 10,              /* hit box width and height */
-    NULL,                /* gadget flags */
+    0,                   /* gadget flags */
     RELVERIFY,           /* activation flags */
     BOOLGADGET,          /* gadget type flags */
     (APTR) &ClipBorder2, /* gadget border or image to be rendered */
     NULL,                /* alternate imagery for selection */
     &ClipIText2,         /* first IntuiText structure */
-    NULL,                /* gadget mutual-exclude long word */
+    0,                   /* gadget mutual-exclude long word */
     NULL,                /* SpecialInfo structure */
     GADOKAY,             /* user-definable data */
     NULL                 /* pointer to user-definable data */
@@ -111,7 +111,7 @@ static struct Gadget ClipXCLIP = {
     (APTR) &ClipImage1,         /* gadget border or image to be rendered */
     NULL,                       /* alternate imagery for selection */
     &ClipIText3,                /* first IntuiText structure */
-    NULL,                       /* gadget mutual-exclude long word */
+    0,                          /* gadget mutual-exclude long word */
     (APTR) &ClipClipXCLIPSInfo, /* SpecialInfo structure */
     XCLIP,                      /* user-definable data */
     NULL                        /* pointer to user-definable data */
@@ -150,7 +150,7 @@ static struct Gadget ClipYCLIP = {
     (APTR) &ClipImage2,         /* gadget border or image to be rendered */
     NULL,                       /* alternate imagery for selection */
     &ClipIText4,                /* first IntuiText structure */
-    NULL,                       /* gadget mutual-exclude long word */
+    0,                          /* gadget mutual-exclude long word */
     (APTR) &ClipClipYCLIPSInfo, /* SpecialInfo structure */
     YCLIP,                      /* user-definable data */
     NULL                        /* pointer to user-definable data */
@@ -189,7 +189,7 @@ static struct Gadget ClipXSIZE = {
     (APTR) &ClipImage3,         /* gadget border or image to be rendered */
     NULL,                       /* alternate imagery for selection */
     &ClipIText5,                /* first IntuiText structure */
-    NULL,                       /* gadget mutual-exclude long word */
+    0,                          /* gadget mutual-exclude long word */
     (APTR) &ClipClipXSIZESInfo, /* SpecialInfo structure */
     XSIZE,                      /* user-definable data */
     NULL                        /* pointer to user-definable data */
@@ -228,7 +228,7 @@ static struct Gadget ClipYSIZE = {
     (APTR) &ClipImage4,         /* gadget border or image to be rendered */
     NULL,                       /* alternate imagery for selection */
     &ClipIText6,                /* first IntuiText structure */
-    NULL,                       /* gadget mutual-exclude long word */
+    0,                          /* gadget mutual-exclude long word */
     (APTR) &ClipClipYSIZESInfo, /* SpecialInfo structure */
     YSIZE,                      /* user-definable data */
     NULL                        /* pointer to user-definable data */

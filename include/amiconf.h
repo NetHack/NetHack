@@ -6,10 +6,6 @@
 #ifndef AMICONF_H
 #define AMICONF_H
 
-#undef abs /* avoid using macro form of abs */
-#undef min /* this gets redefined */
-#undef max /* this gets redefined */
-
 #include <time.h> /* get time_t defined before use! */
 
 #include <stdlib.h>
@@ -18,6 +14,10 @@
 #include <dos/dos.h>
 #include <clib/dos_protos.h>
 #include <proto/dos.h>
+
+#undef abs /* avoid using macro form of abs */
+#undef min /* this gets redefined */
+#undef max /* this gets redefined */
 
 #define MICRO /* must be defined to allow some inclusions */
 

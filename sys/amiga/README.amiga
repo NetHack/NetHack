@@ -59,11 +59,25 @@ Edit nethack.cnf for game options.  Defaults shipped:
     OPTIONS=lit_corridor        - show lit corridors
     OPTIONS=menucolors          - colored inventory items
 
-ALT+letter shortcuts to extended commands (ALT+L for #loot, ALT+F for
-#force, etc.) are enabled by default.  On keymaps that need ALT for
-typing characters (Scandinavian, German, French, ...) disable with:
+For extended commands, hit '#' and start typing the name.  Tab fills in
+as far as the prefix is unambiguous, and tapping Tab again walks through
+the rest of the matches one by one.  If you'd rather just pick from a
+list, '?' brings up the full menu.
+
+ALT+letter gets you to the common ones in one keystroke -- ALT+L for
+#loot, ALT+F for #force, and so on.  That shortcut rides on 'altmeta',
+which is on by default and simply tells NetHack to treat ALT as the Meta
+key.  Leave it on unless your keymap needs ALT to type characters, in
+which case turn it off:
 
     OPTIONS=!altmeta
+
+The symbol commands have spelled-out names too, which come in handy when
+altmeta is off: @ = #autopickup, \ = #known, | = #perminv.
+
+One UAE gotcha: the ALT shortcuts do nothing under its default keyboard
+handling.  Switch UAE to "accurate keyboard emulation" and they'll start
+working.
 
 Menu color examples (after OPTIONS=menucolors):
 

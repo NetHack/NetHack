@@ -12,8 +12,7 @@ char *amii_get_color_string(void);
 void amii_getlin(const char *prompt, char *bufp);
 void getlind(const char *prompt, char *bufp, const char *dflt);
 int filecopy(char *from, char *to);
-char *basename(char *str);
-char *dirname(char *str);
+void nh_dirname(const char *str, char *dir, size_t dirsize);
 
 /* winstr.c */
 void amii_putstr(winid window, int attr, const char *str);
@@ -26,8 +25,15 @@ void amii_remember_topl(void);
 long CountLines(winid);
 long FindLine(winid, int);
 int amii_doprev_message(void);
+extern int amii_msgscroll_dirty;
+void amii_flush_msgscroll(void);
 void flushIDCMP(struct MsgPort *);
 int amii_msgborder(struct Window *);
+void amii_pens_for_color(int, int *, int *);
+void amii_status_init(void);
+void amii_status_finish(void);
+void amii_status_enablefield(int, const char *, const char *, boolean);
+void amii_status_update(int, genericptr_t, int, int, int, unsigned long *);
 void amii_scrollmsg(register struct Window *w,
                     register struct amii_WinDesc *cw);
 
@@ -52,6 +58,7 @@ void SetPropInfo(struct Window *win, struct Gadget *gad, long vis, long total,
 /* amiwind.c */
 struct Window *OpenShWindow(struct NewWindow *nw);
 void CloseShWindow(struct Window *win);
+void CloseShWindowKeepKbd(struct Window *win);
 int ConvertKey(struct IntuiMessage *message);
 void ProcessMessage(struct IntuiMessage *message);
 int kbhit(void);
@@ -105,7 +112,7 @@ void amii_wait_synch(void);
 void amii_setclipped(void);
 void amii_cliparound(int x, int y);
 void amii_set_text_font(char *font, int size);
-BitMapHeader ReadImageFile(const char *, struct BitMap **);
+boolean ReadImageFile(const char *, struct BitMap **, BitMapHeader *);
 void FreeImageFile(struct BitMap **);
 BitMapHeader ReadTileImageFiles(void);
 void FreeTileImageFiles(void);

@@ -458,7 +458,7 @@ DoMenuScroll(int win, int blocking, int how, menu_item **retmip)
         /* Process window messages */
 
         WaitPort(w->UserPort);
-        while (imsg = (struct IntuiMessage *) GetMsg(w->UserPort)) {
+        while ((imsg = (struct IntuiMessage *) GetMsg(w->UserPort)) != NULL) {
             class = imsg->Class;
             code = imsg->Code;
             mics = imsg->Micros;
@@ -856,6 +856,13 @@ DoMenuScroll(int win, int blocking, int how, menu_item **retmip)
                     }
                 } else {
                     int selected = FALSE;
+                    int gmatches = 0;
+
+                    if (how == PICK_ONE) {
+                        for (amip = cw->menu.items; amip; amip = amip->next)
+                            if (amip->canselect && amip->gselector == code)
+                                gmatches++;
+                    }
                     for (amip = cw->menu.items; amip; amip = amip->next) {
                         if (!amip->canselect)
                             continue;
@@ -873,7 +880,11 @@ DoMenuScroll(int win, int blocking, int how, menu_item **retmip)
                                 amip->str[SOFF + 2] = '-';
                             }
                             selected = TRUE;
+                            if (how == PICK_ONE)
+                                break;
                         } else if (amip->gselector == code) {
+                            if (how == PICK_ONE && gmatches != 1)
+                                continue;
                             amip->selected = !amip->selected;
                             if (counting) {
                                 amip->count = count;
@@ -885,6 +896,10 @@ DoMenuScroll(int win, int blocking, int how, menu_item **retmip)
                                 amip->str[SOFF + 2] = '-';
                             }
                             selected = TRUE;
+                            if (how == PICK_ONE) {
+                                aredone = 1;
+                                break;
+                            }
                         }
                     }
                     if (selected)
@@ -989,8 +1004,7 @@ DoMenuScroll(int win, int blocking, int how, menu_item **retmip)
                         /* Remove old highlighting if visible */
 
                         amip = find_menu_item(cw, oidx);
-                        if (amip && oidx != aidx
-                            && (oidx > topidx && oidx - topidx < wheight)) {
+                        if (amip && oidx != aidx) {
                             if (how != PICK_ANY) {
                                 amip->selected = 0;
                                 amip->count = -1;
@@ -1314,8 +1328,18 @@ DisplayData(winid win, int start)
 
         /* Apply menucolor if set for this item */
         if (mip && mip->color != NO_COLOR && !(mip->selected)) {
-            extern const int foreg[];
-            SetAPen(rp, foreg[mip->color]);
+            int fg, bg;
+
+            if (cw->type == NHW_TEXT) {
+                fg = amii_textAPen;
+                bg = amii_textBPen;
+            } else {
+                fg = amii_menuAPen;
+                bg = amii_menuBPen;
+            }
+            amii_pens_for_color(mip->color, &fg, &bg);
+            SetAPen(rp, fg);
+            SetBPen(rp, bg);
             whichcolor = 0; /* force re-evaluation next item */
         }
 

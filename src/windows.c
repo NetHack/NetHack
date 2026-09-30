@@ -20,7 +20,8 @@ extern void win_X11_init(int);
 extern struct window_procs Qt_procs;
 #endif
 #ifdef GEM_GRAPHICS
-/*#include "wingem.h"*/
+extern struct window_procs Gem_procs;
+extern void win_Gem_init(int);
 #endif
 #ifdef MAC68K
 extern struct window_procs mac_procs;

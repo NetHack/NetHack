@@ -1,0 +1,129 @@
+              Cross-compiling NetHack 5.0 for Atari ST/TT/Falcon
+              ===================================================
+
+This document covers the Atari-specific bits of cross-compiling
+NetHack 5.0 from a Linux host.  See the top-level Cross-compiling
+document for the general theory of NetHack's cross-build (HOST
+vs TARGET, the five-step build, etc.).
+
+Cross-compiler used:     Thorsten Otto's m68k-atari-mint-gcc
+Cross-compiler url:      https://tho-otto.de/crossmint.php
+Author of 5.0 support:   Ingo Paschke
+
+
+Toolchain (quick install)
+-------------------------
+
+The companion script sys/atari/install-toolchain.sh fetches the
+m68k-atari-mint cross-compiler, mintlib, fdlibm, gemlib, and
+E_GEM, and lays them out as a self-contained tree under one
+prefix -- same style as /opt/retro68 or /opt/amiga.
+
+    sudo sys/atari/install-toolchain.sh                  # /opt/cross-mint
+    ./install-toolchain.sh --prefix=$HOME/cross-mint     # unprivileged
+    ./install-toolchain.sh --prefix=/opt/cross-foo --sudo
+
+Resulting layout under $PREFIX:
+
+    $PREFIX/bin/m68k-atari-mint-gcc        (host driver)
+    $PREFIX/m68k-atari-mint/bin/*          (binutils target wrappers)
+    $PREFIX/lib64/gcc/m68k-atari-mint/15/  (gcc internals)
+    $PREFIX/m68k-atari-mint/sys-root/usr/include/  (mintlib + E_GEM)
+    $PREFIX/m68k-atari-mint/sys-root/usr/lib/      (libc, libm, libgem, libe_gem)
+
+What each component provides:
+
+  mintlib  C library (libc.a) and headers.  Without this, no C
+           program will link.
+  fdlibm   Math library (libm.a).  Replaces MiNTLib's libm, which
+           has a multiple-definition flaw in 'xcpt' that otherwise
+           requires -Wl,--allow-multiple-definition at link time.
+  gemlib   AES/VDI bindings (libgem.a, gem.h).
+  E_GEM    Higher-level UI toolkit (windows, dialogs, popups,
+           sliders, drag-and-drop, XAcc/AV protocols).  Binary
+           release as lib_e_gem_*.zip at the EGEM_220 GitHub URL;
+           source at the same repo if you want to build it yourself
+           (cd EGEM_220/source && make -f makefile.gcc).
+
+Version pins are at the top of the script; override via the
+GCC_VER / BINUTILS_VER / MINTLIB_VER / FDLIBM_VER / GEMLIB_VER /
+EGEM_VER environment variables if you need a specific release.
+
+Verified with gcc 15.2.0; gcc 14.x also builds NetHack cleanly.
+
+
+Manual install
+--------------
+
+The script is just a wrapper around the steps below.  The host
+tarballs put their files under usr/* internally; we want them
+under $PREFIX/* directly (self-contained tree), so strip one
+leading component on extract.
+
+    sudo mkdir -p /opt/cross-mint
+    cd /opt/cross-mint
+
+    # Host tools (gcc + binutils) from https://tho-otto.de/crossmint.php :
+    sudo tar xJf gcc-<ver>-bin-linux64.tar.xz      --strip-components=1
+    sudo tar xJf binutils-<ver>-bin-linux64.tar.xz --strip-components=1
+
+    # Target libs from https://tho-otto.de/snapshots/{mintlib,fdlibm,gemlib}/
+    # -- extract INTO the sysroot subdir, NOT at /:
+    sudo mkdir -p m68k-atari-mint/sys-root
+    cd m68k-atari-mint/sys-root
+    sudo tar xjf <path>/mintlib-<ver>-mint.tar.bz2
+    sudo tar xjf <path>/fdlibm-<ver>-mint.tar.bz2
+    sudo tar xjf <path>/gemlib-<ver>-mint.tar.bz2
+
+    # E_GEM binary release from
+    # https://github.com/ingpaschke/EGEM_220/releases :
+    sudo unzip <path>/lib_e_gem_2.2.1.zip -d usr
+
+
+Host build prerequisites
+------------------------
+
+    sudo apt install make perl zip unzip curl
+
+
+Building
+--------
+
+On your Linux host, from the top of the NetHack source tree:
+
+    sys/unix/setup.sh sys/unix/hints/linux.500
+    make fetch-lua
+    make CROSS_TO_ATARI=1 all
+    make CROSS_TO_ATARI=1 package
+
+The Atari hint (sys/unix/hints/include/cross-pre2.500) defaults
+to TOOLTOP=/opt/cross-mint/bin, matching the install-toolchain.sh
+default.  If your toolchain lives elsewhere, override:
+
+    make CROSS_TO_ATARI=1 TOOLTOP=/usr/bin package           # raw tho-otto tarballs at /
+    make CROSS_TO_ATARI=1 TOOLTOP=$HOME/cross-mint/bin package
+
+The 'CROSS_TO_ATARI=1' flag activates the Atari hints under
+sys/unix/hints/include/cross-*.500, which override TARGET_CC,
+TARGET_AR, TARGET_LINK, TARGET_CFLAGS, TARGET_LFLAGS, and the
+source/object lists.  The build produces:
+
+    targets/atari/nethack.prg       Atari 68000 m68k-atari-mint
+                                    GEM application
+    targets/atari/NH500ST.ZIP       Packaged self-contained game
+                                    directory (~3 MB) ready to
+                                    unzip on the Atari side.
+
+ZIP contents are documented in sys/atari/README.tos.
+
+
+Notes
+-----
+
+  - The host-side tool bmp2img_host is built with the host's native
+    compiler and run on the host to convert nhtiles.bmp into the
+    three IMG tile sheets (NH16.IMG, NH32.IMG, NH2.IMG) that ship in
+    the package.
+
+  - For playing the game and end-user configuration, see
+    sys/atari/README.tos.
