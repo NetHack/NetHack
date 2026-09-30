@@ -9,7 +9,7 @@ from or not transferred to your system if you wish.
 (files in top directory)
 .clang-format        Contributing.md      Cross-compiling
 Files                Porting              README
-azure-pipelines.yml
+README.md            azure-pipelines.yml
 
 DEVEL:
 (files for people developing changes to NetHack)
@@ -93,16 +93,17 @@ botl.h        color.h       config.h      config1.h     context.h
 coord.h       cstd.h        decl.h        defsym.h      dgn_file.h
 display.h     dlb.h         dungeon.h     engrave.h     extern.h
 flag.h        fnamesiz.h    func_tab.h    global.h      hack.h
-hacklib.h     integer.h     isaac64.h     lint.h        mail.h
-mcastu.h      mextra.h      mfndpos.h     micro.h       mkroom.h
-monattk.h     mondata.h     monflag.h     monst.h       monsters.h
-nhlua.h       nhmd4.h       nhregex.h     obj.h         objclass.h
-objects.h     optlist.h     patchlevel.h  pcconf.h      permonst.h
-prop.h        quest.h       rect.h        region.h      revision.h
-rm.h          savefile.h    seffects.h    selvar.h      sfmacros.h
-sfprocs.h     skills.h      sndprocs.h    sp_lev.h      spell.h
-stairs.h      sym.h         sys.h         tcap.h        tileset.h
-timeout.h     tradstdc.h    trap.h        unixconf.h    vision.h
+hacklib.h     integer.h     isaac64.h     lint.h        mac68kconf.h
+mactty.h      macwin.h      mail.h        mcastu.h      mextra.h
+mfndpos.h     micro.h       mkroom.h      monattk.h     mondata.h
+monflag.h     monst.h       monsters.h    mttypriv.h    nhlua.h
+nhmd4.h       nhregex.h     obj.h         objclass.h    objects.h
+optlist.h     patchlevel.h  pcconf.h      permonst.h    prop.h
+quest.h       rect.h        region.h      revision.h    rm.h
+savefile.h    seffects.h    selvar.h      sfmacros.h    sfprocs.h
+skills.h      sndprocs.h    sp_lev.h      spell.h       stairs.h
+sym.h         sys.h         tcap.h        tileset.h     timeout.h
+tosconf.h     tradstdc.h    trap.h        unixconf.h    vision.h
 vmsconf.h     warnings.h    weight.h      winami.h      wincurs.h
 windconf.h    winprocs.h    wintype.h     you.h         youprop.h
 
@@ -146,36 +147,22 @@ outdated/dat:
 symbols
 
 outdated/include:
-(files for GEM versions)
-bitmfile.h  gem_rsc.h   load_img.h  wingem.h
-
 (file for GNOME versions)
 winGnome.h
 
 (files for all versions)
-beconf.h    def_os2.h   os2conf.h   system.h    tosconf.h   trampoli.h
-wceconf.h
+beconf.h    def_os2.h   os2conf.h   system.h    trampoli.h  wceconf.h
 
 (files for various Macintosh versions)
-mac-carbon.h  mac-qt.h      mac-term.h    macconf.h     macpopup.h
-mactty.h      macwin.h      mttypriv.h
+mac-carbon.h  mac-qt.h      mac-term.h    macpopup.h
 
 outdated/sys/atari:
-(files for Atari version - untested for 5.0)
-Install.tos   atarifnt.uue  nethack.mnu   setup.g       tos.c
-unx2atar.sed
+(files that are no longer maintained for current game code)
+Install.tos
 
 outdated/sys/be:
 (files for BeOS version - untested for 5.0)
 README    bemain.c
-
-outdated/sys/mac:
-(files for 68K Macintosh versions)
-Files.r       Install.mw    MacHelp       NHDeflts      NHrsrc.hqx
-NHsound.hqx   News          README        carbon.plist  dprintf.c
-maccurs.c     macerrs.c     macfile.c     machelp.hqx   macmain.c
-macmenu.c     mactopl.c     mactty.c      macunix.c     macwin.c
-mgetline.c    mmodal.c      mrecover.c    mrecover.hqx  mttymain.c
 
 outdated/sys/msdos:
 (files for deprecated real mode msdos version)
@@ -237,11 +224,6 @@ qt3_win.cpp          qt3_win.h            qt3_xpms.h
 qt3tableview.cpp     qt3tableview.h       tileedit.cpp
 tileedit.h
 
-outdated/win/gem:
-(files for GEM versions - untested for 5.0)
-Install.gem  bitmfile.c   gem_rsc.uu   gem_rso.uu   gr_rect.c    gr_rect.h
-load_img.c   tile2img.c   title.uu     wingem.c     wingem1.c    xpm2img.c
-
 outdated/win/gnome:
 (files for GNOME versions - untested for 5.0)
 README      gn_xpms.h   gnaskstr.c  gnaskstr.h  gnbind.c    gnbind.h
@@ -254,6 +236,10 @@ gnyesno.h   mapbg.xpm
 sound/fmod:
 (file in top directory)
 fmod.c
+
+sound/mac68ksound:
+(file in top directory)
+mac68ksound.c
 
 sound/macsound:
 (file in top directory)
@@ -343,6 +329,14 @@ winamenu.c       winami.c         winchar.c        windefs.h
 winext.h         winfuncs.c       winkey.c         winproto.h
 winreq.c         winstr.c         xpm2iff_host.c
 
+sys/atari:
+(files for Atari version)
+README.Crosscompiling  README.tos             atarifnt.uue
+bmp2img_host.c         crashlog.c             crashlog.h
+install-toolchain.sh   keytrans.h             nethack.cnf
+nethack.mnu            run-hatari.sh          sbrk.c
+setup.g                tos.c                  unx2atar.sed
+
 sys/libnh:
 (files in top directory)
 README.md    libnhmain.c  sysconf
@@ -350,6 +344,29 @@ README.md    libnhmain.c  sysconf
 sys/libnh/test:
 (files in top directory)
 README.md  libtest.c  run.sh
+
+sys/mac68k:
+(files for 68K Macintosh versions)
+BUILD.md            Files.r             Install.mw
+MacHelp             NHDeflts            NHrsrc.hqx
+NHsound.hqx         README              ReadMe.txt
+carbon.plist        dprintf.c           macalloc.c
+maccompat.h         maccurs.c           macerrs.c
+macfile.c           machelp.hqx         macmain.c
+macmap.c            macmap.h            macmenu.c
+macprefs.c          macstat.c           mactile.c
+mactile.h           mactopl.c           mactty.c
+macunix.c           macwin.c            mgetline.c
+mmodal.c            mrecover.c          mrecover.hqx
+mttymain.c          nhcfrg.r            nhmapwind.r
+nhmenus.r           nhsize.r            nhtiles_template.r
+nhtitle.r           nhvers.r            scsidriver.bin
+
+sys/mac68k/tools:
+(files for 68K Macintosh versions)
+decode_hqx.py          dump_rsrc.py           encode_hqx.py
+make_info.py           make_scsi_image2.py    retro68_elf2mac.patch
+rsrc_to_rez.py         strip_rsrc.py          wav2snd.py
 
 sys/msdos:
 (files for MSDOS version)
@@ -607,8 +624,9 @@ test_sel.lua  test_shk.lua  test_src.lua  testmove.lua  testwish.lua
 
 util:
 (files for all versions)
-dlb_main.c  makedefs.c  mdgrep.h    mdgrep.pl   panic.c     recover.c
-sfctool.c   sfexpasc.c  sftags.c    stripbs.c
+dlb_main.c         makedefs.c         mdgrep.h           mdgrep.pl
+panic.c            recover.c          sfctool.c          sfexpasc.c
+sftags.c           stripbs.c          tile2pict.c        tile2pict_quant.h
 
 win/Qt:
 (files for the Qt 4 or 5 widget library - X11, Windows, Mac OS X)
@@ -643,6 +661,12 @@ win/curses:
 Bugs.txt    Readme.txt  Todo.txt    cursdial.c  cursdial.h  cursinit.c
 cursinit.h  cursinvt.c  cursinvt.h  cursmain.c  cursmesg.c  cursmesg.h
 cursmisc.c  cursmisc.h  cursstat.c  cursstat.h  curswins.c  curswins.h
+
+win/gem:
+(files for GEM versions)
+Install.gem  gem_rsc.h    gem_rsc.uu   gem_rso.uu   gr_rect.c    gr_rect.h
+load_img.c   load_img.h   rip.uu       title.uu     title2.uu    wingem.c
+wingem.h     wingem1.c
 
 win/macosx:
 (files for macosx versions)
