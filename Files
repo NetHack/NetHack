@@ -9,7 +9,7 @@ from or not transferred to your system if you wish.
 (files in top directory)
 .clang-format        Contributing.md      Cross-compiling
 Files                Porting              README
-README.md            azure-pipelines.yml
+azure-pipelines.yml
 
 DEVEL:
 (files for people developing changes to NetHack)
