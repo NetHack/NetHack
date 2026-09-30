@@ -131,7 +131,6 @@ vsbindir:
 clean:
 #	@if exist $(LIBDIR)\$(PDCDIST) rmdir /Q $(LIBDIR)\$(PDCDIST) /s
 #	@if exist $(LIBDIR)\lua-$(LUA_VERSION) rmdir /Q $(LIBDIR)\lua-$(LUA_VERSION) /s
-#	@if exist ..\..\..\..\include\nhlua.h del /Q ..\..\..\..\include\nhlua.h
 
 rebuild:
 #	@if exist $(LIBDIR)\$(PDCDIST) echo nothing to do for lib\$(PDCDIST)
