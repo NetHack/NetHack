@@ -5,18 +5,17 @@ The sys/unix/hints/include subfolder contains Makefile content that
 is included in the distributed Makefiles.
 
 
-[.500 hints]
+[.501 hints]
 
 
-There are two .500 series hints files provided with NetHack:
-    linux.500    for use on Linux
-    macOS.500    for use on macOS
+There are two .501 series hints files provided with NetHack:
+    linux.501    for use on Linux
+    macOS.501    for use on macOS
 
-Those will also pull in content from sys/unix/hints/include/*.500,
-that is shared between the linux.500 and macOS.500 hints files.
+Those will also pull in content from sys/unix/hints/include/*.501,
+that is shared between the linux.501 and macOS.501 hints files.
 
-
-[.500 make build options]
+[.501 make build options]
 
 
 Here are some options that can be specified on the make command
@@ -49,8 +48,6 @@ make musl=1                   Build with settings appropriate for linking with
                               musl libc, instead of glibc. This causes
                               NOCRASHREPORT to be defined, and avoids the use
                               of 'col' during the build.
-make WANT_SYSTEM_LUA=1        Attempt to use an existing Lua package already
-                              on the system (initially for Alpine Linux).
 make resp=1                   Place the majority of the compiler switches into
                               a response file to de-clutter the build compiler
                               command lines and eliminate some of the
@@ -59,9 +56,9 @@ make CROSS_TO_MSDOS=1 package Cross-compile for an MSDOS target package.
 make CROSS_TO_WASM=1          Cross-compile for a WASM target.
 make CROSS_TO_MIPS=1          Cross-compile for a mips target.
 
-make WANT_BUNDLE=1            For macOS.500 only, place the build results into
+make WANT_BUNDLE=1            For macOS.501 only, place the build results into
                               a macOS bundle layout.
-make WANT_MACSOUND=1          For macOS.500, include support for built-in macOS
+make WANT_MACSOUND=1          For macOS.501, include support for built-in macOS
                               sound libraries.
 make WANT_SPEECH=1            If one of the sound libraries was included, also
                               include speech synthesis support (Recent macOS

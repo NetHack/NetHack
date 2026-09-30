@@ -1,5 +1,5 @@
 $ ! vms/vmsbuild.com -- compile and link NetHack 5.0.*			[pr]
-$	version_number = "5.0.0"
+$	version_number = "5.0.1"
 $ ! $NHDT-Date: 1687541093 2023/06/23 17:24:53 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.39 $
 $ ! Copyright (c) 2018 by Robert Patrick Rankin
 $ ! NetHack may be freely redistributed.  See license for details.

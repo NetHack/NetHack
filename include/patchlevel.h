@@ -12,7 +12,7 @@
 /*
  * PATCHLEVEL is updated for each release.
  */
-#define PATCHLEVEL 0
+#define PATCHLEVEL 1
 /*
  * Incrementing EDITLEVEL can be used to force invalidation of old bones
  * and save files.
@@ -30,7 +30,7 @@
 /*
  * Development status of this NetHack version.
  */
-#define NH_DEVEL_STATUS NH_STATUS_POSTRELEASE
+#define NH_DEVEL_STATUS NH_STATUS_WIP
 
 #ifndef DEBUG  /* allow tool chains to define without causing warnings */
 #define DEBUG
@@ -67,10 +67,27 @@
  * to individual level files matter; changes to general game state don't)
  * but the extra complexity to support that is not worth the effort.]
  */
-/*#define VERSION_COMPATIBILITY 0x05000000L*/
+#define VERSION_COMPATIBILITY 0x05000000L
 
 /****************************************************************************/
 /* Version 5.0.x */
+
+/*  Patch 1, work in progress
+ *
+ *  Monsters marked off-the-map while still on svl.level.monlist.could bank
+ *    movement credits, which would then get used up in rapid succession if
+ *    placed on the map (steed that hero dismounts from, whether intentionally
+ *    or unintentionally, or bones files; possibly migration to another level.
+ *
+ *  Spurious messages were issued repeatedly when a vault guard was parked
+ *    off the map at 0,0 and intended to be hidden from display.
+ *
+ *  The monster id's associated with usteed and ustuck were not being written
+ *    to the checkpoint file, so recover capability from a sudden game halt
+ *    was lost if the hero was riding or swallowed at the time the game
+ *    ceased.
+ *
+ */
 
 /*
  *  NetHack 5.0.0, May 2, 2026

@@ -116,11 +116,10 @@ steps:
 - bash: |
     export ADD_LUA=Y
     export WANT_LUAC=N
-    export LUATOP=../submodules/lua
-    export LUASRC=../submodules/lua
+    export LUATOP=../nhlua/lua
+    export LUASRC=../nhlua/lua
     export ADD_CURSES=Y
     export PDCURSES_TOP=../submodules/pdcursesmod
-    export LUA_VERSION=5.4.8
     #
     # 64-bit
     #export CURLSRC=https://github.com/brechtsanders/winlibs_mingw/releases/download/14.2.0posix-19.1.1-12.0.0-ucrt-r2/winlibs-x86_64-posix-seh-gcc-14.2.0-llvm-19.1.1-mingw-w64ucrt-12.0.0-r2.zip
@@ -148,9 +147,9 @@ steps:
     cd ../src
     pwd
     cp ../sys/windows/GNUmakefile* .
-    mingw32-make -f GNUmakefile CI_COMPILER=1 GIT=1 MSYSTEM=$MSYSTEM LUA_VERSION=$LUA_VERSION clean
-    mingw32-make -f GNUmakefile CI_COMPILER=1 GIT=1 MSYSTEM=$MSYSTEM LUA_VERSION=$LUA_VERSION depend
-    mingw32-make -f GNUmakefile CI_COMPILER=1 GIT=1 MSYSTEM=$MSYSTEM LUA_VERSION=$LUA_VERSION
+    mingw32-make -f GNUmakefile CI_COMPILER=1 GIT=1 MSYSTEM=$MSYSTEM clean
+    mingw32-make -f GNUmakefile CI_COMPILER=1 GIT=1 MSYSTEM=$MSYSTEM depend
+    mingw32-make -f GNUmakefile CI_COMPILER=1 GIT=1 MSYSTEM=$MSYSTEM
   condition: eq( variables.toolchain, 'mingw' )
   workingDirectory: $(Agent.BuildDirectory)/$(netHackPath)/src
   displayName: 'MinGW Build'
@@ -165,9 +164,8 @@ steps:
 
 - bash: |
     cd sys/unix
-    sh setup.sh hints/linux.500
+    sh setup.sh hints/linux.501
     cd ../..
-    make fetch-lua
     make WANT_WIN_ALL=1 QT_SELECT=5 MOC=moc all
   condition: and(eq( variables['Agent.OS'], 'Linux' ), eq( variables.buildTarget, 'all'))
   workingDirectory: $(Agent.BuildDirectory)/$(netHackPath)
@@ -198,7 +196,6 @@ steps:
     sed -i '/^#[ 	]*define MAIL/d'           include/unixconf.h
     sed -i '/^#[ 	]*define SHELL/d'          include/unixconf.h
     sed -i '/^#[ 	]*define SUSPEND/d'        include/unixconf.h
-    make fetch-lua
     make WANT_WIN_ALL=1 NOCRASHREPORT=1 all
   condition: and(eq( variables['Agent.OS'], 'Linux' ), eq( variables.buildTarget, 'minimal'))
   displayName: 'Building linux minimal build'
@@ -207,9 +204,8 @@ steps:
 - bash: |
     brew install groff
     cd sys/unix
-    sh setup.sh hints/macos.500
+    sh setup.sh hints/macos.501
     cd ../..
-    make fetch-lua
     make WANT_MACSOUND=1 all
   condition: eq( variables['Agent.OS'], 'Darwin' )
   workingDirectory: $(Agent.BuildDirectory)/$(netHackPath)
@@ -220,13 +216,12 @@ steps:
     export GCCVER=gcc1220
     export IN_CI=SKIP_FONTS_IN_CI=1
     cd sys/unix
-    sh setup.sh hints/linux.500
+    sh setup.sh hints/linux.501
     cd ../..
-    make fetch-lua
     sys/msdos/fetch-cross-compiler.sh
     retVal=$?
     if [ $retVal -eq 0 ]; then
-        make LUA_VERSION=5.4.8 WANT_WIN_TTY=1 WANT_WIN_CURSES=1 CROSS_TO_MSDOS=1 $IN_CI package
+        make WANT_WIN_TTY=1 WANT_WIN_CURSES=1 CROSS_TO_MSDOS=1 $IN_CI package
     fi
   condition: and(eq( variables['Agent.OS'], 'Linux' ), eq( variables.toolchain, 'cross'))
   workingDirectory: $(Agent.BuildDirectory)/$(netHackPath)

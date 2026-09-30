@@ -1,6 +1,3 @@
-[submodule "submodules/lua"]
-	path = submodules/lua
-	url = https://github.com/lua/lua.git
 [submodule "submodules/pdcurses"]
 	path = submodules/pdcurses
 	url = https://github.com/wmcbrine/PDCurses.git

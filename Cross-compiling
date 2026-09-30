@@ -479,7 +479,7 @@ Cross-compiler pre-built binary downloads:
            bash sys/msdos/fetch-cross-compiler.sh
 
     That script won't install anything, it just does file fetches and stores
-    them in subfolders of lib. The linux.500 and macOS.500 hints files are
+    them in subfolders of lib. The linux.501 and macOS.501 hints files are
     configured to find the cross-compiler there if you add
         CROSS_TO_MSDOS=1
     on your make command line.
@@ -490,13 +490,11 @@ Cross-compiler pre-built binary downloads:
 
     On your linux host:
 
-        cd sys/unix ; sh setup.sh hints/linux.500 ; cd ../..
-        make fetch-lua
+        cd sys/unix ; sh setup.sh hints/linux.501 ; cd ../..
 
     On your macOS host:
 
-        cd sys/unix ; sh setup.sh hints/macOS.500 ; cd ../..
-        make fetch-lua
+        cd sys/unix ; sh setup.sh hints/macOS.501 ; cd ../..
 
     The MSDOS cross-compile can then be carried out by specifying
     CROSS_TO_MSDOS=1 on the make command line:
@@ -579,21 +577,20 @@ Author of 5.0 support:   Ingo Paschke
 
         # Clone NetHack 5.0 source
         cd NetHack
-        sys/unix/setup.sh sys/unix/hints/linux.500
-        make fetch-lua
+        sys/unix/setup.sh sys/unix/hints/linux.501
         make CROSS_TO_AMIGA=1 fetch-regex
         make CROSS_TO_AMIGA=1 all
         make CROSS_TO_AMIGA=1 package
 
-        The distribution ZIP is created at targets/amiga/NH500AMI.ZIP.
+        The distribution ZIP is created at targets/amiga/NH501AMI.ZIP (or NH501AMIn.ZIP where
+        n is a sequence number for the revision of the binary)..
 
         On your macOS host, the Amiga cross-compile can be carried out by specifying
         CROSS_TO_AMIGA=1 on the make command line:
 
         # Clone NetHack 5.0 source
         cd NetHack
-        sys/unix/setup.sh sys/unix/hints/macOS.500
-        make fetch-lua
+        sys/unix/setup.sh sys/unix/hints/macOS.501
         make CROSS_TO_AMIGA=1 fetch-regex
         make CROSS_TO_AMIGA=1 all
         make CROSS_TO_AMIGA=1 package
@@ -665,13 +662,11 @@ Cross-compiler url: https://emscripten.org/docs/getting_started/downloads.html
 
     On your linux host, prepare to cross-compile NetHack as follows:
 
-        cd sys/unix ; sh setup.sh hints/linux.500 ; cd ../..
-        make fetch-lua
+        cd sys/unix ; sh setup.sh hints/linux.501 ; cd ../..
 
     On your macOS host, prepare to cross-compile NetHack as follows:
 
-        cd sys/unix ; sh setup.sh hints/macOS.500 ; cd ../..
-        make fetch-lua
+        cd sys/unix ; sh setup.sh hints/macOS.501 ; cd ../..
 
     Then, cross-compile to targets/wasm as follows:
 
@@ -693,7 +688,7 @@ Cross-compiler url: https://emscripten.org/docs/getting_started/downloads.html
 
     The cross-compiler hints additions are enclosed inside ifdef sections
     and shouldn't interfere with the non-cross-compile builds using
-    hints/linux.500 or hints/macOS.500.
+    hints/linux.501 or hints/macOS.501.
 
 
   +--------------------------------+
@@ -713,8 +708,7 @@ Cross-compiler url:
         sudo apt install g++-mipsel-linux-gnu
 
     On your linux host, prepare to cross-compile NetHack as follows:
-        cd sys/unix ; sh setup.sh hints/linux.500 ; cd ../..
-        make fetch-lua
+        cd sys/unix ; sh setup.sh hints/linux.501 ; cd ../..
 
     Then, cross-compile to targets/mips as follows:
         make CROSS_TO_MIPS=1 fetch-ncurses
@@ -726,7 +720,7 @@ Cross-compiler url:
 
     The cross-compiler hints additions are enclosed inside ifdef sections
     and shouldn't interfere with the non-cross-compile builds using
-    hints/linux.500 or hints/macOS.500.
+    hints/linux.501 or hints/macOS.501.
 
 
 ---

@@ -13,7 +13,7 @@ tile rendering. Native AGA/OCS/ECS chipsets are supported.
 
 Installation
 ------------
-Extract NH500AMI.ZIP (or NH500AMIn.ZIP if there's a an updated
+Extract NH501AMI.ZIP (or NH501AMIn.ZIP if there's a an updated
 binary, where 'n' is a digit suffix) somewhere on your hard drive
 (e.g. into Work:). You'll get a NetHack drawer with everything inside.
 
@@ -80,13 +80,14 @@ Cross-compilation from Linux using bebbo's m68k-amigaos-gcc toolchain
     # Install toolchain to /opt/amiga
     # Clone NetHack 5.0 source
     cd NetHack
-    sys/unix/setup.sh sys/unix/hints/linux.500
-    make fetch-lua
+    sys/unix/setup.sh sys/unix/hints/linux.501
     make CROSS_TO_AMIGA=1 fetch-regex
     make CROSS_TO_AMIGA=1 all
     make CROSS_TO_AMIGA=1 package
 
-The distribution ZIP is created at targets/amiga/NH500AMI.ZIP.
+The distribution ZIP is created at targets/amiga/NH501AMI.ZIP
+(or targets/amiga/NH501AMIn.ZIP, where n is a sequential revision
+number for the binary)..
 
 Toolchain requirements:
 

@@ -28,7 +28,7 @@
     <IntDir>$(ObjDir)</IntDir>
     <WinCursDir>$(RootDir)win\curses\</WinCursDir>
     <SubmodulesDir>$(RootDir)submodules\</SubmodulesDir>
-    <LuaDir>$(LibDir)lua-$(LUA_VERSION)\src\</LuaDir>
+    <LuaDir>$(RootDir)nhlua\lua\src\</LuaDir>
     <SftagsDir>$(RootDir)\sys\windows\vs\sftags\</SftagsDir>
     <SfctoolDir>$(RootDir)\sys\windows\vs\sfctool\</SfctoolDir>
     <PackageBin>$(RootDir)binary\$(Configuration)\$(Platform)</PackageBin>

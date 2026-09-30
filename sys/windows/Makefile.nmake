@@ -142,12 +142,6 @@ GIT_AVAILABLE=1
 # if next line is commented out, full compiler command lines will be output
 Q=@
 
-!IFNDEF LUA_VERSION
-LUAVER=5.4.8
-!ELSE
-LUAVER=$(LUA_VERSION)
-!ENDIF
-
 # if GIT=1 is passed on the make command, allow use of git and internet
 !IF "$(GIT)" == "1"
 INTERNET_AVAILABLE=1
@@ -173,7 +167,7 @@ GIT_AVAILABLE=1
 #==============================================================================
 #
 #  The version of the game this Makefile was designed for
-NETHACK_VERSION="5.0.0"
+NETHACK_VERSION="5.0.1"
 
 # A brief version for use in macros
 NHV=$(NETHACK_VERSION:.=)
@@ -267,67 +261,17 @@ LUA_MAY_PROCEED=N
 ADD_CURSES=N
 
 # First, Lua
-!IF "$(INTERNET_AVAILABLE)" == "1"
-!IF "$(GIT_AVAILABLE)" == "1"
-R_LUATOP=$(SUBM)lua
-LUATOP=$(SUBM)lua$(BACKSLASH)
-R_LUASRC=$(R_LUATOP)
-LUASRC=$(R_LUASRC)$(BACKSLASH)
-LUA_MAY_PROCEED=Y
-!ELSE   # GIT_AVAILABLE
-R_LUATOP=$(LIBDIR)lua-$(LUAVER)
+R_LUATOP=..\nhlua\lua
 LUATOP=$(R_LUATOP)$(BACKSLASH)
-#U_LUATOP=$(LUATOP:\=/)
 R_LUASRC=$(LUATOP)src
 LUASRC=$(R_LUASRC)$(BACKSLASH)
 #U_LUASRC=$(LUASRC:\=/)
 LUA_MAY_PROCEED=Y
-!ENDIF  # GIT_AVAILABLE
-!ELSE   # INTERNET_AVAILABLE is not Y below
-# The internet is not available for obtaining Lua using either
-# method (git or download). Check to see if it is available already, with
-# precedence given to ../submodules, then ../lib.
-#
-!IF EXIST("$(SUBM)lua\lua.h")
-R_LUATOP=$(SUBM)lua
-LUATOP=$(R_LUATOP)$(BACKSLASH)
-#U_LUATOP=$(LUATOP:\=/)
-R_LUASRC=$(LUATOP)
-LUASRC=$(LUATOP)$(BACKSLASH)
-#U_LUASRC=$(LUASRC:\=/)
-LUA_MAY_PROCEED=Y
-!ELSEIF EXIST("$(LIBDIR)lua-$(LUAVER)\src\lua.h")
-R_LUATOP=$(LIBDIR)lua-$(LUAVER)
-LUATOP=$(R_LUATOP)$(BACKSLASH)
-#U_LUATOP=$(LUATOP:\=/)
-R_LUASRC=$(LUATOP)src
-LUASRC=$(R_LUASRC)$(BACKSLASH)
-#U_LUASRC=$(LUASRC:\=/)
-LUA_MAY_PROCEED=Y
-!ENDIF  # Lua sources
-!IF "$(LUA_MAY_PROCEED)" == "Y"
-!MESSAGE No internet connection was authorized in the Makefile,
-!MESSAGE but a copy of lua-$(LUAVER) was found in $(LUATOP), so that will be used.
-!ENDIF  # LUA_MAY_PROCEED
-!ENDIF  # INTERNET_AVAILABLE
 
 #!MESSAGE R_LUATOP=$(R_LUATOP)
 #!MESSAGE LUATOP=$(R_LUATOP)
 #!MESSAGE R_LUASRC=$(R_LUASRC)
 #!MESSAGE LUASRC=$(LUASRC)
-
-!IF "$(LUA_MAY_PROCEED)" != "Y"
-!IF "$(INTERNET_AVAILABLE)" != "1"
-!MESSAGE Your Makefile settings do not allow use of the internet to obtain Lua
-!ENDIF  # INTERNET_AVAILABLE
-!MESSAGE and no copy of Lua was found in either $(SUBM)lua or $(LIBDIR)lua-$(LUAVER).
-!MESSAGE Change your nmake command line to include:
-!MESSAGE     GIT=1
-!MESSAGE or modify your Makefile to set the following:
-!MESSAGE     INTERNET_AVAILABLE=1
-!MESSAGE     GIT_AVAILABLE=1
-!ERROR Stopping because NetHack 5.0 requires Lua for its build.
-!ENDIF  # LUA_MAY_PROCEED
 
 # Now, pdcursesmod
 !IF "$(CURSES_CONSOLE)" == "Y"
@@ -547,32 +491,8 @@ GITBRANCH = -DNETHACK_GIT_BRANCH=\"$(GIT_BRANCH)\"
 GITPREFIX = -DNETHACK_GIT_PREFIX=\"$(GIT_PREFIX)\"
 !ENDIF
 
-#=================================================================
-# LUA library
-# Official source for Lua is http://www.lua.org/ftp/lua-5.4.8.tar.gz
-#
-# Source for the NetHack repository submodule in ../submodules/lua
-# is https://github.com/lua/lua.git
-#=================================================================
-#
-# Location of LUA
-#
-# Original source needs to be obtained from:
-#    http://www.lua.org/ftp/lua-5.4.8.tar.gz
-#
-#    This build assumes that the LUA sources are located
-#    at the specified location. If they are actually elsewhere
-#    you'll need to specify the correct spot below in order to
-#    successfully build NetHack-5.0.  You cannot build a functional
-#    version of NetHack-5.0 Work-in-progress without including Lua.
-#
-
-!IFNDEF LUAVER
-LUAVER=5.4.8
-!ENDIF
-
-LUALIB   = $(LIBDIR)lua$(LUAVER)-$(TARGET_CPU)-static.lib
-LUADLL   = $(LIBDIR)lua$(LUAVER)-$(TARGET_CPU).dll
+LUALIB   = $(LIBDIR)lua-$(TARGET_CPU)-static.lib
+LUADLL   = $(LIBDIR)lua-$(TARGET_CPU).dll
 R_LUAINCL  = /I$(R_LUASRC)
 LUATARGETS = lua.exe $(LUADLL) $(LUALIB)
 
@@ -593,13 +513,6 @@ LUAOBJFILES =   $(OLUA)lapi.o $(OLUA)lauxlib.o $(OLUA)lbaselib.o                
 		$(OLUA)lstring.o $(OLUA)lstrlib.o $(OLUA)ltable.o $(OLUA)ltablib.o \
 		$(OLUA)ltm.o $(OLUA)lundump.o $(OLUA)lutf8lib.o $(OLUA)lvm.o $(OLUA)lzio.o
 
-!IF "$(LUAVER)" == "5.3.5"
-LUASRCFILES = $(LUASRCFILES) lbitlib.c
-LUAOBJFILES =   $(LUAOBJFILES) $(OLUA)lbitlib.o
-!ELSE
-#  5.4.0 added header files ljumptab.h and lopnames.h
-#        and removes lbitlib.c
-!ENDIF
 #===============-=================================================
 # PDCursesmod build macros
 # Source for the NetHack repository submodule in
@@ -1564,7 +1477,7 @@ DLB =
 #==========================================
 
 {$(R_LUASRC)}.c{$(R_OBJLUA)}.o:
-	$(Q)$(CC) $(CFLAGS) -wd4701 -wd4702 -wd4774 -wd4324 -wd5262 $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
+	$(Q)$(CC) $(CFLAGS) -I../nhlua/lua/src -wd4701 -wd4702 -wd4709 -wd4774 -wd4324 -wd5262 $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
 
 #===============================================================================
 # Rules for integrated sound files in sound/wav
@@ -1609,10 +1522,6 @@ all :	package
 
 !IF "$(INTERNET_AVAILABLE)" == "1"
 !IF "$(GIT_AVAILABLE)" == "1"
-$(LUASRC)lua.h:
-	git submodule init $(SUBM)lua
-	git submodule update $(SUBM)lua
-#	git submodule update --remote $(SUBM)lua
 #
 #aka PDCDEP
 !IF "$(ADD_CURSES)" == "Y"
@@ -1622,19 +1531,11 @@ $(PDCURSES_TOP)curses.h:
 #	git submodule update --remote $(SUBM)$(R_PDCDIST)
 !ENDIF
 !ELSE  # GIT_AVAILABLE no
-CURLLUASRC=http://www.lua.org/ftp/lua-5.4.8.tar.gz
-CURLLUADST=lua-5.4.8.tar.gz
 
 #CURLPDCSRC=https://github.com/wmcbrine/PDCurses/archive/refs/tags/3.9.zip
 CURLPDCSRC=https://github.com/Bill-Gray/PDCursesMod/archive/refs/tags/v4.4.0.zip
 CURLPDCDST=$(PDCDIST).zip
 
-$(LUASRC)lua.h:
-	@if not exist $(LIBDIR)*.* mkdir $(R_LIBDIR)
-	cd $(R_LIBDIR)
-	curl -L $(CURLLUASRC) -o $(CURLLUADST)
-	tar -xvf $(CURLLUADST)
-	cd $(R_SRC)
 !IF "$(ADD_CURSES)" == "Y"
 $(PDCURSES_TOP)curses.h:
 	@if not exist $(LIBDIR)*.* mkdir $(R_LIBDIR)
@@ -1787,17 +1688,9 @@ recover: $(OUTLHACKLIB) $(U)recover.exe
 	if exist $(U)recover.exe copy $(U)recover.exe  $(GAMEDIR)
 	if exist $(DOC)recover.txt copy $(DOC)recover.txt $(GAMEDIR)recover.txt
 
-$(OUTL)utility.tag: $(INCL)nhlua.h outldir$(TARGET_CPU).tag $(OUTLHACKLIB) $(U)tile2bmp.exe $(U)makedefs.exe
+$(OUTL)utility.tag: outldir$(TARGET_CPU).tag $(OUTLHACKLIB) $(U)tile2bmp.exe $(U)makedefs.exe
 	     @echo utilities made >$@
 	     @echo utilities made.
-
-$(INCL)nhlua.h:
-	@echo  /* nhlua.h - generated by Makefile from Makefile.nmake */ > $@
-	@echo #include "lua.h" >> $@
-	@echo ATTRNORETURN LUA_API int   (lua_error) (lua_State *L) NORETURN; >> $@
-	@echo #include "lualib.h" >> $@
-	@echo #include "lauxlib.h" >> $@
-	@echo /*nhlua.h*/ >> $@
 
 tileutil: $(U)gif2txt.exe $(U)gif2tx32.exe $(U)txt2ppm.exe
 	@echo Optional tile development utilities are up to date.
@@ -2051,20 +1944,6 @@ cpu.tag:
 #==========================================
 #=========== SECONDARY TARGETS ============
 #==========================================
-fetch-lua: fetch-actual-Lua
-
-fetch-Lua: fetch-actual-Lua
-
-fetch-actual-Lua:
-	@if not exist $(LIBDIR)*.* mkdir $(R_LIBDIR)
-	cd $(LIBDIR)
-	curl -L -R -O http://www.lua.org/ftp/lua-$(LUAVER).tar.gz
-	tar zxf lua-$(LUAVER).tar.gz
-	if exist lua-$(LUAVER).tar.gz del lua-$(LUAVER).tar.gz
-	if exist lua-$(LUAVER).tar del lua-$(LUAVER).tar
-	cd $(R_SRC)
-	@echo Lua has been fetched into $(LIBDIR)lua-$(LUAVER)
-
 !IF "$(ADD_CURSES)" == "Y"
 fetch-pdcurses:
 	@if not exist $(LIBDIR)*.* mkdir $(R_LIBDIR)
@@ -2362,11 +2241,11 @@ lua.exe: $(OLUA)lua.o $(LUALIB)
 #	@echo Linking $(@:\=/)
 #	@$(link) /OUT:$@ $(OLUA)luac.o $(LUALIB)
 
-$(LIBDIR)lua$(LUAVER)-$(TARGET_CPU).dll: $(LUAOBJFILES)
+$(LIBDIR)lua-$(TARGET_CPU).dll: $(LUAOBJFILES)
 	@echo Linking $(@:\=/)
-	@$(link) /DLL /IMPLIB:$(LIBDIR)lua$(LUAVER).lib /OUT:$@ $(LUAOBJFILES)
+	@$(link) /DLL /IMPLIB:$(LIBDIR)lua.lib /OUT:$@ $(LUAOBJFILES)
 
-$(LIBDIR)lua$(LUAVER)-$(TARGET_CPU)-static.lib: $(LUAOBJFILES)
+$(LIBDIR)lua-$(TARGET_CPU)-static.lib: $(LUAOBJFILES)
 	@echo Building library $@ from $**
 	@$(librarian) /OUT:$@ $(LUAOBJFILES)
 
@@ -2825,7 +2704,7 @@ binary:  envchk.tag libdir.tag ottydir$(TARGET_CPU).tag \
 		oluadir$(TARGET_CPU).tag opdcdir$(TARGET_CPU).tag \
 		opdctxtdir$(TARGET_CPU).tag opdcguidir$(TARGET_CPU).tag \
 		$(LUASRC)lua.h $(PDCDEP) \
-		$(INCL)nhlua.h $(OUTL)utility.tag \
+		$(OUTL)utility.tag \
 		$(DAT)data $(DAT)rumors $(DAT)oracles $(DAT)engrave \
 		$(DAT)epitaph $(DAT)bogusmon $(GAMEDIR)NetHack.exe \
 		$(GAMEDIR)NetHackW.exe $(SFCTOOLPKG) $(GAMEDIRDLLS) binary.tag
@@ -2930,7 +2809,6 @@ clean:
 	if exist $(OTTY)sp_lev.tag      del $(OTTY)sp_lev.tag
 	if exist $(OGUI)sp_lev.tag      del $(OGUI)sp_lev.tag
 	if exist $(SRC)tile.c           del $(SRC)tile.c
-	if exist $(INCL)nhlua.h         del $(INCL)nhlua.h
 	if exist $(U)makedefs.exe       del $(U)makedefs.exe
 	if exist $(U)dlb_main.exe       del $(U)dlb_main.exe
 	if exist $(U)tile2bmp.exe       del $(U)tile2bmp.exe

@@ -670,8 +670,7 @@ typedef unsigned char uchar;
 
 #define USE_ISAAC64 /* Use cross-platform, bundled RNG */
 
-/* TEMPORARY - MAKE UNCONDITIONAL BEFORE RELEASE */
-/* undef this to check if sandbox breaks something */
+/* undef this to check if sandbox breaks something, but only for debugging! */
 #define NHL_SANDBOX
 
 #ifdef NHL_SANDBOX
