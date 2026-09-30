@@ -61,7 +61,7 @@ II. There once was a time when people built NetHack right on their DOS machine.
         sys/msdos/fetch-cross-compiler.sh
 
     That script won't install anything, it just does file fetches and stores
-    them in subfolders of lib. The linux.500 and macOS.500 hints files are
+    them in subfolders of lib. The linux.501 and macOS.501 hints files are
     configured to find the cross-compiler there if you add
         CROSS_TO_MSDOS=1
     on your make command line.
@@ -72,13 +72,11 @@ II. There once was a time when people built NetHack right on their DOS machine.
 
     On your linux host:
 
-        cd sys/unix ; sh setup.sh hints/linux.500 ; cd ../..
-        make fetch-lua
+        cd sys/unix ; sh setup.sh hints/linux.501 ; cd ../..
 
     On your macOS host:
 
-        cd sys/unix ; sh setup.sh hints/macOS.500 ; cd ../..
-        make fetch-lua
+        cd sys/unix ; sh setup.sh hints/macOS.501 ; cd ../..
 
     The MSDOS cross-compile can then be carried out by specifying
     CROSS_TO_MSDOS=1 on the make command line:
@@ -134,7 +132,7 @@ Appendix B - Common Difficulties Encountered
 
      For example:
          make CROSS_TO_MSDOS=1 package
-         ( cd src ; make LUA_VERSION=5.4.8 nethack )
+         ( cd src ; make nethack )
          make[1]: Entering directory '/home/johndoe/NHsource/src'
          mkdir -p ../targets/msdos ; make ../targets/msdos/exceptn.o ;
          make[2]: Entering directory '/home/johndoe/NHsource/src'

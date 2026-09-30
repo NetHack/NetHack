@@ -1,0 +1,974 @@
+#===============-=================================================
+# NetHack 5.0  include/cross-post $NHDT-Date: 1597332785 2020/08/13 15:33:05 $  $NHDT-Branch: NetHack-5.0 $
+#
+# Cross-compiling -POST section
+
+ifdef CROSS_TO_MSDOS
+#
+.PHONY: tilemap
+tilemap:  ../util/tilemap.o $(SRCDIR)/objects.o $(SRCDIR)/monst.o $(SRCDIR)/drawing.o $(HACKLIB)
+../util/tilemap.o : ../win/share/tilemap.c
+	(cd ../util ; make tilemap.o ; cd ../src )
+$(TARGETPFX)msdos.o : ../sys/msdos/msdos.c $(HACK_H)
+$(TARGETPFX)font.o : ../sys/msdos/font.c ../sys/msdos/font.h $(HACK_H)
+$(TARGETPFX)pckeys.o : ../sys/msdos/pckeys.c $(HACK_H)
+$(TARGETPFX)pctiles.o : ../sys/msdos/pctiles.c ../sys/msdos/portio.h $(HACK_H)
+$(TARGETPFX)video.o : ../sys/msdos/video.c ../sys/msdos/portio.h $(HACK_H)
+$(TARGETPFX)vidtxt.o : ../sys/msdos/vidtxt.c ../sys/msdos/portio.h \
+		../win/share/tile.h ../include/tileset.h $(HACK_H)
+$(TARGETPFX)vidvga.o : ../sys/msdos/vidvga.c ../sys/msdos/portio.h \
+		../win/share/tile.h ../include/tileset.h $(HACK_H)
+$(TARGETPFX)vidvesa.o : ../sys/msdos/vidvesa.c ../sys/msdos/portio.h \
+		../win/share/tile.h ../include/tileset.h ../sys/msdos/font.h $(HACK_H)
+$(TARGETPFX)vidstub.o : ../sys/msdos/vidvesa.c ../sys/msdos/portio.h \
+		$(HACK_H)
+$(TARGETPFX)tile.o : $(SRCDIR)/tile.c
+	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ $(SRCDIR)/tile.c
+$(SRCDIR)/tile.c : tilemap
+$(TARGETPFX)exceptn.o : ../lib/djgpp/djgpp-patch/src/libc/go32/exceptn.S
+	$(TARGET_CC) -c -o $@ ../lib/djgpp/djgpp-patch/src/libc/go32/exceptn.S
+	$(TARGET_AR) ru ../lib/djgpp/i586-pc-msdosdjgpp/lib/libc.a $(TARGETPFX)exceptn.o
+$(GAMEBIN) : $(HOBJ) $(TARGETPFX)date.o $(TARGET_HACKLIB) $(LUACROSSLIB)
+	$(TARGET_LINK) $(TARGET_LFLAGS) -o $@ \
+	$(HOBJ) $(DATE_O) $(GENTILEOFILE) $(TARGET_HACKLIB) $(WINLIB) $(TARGET_LIBS)
+$(DOSFONT)/ter-u16b.psf: $(FONTTOP)/ter-u16b.bdf $(DOSFONT)/nh-u16b.bdf $(DOSFONT)/makefont.lua $(LUABIN)
+	$(LUABIN) $(DOSFONT)/makefont.lua $(FONTTOP)/ter-u16b.bdf $(DOSFONT)/nh-u16b.bdf $@
+$(DOSFONT)/ter-u16v.psf: $(FONTTOP)/ter-u16v.bdf $(DOSFONT)/nh-u16v.bdf $(DOSFONT)/makefont.lua $(LUABIN)
+	$(LUABIN) $(DOSFONT)/makefont.lua $(FONTTOP)/ter-u16v.bdf $(DOSFONT)/nh-u16v.bdf $@
+$(DOSFONT)/ter-u18b.psf: $(FONTTOP)/ter-u18b.bdf $(DOSFONT)/nh-u18b.bdf $(DOSFONT)/makefont.lua $(LUABIN)
+	$(LUABIN) $(DOSFONT)/makefont.lua $(FONTTOP)/ter-u18b.bdf $(DOSFONT)/nh-u18b.bdf $@
+$(DOSFONT)/ter-u20b.psf: $(FONTTOP)/ter-u20b.bdf $(DOSFONT)/nh-u20b.bdf $(DOSFONT)/makefont.lua $(LUABIN)
+	$(LUABIN) $(DOSFONT)/makefont.lua $(FONTTOP)/ter-u20b.bdf $(DOSFONT)/nh-u20b.bdf $@
+$(DOSFONT)/ter-u22b.psf: $(FONTTOP)/ter-u22b.bdf $(DOSFONT)/nh-u22b.bdf $(DOSFONT)/makefont.lua $(LUABIN)
+	$(LUABIN) $(DOSFONT)/makefont.lua $(FONTTOP)/ter-u22b.bdf $(DOSFONT)/nh-u22b.bdf $@
+$(DOSFONT)/ter-u24b.psf: $(FONTTOP)/ter-u24b.bdf $(DOSFONT)/nh-u24b.bdf $(DOSFONT)/makefont.lua $(LUABIN)
+	$(LUABIN) $(DOSFONT)/makefont.lua $(FONTTOP)/ter-u24b.bdf $(DOSFONT)/nh-u24b.bdf $@
+$(DOSFONT)/ter-u28b.psf: $(FONTTOP)/ter-u28b.bdf $(DOSFONT)/nh-u28b.bdf $(DOSFONT)/makefont.lua $(LUABIN)
+	$(LUABIN) $(DOSFONT)/makefont.lua $(FONTTOP)/ter-u28b.bdf $(DOSFONT)/nh-u28b.bdf $@
+$(DOSFONT)/ter-u32b.psf: $(FONTTOP)/ter-u32b.bdf $(DOSFONT)/nh-u32b.bdf $(DOSFONT)/makefont.lua $(LUABIN)
+	$(LUABIN) $(DOSFONT)/makefont.lua $(FONTTOP)/ter-u32b.bdf $(DOSFONT)/nh-u32b.bdf $@
+#
+.PHONY: dodata dospkg dosfonts
+dosfonts: $(FONTTARGETS)
+dospkg: dodata dosfonts $(GAMEBIN) $(TARGETPFX)recover.exe $(NHTILES)
+	$(TARGET_STUBEDIT) $(GAMEBIN) minstack=2048K
+	mkdir -p $(TARGETPFX)pkg
+	cp $(GAMEBIN) $(TARGETPFX)pkg/NETHACK.EXE
+	cp $(TARGETPFX)recover.exe $(TARGETPFX)pkg/RECOVER.EXE
+	-cp $(SFCTOOLBIN) $(TARGETPFX)pkg/SFCTOOL.EXE
+	cp ../dat/nhdat $(TARGETPFX)pkg/NHDAT
+	cp ../dat/license $(TARGETPFX)pkg/LICENSE
+	-cp ../dat/nhtiles.bmp $(TARGETPFX)pkg/NHTILES.BMP
+	cp ../dat/symbols $(TARGETPFX)pkg/SYMBOLS
+	cp ../sys/share/NetHack.cnf $(TARGETPFX)pkg/NETHACK.CNF
+	cp ../sys/msdos/sysconf $(TARGETPFX)pkg/SYSCONF
+	cp ../doc/nethack.txt $(TARGETPFX)pkg/NETHACK.TXT
+	-cp $(DOSFONT)/ter-u16b.psf $(TARGETPFX)pkg/TER-U16B.PSF
+	-cp $(DOSFONT)/ter-u16v.psf $(TARGETPFX)pkg/TER-U16V.PSF
+	-cp $(DOSFONT)/ter-u18b.psf $(TARGETPFX)pkg/TER-U18B.PSF
+	-cp $(DOSFONT)/ter-u20b.psf $(TARGETPFX)pkg/TER-U20B.PSF
+	-cp $(DOSFONT)/ter-u22b.psf $(TARGETPFX)pkg/TER-U22B.PSF
+	-cp $(DOSFONT)/ter-u24b.psf $(TARGETPFX)pkg/TER-U24B.PSF
+	-cp $(DOSFONT)/ter-u28b.psf $(TARGETPFX)pkg/TER-U28B.PSF
+	-cp $(DOSFONT)/ter-u32b.psf $(TARGETPFX)pkg/TER-U32B.PSF
+	cp  ../lib/djgpp/cwsdpmi/bin/CWSDPMI.EXE $(TARGETPFX)pkg/CWSDPMI.EXE
+	( if [ -f ../lib/djgpp/target/bin/symify.exe ]; then \
+	      cp  ../lib/djgpp/target/bin/symify.exe $(TARGETPFX)pkg/SYMIFY.EXE; \
+          else \
+              pwd; echo "../lib/djgpp/target/bin/symify.exe not found"; \
+	  fi; )
+ifeq "$(WANT_DEBUG)" "1"
+	( if [ -f $(GDBEXE) ]; \
+	  then \
+		cp  $(GDBEXE) $(TARGETPFX)pkg/GDB.EXE; \
+		echo "gdb -ex '$(GDBCMDLINE)' NETHACK.EXE"> $(TARGETPFX)pkg/$(GDBBAT); \
+          else \
+		pwd; echo "$(GDBEXE) not found and WANT_DEBUG=1 specified"; \
+	  fi; )
+else
+	-( if [ -f $(TARGETPFX)pkg/GDB.EXE ]; \
+	  then \
+		rm $(TARGETPFX)pkg/GDB.EXE; \
+	  fi; )
+	-( if [ -f $(TARGETPFX)pkg/NHGDB.BAT ]; \
+	  then \
+		rm $(TARGETPFX)pkg/NHGDB.BAT; \
+	  fi; )
+endif
+	-touch $(TARGETPFX)pkg/RECORD
+	cd $(TARGETPFX)pkg ; zip -9 ../NH$(NHV)DOS.ZIP * ; cd ../../..
+	@echo msdos package zip file $(TARGETPFX)NH$(NHV)DOS.ZIP
+
+$(LUABIN):
+	( cd .. && make luabin && cd src)
+dodata:
+	( cd .. && make dlb && cd src)
+ifdef dosbox
+# make CROSS_TO_MSDOS=1 dosbox=~/dosbox deploy-to-dosbox
+ifdef MAKEFILE_TOP
+deploy-to-dosbox: 
+	( cd src; make $(DEPLOY); cd .. )
+endif
+.PHONY: deploytodosbox
+
+deploytodosbox: $(TARGETPFX)NH$(NHV)DOS.ZIP $(dosboxnhfolder) $(dosboxnhsrc) \
+			$(dosboxnhsrc)/src $(dosboxnhsrc)/include \
+			$(dosboxnhsrc)/sys/msdos $(dosboxnhsrc)/sys/share \
+			$(dosboxnhsrc)/win/share $(dosboxnhsrc)/win/curses \
+			$(dosboxnhsrc)/win/tty $(dosboxnhsrc)/util \
+			$(dosboxnhfolder)/NETHACK.EXE
+	@echo DOS NetHack deployed to dosbox at $(dosboxnhfolder)
+$(TARGETPFX)NH$(NHV)DOS.ZIP: dospkg
+$(dosboxnhfolder):
+	mkdir -p $@
+$(dosboxnhsrc): $(dosboxnhfolder)
+	mkdir -p $@
+$(dosboxnhsrc)/src: $(dosboxnhsrc)
+	mkdir -p $@
+	cp --preserve=timestamps $(FLDR)src/*.c $(dosboxnhsrc)/src
+$(dosboxnhsrc)/include: $(dosboxnhsrc)
+	mkdir -p $@
+	cp --preserve=timestamps $(FLDR)include/*.h $(dosboxnhsrc)/include
+$(dosboxnhsrc)/sys/msdos: $(dosboxnhsrc)
+	mkdir -p $@
+	cp --preserve=timestamps $(FLDR)sys/msdos/*.c $(dosboxnhsrc)/sys/msdos
+	cp --preserve=timestamps $(FLDR)sys/msdos/*.h $(dosboxnhsrc)/sys/msdos
+$(dosboxnhsrc)/sys/share: $(dosboxnhsrc)
+	mkdir -p $@
+	cp --preserve=timestamps $(FLDR)sys/share/*.c $(dosboxnhsrc)/sys/share
+$(dosboxnhsrc)/win/share: $(dosboxnhsrc)
+	mkdir -p $@
+	cp --preserve=timestamps $(FLDR)win/share/*.c $(dosboxnhsrc)/win/share
+$(dosboxnhsrc)/win/curses: $(dosboxnhsrc)
+	mkdir -p $@
+	cp --preserve=timestamps $(FLDR)win/curses/*.c $(dosboxnhsrc)/win/curses
+	cp --preserve=timestamps $(FLDR)win/curses/*.h $(dosboxnhsrc)/win/curses
+$(dosboxnhsrc)/win/tty: $(dosboxnhsrc)
+	mkdir -p $@
+	cp --preserve=timestamps $(FLDR)win/tty/*.c $(dosboxnhsrc)/win/tty
+$(dosboxnhsrc)/util: $(dosboxnhsrc)
+	mkdir -p $@
+	cp --preserve=timestamps $(FLDR)util/*.c $(dosboxnhsrc)/util
+	cp --preserve=timestamps $(FLDR)util/*.h $(dosboxnhsrc)/util
+$(dosboxnhfolder)/NETHACK.EXE: $(TARGETPFX)NH$(NHV)DOS.ZIP
+	unzip -o $(TARGETPFX)NH$(NHV)DOS.ZIP -d $(dosboxnhfolder)
+	find $(dosboxnhfolder) -type f -name "$(dosboxconfigfile)" \
+		| xargs sed -i 's/#OPTIONS=video:autodetect/OPTIONS=video:autodetect/g'
+endif  # dosbox
+endif  # CROSS_TO_MSDOS
+
+ifdef CROSS_TO_WASM
+$(WASM_TARGET): pregame $(TARGET_HACKLIB) $(TARGETPFX)date.o $(HOSTOBJ) $(HOBJ) $(LUACROSSLIB) $(WASM_DATA_DIR)
+	-rm $@
+	$(TARGET_CC) $(TARGET_LFLAGS) $(TARGET_CFLAGS) -o $@ \
+		$(HOBJ) $(TARGETPFX)date.o $(TARGET_HACKLIB) $(TARGET_LIBS)
+
+$(WASM_DATA_DIR): $(WASM_DATA_DIR)/nhdat
+	touch $(WASM_DATA_DIR)/perm
+	touch $(WASM_DATA_DIR)/record
+	touch $(WASM_DATA_DIR)/logfile
+	touch $(WASM_DATA_DIR)/xlogfile
+	touch $(WASM_DATA_DIR)/livelog
+	cp ../sys/libnh/sysconf $(WASM_DATA_DIR)/sysconf
+
+$(WASM_DATA_DIR)/nhdat:
+	( cd ..; $(MAKE) INSTDIR='$(WASM_DATA_DIR)' $(WASMDEP) dofiles-dlb )
+
+#
+$(TARGETPFX)unixmain.o : ../sys/unix/unixmain.c $(HACK_H)
+$(TARGETPFX)unixres.o : ../sys/unix/unixres.c $(HACK_H)
+$(TARGETPFX)unixunix.o : ../sys/unix/unixunix.c $(HACK_H)
+$(TARGETPFX)ioctl.o : ../sys/share/ioctl.c $(HACK_H)
+$(TARGETPFX)unixtty.o : ../sys/share/unixtty.c $(HACK_H)
+$(TARGETPFX)winshim.o : ../win/shim/winshim.c $(HACK_H)
+$(TARGETPFX)libnhmain.o : ../sys/libnh/libnhmain.c $(HACK_H)
+endif  # CROSS_TO_WASM
+
+#
+ifdef CROSS_TO_MIPS
+$(MIPS_TARGET): pregame $(TARGETPFX)date.o $(HOSTOBJ) $(HOBJ) $(LUACROSSLIB) \
+			$(TARGETPFX)ncurses/lib/libncurses.a \
+			$(MIPS_DATA_DIR)
+	-rm $@
+	$(TARGET_LINK) $(TARGET_LFLAGS) -o $@ \
+		$(HOBJ) $(TARGETPFX)date.o $(TARGETPFX)$(HACKLIB) \
+		$(TARGETPFX)ncurses/lib/libncurses.a \
+		$(TARGET_LIBS)
+
+$(MIPS_DATA_DIR): $(MIPS_DATA_DIR)/nhdat
+	touch $(MIPS_DATA_DIR)/perm
+	touch $(MIPS_DATA_DIR)/record
+	touch $(MIPS_DATA_DIR)/logfile
+	touch $(MIPS_DATA_DIR)/xlogfile
+	touch $(MIPS_DATA_DIR)/livelog
+	cp ../sys/unix/sysconf $(MIPS_DATA_DIR)/sysconf
+
+$(MIPS_DATA_DIR)/nhdat:
+	( cd ..; $(MAKE) INSTDIR='$(MIPS_DATA_DIR)' $(MIPSDEP) dofiles-dlb )
+
+#
+$(TARGETPFX)unixmain.o : ../sys/unix/unixmain.c $(HACK_H)
+$(TARGETPFX)unixres.o : ../sys/unix/unixres.c $(HACK_H)
+$(TARGETPFX)unixunix.o : ../sys/unix/unixunix.c $(HACK_H)
+$(TARGETPFX)ioctl.o : ../sys/share/ioctl.c $(HACK_H)
+$(TARGETPFX)unixtty.o : ../sys/share/unixtty.c $(HACK_H)
+
+$(LUABIN):
+	( cd .. && make luabin && cd src)
+dodata:
+	( cd .. && make dlb && cd src)
+
+mipsrecover: $(TARGETPFX)recover
+.PHONY: mipspkg
+mipspkg: dodata $(GAMEBIN) $(TARGETPFX)recover
+	mkdir -p $(TARGETPFX)pkg
+	cp $(GAMEBIN) $(TARGETPFX)pkg/nethack
+	cp $(TARGETPFX)recover $(TARGETPFX)pkg/recover
+	cp ../dat/nhdat $(TARGETPFX)pkg/nhdat
+	cp ../dat/license $(TARGETPFX)pkg/license
+	cp ../dat/symbols $(TARGETPFX)pkg/symbols
+	cp ../sys/share/NetHack.cnf $(TARGETPFX)pkg/.nethackrc
+	cp ../sys/msdos/sysconf $(TARGETPFX)pkg/sysconf
+	cp ../doc/nethack.txt $(TARGETPFX)pkg/nethack.txt
+	-touch $(TARGETPFX)pkg/record
+	cd $(TARGETPFX)pkg ; zip -9 ../nh$(NHV)mips.zip * ; cd ../../..
+	@echo MIPS package zip file $(TARGETPFX)nh$(NHV)mips.zip
+endif  # CROSS_TO_MIPS
+
+
+ifdef CROSS_TO_AMIGA
+$(TARGETPFX)tile.o : $(SRCDIR)/tile.c
+	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ $(SRCDIR)/tile.c
+$(TARGETPFX)amidos.o : ../sys/amiga/amidos.c $(HACK_H)
+$(TARGETPFX)amirip.o : ../sys/amiga/amirip.c $(HACK_H)
+$(TARGETPFX)amistack.o : ../sys/amiga/amistack.c $(HACK_H)
+$(TARGETPFX)amiwind.o : ../sys/amiga/amiwind.c \
+		../sys/amiga/amimenu.c $(HACK_H)
+$(TARGETPFX)winami.o : ../sys/amiga/winami.c $(HACK_H)
+$(TARGETPFX)winchar.o : ../sys/amiga/winchar.c $(SRCDIR)/tile.c $(HACK_H)
+$(TARGETPFX)winfuncs.o : ../sys/amiga/winfuncs.c $(HACK_H)
+$(TARGETPFX)winkey.o : ../sys/amiga/winkey.c $(HACK_H)
+$(TARGETPFX)winamenu.o : ../sys/amiga/winamenu.c $(HACK_H)
+$(TARGETPFX)winreq.o : ../sys/amiga/winreq.c \
+		../sys/amiga/colorwin.c \
+		../sys/amiga/clipwin.c $(HACK_H)
+$(TARGETPFX)winstr.o : ../sys/amiga/winstr.c $(HACK_H)
+$(GAMEBIN) : $(HOBJ) $(LUACROSSLIB)
+	$(TARGET_LINK) $(TARGET_LFLAGS) -o $(GAMEBIN) \
+	$(HOBJ) $(WINLIB) $(TARGET_LIBS)
+#
+# Host-side IFF tile conversion tools (run on Linux, produce Amiga IFF files)
+#
+AMISRC = ../sys/amiga
+
+$(TARGETPFX)xpm2iff_host: $(AMISRC)/xpm2iff_host.c
+	$(CC) $(CFLAGS) -o $@ $<
+$(TARGETPFX)tomb.iff: $(AMISRC)/grave16.xpm $(TARGETPFX)xpm2iff_host
+	$(TARGETPFX)xpm2iff_host $(AMISRC)/grave16.xpm $@
+
+$(TARGETPFX)bmp2iff_host: $(AMISRC)/bmp2iff_host.c
+	$(CC) $(CFLAGS) -o $@ $<
+$(TARGETPFX)tiles16.iff: ../dat/nhtiles.bmp $(TARGETPFX)bmp2iff_host
+	$(TARGETPFX)bmp2iff_host -planes 4 ../dat/nhtiles.bmp $@
+$(TARGETPFX)tiles32.iff: ../dat/nhtiles.bmp $(TARGETPFX)bmp2iff_host
+	$(TARGETPFX)bmp2iff_host -planes 5 ../dat/nhtiles.bmp $@
+
+AMITILES = $(TARGETPFX)tiles16.iff $(TARGETPFX)tiles32.iff $(TARGETPFX)tomb.iff
+
+AMIREGEX_URL = https://github.com/garyhouston/regex.git
+AMIREGEX_SRCDIR = $(AMISRC)/regex
+
+.PHONY: fetch-regex amigapkg amitiles
+
+fetch-regex:
+	@DSTDIR=sys/amiga/regex; \
+	if [ ! -d src ]; then DSTDIR=../$$DSTDIR; fi; \
+	if [ -f $$DSTDIR/regcomp.c ]; then \
+	  echo "BSD regex already present"; \
+	else \
+	  echo "Fetching BSD regex from $(AMIREGEX_URL)"; \
+	  tmpdir=$$(mktemp -d) && \
+	  git clone --depth 1 $(AMIREGEX_URL) $$tmpdir && \
+	  cd $$tmpdir && \
+	  sh ./mkh -p regcomp.c > regcomp.ih && \
+	  sh ./mkh -p engine.c > engine.ih && \
+	  sh ./mkh -p regexec.c > regexec.ih && \
+	  sh ./mkh -p regerror.c > regerror.ih && \
+	  sh ./mkh -i _REGEX_H_ regex2.h regcomp.c \
+	    regexec.c regerror.c regfree.c > regex.h && \
+	  cd - > /dev/null && \
+	  mkdir -p $$DSTDIR && \
+	  for f in regcomp.c regexec.c regerror.c regfree.c \
+	    engine.c regex.h regex2.h cclass.h cname.h \
+	    utils.h regcomp.ih engine.ih regexec.ih \
+	    regerror.ih \
+	    COPYRIGHT; do \
+	    cp $$tmpdir/$$f $$DSTDIR/; \
+	  done && \
+	  rm -rf $$tmpdir && \
+	  echo "BSD regex installed in $$DSTDIR"; \
+	fi
+amitiles: $(AMITILES)
+
+amigapkg: $(GAMEBIN) $(AMITILES) ../util/uudecode
+	mkdir -p $(TARGETPFX)pkg/NetHack/tiles $(TARGETPFX)pkg/NetHack/hack
+	cp $(GAMEBIN) $(TARGETPFX)pkg/NetHack/nethack
+	cp ../dat/nhdat $(TARGETPFX)pkg/NetHack/nhdat
+	cp ../dat/license $(TARGETPFX)pkg/NetHack/license
+	cp ../dat/symbols $(TARGETPFX)pkg/NetHack/symbols
+	cp $(TARGETPFX)tiles16.iff $(TARGETPFX)pkg/NetHack/tiles/tiles16.iff
+	cp $(TARGETPFX)tiles32.iff $(TARGETPFX)pkg/NetHack/tiles/tiles32.iff
+	cp $(TARGETPFX)tomb.iff $(TARGETPFX)pkg/NetHack/tomb.iff
+	cp ../doc/nethack.txt $(TARGETPFX)pkg/NetHack/nethack.txt
+	( cd $(TARGETPFX)pkg/NetHack && ../../../../util/uudecode ../../../../sys/amiga/amifont8.uu && mv 8 hack/8 )
+	( cd $(TARGETPFX)pkg/NetHack && ../../../../util/uudecode ../../../../sys/amiga/amifont.uu )
+	cp $(AMISRC)/nethack.cnf $(TARGETPFX)pkg/NetHack/nethack.cnf
+	cp $(AMISRC)/README.amiga $(TARGETPFX)pkg/NetHack/README.amiga
+	cp $(AMISRC)/amii.hlp $(TARGETPFX)pkg/NetHack/amii.hlp
+	( cd $(TARGETPFX)pkg/NetHack && ../../../../util/uudecode ../../../../sys/amiga/NHinfo.uu )
+	( cd $(TARGETPFX)pkg/NetHack && ../../../../util/uudecode ../../../../sys/amiga/cnf-info.uu )
+	( cd $(TARGETPFX)pkg/NetHack && ../../../../util/uudecode ../../../../sys/amiga/license-info.uu )
+	( cd $(TARGETPFX)pkg/NetHack && ../../../../util/uudecode ../../../../sys/amiga/txt-info.uu )
+	( cd $(TARGETPFX)pkg/NetHack && ../../../../util/uudecode ../../../../sys/amiga/readme-info.uu )
+	( cd $(TARGETPFX)pkg && ../../../util/uudecode ../../../sys/amiga/drawer-info.uu )
+	touch $(TARGETPFX)pkg/NetHack/record
+	( cd $(TARGETPFX)pkg && zip -9r ../NH$(NHV)AMI$(AMIPKGSEQ).ZIP NetHack NetHack.info )
+	@echo amiga package zip file $(TARGETPFX)NH$(NHV)AMI$(AMIPKGSEQ).ZIP
+endif  # CROSS_TO_AMIGA
+
+ifdef CROSS_TO_MAC68K
+# Mac 68k file dependencies
+# mac68kconf.h is pulled in via config.h on MAC68K but the generic
+# $(CONFIG_H) timestamp rule only lists pcconf/unixconf/vmsconf/windconf;
+# without this extra prerequisite, editing it leaves every core object
+# stale (mixed-ABI binary: struct iflags layouts disagree between objects)
+$(CONFIG_H): ../include/mac68kconf.h
+MAC_H = $(HACK_H) ../sys/mac68k/maccompat.h ../include/macwin.h \
+	../include/mactty.h ../include/mttypriv.h
+# Rule for files in sys/mac68k
+$(TARGETPFX)%.o : ../sys/mac68k/%.c
+	$(TARGET_CC) $(TARGET_CFLAGS) -o$@ $<
+$(TARGETPFX)macmain.o : ../sys/mac68k/macmain.c $(MAC_H)
+$(TARGETPFX)macwin.o : ../sys/mac68k/macwin.c $(MAC_H) \
+		../sys/mac68k/mactile.h ../sys/mac68k/macmap.h
+$(TARGETPFX)mactty.o : ../sys/mac68k/mactty.c $(MAC_H)
+$(TARGETPFX)macmenu.o : ../sys/mac68k/macmenu.c $(MAC_H) \
+		../sys/mac68k/mactile.h ../sys/mac68k/macmap.h
+$(TARGETPFX)mttymain.o : ../sys/mac68k/mttymain.c $(MAC_H)
+$(TARGETPFX)macfile.o : ../sys/mac68k/macfile.c $(MAC_H)
+$(TARGETPFX)maccurs.o : ../sys/mac68k/maccurs.c $(MAC_H)
+$(TARGETPFX)macerrs.o : ../sys/mac68k/macerrs.c $(MAC_H)
+$(TARGETPFX)mactopl.o : ../sys/mac68k/mactopl.c $(MAC_H)
+$(TARGETPFX)macunix.o : ../sys/mac68k/macunix.c $(MAC_H)
+$(TARGETPFX)mgetline.o : ../sys/mac68k/mgetline.c $(MAC_H)
+$(TARGETPFX)mmodal.o : ../sys/mac68k/mmodal.c
+$(TARGETPFX)dprintf.o : ../sys/mac68k/dprintf.c $(MAC_H)
+$(TARGETPFX)mactile.o : ../sys/mac68k/mactile.c $(MAC_H) ../sys/mac68k/mactile.h
+$(TARGETPFX)macmap.o : ../sys/mac68k/macmap.c $(MAC_H) ../sys/mac68k/macmap.h ../sys/mac68k/mactile.h
+$(TARGETPFX)macstat.o : ../sys/mac68k/macstat.c $(MAC_H)
+$(TARGETPFX)macprefs.o : ../sys/mac68k/macprefs.c $(MAC_H)
+$(TARGETPFX)mac68ksound.o : ../sound/mac68ksound/mac68ksound.c $(HACK_H)
+	$(TARGET_CC) $(TARGET_CFLAGS) -o$@ $<
+# tile.c is the generated glyph-to-tileidx lookup table; tilemap is built
+# by util/Makefile and writes to ../src/tile.c.
+$(TARGETPFX)tile.o : tile.c
+tile.c : ../util/tilemap
+	cd ../util && ./tilemap
+../util/tilemap :
+	cd ../util && $(MAKE) tilemap
+../util/tile2pict :
+	cd ../util && $(MAKE) tile2pict
+# wintty.o, topl.o, getline.o rules are auto-generated by CROSS_SHARED
+# date.o (build stamp, defines nomakedefs) and hacklib.a (eos, &c) are NOT in
+# HOBJ; the Sysunix rule that 'make all' uses links them but this packaging
+# rule must too, or a cold `mac68kpkg` relink fails with undefined eos/nomakedefs.
+$(GAMEBIN) : $(HOBJ) $(DATE_O) $(TARGET_HACKLIB) $(LUACROSSLIB)
+	$(TARGET_LINK) $(TARGET_LFLAGS) -o $(GAMEBIN) \
+	$(HOBJ) $(DATE_O) $(TARGET_HACKLIB) $(LUACROSSLIB) $(WINLIB) $(TARGET_LIBS)
+#
+# Recover -- the standalone crash-recovery application (sys/mac68k/mrecover.c).
+# Linked without the malloc wrap (it doesn't use the pooling allocator).
+$(TARGETPFX)mrecover.o: ../sys/mac68k/mrecover.c
+	$(TARGET_CC) $(TARGET_CFLAGS) -o $@ ../sys/mac68k/mrecover.c
+$(TARGETPFX)Recover: $(TARGETPFX)mrecover.o
+	$(TARGET_LINK) -Wl,-gc-sections -o $@ $(TARGETPFX)mrecover.o -lm -lInterface
+#
+# UI resource compiles -- standalone rules so editing a .r recompiles just
+# its .rsrc (and the mac68kpkg merge re-runs).  nhtiles.rsrc stays in the
+# recipe below: it needs the tile2pict-generated nhtiles_data.r first.
+$(TARGETPFX)nhvers.rsrc : ../sys/mac68k/nhvers.r
+	@mkdir -p $(dir $@)
+	$(RETRO68)/bin/Rez ../sys/mac68k/nhvers.r \
+		-I $(RETRO68)/multiversal/RIncludes -o $@
+$(TARGETPFX)nhsize.rsrc : ../sys/mac68k/nhsize.r
+	@mkdir -p $(dir $@)
+	$(RETRO68)/bin/Rez ../sys/mac68k/nhsize.r -o $@
+$(TARGETPFX)nhmapwind.rsrc : ../sys/mac68k/nhmapwind.r
+	@mkdir -p $(dir $@)
+	$(RETRO68)/bin/Rez ../sys/mac68k/nhmapwind.r \
+		-I $(RETRO68)/multiversal/RIncludes -o $@
+$(TARGETPFX)nhmenus.rsrc : ../sys/mac68k/nhmenus.r ../sys/mac68k/nhtitle.r
+	@mkdir -p $(dir $@)
+	$(RETRO68)/bin/Rez ../sys/mac68k/nhmenus.r ../sys/mac68k/nhtitle.r \
+		-I $(RETRO68)/multiversal/RIncludes -o $@
+#
+.PHONY: mac68kpkg
+mac68kpkg: $(GAMEBIN) $(TARGETPFX)Recover \
+		$(TARGETPFX)nhvers.rsrc $(TARGETPFX)nhsize.rsrc \
+		$(TARGETPFX)nhmapwind.rsrc $(TARGETPFX)nhmenus.rsrc \
+		../util/tile2pict
+	@echo "=== Decoding UI resources ==="
+	python3 ../sys/mac68k/tools/decode_hqx.py \
+		../sys/mac68k/NHrsrc.hqx $(TARGETPFX)resources \
+		--creator-fixup nh31 nh50
+	@echo "=== Converting wav sounds to snd resources ==="
+	@mkdir -p $(TARGETPFX)sounds/.rsrc
+	python3 ../sys/mac68k/tools/wav2snd.py ../sound/wav \
+		$(TARGETPFX)sounds/.rsrc/Sounds
+	@touch $(TARGETPFX)sounds/Sounds
+	@echo "=== Decoding Recover resources ==="
+	python3 ../sys/mac68k/tools/decode_hqx.py \
+		../sys/mac68k/mrecover.hqx $(TARGETPFX)recrsrc
+	@mkdir -p $(TARGETPFX)recrsrc/.rsrc
+	@cp $(TARGETPFX)recrsrc/mrecover.rsrc.rsrc $(TARGETPFX)recrsrc/.rsrc/mrecover
+	@touch $(TARGETPFX)recrsrc/mrecover
+	@echo "=== UI resources (nhvers/nhsize/nhmapwind/nhmenus) up to date ==="
+	@echo "=== Generating tile PICT resources ==="
+	cd ../util && ./tile2pict $(abspath $(TARGETPFX)nhtiles_data.r)
+	@echo "=== Compiling tile resource ==="
+	$(RETRO68)/bin/Rez ../sys/mac68k/nhtiles_template.r \
+		-I $(abspath $(TARGETPFX)) \
+		-o $(TARGETPFX)nhtiles.rsrc
+	@echo "=== Merging resources (single Rez pass) ==="
+	@mkdir -p $(TARGETPFX)resources/.rsrc
+	@cp $(TARGETPFX)resources/NetHack.rsrc.rsrc $(TARGETPFX)resources/.rsrc/NHrsrc
+	@touch $(TARGETPFX)resources/NHrsrc
+	rm -f $(TARGETPFX)NetHackRsrc $(TARGETPFX).rsrc/NetHackRsrc \
+		$(TARGETPFX)NetHack.bin
+	$(RETRO68)/bin/Rez \
+		--copy $(TARGETPFX)NetHack \
+		--copy $(TARGETPFX)nhmapwind.rsrc \
+		--copy $(TARGETPFX)nhmenus.rsrc \
+		--copy $(TARGETPFX)nhtiles.rsrc \
+		--copy $(TARGETPFX)nhsize.rsrc \
+		--copy $(TARGETPFX)resources/NHrsrc \
+		--copy $(TARGETPFX)sounds/Sounds \
+		--copy $(TARGETPFX)nhvers.rsrc \
+		--data $(TARGETPFX)NetHack \
+		-t APPL -c nh50 \
+		-o $(TARGETPFX)NetHack.bin \
+		--cc $(TARGETPFX)NetHackRsrc
+	@echo "=== Merging Recover resources ==="
+	rm -f $(TARGETPFX)RecoverRsrc $(TARGETPFX).rsrc/RecoverRsrc \
+		$(TARGETPFX)Recover.bin
+	$(RETRO68)/bin/Rez \
+		--copy $(TARGETPFX)Recover \
+		--copy $(TARGETPFX)recrsrc/mrecover \
+		--data $(TARGETPFX)Recover \
+		-t APPL -c nhRc \
+		-o $(TARGETPFX)Recover.bin \
+		--cc $(TARGETPFX)RecoverRsrc
+	@echo "=== Staging package files ==="
+	@rm -rf $(TARGETPFX)pkg
+	@mkdir -p $(TARGETPFX)pkg
+	cp $(TARGETPFX)NetHack $(TARGETPFX)pkg/NetHack
+	cp $(TARGETPFX).rsrc/NetHackRsrc $(TARGETPFX)pkg/NetHack.rsrc
+	python3 ../sys/mac68k/tools/make_info.py NetHack APPL nh50 \
+		$(TARGETPFX)pkg/NetHack.info
+	cp $(TARGETPFX)Recover $(TARGETPFX)pkg/Recover
+	cp $(TARGETPFX).rsrc/RecoverRsrc $(TARGETPFX)pkg/Recover.rsrc
+	python3 ../sys/mac68k/tools/make_info.py Recover APPL nhRc \
+		$(TARGETPFX)pkg/Recover.info
+	cp ../dat/nhdat $(TARGETPFX)pkg/nhdat
+	tr '\n' '\r' < ../sys/mac68k/ReadMe.txt > "$(TARGETPFX)pkg/Read Me"
+	tr '\n' '\r' < ../dat/license > $(TARGETPFX)pkg/license
+	tr '\n' '\r' < ../dat/symbols > $(TARGETPFX)pkg/symbols
+	tr '\n' '\r' < ../doc/Guidebook.txt > $(TARGETPFX)pkg/Guidebook
+	tr '\n' '\r' < ../sys/mac68k/NHDeflts > "$(TARGETPFX)pkg/NetHack Defaults"
+	@echo "=== Building SCSI disk image (emulator/BlueSCSI) ==="
+	dd if=/dev/zero of=$(TARGETPFX)nethack_hfs.img bs=1M count=14 2>/dev/null
+	hformat -l "NetHack 5.0" $(TARGETPFX)nethack_hfs.img
+	hmount $(TARGETPFX)nethack_hfs.img
+	hcopy -m $(TARGETPFX)NetHack.bin :
+	hcopy -m $(TARGETPFX)Recover.bin :
+	hcopy -r $(TARGETPFX)pkg/nhdat :nhdat && hattrib -t DATA -c nh50 nhdat
+	hcopy -r "$(TARGETPFX)pkg/Read Me" ":Read Me" && hattrib -t TEXT -c ttxt "Read Me"
+	hcopy -r $(TARGETPFX)pkg/license :license && hattrib -t TEXT -c ttxt license
+	hcopy -r $(TARGETPFX)pkg/symbols :symbols && hattrib -t TEXT -c nh50 symbols
+	hcopy -r $(TARGETPFX)pkg/Guidebook :Guidebook && hattrib -t TEXT -c ttxt Guidebook
+	hcopy -r "$(TARGETPFX)pkg/NetHack Defaults" ":NetHack Defaults" && hattrib -t TEXT -c ttxt "NetHack Defaults"
+	hcopy -r /dev/null :record && hattrib -t TEXT -c nh50 record
+	humount
+	python3 ../sys/mac68k/tools/make_scsi_image2.py \
+		$(TARGETPFX)nethack_hfs.img \
+		$(TARGETPFX)NetHack.img \
+		--driver ../sys/mac68k/scsidriver.bin
+	rm $(TARGETPFX)nethack_hfs.img
+	@echo "=== Creating StuffIt archive (distribution) ==="
+	@rm -f $(TARGETPFX)NetHack.sit
+	@if command -v sit >/dev/null 2>&1; then \
+	  sit -T TEXT -C ttxt -o $(TARGETPFX)NetHack.sit \
+		$(TARGETPFX)pkg/NetHack \
+		$(TARGETPFX)pkg/Recover \
+		$(TARGETPFX)pkg/nhdat \
+		$(TARGETPFX)pkg/Guidebook \
+		"$(TARGETPFX)pkg/NetHack Defaults" \
+		$(TARGETPFX)pkg/license \
+		$(TARGETPFX)pkg/symbols \
+		"$(TARGETPFX)pkg/Read Me" ; \
+	else \
+	  echo "sit not found: skipping the StuffIt archive (see sys/mac68k/BUILD.md)"; \
+	fi
+	@rm -rf $(TARGETPFX)pkg
+	@echo "=== Done ==="
+	@echo "SCSI image: $(TARGETPFX)NetHack.img"
+	@test -f $(TARGETPFX)NetHack.sit && \
+	  echo "StuffIt:    $(TARGETPFX)NetHack.sit" || true
+endif  # CROSS_TO_MAC68K
+
+ifdef CROSS_TO_MACPPC
+# PowerPC file dependencies (mirror of the 68k rules; TARGETPFX retargets them)
+$(CONFIG_H): ../include/mac68kconf.h
+MAC_H = $(HACK_H) ../sys/mac68k/maccompat.h ../include/macwin.h \
+	../include/mactty.h ../include/mttypriv.h
+# Rule for files in sys/mac68k
+$(TARGETPFX)%.o : ../sys/mac68k/%.c
+	$(TARGET_CC) $(TARGET_CFLAGS) -o$@ $<
+$(TARGETPFX)macmain.o : ../sys/mac68k/macmain.c $(MAC_H)
+$(TARGETPFX)macwin.o : ../sys/mac68k/macwin.c $(MAC_H) \
+		../sys/mac68k/mactile.h ../sys/mac68k/macmap.h
+$(TARGETPFX)mactty.o : ../sys/mac68k/mactty.c $(MAC_H)
+$(TARGETPFX)macmenu.o : ../sys/mac68k/macmenu.c $(MAC_H) \
+		../sys/mac68k/mactile.h ../sys/mac68k/macmap.h
+$(TARGETPFX)mttymain.o : ../sys/mac68k/mttymain.c $(MAC_H)
+$(TARGETPFX)macfile.o : ../sys/mac68k/macfile.c $(MAC_H)
+$(TARGETPFX)maccurs.o : ../sys/mac68k/maccurs.c $(MAC_H)
+$(TARGETPFX)macerrs.o : ../sys/mac68k/macerrs.c $(MAC_H)
+$(TARGETPFX)mactopl.o : ../sys/mac68k/mactopl.c $(MAC_H)
+$(TARGETPFX)macunix.o : ../sys/mac68k/macunix.c $(MAC_H)
+$(TARGETPFX)mgetline.o : ../sys/mac68k/mgetline.c $(MAC_H)
+$(TARGETPFX)mmodal.o : ../sys/mac68k/mmodal.c
+$(TARGETPFX)dprintf.o : ../sys/mac68k/dprintf.c $(MAC_H)
+$(TARGETPFX)mactile.o : ../sys/mac68k/mactile.c $(MAC_H) ../sys/mac68k/mactile.h
+$(TARGETPFX)macmap.o : ../sys/mac68k/macmap.c $(MAC_H) ../sys/mac68k/macmap.h ../sys/mac68k/mactile.h
+$(TARGETPFX)macstat.o : ../sys/mac68k/macstat.c $(MAC_H)
+$(TARGETPFX)macprefs.o : ../sys/mac68k/macprefs.c $(MAC_H)
+$(TARGETPFX)mac68ksound.o : ../sound/mac68ksound/mac68ksound.c $(HACK_H)
+	$(TARGET_CC) $(TARGET_CFLAGS) -o$@ $<
+$(TARGETPFX)tile.o : tile.c
+tile.c : ../util/tilemap
+	cd ../util && ./tilemap
+../util/tilemap :
+	cd ../util && $(MAKE) tilemap
+../util/tile2pict :
+	cd ../util && $(MAKE) tile2pict
+# Link to an XCOFF/ELF executable; Task 2 converts it to PEF with MakePEF.
+$(GAMEBIN) : $(HOBJ) $(DATE_O) $(TARGET_HACKLIB) $(LUACROSSLIB)
+	$(TARGET_LINK) $(TARGET_LFLAGS) -o $(GAMEBIN) \
+	$(HOBJ) $(DATE_O) $(TARGET_HACKLIB) $(LUACROSSLIB) $(WINLIB) $(TARGET_LIBS)
+
+# --- PPC UI resource compiles (mirror of the 68k rules) ---
+$(TARGETPFX)nhvers.rsrc : ../sys/mac68k/nhvers.r
+	@mkdir -p $(dir $@)
+	$(RETRO68)/bin/Rez ../sys/mac68k/nhvers.r -I $(RETRO68)/multiversal/RIncludes -o $@
+$(TARGETPFX)nhsize.rsrc : ../sys/mac68k/nhsize.r
+	@mkdir -p $(dir $@)
+	$(RETRO68)/bin/Rez ../sys/mac68k/nhsize.r -o $@
+$(TARGETPFX)nhmapwind.rsrc : ../sys/mac68k/nhmapwind.r
+	@mkdir -p $(dir $@)
+	$(RETRO68)/bin/Rez ../sys/mac68k/nhmapwind.r -I $(RETRO68)/multiversal/RIncludes -o $@
+$(TARGETPFX)nhmenus.rsrc : ../sys/mac68k/nhmenus.r ../sys/mac68k/nhtitle.r
+	@mkdir -p $(dir $@)
+	$(RETRO68)/bin/Rez ../sys/mac68k/nhmenus.r ../sys/mac68k/nhtitle.r -I $(RETRO68)/multiversal/RIncludes -o $@
+$(TARGETPFX)nhcfrg.rsrc : ../sys/mac68k/nhcfrg.r
+	@mkdir -p $(dir $@)
+	$(RETRO68)/bin/Rez ../sys/mac68k/nhcfrg.r -I $(RETRO68)/multiversal/RIncludes -o $@
+# --- Recover helper (PPC): link XCOFF; MakePEF happens in the pkg recipe ---
+$(TARGETPFX)mrecover.o: ../sys/mac68k/mrecover.c
+	$(TARGET_CC) $(TARGET_CFLAGS) -o $@ ../sys/mac68k/mrecover.c
+$(TARGETPFX)Recover.xcoff: $(TARGETPFX)mrecover.o
+	$(TARGET_LINK) -Wl,-gc-sections -o $@ $(TARGETPFX)mrecover.o -lInterfaceLib -lm
+
+.PHONY: macppcpkg
+macppcpkg: $(GAMEBIN) $(TARGETPFX)Recover.xcoff \
+		$(TARGETPFX)nhvers.rsrc $(TARGETPFX)nhsize.rsrc \
+		$(TARGETPFX)nhmapwind.rsrc $(TARGETPFX)nhmenus.rsrc \
+		$(TARGETPFX)nhcfrg.rsrc \
+		../util/tile2pict
+	@echo "=== Converting executables to PEF ==="
+	$(RETRO68)/bin/MakePEF $(TARGETPFX)NetHack.xcoff -o $(TARGETPFX)NetHack.pef
+	$(RETRO68)/bin/MakePEF $(TARGETPFX)Recover.xcoff -o $(TARGETPFX)Recover.pef
+	@echo "=== Decoding UI resources ==="
+	python3 ../sys/mac68k/tools/decode_hqx.py ../sys/mac68k/NHrsrc.hqx $(TARGETPFX)resources --creator-fixup nh31 nh50
+	@echo "=== Converting wav sounds to snd resources ==="
+	@mkdir -p $(TARGETPFX)sounds/.rsrc
+	python3 ../sys/mac68k/tools/wav2snd.py ../sound/wav $(TARGETPFX)sounds/.rsrc/Sounds
+	@touch $(TARGETPFX)sounds/Sounds
+	@echo "=== Decoding Recover resources ==="
+	python3 ../sys/mac68k/tools/decode_hqx.py ../sys/mac68k/mrecover.hqx $(TARGETPFX)recrsrc
+	@mkdir -p $(TARGETPFX)recrsrc/.rsrc
+	@cp $(TARGETPFX)recrsrc/mrecover.rsrc.rsrc $(TARGETPFX)recrsrc/.rsrc/mrecover
+	@touch $(TARGETPFX)recrsrc/mrecover
+	@echo "=== Generating tile PICT resources ==="
+	cd ../util && ./tile2pict $(abspath $(TARGETPFX)nhtiles_data.r)
+	@echo "=== Compiling tile resource ==="
+	$(RETRO68)/bin/Rez ../sys/mac68k/nhtiles_template.r -I $(abspath $(TARGETPFX)) -o $(TARGETPFX)nhtiles.rsrc
+	@echo "=== Merging resources + PEF into the app (single Rez pass) ==="
+	@mkdir -p $(TARGETPFX)resources/.rsrc
+	@cp $(TARGETPFX)resources/NetHack.rsrc.rsrc $(TARGETPFX)resources/.rsrc/NHrsrc
+	@touch $(TARGETPFX)resources/NHrsrc
+	rm -f $(TARGETPFX)NetHackRsrc $(TARGETPFX).rsrc/NetHackRsrc $(TARGETPFX)NetHack.bin
+	$(RETRO68)/bin/Rez \
+		--copy $(TARGETPFX)nhcfrg.rsrc \
+		--copy $(TARGETPFX)nhmapwind.rsrc \
+		--copy $(TARGETPFX)nhmenus.rsrc \
+		--copy $(TARGETPFX)nhtiles.rsrc \
+		--copy $(TARGETPFX)nhsize.rsrc \
+		--copy $(TARGETPFX)resources/NHrsrc \
+		--copy $(TARGETPFX)sounds/Sounds \
+		--copy $(TARGETPFX)nhvers.rsrc \
+		--data $(TARGETPFX)NetHack.pef \
+		-t APPL -c nh50 \
+		-o $(TARGETPFX)NetHack.bin \
+		--cc $(TARGETPFX)NetHackRsrc
+	@echo "=== Merging Recover resources + PEF ==="
+	rm -f $(TARGETPFX)RecoverRsrc $(TARGETPFX).rsrc/RecoverRsrc $(TARGETPFX)Recover.bin
+	$(RETRO68)/bin/Rez \
+		--copy $(TARGETPFX)nhcfrg.rsrc \
+		--copy $(TARGETPFX)recrsrc/mrecover \
+		--data $(TARGETPFX)Recover.pef \
+		-t APPL -c nhRc \
+		-o $(TARGETPFX)Recover.bin \
+		--cc $(TARGETPFX)RecoverRsrc
+	@echo "=== Staging package files ==="
+	@rm -rf $(TARGETPFX)pkg
+	@mkdir -p $(TARGETPFX)pkg
+	cp $(TARGETPFX)NetHack.pef $(TARGETPFX)pkg/NetHack
+	cp $(TARGETPFX).rsrc/NetHackRsrc $(TARGETPFX)pkg/NetHack.rsrc
+	python3 ../sys/mac68k/tools/make_info.py NetHack APPL nh50 $(TARGETPFX)pkg/NetHack.info
+	cp $(TARGETPFX)Recover.pef $(TARGETPFX)pkg/Recover
+	cp $(TARGETPFX).rsrc/RecoverRsrc $(TARGETPFX)pkg/Recover.rsrc
+	python3 ../sys/mac68k/tools/make_info.py Recover APPL nhRc $(TARGETPFX)pkg/Recover.info
+	cp ../dat/nhdat $(TARGETPFX)pkg/nhdat
+	tr '\n' '\r' < ../sys/mac68k/ReadMe.txt > "$(TARGETPFX)pkg/Read Me"
+	tr '\n' '\r' < ../dat/license > $(TARGETPFX)pkg/license
+	tr '\n' '\r' < ../dat/symbols > $(TARGETPFX)pkg/symbols
+	tr '\n' '\r' < ../doc/Guidebook.txt > $(TARGETPFX)pkg/Guidebook
+	tr '\n' '\r' < ../sys/mac68k/NHDeflts > "$(TARGETPFX)pkg/NetHack Defaults"
+	@echo "=== Creating StuffIt archive (distribution) ==="
+	@rm -f $(TARGETPFX)NetHack.sit
+	@if command -v sit >/dev/null 2>&1; then \
+	  sit -T TEXT -C ttxt -o $(TARGETPFX)NetHack.sit \
+		$(TARGETPFX)pkg/NetHack \
+		$(TARGETPFX)pkg/Recover \
+		$(TARGETPFX)pkg/nhdat \
+		$(TARGETPFX)pkg/Guidebook \
+		"$(TARGETPFX)pkg/NetHack Defaults" \
+		$(TARGETPFX)pkg/license \
+		$(TARGETPFX)pkg/symbols \
+		"$(TARGETPFX)pkg/Read Me" ; \
+	else \
+	  echo "sit not found: skipping the StuffIt archive (see sys/mac68k/BUILD.md)"; \
+	fi
+	@rm -rf $(TARGETPFX)pkg
+	@echo "=== Done ==="
+	@test -f $(TARGETPFX)NetHack.sit && \
+	  echo "StuffIt: $(TARGETPFX)NetHack.sit" || true
+
+# --- Fat (68k + PowerPC) binary -----------------------------------------
+# One app whose resource fork holds the 68k CODE/DATA/RELA + a cfrg + the
+# shared UI resources, and whose data fork holds the PPC PEF.  68k Macs run
+# the CODE resources; PowerPC Macs see the cfrg and run the PEF natively.
+# Build the 68k half first (it provides the CODE resource fork):
+#     make CROSS_TO_MAC68K=1 mac68kpkg
+#     make CROSS_TO_MACPPC=1 macfatpkg
+# macfatpkg builds the PPC half itself (via macppcpkg) and merges both.
+.PHONY: macfatpkg
+macfatpkg: macppcpkg
+	@test -s ../targets/mac68k/.rsrc/NetHackRsrc || { echo "*** macfatpkg: run 'make CROSS_TO_MAC68K=1 mac68kpkg' first (need the 68k resource fork)"; exit 1; }
+	@echo "=== Merging fat NetHack (68k CODE resources + PPC PEF) ==="
+	@mkdir -p ../targets/macfat
+	rm -f ../targets/macfat/NetHack.bin ../targets/macfat/NetHackFatRsrc ../targets/macfat/.rsrc/NetHackFatRsrc
+	$(RETRO68)/bin/Rez \
+		--copy ../targets/mac68k/NetHackRsrc \
+		--copy $(TARGETPFX)nhcfrg.rsrc \
+		--data $(TARGETPFX)NetHack.pef \
+		-t APPL -c nh50 \
+		-o ../targets/macfat/NetHack.bin \
+		--cc ../targets/macfat/NetHackFatRsrc
+	@echo "=== Merging fat Recover ==="
+	rm -f ../targets/macfat/Recover.bin ../targets/macfat/RecoverFatRsrc ../targets/macfat/.rsrc/RecoverFatRsrc
+	$(RETRO68)/bin/Rez \
+		--copy ../targets/mac68k/RecoverRsrc \
+		--copy $(TARGETPFX)nhcfrg.rsrc \
+		--data $(TARGETPFX)Recover.pef \
+		-t APPL -c nhRc \
+		-o ../targets/macfat/Recover.bin \
+		--cc ../targets/macfat/RecoverFatRsrc
+	@echo "=== Staging fat package files ==="
+	@rm -rf ../targets/macfat/pkg
+	@mkdir -p ../targets/macfat/pkg
+	cp $(TARGETPFX)NetHack.pef ../targets/macfat/pkg/NetHack
+	cp ../targets/macfat/.rsrc/NetHackFatRsrc ../targets/macfat/pkg/NetHack.rsrc
+	python3 ../sys/mac68k/tools/make_info.py NetHack APPL nh50 ../targets/macfat/pkg/NetHack.info
+	cp $(TARGETPFX)Recover.pef ../targets/macfat/pkg/Recover
+	cp ../targets/macfat/.rsrc/RecoverFatRsrc ../targets/macfat/pkg/Recover.rsrc
+	python3 ../sys/mac68k/tools/make_info.py Recover APPL nhRc ../targets/macfat/pkg/Recover.info
+	cp ../dat/nhdat ../targets/macfat/pkg/nhdat
+	tr '\n' '\r' < ../sys/mac68k/ReadMe.txt > "../targets/macfat/pkg/Read Me"
+	tr '\n' '\r' < ../dat/license > ../targets/macfat/pkg/license
+	tr '\n' '\r' < ../dat/symbols > ../targets/macfat/pkg/symbols
+	tr '\n' '\r' < ../doc/Guidebook.txt > ../targets/macfat/pkg/Guidebook
+	tr '\n' '\r' < ../sys/mac68k/NHDeflts > "../targets/macfat/pkg/NetHack Defaults"
+	@echo "=== Creating fat StuffIt archive ==="
+	@rm -f ../targets/macfat/NetHack.sit
+	@if command -v sit >/dev/null 2>&1; then \
+	  sit -T TEXT -C ttxt -o ../targets/macfat/NetHack.sit \
+		../targets/macfat/pkg/NetHack \
+		../targets/macfat/pkg/Recover \
+		../targets/macfat/pkg/nhdat \
+		../targets/macfat/pkg/Guidebook \
+		"../targets/macfat/pkg/NetHack Defaults" \
+		../targets/macfat/pkg/license \
+		../targets/macfat/pkg/symbols \
+		"../targets/macfat/pkg/Read Me" ; \
+	else \
+	  echo "sit not found: skipping the StuffIt archive (see sys/mac68k/BUILD.md)"; \
+	fi
+	@rm -rf ../targets/macfat/pkg
+	@echo "=== Done ==="
+	@test -f ../targets/macfat/NetHack.sit && \
+	  echo "Fat (68k+PPC) StuffIt: ../targets/macfat/NetHack.sit" || true
+
+endif  # CROSS_TO_MACPPC
+
+UUDECODE = ../util/uudecode
+
+../util/uudecode: ../sys/share/uudecode.c
+	$(CC) $(CFLAGS) -o $@ $<
+
+ifdef CROSS_TO_ATARI
+$(TARGETPFX)tos.o : ../sys/atari/tos.c $(HACK_H)
+$(TARGETPFX)wingem.o : ../win/gem/wingem.c $(HACK_H)
+$(TARGETPFX)wingem1.o : ../win/gem/wingem1.c $(HACK_H)
+$(TARGETPFX)gr_rect.o : ../win/gem/gr_rect.c $(HACK_H)
+$(TARGETPFX)load_img.o : ../win/gem/load_img.c $(HACK_H)
+# Explicit rule for the generated tile.c -> tile.o so make's pattern rule
+# $(TARGETPFX)%.o : %.c doesn't pick the wrong path before tile.c exists
+# (breaks -j N builds).  Kept here in cross-post -- after 'all' -- so it
+# never becomes the default goal, matching the amiga/msdos placement.
+$(TARGETPFX)tile.o : $(SRCDIR)/tile.c
+	$(TARGET_CC) $(TARGET_CFLAGS) -o$@ $<
+$(GAMEBIN) : $(HOBJ) $(LUACROSSLIB)
+	$(TARGET_LINK) $(TARGET_LFLAGS) -o $(GAMEBIN) \
+	$(HOBJ) $(WINLIB) $(TARGET_LIBS)
+
+#
+# Host-side BMP-to-XIMG converter (runs on Linux, produces Atari .IMG)
+#
+ATARISRC = ../sys/atari
+
+$(TARGETPFX)bmp2img_host: $(ATARISRC)/bmp2img_host.c
+	$(CC) $(CFLAGS) -o $@ $<
+
+$(TARGETPFX)NH16.IMG: ../dat/nhtiles.bmp $(TARGETPFX)bmp2img_host
+	$(TARGETPFX)bmp2img_host -planes 4 ../dat/nhtiles.bmp $@
+$(TARGETPFX)NH32.IMG: ../dat/nhtiles.bmp $(TARGETPFX)bmp2img_host
+	$(TARGETPFX)bmp2img_host -planes 5 ../dat/nhtiles.bmp $@
+$(TARGETPFX)NH2.IMG:  ../dat/nhtiles.bmp $(TARGETPFX)bmp2img_host
+	$(TARGETPFX)bmp2img_host -atkinson -planes 1 ../dat/nhtiles.bmp $@
+
+ATARITILES = $(TARGETPFX)NH2.IMG $(TARGETPFX)NH16.IMG $(TARGETPFX)NH32.IMG
+
+.PHONY: ataripkg
+
+ataripkg: $(GAMEBIN) ../util/uudecode $(ATARITILES)
+	mkdir -p $(TARGETPFX)pkg
+	cp $(GAMEBIN) $(TARGETPFX)pkg/nethack.prg
+	cp ../dat/nhdat $(TARGETPFX)pkg/nhdat
+	cp ../dat/license $(TARGETPFX)pkg/license
+	cp ../dat/symbols $(TARGETPFX)pkg/symbols
+	cp ../doc/nethack.txt $(TARGETPFX)pkg/nethack.txt
+	cp ../sys/atari/README.tos $(TARGETPFX)pkg/README.txt
+	cp ../sys/atari/nethack.cnf $(TARGETPFX)pkg/nethack.cnf
+	cp ../sys/atari/run-hatari.sh $(TARGETPFX)pkg/run-hatari.sh
+	chmod +x $(TARGETPFX)pkg/run-hatari.sh
+	cp $(TARGETPFX)NH2.IMG  $(TARGETPFX)pkg/NH2.IMG
+	cp $(TARGETPFX)NH16.IMG $(TARGETPFX)pkg/NH16.IMG
+	cp $(TARGETPFX)NH32.IMG $(TARGETPFX)pkg/NH32.IMG
+	( cd $(TARGETPFX)pkg && ../../../util/uudecode ../../../win/gem/gem_rsc.uu )
+	( cd $(TARGETPFX)pkg && ../../../util/uudecode ../../../win/gem/title.uu )
+	( cd $(TARGETPFX)pkg && ../../../util/uudecode ../../../win/gem/title2.uu )
+	( cd $(TARGETPFX)pkg && ../../../util/uudecode ../../../win/gem/rip.uu )
+	touch $(TARGETPFX)pkg/record
+	mkdir -p $(TARGETPFX)pkg/levels $(TARGETPFX)pkg/save
+	( cd $(TARGETPFX)pkg && zip -9r ../NH500ST.ZIP * )
+	@echo atari package zip file $(TARGETPFX)NH500ST.ZIP
+endif  # CROSS_TO_ATARI
+
+ifdef CROSS_SHARED
+# shared file dependencies
+$(TARGETPFX)pcmain.o : ../sys/share/pcmain.c $(HACK_H)
+$(TARGETPFX)pcsys.o : ../sys/share/pcsys.c $(HACK_H)
+$(TARGETPFX)pctty.o : ../sys/share/pctty.c $(HACK_H)
+$(TARGETPFX)pcunix.o : ../sys/share/pcunix.c $(HACK_H)
+$(TARGETPFX)tileset.o : ../win/share/tileset.c
+$(TARGETPFX)bmptiles.o : ../win/share/bmptiles.c
+$(TARGETPFX)giftiles.o : ../win/share/giftiles.c
+endif  # CROSS_SHARED
+#
+ifdef CROSS
+ifdef MAKEFILE_TOP
+# top-level liblua.a is a host-side build; keep TARGET_CC out of it
+LUAMAKEFLAGS = CC='$(CC)' SYSCFLAGS='$(SYSCFLAGS)'
+endif  # MAKEFILE_TOP
+$(TARGETPFX)hacklib.a: $(TARGETPFX)hacklib.o
+	$(TARGET_AR) $(TARGET_ARFLAGS) $@ $(TARGETPFX)hacklib.o
+ifdef MAKEFILE_UTL
+$(TARGETPFX)recover.o: recover.c $(CONFIG_H)
+	$(TARGET_CC) $(TARGET_CFLAGS) -c recover.c -o $@
+ifdef CROSS_TO_MSDOS
+$(TARGETPFX)recover.exe : $(TARGETPFX)recover.o $(TARGETPFX)rversion.o $(TARGETPFX)hacklib.a
+	$(TARGET_LINK) $(TARGET_LFLAGS) \
+	$(TARGETPFX)recover.o $(TARGETPFX)rversion.o $(TARGETPFX)hacklib.a -o $@
+else
+$(TARGETPFX)recover : $(TARGETPFX)recover.o $(TARGETPFX)rversion.o $(TARGETPFX)hacklib.a
+	$(TARGET_LINK) $(TARGET_LFLAGS) \
+	$(TARGETPFX)recover.o $(TARGETPFX)rversion.o $(TARGETPFX)hacklib.a -o $@
+endif
+$(TARGETPFX)rversion.o: ../src/version.c $(HACK_H)
+	$(TARGET_CC) $(TARGET_CFLAGS) -DMINIMAL_FOR_RECOVER  -c ../src/version.c -o $@
+endif  # MAKEFILE_UTL
+endif  # CROSS
+
+ifdef BUILD_TARGET_LUA
+# Lua lib
+$(LUACROSSLIB): $(LUALIBOBJS)
+	if [ -f $@ ]; then rm $@; fi;
+	$(TARGET_AR) rcS $@ $(LUAOBJFILES1)
+	$(TARGET_AR) rcS $@ $(LUAOBJFILES2)
+	$(TARGET_AR) rcS $@ $(LUAOBJFILES3)
+	$(TARGET_AR) rcs $@ $(LUAOBJFILES4)
+
+#	$(TARGET_AR) rcs $@ $(LUALIBOBJS)
+
+# Lua src
+$(TARGETPFX)lapi.o : $(LUASRCDIR)/lapi.c
+$(TARGETPFX)lauxlib.o : $(LUASRCDIR)/lauxlib.c
+$(TARGETPFX)lbaselib.o : $(LUASRCDIR)/lbaselib.c
+$(TARGETPFX)lbitlib.o : $(LUASRCDIR)/lbitlib.c
+$(TARGETPFX)lcode.o : $(LUASRCDIR)/lcode.c
+$(TARGETPFX)lcorolib.o : $(LUASRCDIR)/lcorolib.c
+$(TARGETPFX)lctype.o : $(LUASRCDIR)/lctype.c
+$(TARGETPFX)ldblib.o : $(LUASRCDIR)/ldblib.c
+$(TARGETPFX)ldebug.o : $(LUASRCDIR)/ldebug.c
+$(TARGETPFX)ldo.o : $(LUASRCDIR)/ldo.c
+$(TARGETPFX)ldump.o : $(LUASRCDIR)/ldump.c
+$(TARGETPFX)lfunc.o : $(LUASRCDIR)/lfunc.c
+$(TARGETPFX)lgc.o : $(LUASRCDIR)/lgc.c
+$(TARGETPFX)linit.o : $(LUASRCDIR)/linit.c
+$(TARGETPFX)liolib.o : $(LUASRCDIR)/liolib.c
+$(TARGETPFX)llex.o : $(LUASRCDIR)/llex.c
+$(TARGETPFX)lmathlib.o : $(LUASRCDIR)/lmathlib.c
+$(TARGETPFX)lmem.o : $(LUASRCDIR)/lmem.c
+$(TARGETPFX)loadlib.o : $(LUASRCDIR)/loadlib.c
+$(TARGETPFX)lobject.o : $(LUASRCDIR)/lobject.c
+$(TARGETPFX)lopcodes.o : $(LUASRCDIR)/lopcodes.c
+$(TARGETPFX)loslib.o : $(LUASRCDIR)/loslib.c
+$(TARGETPFX)lparser.o : $(LUASRCDIR)/lparser.c
+$(TARGETPFX)lstate.o : $(LUASRCDIR)/lstate.c
+$(TARGETPFX)lstring.o : $(LUASRCDIR)/lstring.c
+$(TARGETPFX)lstrlib.o : $(LUASRCDIR)/lstrlib.c
+$(TARGETPFX)ltable.o : $(LUASRCDIR)/ltable.c
+$(TARGETPFX)ltablib.o : $(LUASRCDIR)/ltablib.c
+$(TARGETPFX)ltm.o : $(LUASRCDIR)/ltm.c
+$(TARGETPFX)lundump.o : $(LUASRCDIR)/lundump.c
+$(TARGETPFX)lutf8lib.o : $(LUASRCDIR)/lutf8lib.c
+$(TARGETPFX)lvm.o : $(LUASRCDIR)/lvm.c
+$(TARGETPFX)lzio.o : $(LUASRCDIR)/lzio.c
+endif  # BUILD_TARGET_LUA
+
+ifdef BUILD_TARGET_NCURSES
+.PHONY: build-ncurses
+ifdef MAKEFILE_SRC
+../lib/ncurses.tar.gz:
+	@echo "You will need to successfully execute 'make CROSS_TO_$(NCURSES_PLATFORM)=1 fetch-ncurses' first"
+	@false
+$(TARGETPFX)ncurses/lib/libncurses.a: ../lib/ncurses.tar.gz
+	(cd $(TARGETDIR) ; mkdir -p ncurses ; cd ncurses ; tar -xf ../../../lib/ncurses.tar.gz --strip-components=1 ; \
+	./configure --build $(NCURSES_CONFIGURE_BUILD) --host $(NCURSES_CONFIGURE_HOST) ; \
+	make ; \
+	cd ../../../src)
+endif   #MAKEFILE_SRC
+ifdef MAKEFILE_TOP
+.PHONY: fetch-ncurses
+fetch-ncurses:
+	(cd lib ; curl https://invisible-island.net/datafiles/release/ncurses.tar.gz --output ncurses.tar.gz ; cd ..)
+endif
+endif   #BUILD_TARGET_NCURSES
+
+ifdef BUILD_PDCURSES
+ifdef WANT_WIN_CURSES
+$(TARGETPFX)pdclib.a : $(PDCLIBOBJS) $(PDCOBJS)
+	if [ -f $@ ]; then rm $@; fi;
+	$(TARGET_AR) rcs $@ $(PDCLIBOBJS) $(PDCOBJS)
+endif  #WANT_WIN_CURSES
+# PDCurses src
+$(TARGETPFX)addch.o : $(PDCTOP)/pdcurses/addch.c
+$(TARGETPFX)addchstr.o : $(PDCTOP)/pdcurses/addchstr.c
+$(TARGETPFX)addstr.o : $(PDCTOP)/pdcurses/addstr.c
+$(TARGETPFX)attr.o : $(PDCTOP)/pdcurses/attr.c
+$(TARGETPFX)beep.o : $(PDCTOP)/pdcurses/beep.c
+$(TARGETPFX)bkgd.o : $(PDCTOP)/pdcurses/bkgd.c
+$(TARGETPFX)border.o : $(PDCTOP)/pdcurses/border.c
+$(TARGETPFX)clear.o : $(PDCTOP)/pdcurses/clear.c
+$(TARGETPFX)color.o : $(PDCTOP)/pdcurses/color.c
+$(TARGETPFX)delch.o : $(PDCTOP)/pdcurses/delch.c
+$(TARGETPFX)deleteln.o : $(PDCTOP)/pdcurses/deleteln.c
+$(TARGETPFX)getch.o : $(PDCTOP)/pdcurses/getch.c
+$(TARGETPFX)getstr.o : $(PDCTOP)/pdcurses/getstr.c
+$(TARGETPFX)getyx.o : $(PDCTOP)/pdcurses/getyx.c
+$(TARGETPFX)inch.o : $(PDCTOP)/pdcurses/inch.c
+$(TARGETPFX)inchstr.o : $(PDCTOP)/pdcurses/inchstr.c
+$(TARGETPFX)initscr.o : $(PDCTOP)/pdcurses/initscr.c
+$(TARGETPFX)inopts.o : $(PDCTOP)/pdcurses/inopts.c
+$(TARGETPFX)insch.o : $(PDCTOP)/pdcurses/insch.c
+$(TARGETPFX)insstr.o : $(PDCTOP)/pdcurses/insstr.c
+$(TARGETPFX)instr.o : $(PDCTOP)/pdcurses/instr.c
+$(TARGETPFX)kernel.o : $(PDCTOP)/pdcurses/kernel.c
+$(TARGETPFX)keyname.o : $(PDCTOP)/pdcurses/keyname.c
+$(TARGETPFX)mouse.o : $(PDCTOP)/pdcurses/mouse.c
+$(TARGETPFX)move.o : $(PDCTOP)/pdcurses/move.c
+$(TARGETPFX)outopts.o : $(PDCTOP)/pdcurses/outopts.c
+$(TARGETPFX)overlay.o : $(PDCTOP)/pdcurses/overlay.c
+$(TARGETPFX)pad.o : $(PDCTOP)/pdcurses/pad.c
+$(TARGETPFX)panel.o : $(PDCTOP)/pdcurses/panel.c
+$(TARGETPFX)printw.o : $(PDCTOP)/pdcurses/printw.c
+$(TARGETPFX)refresh.o : $(PDCTOP)/pdcurses/refresh.c
+$(TARGETPFX)scanw.o : $(PDCTOP)/pdcurses/scanw.c
+$(TARGETPFX)scr_dump.o : $(PDCTOP)/pdcurses/scr_dump.c
+$(TARGETPFX)scroll.o : $(PDCTOP)/pdcurses/scroll.c
+$(TARGETPFX)slk.o : $(PDCTOP)/pdcurses/slk.c
+$(TARGETPFX)termattr.o : $(PDCTOP)/pdcurses/termattr.c
+$(TARGETPFX)touch.o : $(PDCTOP)/pdcurses/touch.c
+$(TARGETPFX)util.o : $(PDCTOP)/pdcurses/util.c
+# We need an explicit recipe for the creation of $(TARGETPFX)window.o
+# because it will try and use the X11 version of window.c otherwise
+$(TARGETPFX)window.o : $(PDCTOP)/pdcurses/window.c
+	$(TARGET_CC) $(PDCINCL) $(PDC_TARGET_CFLAGS) \
+		-Wno-sign-compare -o$@  $(PDCTOP)/pdcurses/window.c
+$(TARGETPFX)debug.o : $(PDCTOP)/pdcurses/debug.c
+$(TARGETPFX)pdcclip.o : $(PDCPORT)/pdcclip.c
+$(TARGETPFX)pdcdisp.o : $(PDCPORT)/pdcdisp.c
+$(TARGETPFX)pdcgetsc.o : $(PDCPORT)/pdcgetsc.c
+$(TARGETPFX)pdckbd.o : $(PDCPORT)/pdckbd.c
+$(TARGETPFX)pdcscrn.o : $(PDCPORT)/pdcscrn.c
+$(TARGETPFX)pdcsetsc.o : $(PDCPORT)/pdcsetsc.c
+$(TARGETPFX)pdcutil.o : $(PDCPORT)/pdcutil.c
+	$(TARGET_CC) $(PDCINCL) $(PDC_TARGET_CFLAGS) \
+		-Wno-sign-compare -o$@  $(PDCPORT)/pdcutil.c
+# -Wno-sign-compare
+endif  # BUILD_PDCURSES
+#
+# End of cross-compiling -POST section
+#===============-=================================================

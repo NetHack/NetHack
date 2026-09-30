@@ -4,7 +4,7 @@
 #  The version of the game this Makefile was designed for
 
 !IFNDEF NETHACK_VERSION
-NETHACK_VERSION="5.0.0"
+NETHACK_VERSION="5.0.1"
 !MESSAGE NETHACK_VERSION set to $(NETHACK_VERSION).
 !ELSE
 !MESSAGE NETHACK_VERSION set to $(NETHACK_VERSION) by caller.

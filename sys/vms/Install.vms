@@ -1,4 +1,4 @@
-               Instructions for Building and Installing NetHack 5.0.0
+               Instructions for Building and Installing NetHack 5.0.1
                      on a VMS (aka OpenVMS) system
                =========================================
 
@@ -145,7 +145,7 @@ Notes:
 0.  Version 3.5.x was never publicly released.
 
 1.  Save files and bones files from 3.6.x and earlier versions will not
-    work with 5.0.0. The scoreboard file (RECORD) from 3.6.x or 3.4.x or
+    work with 5.0.1. The scoreboard file (RECORD) from 3.6.x or 3.4.x or
     3.3.x will work.
 
 2.  Ancient C libs will not work; vsnprintf is required.

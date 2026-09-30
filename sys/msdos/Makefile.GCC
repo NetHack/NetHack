@@ -64,7 +64,7 @@ endif
 #    successfully build NetHack-5.0.
 #
 ADD_LUA=Y
-LUATOP=../lib/lua$(LUAVER)
+LUATOP=../nhlua/lua
 #
 
 #---------------------------------------------------------------
@@ -328,7 +328,7 @@ ALLOBJ = $(VOBJ) $(SOBJ) $(TILOBJ) $(TILOBJ2) $(VVOBJ)
 #=================================================================
 
 LUASRC   = $(LUATOP)/src
-LUALIB   = $(O)lua$(LUAVER)s.a
+LUALIB   = $(O)lua.a
 LUAINCL  = -I$(LUASRC)
 #LUAFLAGS = unix added -lm here?
 LUATARGETS = lua.exe luac.exe $(LUALIB)
@@ -920,10 +920,10 @@ $(O)dlb_main.o: $(U)dlb_main.c $(INCL)/config.h $(DLB_H)
 lua.exe: $(O)lua.o $(LUALIB) 
 	$(CC) $(LFLAGS) -o$@ $(O)lua.o $(LUALIB)
 
-luac.exe: $(O)luac.o $(O)lua$(LUAVER)s.a
+luac.exe: $(O)luac.o $(O)$(LUALIB)
 	$(CC) $(LFLAGSU) -o$@ $(O)luac.o $(LUALIB)
 
-$(O)lua$(LUAVER)s.a: $(LUAOBJFILES)
+$(O)$(LUALIB).a: $(LUAOBJFILES)
 	ar rcS $@ $(LUAOBJFILES1)
 	ar rcS $@ $(LUAOBJFILES2)
 	ar rcs $@ $(LUAOBJFILES3)

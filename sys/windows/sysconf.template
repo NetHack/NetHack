@@ -28,7 +28,7 @@ WIZARDS=*
 # Only available if NetHack was compiled with DUMPLOG
 # Allows following placeholders:
 #   %% literal '%'
-#   %v version (eg. "5.0.0-0")
+#   %v version (eg. "5.0.1-0")
 #   %u game UID
 #   %t game start time, UNIX timestamp format
 #   %T current time, UNIX timestamp format
@@ -127,4 +127,4 @@ HIDEUSAGE=1
 #LOCKDIR=c:\ProgramData\NetHack\5.0
 
 # URL loaded for creating reports to the NetHack DevTeam
-#CRASHREPORTURL=https://nethack.org/links/cr-5.0.0.html
+#CRASHREPORTURL=https://nethack.org/links/cr-5.0.1.html
