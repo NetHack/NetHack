@@ -193,6 +193,55 @@ mac_fsspec(FSSpec *spec, short vol, long dir, ConstStr255Param name)
     spec->name[0] = (unsigned char) len;
 }
 
+/* Point theDirs.save* at the MAC_SAVEDIR folder beside the application,
+   creating it if needed.  On failure saves stay in the data folder; their
+   ".sav"/".err" names still cannot match an installed file. */
+void
+mac_init_savedir(void)
+{
+    FSSpec spec;
+    CInfoPBRec pb;
+    Str255 name;
+    long dirID;
+
+    C2P(MAC_SAVEDIR, name);
+    mac_fsspec(&spec, theDirs.dataRefNum, theDirs.dataDirID, name);
+    if (FSpDirCreate(&spec, smSystemScript, &dirID) != noErr) {
+        memset(&pb, 0, sizeof pb);
+        pb.dirInfo.ioNamePtr = name;
+        pb.dirInfo.ioVRefNum = theDirs.dataRefNum;
+        pb.dirInfo.ioDrDirID = theDirs.dataDirID;
+        if (PBGetCatInfoSync(&pb) != noErr
+            || !(pb.dirInfo.ioFlAttrib & 0x10)) /* not a folder */
+            return;
+        dirID = pb.dirInfo.ioDrDirID;
+    }
+    theDirs.saveRefNum = theDirs.dataRefNum;
+    theDirs.saveDirID = dirID;
+}
+
+static boolean
+has_suffix(const char *name, const char *sfx)
+{
+    size_t n = strlen(name), s = strlen(sfx);
+
+    return (boolean) (n >= s && !strcmp(name + n - s, sfx));
+}
+
+/* FSSpec for a game file name: save files go to the Saves folder,
+   everything else to the data folder */
+static void
+name_fsspec(const char *name, FSSpec *spec)
+{
+    Str255 s;
+
+    C2P(name, s);
+    if (has_suffix(name, SAVE_EXTENSION) || has_suffix(name, MAC_ERRSAVE_EXT))
+        mac_fsspec(spec, theDirs.saveRefNum, theDirs.saveDirID, s);
+    else
+        mac_fsspec(spec, theDirs.dataRefNum, theDirs.dataDirID, s);
+}
+
 int
 maccreat(const char *name, long fileType)
 {
@@ -208,7 +257,7 @@ macopen(const char *name, int flags, long fileType)
     FSSpec spec;
 
     C2P(name, s);
-    mac_fsspec(&spec, theDirs.dataRefNum, theDirs.dataDirID, s);
+    name_fsspec(name, &spec);
     if (flags & O_CREAT) {
         if (FSpCreate(&spec, TEXT_CREATOR, fileType, smSystemScript)
             && (flags & O_EXCL)) {
@@ -316,11 +365,9 @@ macseek(int fd, long where, short whence)
 int
 macunlink(const char *name)
 {
-    Str255 pname;
     FSSpec spec;
 
-    C2P(name, pname);
-    mac_fsspec(&spec, theDirs.dataRefNum, theDirs.dataDirID, pname);
+    name_fsspec(name, &spec);
     return (FSpDelete(&spec) == noErr ? 0 : -1);
 }
 

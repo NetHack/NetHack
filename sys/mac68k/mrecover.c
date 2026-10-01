@@ -202,6 +202,45 @@ make_spec(const unsigned char *name, FSSpec *spec)
     BlockMove(name, spec->name, (long) len + 1);
     spec->name[0] = (unsigned char) len;
 }
+
+/* The game keeps saves in a MAC_SAVEDIR folder beside the checkpoint files
+   (macfile.c mac_init_savedir); find or create it, falling back to the
+   checkpoint folder as the game does. */
+static long saveDirID;
+
+static void
+find_savedir(void)
+{
+    FSSpec spec;
+    CInfoPBRec pb;
+    long newID;
+
+    make_spec(P_STRING_CONV(MAC_SAVEDIR), &spec);
+    if (FSpDirCreate(&spec, smSystemScript, &newID) == noErr) {
+        saveDirID = newID;
+        return;
+    }
+    memset(&pb, 0, sizeof pb);
+    pb.dirInfo.ioNamePtr = spec.name;
+    pb.dirInfo.ioVRefNum = vRefNum;
+    pb.dirInfo.ioDrDirID = dirID;
+    if (PBGetCatInfoSync(&pb) == noErr && (pb.dirInfo.ioFlAttrib & 0x10))
+        saveDirID = pb.dirInfo.ioDrDirID;
+    else
+        saveDirID = dirID;
+}
+
+static void
+make_save_spec(const unsigned char *name, FSSpec *spec)
+{
+    make_spec(name, spec);
+    spec->parID = saveDirID;
+}
+
+/* player name from the checkpoint, NUL-terminated (store_plname_in_file) */
+static char plbuf[PL_NSIZ_PLUS];
+/* level files copied into the save; deleted only once it is complete */
+static Boolean copied[MAX_RECOVER_COUNT];
 short levRefNum;  /* level n file descriptor */
 
 /**** Prototypes ****/
@@ -236,7 +275,7 @@ static void restore_savefile(void);
 static long read_levelfile(short, Ptr, long);
 static long write_savefile(short, Ptr, long);
 static void close_file(short *);
-static void unlink_file(unsigned char *);
+static short remove_level_files(void);
 
 /**** Routines ****/
 
@@ -902,7 +941,8 @@ basenameFileFilter(ParmBlkPtr pPB)
     if (!(pC = (unsigned char *) pPB->fileParam.ioNamePtr))
         return true;
 
-    if ((*pC < 4) || (*pC > 28)) /* save/ 1name .0 */
+    /* "1<name>.0", name at most MAC_FNAME_PLMAX characters */
+    if ((*pC < 4) || (*pC > 1 + MAC_FNAME_PLMAX + 2))
         return true;
 
     if ((pC[*pC - 1] == '.') && (pC[*pC] == '0')) /* bingo! */
@@ -942,6 +982,7 @@ beginRecover(void)
 
         dirID = catInfo.hFileInfo.ioFlParID;
     }
+    find_savedir();
 
     /* open the progress thermometer dialog */
     (void) GetNewDialog(dlogProgress, (Ptr) &dlgThermo, (WindowPtr) -1L);
@@ -975,6 +1016,14 @@ continueRecover(void)
 
     endRecover();
 
+    /* the save file is complete and closed: only now drop the inputs */
+    if (remove_level_files()) {
+        (void) saveRezStrings();
+        note(noErr, alidNote,
+             P_STRING_CONV("OK: Recovered; delete the leftover level files"));
+        return;
+    }
+
     if (saveRezStrings())
         return;
 
@@ -1003,7 +1052,7 @@ endRecover(void)
         (void) FSClose(saveRefNum);
         (void) FlushVol((StringPtr) 0L, vRefNum);
         /* its corrupted so trash it ... */
-        make_spec(savename, &spec);
+        make_save_spec(savename, &spec);
         (void) FSpDelete(&spec);
     }
 
@@ -1024,11 +1073,9 @@ saveRezStrings(void)
     StringHandle strHnd;
     short i, rezID;
     unsigned char plName[256];
-    short skip;
-    int pid = hpid;
     FSSpec spec;
 
-    make_spec(savename, &spec);
+    make_save_spec(savename, &spec);
     FSpCreateResFile(&spec, MAC_CREATOR, SAVE_TYPE, smSystemScript);
 
     sRefNum = FSpOpenResFile(&spec, fsRdWrPerm);
@@ -1037,16 +1084,10 @@ saveRezStrings(void)
         return 1;
     }
 
-    /* savename is "save/<pid><plname>" (pascal); skip "save/" and the pid
-       digits to isolate the player name.  Work on a copy: savename is still
-       needed intact by endRecover should a later recovery fail. */
-    skip = 5; /* "save/" */
-    do {
-        skip++;
-        pid /= 10;
-    } while (pid);
-    plName[0] = (*savename > skip) ? (unsigned char) (*savename - skip) : 0;
-    BlockMove(savename + 1 + skip, plName + 1, plName[0]);
+    /* use the name stored in the checkpoint: the file name may be
+       truncated and regularized */
+    plName[0] = (unsigned char) strlen(plbuf);
+    BlockMove(plbuf, plName + 1, plName[0]);
 
     for (i = 1; i <= 2; i++) {
         switch (i) {
@@ -1111,6 +1152,11 @@ open_levelfile(long lev)
     set_levelfile_name(lev);
     if (!in.Recover)
         return (-1);
+    /* past the HFS 31-character limit (e.g. "1<27 chars>.100"): the game
+       never creates such a level, and opening it would fail with bdNamErr
+       rather than fnfErr and abort the recovery */
+    if (*lock > 31)
+        return (-1);
 
     make_spec(lock, &spec);
     if ((openErr = FSpOpenDF(&spec, fsRdWrPerm, &fRefNum))
@@ -1145,7 +1191,7 @@ create_savefile(unsigned char *savename)
         *savename = nameLen;
     }
 
-    make_spec(savename, &spec);
+    make_save_spec(savename, &spec);
     if (FSpCreate(&spec, MAC_CREATOR, SAVE_TYPE, smSystemScript)
         || FSpOpenDF(&spec, fsRdWrPerm, &fRefNum)) {
         endRecover();
@@ -1192,10 +1238,12 @@ copy_bytes(short inRefNum, short outRefNum)
  *   steps 2..n        copy one numbered level file per call (savelev is
  *                     skipped -- already copied; missing levels are fine);
  *   last step         close the save file (continueRecover then calls
- *                     endRecover and saveRezStrings).
- * Any error calls endRecover(), which clears in.Recover and deletes the
- * partial save file.  savelev is static: it carries the current-level
- * number, read in step 1, across subsequent calls.
+ *                     endRecover, remove_level_files and saveRezStrings).
+ * No input is deleted until the save file is complete, so any error or a
+ * cancel can call endRecover(), which clears in.Recover and deletes only
+ * the partial save file; the checkpoint stays recoverable.  savelev is
+ * static: it carries the current-level number, read in step 1, across
+ * subsequent calls.
  */
 static void
 restore_savefile(void)
@@ -1209,7 +1257,6 @@ restore_savefile(void)
        does not link version.c, so it cannot share its cscbuf */
     unsigned char cscbuf[256];
     int pltmpsiz;
-    char plbuf[PL_NSIZ_PLUS];
 
     /* level 0 file contains, in order (keep in step with util/recover.c
      * and the writer in src/files.c):
@@ -1227,6 +1274,7 @@ restore_savefile(void)
 
     lev = in.Recover - 1;
     if (lev == 0L) {
+        memset(copied, 0, sizeof copied);
         gameRefNum = open_levelfile(0L);
 
         if (in.Recover)
@@ -1266,8 +1314,10 @@ restore_savefile(void)
                  P_STRING_CONV("Sorry: bad player name in checkpoint"));
             return;
         }
+        plbuf[0] = '\0';
         if (in.Recover && pltmpsiz > 0)
             (void) read_levelfile(gameRefNum, (Ptr) plbuf, (long) pltmpsiz);
+        plbuf[PL_NSIZ - 1] = '\0'; /* bound strlen() in saveRezStrings */
 
         /* save file should contain:
          *	format indicator (1 byte)
@@ -1308,20 +1358,14 @@ restore_savefile(void)
         if (in.Recover)
             close_file(&levRefNum);
 
-        if (in.Recover)
-            unlink_file(lock);
+        if (in.Recover && savelev > 0 && savelev < MAX_RECOVER_COUNT)
+            copied[savelev] = true;
 
         if (in.Recover)
             copy_bytes(gameRefNum, saveRefNum);
 
         if (in.Recover)
             close_file(&gameRefNum);
-
-        if (in.Recover)
-            set_levelfile_name(0L);
-
-        if (in.Recover)
-            unlink_file(lock);
     } else if (lev != savelev) {
         levRefNum = open_levelfile(lev);
         if (levRefNum >= 0) {
@@ -1337,7 +1381,7 @@ restore_savefile(void)
                 close_file(&levRefNum);
 
             if (in.Recover)
-                unlink_file(lock);
+                copied[lev] = true;
         }
     }
 
@@ -1389,15 +1433,25 @@ close_file(short *pFRefNum)
     *pFRefNum = -1;
 }
 
-static void
-unlink_file(unsigned char *filename)
+/* Delete the level files copied into the finished save, the level-0
+   checkpoint last so an interrupted cleanup still leaves its anchor.
+   Returns the number of files that could not be deleted. */
+static short
+remove_level_files(void)
 {
     FSSpec spec;
+    OSErr err;
+    short failed = 0;
+    long lev;
 
-    make_spec(filename, &spec);
-    if (FSpDelete(&spec)) {
-        endRecover();
-        note(noErr, alidNote, P_STRING_CONV("Sorry: File Delete Error"));
-        return;
+    for (lev = MAX_RECOVER_COUNT; lev-- > 0;) {
+        if (lev > 0 && !copied[lev])
+            continue;
+        set_levelfile_name(lev);
+        make_spec(lock, &spec);
+        err = FSpDelete(&spec);
+        if (err != noErr && err != fnfErr)
+            failed++;
     }
+    return failed;
 }

@@ -91,12 +91,11 @@ Building
 
 On your Linux host, from the top of the NetHack source tree:
 
-    sys/unix/setup.sh sys/unix/hints/linux.500
-    make fetch-lua
+    sys/unix/setup.sh sys/unix/hints/linux.501
     make CROSS_TO_ATARI=1 all
     make CROSS_TO_ATARI=1 package
 
-The Atari hint (sys/unix/hints/include/cross-pre2.500) defaults
+The Atari hint (sys/unix/hints/include/cross-pre2.501) defaults
 to TOOLTOP=/opt/cross-mint/bin, matching the install-toolchain.sh
 default.  If your toolchain lives elsewhere, override:
 
@@ -104,13 +103,13 @@ default.  If your toolchain lives elsewhere, override:
     make CROSS_TO_ATARI=1 TOOLTOP=$HOME/cross-mint/bin package
 
 The 'CROSS_TO_ATARI=1' flag activates the Atari hints under
-sys/unix/hints/include/cross-*.500, which override TARGET_CC,
+sys/unix/hints/include/cross-*.501, which override TARGET_CC,
 TARGET_AR, TARGET_LINK, TARGET_CFLAGS, TARGET_LFLAGS, and the
 source/object lists.  The build produces:
 
     targets/atari/nethack.prg       Atari 68000 m68k-atari-mint
                                     GEM application
-    targets/atari/NH500ST.ZIP       Packaged self-contained game
+    targets/atari/NH501ST.ZIP       Packaged self-contained game
                                     directory (~3 MB) ready to
                                     unzip on the Atari side.
 

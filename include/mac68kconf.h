@@ -117,6 +117,18 @@ extern int macunlink(const char *);
                                binding goes stale) */
 #define TEXT_CREATOR 'ttxt' /* Something the user can actually edit */
 
+/* Save files live in their own folder next to the application so a
+   player name can never select an installed file (license, record, the
+   application itself, ...).  macfile.c routes names ending in
+   SAVE_EXTENSION or MAC_ERRSAVE_EXT there; Recover finds the folder the
+   same way. */
+#define MAC_SAVEDIR "Saves"
+#define SAVE_EXTENSION ".sav"
+#define MAC_ERRSAVE_EXT ".err"
+/* Longest player name used in file names: "<name>.sav" and the level
+   files "1<name>.NN" must fit the 31-character HFS limit. */
+#define MAC_FNAME_PLMAX 27
+
 /*
  * Define PORT_HELP to be the name of the port-specfic help file.
  * This file is included into the resource fork of the application.

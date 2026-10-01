@@ -25,10 +25,11 @@ OPTIONS=pickup_types:$?!/="+
 # Status line: hit point bar behind name/title, plus field highlighting.
 # The number after statushilites is how many turns up/down change
 # hilites stay visible.  Same color/attribute names as MENUCOLOR below.
+# Full hit points stay uncolored (black text, black bar).
 OPTIONS=hitpointbar
 OPTIONS=statushilites:10
-OPTIONS=hilite_status: hitpoints/100%/gray/<100%/green/<66%/yellow
-OPTIONS=hilite_status: hitpoints/<50%/orange/<33%/red&bold/<15%/red&inverse
+OPTIONS=hilite_status: hitpoints/<100%/green/<50%/orange
+OPTIONS=hilite_status: hitpoints/<33%/red&bold/<15%/red&inverse
 OPTIONS=hilite_status: power/<50%/orange/<25%/red&bold
 OPTIONS=hilite_status: characteristics/up/green/down/red
 OPTIONS=hilite_status: armor-class/down/green/up/red
@@ -43,6 +44,12 @@ OPTIONS=hilite_status: condition/major/orange&inverse
 #   light cyan  white  no color
 #   aliases: grey, purple, bright red/green/blue/magenta/cyan, transparent
 #
+# Status and menus are drawn on a white background, and in 16-color
+# mode each color becomes the nearest of 16 screen pens.  Readable
+# there: black, red, green, blue, cyan, orange (brown and yellow come
+# out as the same orange).  Nearly invisible: gray, magenta and the
+# light/bright colors.
+#
 # Optional attributes (combine via '&'):
 #   none  bold  dim  italic  underline  blink  inverse
 OPTIONS=menucolors
@@ -51,7 +58,9 @@ MENUCOLOR=" blessed "=green
 MENUCOLOR=" uncursed "=cyan
 MENUCOLOR=" holy water"=cyan
 MENUCOLOR=" unholy water"=red&bold
-# Worn / wielded gear stands out in the inventory list.
-MENUCOLOR=" \\(being worn\\)$"=green
-MENUCOLOR=" \\(weapon in hand\\)$"=green
-MENUCOLOR=" \\(wielded\\)$"=green
+# Worn / wielded gear stands out in the inventory list; these come
+# after the B/U/C rules because the last matching rule wins.  [(]
+# matches a literal parenthesis ("\\(" does not work here).
+MENUCOLOR=" [(]being worn[)]$"=green
+MENUCOLOR=" [(]weapon in .*hand[)]$"=green
+MENUCOLOR=" [(]wielded[)]$"=green

@@ -155,6 +155,13 @@ cache_pens(void)
     pen_black    = nearest_pen(0, 0, 0);
     pen_white    = nearest_pen(1000, 1000, 1000);
     pen_darkgray = nearest_pen(400, 400, 400);
+    if (planes == 1) {
+        /* vq_color() on a monochrome screen does not report what the
+           pens display (pen 0 comes back black, yet shows white), so
+           use the fixed VDI assignment */
+        pen_black = pen_darkgray = BLACK;
+        pen_white = WHITE;
+    }
     /* Skip pure-black-ish pens for NetHack text colours so map glyphs
        always render visibly on the black map background, even when
        the palette has no close match for a particular CLR_*. */
@@ -1247,10 +1254,19 @@ draw_rip(PARMBLK *pb)
             vst_alignment(x_handle, 1, 5, &sa_dummy, &sa_dummy);
             pla[5] += 64;
             for (i = 0; i < 7; i++, pla[5] += chardim[3]) {
+                /* white outline one pixel around the black text keeps it
+                   readable over the dithered stone */
+                static const short halo[4][2] = {
+                    { -1, 0 }, { 1, 0 }, { 0, -1 }, { 0, 1 }
+                };
+                short h;
+
                 v_set_text(text_font.id,
                            (i == 0 || i == 6) ? text_font.size : 12,
                            pen_white, 0, 0, chardim);
-                (*v_mtext)(x_handle, pla[4] + 157, pla[5], rip_line[i]);
+                for (h = 0; h < 4; h++)
+                    (*v_mtext)(x_handle, pla[4] + 157 + halo[h][0],
+                               pla[5] + halo[h][1], rip_line[i]);
                 v_set_text(text_font.id,
                            (i == 0 || i == 6) ? text_font.size : 12,
                            pen_black, 0, 0, chardim);
@@ -1567,10 +1583,14 @@ load_tile_image(void)
 {
     short img_err, tried_default = FALSE;
 
-    if (tile_image.addr)
+    /* Tile_bilder owns the converted sheet; tile_image.addr is only
+       the raw depacked image and is NULL once handed over */
+    if (Tile_bilder.fd_addr)
         return (0);
 
 loadimg:
+    /* depack_img() frees a previous addr but not the palette */
+    test_free(tile_image.palette);
     img_err = depack_img(Tilefile ? Tilefile : (planes >= 5) ? "NH32.IMG"
                                                   : (planes >= 4) ? "NH16.IMG"
                                                                    : "NH2.IMG",
@@ -1613,22 +1633,33 @@ loadimg:
            palette involvement. */
         MFDB new_mfdb;
         if (build_truecolor_mfdb(&tile_image, &new_mfdb, planes)) {
-            free(tile_image.addr);
-            tile_image.addr = (char *) new_mfdb.fd_addr;
             tile_image.planes = planes;
             Tile_bilder = new_mfdb;
+        } else {
+            img_err = ERR_ALLOC;
         }
+        test_free(tile_image.addr);
     } else {
+        /* Tile_bilder takes over the raw sheet: convert() frees it and
+           installs the device-format buffer in its place */
         mfdb(&Tile_bilder, (short *) tile_image.addr, tile_image.img_w,
              tile_image.img_h, 1, tile_image.planes);
-        transform_img(&Tile_bilder);
-        /* Set workstation palette so vro_cpyfm of palettized device
-           data displays the right colors.  Only meaningful at <=8
-           planes; on truecolor we've already baked RGB into pixels. */
-        if (tile_image.planes > 1 && tile_image.palette)
+        tile_image.addr = NULL;
+        if (!transform_img(&Tile_bilder)) {
+            /* fd_addr is the unconverted sheet or NULL; unusable */
+            test_free(Tile_bilder.fd_addr);
+            img_err = ERR_ALLOC;
+        } else if (tile_image.planes > 1 && tile_image.palette) {
+            /* Set workstation palette so vro_cpyfm of palettized device
+               data displays the right colors.  Only meaningful at <=8
+               planes; on truecolor we've already baked RGB into
+               pixels. */
             img_set_colors(x_handle, tile_image.palette, tile_image.planes);
+        }
     }
-    return (0);
+    if (img_err)
+        test_free(tile_image.palette);
+    return (img_err);
 }
 
 int
@@ -1824,6 +1855,7 @@ mar_exit_nhwindows(void)
 
     test_free(tile_image.palette);
     test_free(tile_image.addr);
+    test_free(Tile_bilder.fd_addr);
     test_free(titel_image.palette);
     test_free(titel_image.addr);
 
@@ -2922,23 +2954,31 @@ mar_display_nhwindow(winid wind)
         scroll_menu.vsize = num_text_lines;
         scroll_menu.vpos = 0;
         if (use_rip) {
-            if (!depack_img(planes < 4 ? "RIP2.IMG" : "RIP.IMG",
+            /* RIP.IMG has 8 planes; convert() would drop the extra
+               planes on a shallower screen, so smaller screens get
+               the build-time 16-colour and dithered mono versions */
+            if (!depack_img(planes < 4   ? "RIP2.IMG"
+                            : planes < 8 ? "RIP16.IMG"
+                                         : "RIP.IMG",
                             &rip_image)) {
                 if (planes >= 16 && rip_image.palette) {
                     MFDB new_mfdb;
-                    if (build_truecolor_mfdb(&rip_image, &new_mfdb, planes)) {
-                        free(rip_image.addr);
-                        rip_image.addr = NULL;
+                    if (build_truecolor_mfdb(&rip_image, &new_mfdb, planes))
                         Rip_bild = new_mfdb;
-                    }
+                    test_free(rip_image.addr);
                 } else {
+                    /* Rip_bild takes over the raw image, as for tiles */
                     mfdb(&Rip_bild, (short *) rip_image.addr,
                          rip_image.img_w, rip_image.img_h, 1,
                          rip_image.planes);
-                    transform_img(&Rip_bild);
-                    if (rip_image.planes > 1 && rip_image.palette)
+                    rip_image.addr = NULL;
+                    if (!transform_img(&Rip_bild)) {
+                        /* draw_rip() skips a NULL image */
+                        test_free(Rip_bild.fd_addr);
+                    } else if (rip_image.planes > 1 && rip_image.palette) {
                         img_set_colors_ex(x_handle, rip_image.palette,
                                           rip_image.planes, 0);
+                    }
                 }
             }
             ub_lines.ub_code = draw_rip;
@@ -2981,14 +3021,9 @@ mar_display_nhwindow(winid wind)
         if (planes <= 8 && use_rip && normal_palette)
             img_set_colors(x_handle, normal_palette, planes);
         if (use_rip) {
-            if (Rip_bild.fd_addr
-                && Rip_bild.fd_addr != (short *) rip_image.addr)
-                free(Rip_bild.fd_addr);
-            Rip_bild.fd_addr = NULL;
+            test_free(Rip_bild.fd_addr);
             test_free(rip_image.palette);
-            rip_image.palette = NULL;
             test_free(rip_image.addr);
-            rip_image.addr = NULL;
         }
         ob_set_text(z_ob, QLINE, tmp_button);
         break;
