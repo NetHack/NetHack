@@ -133,6 +133,9 @@ all:    $(ALLDEP)
 	true; $(MOREALL)
 	@echo "Done."
 
+$(GAME): $(LUA_LIB)
+	( cd src ; $(MAKE) $(GAME) )
+
 # Several top-level targets reach the host 'makedefs' tool through their own
 # recursive sub-make, so under -jN they would build (and race on) it at the
 # same time.  Serialize the top level so makedefs is built once; the sub-makes
