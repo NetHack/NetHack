@@ -397,7 +397,6 @@ spotless: clean
 	pipe set def $(SRC) && $(MAKE) spotless && set def [-]
 	pipe set def $(UTIL) && $(MAKE) spotless && set def [-]
 	pipe set def $(DOC) && $(MAKE) spotless && set def [-]
-	-delete/log $(SPOTLESSFILES) $(INCL)nhlua.h;*
 
 #	pipe set def $(DAT) && $(MAKE) spotless && set def [-]
 #	-$(RM) $(GAMEBIN);*
