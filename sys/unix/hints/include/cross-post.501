@@ -809,7 +809,7 @@ ATARIRIPS = $(TARGETPFX)RIP16.IMG $(TARGETPFX)RIP2.IMG
 # levels and scores there that must not be packaged.
 ataripkg: $(GAMEBIN) ../util/uudecode $(ATARITILES) $(ATARIRIPS)
 	rm -rf $(TARGETPFX)pkg
-	rm -f $(TARGETPFX)NH500ST.ZIP
+	rm -f $(TARGETPFX)NH$(NHV)ST.ZIP
 	mkdir -p $(TARGETPFX)pkg
 	cp $(GAMEBIN) $(TARGETPFX)pkg/nethack.prg
 	cp ../dat/nhdat $(TARGETPFX)pkg/nhdat
@@ -831,8 +831,8 @@ ataripkg: $(GAMEBIN) ../util/uudecode $(ATARITILES) $(ATARIRIPS)
 	( cd $(TARGETPFX)pkg && ../../../util/uudecode ../../../win/gem/rip.uu )
 	: > $(TARGETPFX)pkg/record
 	mkdir -p $(TARGETPFX)pkg/levels $(TARGETPFX)pkg/save
-	( cd $(TARGETPFX)pkg && zip -9r ../NH500ST.ZIP * )
-	@echo atari package zip file $(TARGETPFX)NH500ST.ZIP
+	( cd $(TARGETPFX)pkg && zip -9r ../NH$(NHV)ST.ZIP * )
+	@echo atari package zip file $(TARGETPFX)NH$(NHV)ST.ZIP
 endif  # CROSS_TO_ATARI
 
 ifdef CROSS_SHARED

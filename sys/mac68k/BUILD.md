@@ -75,8 +75,7 @@ build-PPC, skip-Carbon:
 ## Configure (once)
 
     cd NetHack
-    sys/unix/setup.sh sys/unix/hints/linux.500
-    make fetch-lua
+    sys/unix/setup.sh sys/unix/hints/linux.501
 
 ## Build and package
 

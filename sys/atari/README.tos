@@ -26,7 +26,7 @@ Supported display modes:
 
 Installation
 ------------
-Unzip NH500ST.ZIP on the Atari side -- not on the Linux/Windows
+Unzip NH501ST.ZIP on the Atari side -- not on the Linux/Windows
 host -- because some unzippers translate line endings inside the
 archive and corrupt nhdat.
 

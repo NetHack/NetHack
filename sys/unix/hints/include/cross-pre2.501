@@ -1020,8 +1020,7 @@ ifdef CROSS_TO_ATARI
 # The companion script sys/atari/install-toolchain.sh installs the
 # full toolchain (gcc, binutils, mintlib, fdlibm, gemlib, E_GEM) under
 # /opt/cross-mint by default.  Once installed, run:
-#     sys/unix/setup.sh sys/unix/hints/linux.500
-#     make fetch-lua
+#     sys/unix/setup.sh sys/unix/hints/linux.501
 #     make CROSS_TO_ATARI=1 all
 #     make CROSS_TO_ATARI=1 package
 #=================================================================
