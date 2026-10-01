@@ -239,6 +239,8 @@ make_save_spec(const unsigned char *name, FSSpec *spec)
 
 /* player name from the checkpoint, NUL-terminated (store_plname_in_file) */
 static char plbuf[PL_NSIZ_PLUS];
+/* level files copied into the save; deleted only once it is complete */
+static Boolean copied[MAX_RECOVER_COUNT];
 short levRefNum;  /* level n file descriptor */
 
 /**** Prototypes ****/
@@ -273,7 +275,7 @@ static void restore_savefile(void);
 static long read_levelfile(short, Ptr, long);
 static long write_savefile(short, Ptr, long);
 static void close_file(short *);
-static void unlink_file(unsigned char *);
+static short remove_level_files(void);
 
 /**** Routines ****/
 
@@ -1014,6 +1016,14 @@ continueRecover(void)
 
     endRecover();
 
+    /* the save file is complete and closed: only now drop the inputs */
+    if (remove_level_files()) {
+        (void) saveRezStrings();
+        note(noErr, alidNote,
+             P_STRING_CONV("OK: Recovered; delete the leftover level files"));
+        return;
+    }
+
     if (saveRezStrings())
         return;
 
@@ -1223,10 +1233,12 @@ copy_bytes(short inRefNum, short outRefNum)
  *   steps 2..n        copy one numbered level file per call (savelev is
  *                     skipped -- already copied; missing levels are fine);
  *   last step         close the save file (continueRecover then calls
- *                     endRecover and saveRezStrings).
- * Any error calls endRecover(), which clears in.Recover and deletes the
- * partial save file.  savelev is static: it carries the current-level
- * number, read in step 1, across subsequent calls.
+ *                     endRecover, remove_level_files and saveRezStrings).
+ * No input is deleted until the save file is complete, so any error or a
+ * cancel can call endRecover(), which clears in.Recover and deletes only
+ * the partial save file; the checkpoint stays recoverable.  savelev is
+ * static: it carries the current-level number, read in step 1, across
+ * subsequent calls.
  */
 static void
 restore_savefile(void)
@@ -1257,6 +1269,7 @@ restore_savefile(void)
 
     lev = in.Recover - 1;
     if (lev == 0L) {
+        memset(copied, 0, sizeof copied);
         gameRefNum = open_levelfile(0L);
 
         if (in.Recover)
@@ -1340,20 +1353,14 @@ restore_savefile(void)
         if (in.Recover)
             close_file(&levRefNum);
 
-        if (in.Recover)
-            unlink_file(lock);
+        if (in.Recover && savelev > 0 && savelev < MAX_RECOVER_COUNT)
+            copied[savelev] = true;
 
         if (in.Recover)
             copy_bytes(gameRefNum, saveRefNum);
 
         if (in.Recover)
             close_file(&gameRefNum);
-
-        if (in.Recover)
-            set_levelfile_name(0L);
-
-        if (in.Recover)
-            unlink_file(lock);
     } else if (lev != savelev) {
         levRefNum = open_levelfile(lev);
         if (levRefNum >= 0) {
@@ -1369,7 +1376,7 @@ restore_savefile(void)
                 close_file(&levRefNum);
 
             if (in.Recover)
-                unlink_file(lock);
+                copied[lev] = true;
         }
     }
 
@@ -1421,15 +1428,25 @@ close_file(short *pFRefNum)
     *pFRefNum = -1;
 }
 
-static void
-unlink_file(unsigned char *filename)
+/* Delete the level files copied into the finished save, the level-0
+   checkpoint last so an interrupted cleanup still leaves its anchor.
+   Returns the number of files that could not be deleted. */
+static short
+remove_level_files(void)
 {
     FSSpec spec;
+    OSErr err;
+    short failed = 0;
+    long lev;
 
-    make_spec(filename, &spec);
-    if (FSpDelete(&spec)) {
-        endRecover();
-        note(noErr, alidNote, P_STRING_CONV("Sorry: File Delete Error"));
-        return;
+    for (lev = MAX_RECOVER_COUNT; lev-- > 0;) {
+        if (lev > 0 && !copied[lev])
+            continue;
+        set_levelfile_name(lev);
+        make_spec(lock, &spec);
+        err = FSpDelete(&spec);
+        if (err != noErr && err != fnfErr)
+            failed++;
     }
+    return failed;
 }
