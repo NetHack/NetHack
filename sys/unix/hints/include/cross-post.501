@@ -253,9 +253,12 @@ $(TARGETPFX)winreq.o : ../sys/amiga/winreq.c \
 		../sys/amiga/colorwin.c \
 		../sys/amiga/clipwin.c $(HACK_H)
 $(TARGETPFX)winstr.o : ../sys/amiga/winstr.c $(HACK_H)
-$(GAMEBIN) : $(HOBJ) $(LUACROSSLIB)
+# Same objects, libraries and order as the Sysunix rule 'make all' uses, so
+# invoking the packaging target directly also links a complete game.
+$(GAMEBIN) : $(HOBJ) $(DATE_O) $(GENTILEOFILE) $(TARGET_HACKLIB) $(LUACROSSLIB)
 	$(TARGET_LINK) $(TARGET_LFLAGS) -o $(GAMEBIN) \
-	$(HOBJ) $(WINLIB) $(TARGET_LIBS)
+	$(HOBJ) $(DATE_O) $(GENTILEOFILE) $(TARGET_HACKLIB) $(WINLIB) \
+	$(TARGET_LIBS)
 #
 # Host-side IFF tile conversion tools (run on Linux, produce Amiga IFF files)
 #
@@ -310,7 +313,12 @@ fetch-regex:
 	fi
 amitiles: $(AMITILES)
 
+# Stage into a fresh pkg directory and write a fresh ZIP: anything left in
+# pkg (saves, levels, bones, scores from playing there, or files no longer
+# packaged) must not reach the distribution.
 amigapkg: $(GAMEBIN) $(AMITILES) ../util/uudecode
+	rm -rf $(TARGETPFX)pkg
+	rm -f $(TARGETPFX)NH$(NHV)AMI$(AMIPKGSEQ).ZIP
 	mkdir -p $(TARGETPFX)pkg/NetHack/tiles $(TARGETPFX)pkg/NetHack/hack
 	cp $(GAMEBIN) $(TARGETPFX)pkg/NetHack/nethack
 	cp ../dat/nhdat $(TARGETPFX)pkg/NetHack/nhdat
@@ -331,7 +339,7 @@ amigapkg: $(GAMEBIN) $(AMITILES) ../util/uudecode
 	( cd $(TARGETPFX)pkg/NetHack && ../../../../util/uudecode ../../../../sys/amiga/txt-info.uu )
 	( cd $(TARGETPFX)pkg/NetHack && ../../../../util/uudecode ../../../../sys/amiga/readme-info.uu )
 	( cd $(TARGETPFX)pkg && ../../../util/uudecode ../../../sys/amiga/drawer-info.uu )
-	touch $(TARGETPFX)pkg/NetHack/record
+	: > $(TARGETPFX)pkg/NetHack/record
 	( cd $(TARGETPFX)pkg && zip -9r ../NH$(NHV)AMI$(AMIPKGSEQ).ZIP NetHack NetHack.info )
 	@echo amiga package zip file $(TARGETPFX)NH$(NHV)AMI$(AMIPKGSEQ).ZIP
 endif  # CROSS_TO_AMIGA
@@ -759,9 +767,12 @@ $(TARGETPFX)load_img.o : ../win/gem/load_img.c $(HACK_H)
 # never becomes the default goal, matching the amiga/msdos placement.
 $(TARGETPFX)tile.o : $(SRCDIR)/tile.c
 	$(TARGET_CC) $(TARGET_CFLAGS) -o$@ $<
-$(GAMEBIN) : $(HOBJ) $(LUACROSSLIB)
+# Same objects, libraries and order as the Sysunix rule 'make all' uses, so
+# invoking the packaging target directly also links a complete game.
+$(GAMEBIN) : $(HOBJ) $(DATE_O) $(GENTILEOFILE) $(TARGET_HACKLIB) $(LUACROSSLIB)
 	$(TARGET_LINK) $(TARGET_LFLAGS) -o $(GAMEBIN) \
-	$(HOBJ) $(WINLIB) $(TARGET_LIBS)
+	$(HOBJ) $(DATE_O) $(GENTILEOFILE) $(TARGET_HACKLIB) $(WINLIB) \
+	$(TARGET_LIBS)
 
 #
 # Host-side BMP-to-XIMG converter (runs on Linux, produces Atari .IMG)
@@ -782,7 +793,11 @@ ATARITILES = $(TARGETPFX)NH2.IMG $(TARGETPFX)NH16.IMG $(TARGETPFX)NH32.IMG
 
 .PHONY: ataripkg
 
+# Fresh pkg and ZIP, as for amigapkg: playing from pkg leaves saves,
+# levels and scores there that must not be packaged.
 ataripkg: $(GAMEBIN) ../util/uudecode $(ATARITILES)
+	rm -rf $(TARGETPFX)pkg
+	rm -f $(TARGETPFX)NH500ST.ZIP
 	mkdir -p $(TARGETPFX)pkg
 	cp $(GAMEBIN) $(TARGETPFX)pkg/nethack.prg
 	cp ../dat/nhdat $(TARGETPFX)pkg/nhdat
@@ -800,7 +815,7 @@ ataripkg: $(GAMEBIN) ../util/uudecode $(ATARITILES)
 	( cd $(TARGETPFX)pkg && ../../../util/uudecode ../../../win/gem/title.uu )
 	( cd $(TARGETPFX)pkg && ../../../util/uudecode ../../../win/gem/title2.uu )
 	( cd $(TARGETPFX)pkg && ../../../util/uudecode ../../../win/gem/rip.uu )
-	touch $(TARGETPFX)pkg/record
+	: > $(TARGETPFX)pkg/record
 	mkdir -p $(TARGETPFX)pkg/levels $(TARGETPFX)pkg/save
 	( cd $(TARGETPFX)pkg && zip -9r ../NH500ST.ZIP * )
 	@echo atari package zip file $(TARGETPFX)NH500ST.ZIP
