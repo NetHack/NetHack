@@ -677,8 +677,9 @@ mac_askname(void)
 
     GetDialogItem(askdialog, RSRC_ASK_NAME, &type, &handle, &rect);
     GetDialogItemText(handle, str);
-    if (str[0] > PL_NSIZ - 1)
-        str[0] = PL_NSIZ - 1;
+    /* file names hold at most MAC_FNAME_PLMAX characters of the name */
+    if (str[0] > MAC_FNAME_PLMAX)
+        str[0] = MAC_FNAME_PLMAX;
     P2C(str, svp.plname);
 
     for (i = RSRC_ASK_ROLE; i <= RSRC_ASK_MODE; i++) {

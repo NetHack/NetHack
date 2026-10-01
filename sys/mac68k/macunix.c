@@ -30,7 +30,9 @@ getlock(void)
     int fd;
     int pid = getpid(); /* always 1 on classic Mac OS */
 
-    Sprintf(gl.lock, "%d%s", getuid(), svp.plname);
+    /* regularize: a ':' in the name would make an HFS partial path */
+    Sprintf(gl.lock, "%d%.*s", getuid(), MAC_FNAME_PLMAX, svp.plname);
+    regularize(gl.lock);
     set_levelfile_name(gl.lock, 0);
 
     if ((fd = open(gl.lock, O_RDWR | O_EXCL | O_CREAT, LEVL_TYPE)) == -1) {

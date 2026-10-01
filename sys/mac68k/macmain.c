@@ -196,15 +196,15 @@ process_openfile(FSSpec *src, OSType ftype)
     if (ftype != SAVE_TYPE)
         return; /* only deal with save files */
 
-    /* same name, but in the data (game) directory */
-    mac_fsspec(&dst, theDirs.dataRefNum, theDirs.dataDirID, src->name);
+    /* same name, but in the Saves folder */
+    mac_fsspec(&dst, theDirs.saveRefNum, theDirs.saveDirID, src->name);
 
-    if (src->vRefNum != theDirs.dataRefNum
-        || src->parID != theDirs.dataDirID) {
+    if (src->vRefNum != theDirs.saveRefNum
+        || src->parID != theDirs.saveDirID) {
         /* FSpCatMove's dst names the target directory itself */
         FSSpec dstdir;
 
-        mac_fsspec(&dstdir, theDirs.dataRefNum, theDirs.dataDirID,
+        mac_fsspec(&dstdir, theDirs.saveRefNum, theDirs.saveDirID,
                    P_STRING_CONV(":"));
         if (FSpCatMove(src, &dstdir) != noErr) {
             FSpCreate(&dst, MAC_CREATOR, SAVE_TYPE, smSystemScript);
@@ -233,15 +233,20 @@ process_openfile(FSSpec *src, OSType ftype)
                 P2C(*(StringHandle) name, svp.plname);
                 set_savefile_name(TRUE);
                 C2P(fqname(gs.SAVEF, SAVEPREFIX, 0), save_f_p);
-                {
+                if (EqualString(dst.name, save_f_p, false, true)) {
+                    /* already in place under its own name */
+                    macFlags.gotOpen = 1;
+                } else {
                     FSSpec oldsave;
 
-                    mac_fsspec(&oldsave, theDirs.dataRefNum,
-                               theDirs.dataDirID, save_f_p);
+                    /* both specs are in the Saves folder, so this can
+                       only replace another save */
+                    mac_fsspec(&oldsave, theDirs.saveRefNum,
+                               theDirs.saveDirID, save_f_p);
                     force_hdelete(&oldsave);
+                    if (FSpRename(&dst, save_f_p) == noErr)
+                        macFlags.gotOpen = 1;
                 }
-                if (FSpRename(&dst, save_f_p) == noErr)
-                    macFlags.gotOpen = 1;
             }
             CloseResFile(ref);
         }

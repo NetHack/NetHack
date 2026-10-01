@@ -209,6 +209,7 @@ extern void C2P(const char *c, unsigned char *p);
 extern void mac_fsspec(FSSpec *spec, short vol, long dir,
                        ConstStr255Param name);
 extern void P2C(const unsigned char *p, char *c);
+extern void mac_init_savedir(void);
 
 /* P_STRING_CONV (compile-time Pascal string from a C literal) lives in
    maccompat.h, included above, so standalone tools (mrecover.c) and

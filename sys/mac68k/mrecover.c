@@ -202,6 +202,43 @@ make_spec(const unsigned char *name, FSSpec *spec)
     BlockMove(name, spec->name, (long) len + 1);
     spec->name[0] = (unsigned char) len;
 }
+
+/* The game keeps saves in a MAC_SAVEDIR folder beside the checkpoint files
+   (macfile.c mac_init_savedir); find or create it, falling back to the
+   checkpoint folder as the game does. */
+static long saveDirID;
+
+static void
+find_savedir(void)
+{
+    FSSpec spec;
+    CInfoPBRec pb;
+    long newID;
+
+    make_spec(P_STRING_CONV(MAC_SAVEDIR), &spec);
+    if (FSpDirCreate(&spec, smSystemScript, &newID) == noErr) {
+        saveDirID = newID;
+        return;
+    }
+    memset(&pb, 0, sizeof pb);
+    pb.dirInfo.ioNamePtr = spec.name;
+    pb.dirInfo.ioVRefNum = vRefNum;
+    pb.dirInfo.ioDrDirID = dirID;
+    if (PBGetCatInfoSync(&pb) == noErr && (pb.dirInfo.ioFlAttrib & 0x10))
+        saveDirID = pb.dirInfo.ioDrDirID;
+    else
+        saveDirID = dirID;
+}
+
+static void
+make_save_spec(const unsigned char *name, FSSpec *spec)
+{
+    make_spec(name, spec);
+    spec->parID = saveDirID;
+}
+
+/* player name from the checkpoint, NUL-terminated (store_plname_in_file) */
+static char plbuf[PL_NSIZ_PLUS];
 short levRefNum;  /* level n file descriptor */
 
 /**** Prototypes ****/
@@ -902,7 +939,8 @@ basenameFileFilter(ParmBlkPtr pPB)
     if (!(pC = (unsigned char *) pPB->fileParam.ioNamePtr))
         return true;
 
-    if ((*pC < 4) || (*pC > 28)) /* save/ 1name .0 */
+    /* "1<name>.0", name at most MAC_FNAME_PLMAX characters */
+    if ((*pC < 4) || (*pC > 1 + MAC_FNAME_PLMAX + 2))
         return true;
 
     if ((pC[*pC - 1] == '.') && (pC[*pC] == '0')) /* bingo! */
@@ -942,6 +980,7 @@ beginRecover(void)
 
         dirID = catInfo.hFileInfo.ioFlParID;
     }
+    find_savedir();
 
     /* open the progress thermometer dialog */
     (void) GetNewDialog(dlogProgress, (Ptr) &dlgThermo, (WindowPtr) -1L);
@@ -1003,7 +1042,7 @@ endRecover(void)
         (void) FSClose(saveRefNum);
         (void) FlushVol((StringPtr) 0L, vRefNum);
         /* its corrupted so trash it ... */
-        make_spec(savename, &spec);
+        make_save_spec(savename, &spec);
         (void) FSpDelete(&spec);
     }
 
@@ -1024,11 +1063,9 @@ saveRezStrings(void)
     StringHandle strHnd;
     short i, rezID;
     unsigned char plName[256];
-    short skip;
-    int pid = hpid;
     FSSpec spec;
 
-    make_spec(savename, &spec);
+    make_save_spec(savename, &spec);
     FSpCreateResFile(&spec, MAC_CREATOR, SAVE_TYPE, smSystemScript);
 
     sRefNum = FSpOpenResFile(&spec, fsRdWrPerm);
@@ -1037,16 +1074,10 @@ saveRezStrings(void)
         return 1;
     }
 
-    /* savename is "save/<pid><plname>" (pascal); skip "save/" and the pid
-       digits to isolate the player name.  Work on a copy: savename is still
-       needed intact by endRecover should a later recovery fail. */
-    skip = 5; /* "save/" */
-    do {
-        skip++;
-        pid /= 10;
-    } while (pid);
-    plName[0] = (*savename > skip) ? (unsigned char) (*savename - skip) : 0;
-    BlockMove(savename + 1 + skip, plName + 1, plName[0]);
+    /* use the name stored in the checkpoint: the file name may be
+       truncated and regularized */
+    plName[0] = (unsigned char) strlen(plbuf);
+    BlockMove(plbuf, plName + 1, plName[0]);
 
     for (i = 1; i <= 2; i++) {
         switch (i) {
@@ -1145,7 +1176,7 @@ create_savefile(unsigned char *savename)
         *savename = nameLen;
     }
 
-    make_spec(savename, &spec);
+    make_save_spec(savename, &spec);
     if (FSpCreate(&spec, MAC_CREATOR, SAVE_TYPE, smSystemScript)
         || FSpOpenDF(&spec, fsRdWrPerm, &fRefNum)) {
         endRecover();
@@ -1209,7 +1240,6 @@ restore_savefile(void)
        does not link version.c, so it cannot share its cscbuf */
     unsigned char cscbuf[256];
     int pltmpsiz;
-    char plbuf[PL_NSIZ_PLUS];
 
     /* level 0 file contains, in order (keep in step with util/recover.c
      * and the writer in src/files.c):
@@ -1266,8 +1296,10 @@ restore_savefile(void)
                  P_STRING_CONV("Sorry: bad player name in checkpoint"));
             return;
         }
+        plbuf[0] = '\0';
         if (in.Recover && pltmpsiz > 0)
             (void) read_levelfile(gameRefNum, (Ptr) plbuf, (long) pltmpsiz);
+        plbuf[PL_NSIZ - 1] = '\0'; /* bound strlen() in saveRezStrings */
 
         /* save file should contain:
          *	format indicator (1 byte)
