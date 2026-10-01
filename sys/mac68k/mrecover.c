@@ -1152,6 +1152,11 @@ open_levelfile(long lev)
     set_levelfile_name(lev);
     if (!in.Recover)
         return (-1);
+    /* past the HFS 31-character limit (e.g. "1<27 chars>.100"): the game
+       never creates such a level, and opening it would fail with bdNamErr
+       rather than fnfErr and abort the recovery */
+    if (*lock > 31)
+        return (-1);
 
     make_spec(lock, &spec);
     if ((openErr = FSpOpenDF(&spec, fsRdWrPerm, &fRefNum))
