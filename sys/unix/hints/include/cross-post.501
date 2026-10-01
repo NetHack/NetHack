@@ -791,11 +791,23 @@ $(TARGETPFX)NH2.IMG:  ../dat/nhtiles.bmp $(TARGETPFX)bmp2img_host
 
 ATARITILES = $(TARGETPFX)NH2.IMG $(TARGETPFX)NH16.IMG $(TARGETPFX)NH32.IMG
 
+# Tombstones for screens shallower than the 8-plane rip.img: the GEM
+# code loads RIP16.IMG on 4-7 planes and RIP2.IMG below that.  Source
+# is the 8-bit Windows rip.bmp, the same picture.
+$(TARGETPFX)rip.bmp: ../win/win32/rip.uu ../util/uudecode
+	( cd $(TARGETDIR) && ../../util/uudecode ../../win/win32/rip.uu )
+$(TARGETPFX)RIP16.IMG: $(TARGETPFX)rip.bmp $(TARGETPFX)bmp2img_host
+	$(TARGETPFX)bmp2img_host -dither -picture -planes 4 $(TARGETPFX)rip.bmp $@
+$(TARGETPFX)RIP2.IMG: $(TARGETPFX)rip.bmp $(TARGETPFX)bmp2img_host
+	$(TARGETPFX)bmp2img_host -atkinson -picture -planes 1 $(TARGETPFX)rip.bmp $@
+
+ATARIRIPS = $(TARGETPFX)RIP16.IMG $(TARGETPFX)RIP2.IMG
+
 .PHONY: ataripkg
 
 # Fresh pkg and ZIP, as for amigapkg: playing from pkg leaves saves,
 # levels and scores there that must not be packaged.
-ataripkg: $(GAMEBIN) ../util/uudecode $(ATARITILES)
+ataripkg: $(GAMEBIN) ../util/uudecode $(ATARITILES) $(ATARIRIPS)
 	rm -rf $(TARGETPFX)pkg
 	rm -f $(TARGETPFX)NH500ST.ZIP
 	mkdir -p $(TARGETPFX)pkg
@@ -811,6 +823,8 @@ ataripkg: $(GAMEBIN) ../util/uudecode $(ATARITILES)
 	cp $(TARGETPFX)NH2.IMG  $(TARGETPFX)pkg/NH2.IMG
 	cp $(TARGETPFX)NH16.IMG $(TARGETPFX)pkg/NH16.IMG
 	cp $(TARGETPFX)NH32.IMG $(TARGETPFX)pkg/NH32.IMG
+	cp $(TARGETPFX)RIP16.IMG $(TARGETPFX)pkg/RIP16.IMG
+	cp $(TARGETPFX)RIP2.IMG $(TARGETPFX)pkg/RIP2.IMG
 	( cd $(TARGETPFX)pkg && ../../../util/uudecode ../../../win/gem/gem_rsc.uu )
 	( cd $(TARGETPFX)pkg && ../../../util/uudecode ../../../win/gem/title.uu )
 	( cd $(TARGETPFX)pkg && ../../../util/uudecode ../../../win/gem/title2.uu )

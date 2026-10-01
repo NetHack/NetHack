@@ -8,7 +8,12 @@
  *   - Remaining slots are filled by most-frequent tile colours.
  *   - Unused BMP entries are mapped to nearest colour in the palette.
  *
- * Usage: bmp2img_host -planes N input.bmp output.img
+ * Usage: bmp2img_host [-dither|-ordered|-atkinson] [-picture]
+ *                     -planes N input.bmp output.img
+ *
+ * -picture treats the input as one picture rather than a tile sheet:
+ * dithering runs across the whole image and only the width is padded
+ * (to the 16-pixel word XIMG needs), not the height.
  *
  * This is a HOST tool -- runs on the build machine (Linux/Mac/etc.).
  */
@@ -20,6 +25,9 @@
 
 #define TILE_X 16
 #define TILE_Y 16
+
+/* dithering block size; 0 means the whole image (-picture) */
+static int block_w = TILE_X, block_h = TILE_Y;
 
 #pragma pack(push,1)
 typedef struct {
@@ -307,7 +315,7 @@ dither_fs(RGB *rgb, int w, int h,
           const RGB *pal, int npal,
           uint8_t *result)
 {
-    int tw = TILE_X, th = TILE_Y;
+    int tw = block_w ? block_w : w, th = block_h ? block_h : h;
     int tx, ty, x, y;
 
     memset(result, 0, w * h);
@@ -419,7 +427,7 @@ dither_atkinson(RGB *rgb, int w, int h,
                 const RGB *pal, int npal,
                 uint8_t *result)
 {
-    int tw = TILE_X, th = TILE_Y;
+    int tw = block_w ? block_w : w, th = block_h ? block_h : h;
     int tx, ty, x, y;
 
     memset(result, 0, w * h);
@@ -485,26 +493,31 @@ main(int argc, char **argv)
     int remap[256];
     uint8_t *remapped;
     int use_dither = 0; /* 0=none, 1=Floyd-Steinberg, 2=ordered/Bayer */
+    int picture = 0;
     int argi = 1;
 
     /* parse args */
-    if (argi < argc && strcmp(argv[argi], "-dither") == 0) {
-        use_dither = 1; /* default: Floyd-Steinberg */
-        argi++;
-    } else if (argi < argc && strcmp(argv[argi], "-ordered") == 0) {
-        use_dither = 2; /* ordered/Bayer dithering */
-        argi++;
-    } else if (argi < argc && strcmp(argv[argi], "-atkinson") == 0) {
-        use_dither = 3; /* Atkinson dithering */
-        argi++;
+    for (; argi < argc && strcmp(argv[argi], "-planes") != 0; argi++) {
+        if (strcmp(argv[argi], "-dither") == 0)
+            use_dither = 1; /* default: Floyd-Steinberg */
+        else if (strcmp(argv[argi], "-ordered") == 0)
+            use_dither = 2; /* ordered/Bayer dithering */
+        else if (strcmp(argv[argi], "-atkinson") == 0)
+            use_dither = 3; /* Atkinson dithering */
+        else if (strcmp(argv[argi], "-picture") == 0)
+            picture = 1;
+        else
+            break;
     }
     if (argc - argi != 4
         || strcmp(argv[argi], "-planes") != 0) {
         fprintf(stderr,
-                "Usage: %s [-dither|-ordered|-atkinson] -planes N input.bmp output.img\n",
+                "Usage: %s [-dither|-ordered|-atkinson] [-picture] -planes N input.bmp output.img\n",
                 argv[0]);
         return 1;
     }
+    if (picture)
+        block_w = block_h = 0;
     nplanes = atoi(argv[argi + 1]);
     if (nplanes < 1 || nplanes > 8) {
         fprintf(stderr, "planes must be 1-8\n");
@@ -593,10 +606,11 @@ main(int argc, char **argv)
     }
     free(bmpdata);
 
-    /* Pad image dimensions to tile multiples */
+    /* Pad image dimensions to tile multiples (a picture: width only) */
     {
         int pad_w = (img_w + TILE_X - 1) / TILE_X * TILE_X;
-        int pad_h = (img_h + TILE_Y - 1) / TILE_Y * TILE_Y;
+        int pad_h = picture ? img_h
+                            : (img_h + TILE_Y - 1) / TILE_Y * TILE_Y;
         if (pad_w != img_w || pad_h != img_h) {
             uint8_t *padded = calloc(pad_w * pad_h, 1);
             for (y = 0; y < img_h; y++)

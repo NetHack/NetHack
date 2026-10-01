@@ -155,6 +155,13 @@ cache_pens(void)
     pen_black    = nearest_pen(0, 0, 0);
     pen_white    = nearest_pen(1000, 1000, 1000);
     pen_darkgray = nearest_pen(400, 400, 400);
+    if (planes == 1) {
+        /* vq_color() on a monochrome screen does not report what the
+           pens display (pen 0 comes back black, yet shows white), so
+           use the fixed VDI assignment */
+        pen_black = pen_darkgray = BLACK;
+        pen_white = WHITE;
+    }
     /* Skip pure-black-ish pens for NetHack text colours so map glyphs
        always render visibly on the black map background, even when
        the palette has no close match for a particular CLR_*. */
@@ -1247,10 +1254,19 @@ draw_rip(PARMBLK *pb)
             vst_alignment(x_handle, 1, 5, &sa_dummy, &sa_dummy);
             pla[5] += 64;
             for (i = 0; i < 7; i++, pla[5] += chardim[3]) {
+                /* white outline one pixel around the black text keeps it
+                   readable over the dithered stone */
+                static const short halo[4][2] = {
+                    { -1, 0 }, { 1, 0 }, { 0, -1 }, { 0, 1 }
+                };
+                short h;
+
                 v_set_text(text_font.id,
                            (i == 0 || i == 6) ? text_font.size : 12,
                            pen_white, 0, 0, chardim);
-                (*v_mtext)(x_handle, pla[4] + 157, pla[5], rip_line[i]);
+                for (h = 0; h < 4; h++)
+                    (*v_mtext)(x_handle, pla[4] + 157 + halo[h][0],
+                               pla[5] + halo[h][1], rip_line[i]);
                 v_set_text(text_font.id,
                            (i == 0 || i == 6) ? text_font.size : 12,
                            pen_black, 0, 0, chardim);
@@ -2938,7 +2954,12 @@ mar_display_nhwindow(winid wind)
         scroll_menu.vsize = num_text_lines;
         scroll_menu.vpos = 0;
         if (use_rip) {
-            if (!depack_img(planes < 4 ? "RIP2.IMG" : "RIP.IMG",
+            /* RIP.IMG has 8 planes; convert() would drop the extra
+               planes on a shallower screen, so smaller screens get
+               the build-time 16-colour and dithered mono versions */
+            if (!depack_img(planes < 4   ? "RIP2.IMG"
+                            : planes < 8 ? "RIP16.IMG"
+                                         : "RIP.IMG",
                             &rip_image)) {
                 if (planes >= 16 && rip_image.palette) {
                     MFDB new_mfdb;
