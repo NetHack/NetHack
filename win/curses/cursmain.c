@@ -1292,7 +1292,8 @@ curses_change_color(int color, long rgb, int reverse UNUSED)
     r = (rgb >> 16) & 0xFF;
     g = (rgb >> 8) & 0xFF;
     b = rgb & 0xFF;
-    init_color(color % 16, r * 4, g * 4, b * 4);
+    /* init_color() takes components in the range 0..1000 */
+    init_color(color % 16, r * 1000 / 255, g * 1000 / 255, b * 1000 / 255);
 }
 
 static char *
