@@ -398,9 +398,20 @@ curses_clear_unhighlight_message_window(void)
 
         for (ry = brdroffset; ry < mh; ry++) {
             for (rx = brdroffset; rx < mw; rx++) {
-                chtype cht = mvwinch(win, ry, rx);
+#ifdef CURSES_WIDE_PAIRS
+                /* PAIR_NUMBER() of a chtype is truncated to 8 bits */
+                cchar_t cc;
+                wchar_t wch[CCHARW_MAX + 1];
+                attr_t attrs;
+                short pair = 0;
 
-                mvwchgat(win, ry, rx, 1, A_NORMAL, PAIR_NUMBER(cht), NULL);
+                if (mvwin_wch(win, ry, rx, &cc) == OK)
+                    (void) getcchar(&cc, wch, &attrs, &pair, NULL);
+#else
+                short pair = PAIR_NUMBER(mvwinch(win, ry, rx));
+#endif
+
+                mvwchgat(win, ry, rx, 1, A_NORMAL, pair, NULL);
             }
         }
 

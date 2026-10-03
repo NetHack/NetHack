@@ -94,7 +94,11 @@ curses_read_char(void)
 boolean
 curses_has_256color(void)
 {
+#if defined(NCURSES_VERSION) && !defined(CURSES_WIDE_PAIRS)
+    return FALSE;
+#else
     return (COLORS >= 256) && (COLOR_PAIRS >= 256 * CURSES_NUM_BACKGROUND_COLORS);
+#endif
 }
 
 /* Turn on or off the specified color and / or attribute */

@@ -191,8 +191,19 @@ curses_set_wid_colors(int wid, WINDOW *win)
     }
     /* FIXME: colors and nhwins[] entry for perm invent window */
     if (nhwins[wid].clr_inited > 0) {
-        wbkgd(win ? win : nhwins[wid].curwin,
-              COLOR_PAIR(nhwins[wid].colorpair));
+        WINDOW *w = win ? win : nhwins[wid].curwin;
+#ifdef CURSES_WIDE_PAIRS
+        /* windowcolors pairs sit above 2048 in 256-color mode,
+           beyond what COLOR_PAIR() can express */
+        cchar_t bkgd;
+
+        if (setcchar(&bkgd, L" ", A_NORMAL, (short) nhwins[wid].colorpair,
+                     NULL) == OK) {
+            wbkgrnd(w, &bkgd);
+        }
+#else
+        wbkgd(w, COLOR_PAIR(nhwins[wid].colorpair));
+#endif
     }
 }
 
