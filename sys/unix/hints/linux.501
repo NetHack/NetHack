@@ -398,7 +398,7 @@ endif
 # -x: if built without dlb, some versions of mkfontdir think *.lev are fonts
 POSTINSTALL += bdftopcf win/X11/nh10.bdf > $(HACKDIR)/nh10.pcf; ( cd $(HACKDIR); mkfontdir -x .lev );
 # separate from CFLAGS so that we don't pass it to every file
-X11CFLAGS = -I/opt/X11/include
+X11CFLAGS = -I/opt/X11/include $(COMPILERX11CFLAGS)
 # avoid repeated complaints about _X_NONNULL(args...) in <X11/Xfuncproto.h>
 X11CFLAGS += -Wno-variadic-macros
 ifdef USE_XFT
