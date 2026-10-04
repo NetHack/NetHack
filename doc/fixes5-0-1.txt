@@ -89,7 +89,7 @@ after polymorph or revival from corpse, monsters were not interacting with
 	the terrain until that monster's next move
 fix undead corpses (zombies, etc.) now being edible
 alias rings of constitution, strength, and damage, spellbook/scroll of
-	identification
+	identification, amulet of flight
 pets left on another level no longer have their hunger postponed by the
 	time spent away
 
