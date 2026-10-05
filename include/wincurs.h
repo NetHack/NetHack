@@ -49,6 +49,13 @@ extern WINDOW *activemenu;         /* curses window for menu requesting a
 #define A_ITALIC A_UNDERLINE
 #endif
 
+/* COLOR_PAIR() and PAIR_NUMBER() only carry 8 bits of pair number;
+   the wide-character API can address the pairs above 255 that
+   256-color mode allocates */
+#if defined(NCURSES_VERSION) && defined(NCURSES_WIDECHAR) && NCURSES_WIDECHAR
+#define CURSES_WIDE_PAIRS
+#endif
+
 typedef enum orient_type
 {
     CENTER,

@@ -26,7 +26,7 @@ typedef struct nhw {
     int x;                      /* start of window on terminal (left) */
     int y;                      /* start of window on terminal (top) */
     int orientation;            /* Placement of window relative to map */
-    boolean clr_inited;         /* fg/bg/colorpair inited? */
+    int clr_inited;             /* fg/bg/colorpair: 1 inited, -1 unusable */
     int fg, bg;                 /* foreground, background color index */
     int colorpair;              /* color pair of fg, bg */
     boolean border;             /* Whether window has a visible border */
@@ -191,8 +191,19 @@ curses_set_wid_colors(int wid, WINDOW *win)
     }
     /* FIXME: colors and nhwins[] entry for perm invent window */
     if (nhwins[wid].clr_inited > 0) {
-        wbkgd(win ? win : nhwins[wid].curwin,
-              COLOR_PAIR(nhwins[wid].colorpair));
+        WINDOW *w = win ? win : nhwins[wid].curwin;
+#ifdef CURSES_WIDE_PAIRS
+        /* windowcolors pairs sit above 2048 in 256-color mode,
+           beyond what COLOR_PAIR() can express */
+        cchar_t bkgd;
+
+        if (setcchar(&bkgd, L" ", A_NORMAL, (short) nhwins[wid].colorpair,
+                     NULL) == OK) {
+            wbkgrnd(w, &bkgd);
+        }
+#else
+        wbkgd(w, COLOR_PAIR(nhwins[wid].colorpair));
+#endif
     }
 }
 
@@ -292,23 +303,36 @@ curses_get_nhwin(winid wid)
     return nhwins[wid].curwin;
 }
 
-boolean
-parse_hexstr(char *colorbuf, int *red, int *green, int *blue)
+/* curses_wid_color() result for a color that can't be used */
+#define NO_CURSES_COLOR (-2)
+
+/* convert a windowcolors color (name or #rrggbb) to a curses color;
+   -1 is the terminal's default color */
+static int
+curses_wid_color(char *clrstr)
 {
-    int len = colorbuf ? strlen(colorbuf) : 0;
+    int32 clr = clrstr ? check_enhanced_colors(clrstr) : -1;
+    uint32 closecolor;
+    uint16 clridx;
+    int rgbclr;
 
-    if (len == 7 && colorbuf[0] == '#') {
-        char tmpbuf[16];
-
-        Sprintf(tmpbuf, "0x%c%c", colorbuf[1], colorbuf[2]);
-        *red = strtol(tmpbuf, NULL, 0);
-        Sprintf(tmpbuf, "0x%c%c", colorbuf[3], colorbuf[4]);
-        *green = strtol(tmpbuf, NULL, 0);
-        Sprintf(tmpbuf, "0x%c%c", colorbuf[5], colorbuf[6]);
-        *blue = strtol(tmpbuf, NULL, 0);
-        return TRUE;
+    if (clr < 0)
+        return NO_CURSES_COLOR;
+    if (clr & NH_BASIC_COLOR) {
+        clr &= ~NH_BASIC_COLOR;
+        if (clr == NO_COLOR)
+            return -1;
+        /* without bright colors, use the dim variant */
+        return (clr < COLORS) ? clr : clr % 8;
     }
-    return FALSE;
+    /* use the terminal's 256-color palette rather than redefining
+       palette slots, which most terminals don't support and which
+       the 256-color pairs already use */
+    if (COLORS >= 256 && closest_color((uint32) clr, &closecolor, &clridx))
+        return clridx;
+    rgbclr = curses_init_rgb((clr >> 16) & 0xFF, (clr >> 8) & 0xFF,
+                             clr & 0xFF);
+    return (rgbclr >= 0) ? rgbclr : NO_CURSES_COLOR;
 }
 
 void
@@ -324,28 +348,12 @@ curses_parse_wid_colors(int wid, char *fg, char *bg)
     if (nhwins[wid].clr_inited)
         return;
 
-    int nh_fg = fg ? match_str2clr(fg, TRUE) : CLR_MAX;
-    int nh_bg = bg ? match_str2clr(bg, TRUE) : CLR_MAX;
-    int r, g, b;
-
-    if (nh_fg == CLR_MAX) {
-        if (fg && parse_hexstr(fg, &r, &g, &b)) {
-            nh_fg = curses_init_rgb(r, g, b);
-        } else {
-            nh_fg = -1;
-        }
-    }
-    if (nh_bg == CLR_MAX) {
-        if (bg && parse_hexstr(bg, &r, &g, &b)) {
-            nh_bg = curses_init_rgb(r, g, b);
-        } else {
-            nh_bg = -1;
-        }
-    }
+    int nh_fg = curses_wid_color(fg);
+    int nh_bg = curses_wid_color(bg);
 
     nhwins[wid].fg = nh_fg;
     nhwins[wid].bg = nh_bg;
-    if (nh_fg == -1 || nh_bg == -1) {
+    if (nh_fg == NO_CURSES_COLOR || nh_bg == NO_CURSES_COLOR) {
         nhwins[wid].clr_inited = -1;
     } else {
         nhwins[wid].colorpair = curses_init_pair(nh_fg, nh_bg);

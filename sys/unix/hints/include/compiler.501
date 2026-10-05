@@ -134,6 +134,10 @@ endif
 ifeq "$(CLANGGTEQ22)" "1"
 NO_WARN_DISCARDED_QUALIFIERS=-Wno-incompatible-pointer-types-discards-qualifiers
 endif
+ifdef WANT_WIN_X11
+# X11 header file keysymdef.h triggers [-Wnewline-eof] warnings
+COMPILERX11CFLAGS+=-Wno-newline-eof
+endif  # WANT_WIN_X11
 # none
 endif  # clang-specific ends here
 

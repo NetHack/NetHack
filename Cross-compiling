@@ -404,6 +404,22 @@ Using the cross-compiler, build the following targets:
        tty sources:        win/tty/getline.c, win/tty/termcap.c,
                            win/tty/topl.c, win/tty/wintty.c
 
+       lua sources:        Typically compiled into a static libary and linked
+                           into the game executable to interpret lua level
+                           description files, lua dungeon description files,
+                           and a lua quest text file. The Lua source files
+                           are in nhlua/lua/src:
+
+                           lua.c, lapi.c, lauxlib.c, lbaselib.c, lcode.c,
+                           lcorolib.c, lctype.c, ldblib.c, ldebug.c,
+                           ldo.c, ldump.c, lfunc.c, lgc.c, linit.c,
+                           liolib.c, llex.c, lmathlib.c, lmem.c,
+                           loadlib.c, lobject.c, lopcodes.c,
+                           loslib.c, lparser.c, lstate.c, lstring.c,
+                           lstrlib.c, ltable.c, ltablib.c, ltm.c,
+                           lundump.c, lutf8lib.c, lvm.c, lzio.c,
+                           lbitlib.c
+       
        generated (if req'd):
                           src/tile.c
 
@@ -412,24 +428,8 @@ Using the cross-compiler, build the following targets:
        system support in *sys.c as well as others sources pertaining to your
        specific target platform(s).
 
-    b) Lua (mandatory in 5.0)
 
-          lib/lua-5.4.8/src
-
-                   from sources: lua.c, lapi.c, lauxlib.c, lbaselib.c, lcode.c,
-                                 lcorolib.c, lctype.c, ldblib.c, ldebug.c,
-                                 ldo.c, ldump.c, lfunc.c, lgc.c, linit.c,
-                                 liolib.c, llex.c, lmathlib.c, lmem.c,
-                                 loadlib.c, lobject.c, lopcodes.c,
-                                 loslib.c, lparser.c, lstate.c, lstring.c,
-                                 lstrlib.c, ltable.c, ltablib.c, ltm.c,
-                                 lundump.c, lutf8lib.c, lvm.c, lzio.c,
-                                 lbitlib.c
-                   purpose:      links into the game executable to interpret
-                                 lua level description files, lua dungeon
-                                 description files, and a lua quest text file.
-
-    d) recover (optional if desired/required; some targets have recover
+    b) recover (optional if desired/required; some targets have recover
        functionality built into NetHack itself)
 
     c) Additional optional library packages/obj files as required

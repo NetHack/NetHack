@@ -94,7 +94,11 @@ curses_read_char(void)
 boolean
 curses_has_256color(void)
 {
+#if defined(NCURSES_VERSION) && !defined(CURSES_WIDE_PAIRS)
+    return FALSE;
+#else
     return (COLORS >= 256) && (COLOR_PAIRS >= 256 * CURSES_NUM_BACKGROUND_COLORS);
+#endif
 }
 
 /* Turn on or off the specified color and / or attribute */
@@ -153,7 +157,9 @@ curses_toggle_color_attr(WINDOW *win, int color, int attr, int onoff)
             if (use_bold) {
                 wattron(win, A_BOLD);
             }
-            wcolor_set(win, curses_color, &curses_color);
+            /* opts must be NULL; a curses built without extended colors
+               rejects a non-NULL opts and then sets no color at all */
+            (void) wcolor_set(win, (short) curses_color, NULL);
         }
 
         if (attr != NONE) {
@@ -174,7 +180,9 @@ curses_toggle_color_attr(WINDOW *win, int color, int attr, int onoff)
                 wattroff(win, A_REVERSE);
             }
 # endif/* DARKGRAY */
-            wattroff(win, COLOR_PAIR(curses_color));
+            /* COLOR_PAIR() only carries 8 bits of pair number, so it
+               cannot clear a pair above 255; select the default pair */
+            (void) wcolor_set(win, 0, NULL);
         }
 
         if (attr != NONE) {

@@ -3414,6 +3414,7 @@ static const struct alt_spellings {
     { "iron ball", HEAVY_IRON_BALL },
     { "lantern", BRASS_LANTERN },
     { "mattock", DWARVISH_MATTOCK },
+    { "amulet of flight", AMULET_OF_FLYING },
     { "amulet of poison resistance", AMULET_VERSUS_POISON },
     { "amulet of protection", AMULET_OF_GUARDING },
     { "amulet of telepathy", AMULET_OF_ESP },

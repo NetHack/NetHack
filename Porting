@@ -200,10 +200,9 @@ need to be included in the packaging of the game.
 
      4.3. Lua
 
-	Compile and link into a library, or obtain a prebuilt Lua library for
-your platform. Place the Lua source into lib/lua-5.4.8 (or other folder
-representing an appropriate Lua version); place the compiled Lua library into
-lib.
+	Compile and link the bundled Lua sources into a library.
+	The NetHack source tree includes Lua sources in the  nhlua/lua/src
+	directory. 
 
      4.4  Compile NetHack sources
 
