@@ -1,4 +1,4 @@
-# NetHack 5.0  Makefile.check $NHDT-Date: 1599687610 2020/09/09 21:40:10 $  $NHDT-Branch: NetHack-5.0
+# NetHack 5.0  Makefile.check $NHDT-Date: 1791236407 2026/10/05 21:40:07 $  $NHDT-Branch: keni-headercleanup $ $NHDT-Revision: 1.5 $
 
 SUPATH := sys/unix/
 MKHINTSPATH := $(SUPATH)hints/

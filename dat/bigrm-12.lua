@@ -1,4 +1,4 @@
--- NetHack bigroom bigrm-12.lua	$NHDT-Date: $  $NHDT-Branch: NetHack-5.0 $
+-- NetHack bigroom bigrm-12.lua	$NHDT-Date: 1791235866 2026/10/05 21:31:06 $  $NHDT-Branch: keni-headercleanup $ $NHDT-Revision: 1.1 $
 --	Copyright (c) 2024 by Pasi Kallinen
 -- NetHack may be freely redistributed.  See license for details.
 --
