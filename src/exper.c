@@ -319,7 +319,7 @@ pluslvl(
     if (Upolyd) {
         hpinc = monhp_per_lvl(&gy.youmonst);
         u.mh += hpinc;
-        setuhpmax(u.mhmax, FALSE); /* acts as setmhmax() when Upolyd */
+        setuhpmax(u.mhmax + hpinc, FALSE); /* acts as setmhmax() */
     }
     hpinc = newhp();
     u.uhp += hpinc;
