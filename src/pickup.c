@@ -11,7 +11,7 @@
 
 #define CONTAINED_SYM '>' /* from invent.c */
 
-staticfn void simple_look(struct obj *, boolean);
+staticfn boolean simple_look(struct obj *, boolean);
 staticfn boolean query_classes(char *, boolean *, boolean *, const char *,
                              struct obj *, boolean, int *);
 staticfn boolean fatal_corpse_mistake(struct obj *, boolean);
@@ -69,10 +69,8 @@ static const char
     nearloadpfx[] = "You have much trouble",
     overloadpfx[] = "You have extreme difficulty";
 
-/* BUG: this lets you look at cockatrice corpses while blind without
-   touching them */
 /* much simpler version of the look-here code; used by query_classes() */
-staticfn void
+staticfn boolean
 simple_look(struct obj *otmp, /* list of objects */
             boolean here)     /* flag for type of obj list linkage */
 {
@@ -84,17 +82,29 @@ simple_look(struct obj *otmp, /* list of objects */
         impossible("simple_look(null)");
     } else if (!(here ? otmp->nexthere : otmp->nobj)) {
         pline1(doname(otmp));
+        if (otmp->where != OBJ_INVENT && will_feel_cockatrice(otmp, FALSE)) {
+            feel_cockatrice(otmp, FALSE);
+            return FALSE;
+        }
     } else {
         winid tmpwin = create_nhwindow(NHW_MENU);
 
         putstr(tmpwin, 0, "");
         do {
             putstr(tmpwin, 0, doname(otmp));
+            if (otmp->where != OBJ_INVENT
+                && will_feel_cockatrice(otmp, FALSE))
+                break;
             otmp = here ? otmp->nexthere : otmp->nobj;
         } while (otmp);
         display_nhwindow(tmpwin, TRUE);
         destroy_nhwindow(tmpwin);
+        if (otmp) {
+            feel_cockatrice(otmp, FALSE);
+            return FALSE;
+        }
     }
+    return TRUE;
 }
 
 int
@@ -213,7 +223,9 @@ query_classes(
             else if (sym == 'a')
                 *everything = TRUE;
             else if (sym == ':') {
-                simple_look(objs, here); /* dumb if objs==invent */
+                /* Stop after a dangerous touch, even if hero survives. */
+                if (!simple_look(objs, here))
+                    return FALSE;
                 /* if we just scanned the contents of a container
                    then mark it as having known contents */
                 if (objs->where == OBJ_CONTAINED)
