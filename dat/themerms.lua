@@ -264,8 +264,17 @@ themeroom_fills = {
    {
       name = "Teleportation hub",
       contents = function(rm)
-         local locs = selection.room():filter_mapchar(".");
-         for i = 1, 2 + nh.rn2(3) do
+         -- Only trap the room's interior, never the "gutter" of floor
+         -- tiles next to a wall.  Keeping the gutter clear guarantees a
+         -- trap-free walk around the perimeter between every door, so these
+         -- fixed-destination teleporters can't ring a doorway, seal the
+         -- room, and strand the hero on the wrong side of the level.
+         local floor = selection.room():filter_mapchar(".");
+         local locs = floor - floor:negate():grow("all");
+         -- never ask for more traps than there are interior tiles; a room
+         -- with no interior (smaller than 3x3, which ordinary rooms never
+         -- are) simply gets none
+         for i = 1, math.min(2 + nh.rn2(3), locs:numpoints()) do
             local pos = locs:rndcoord(1);
             if (pos.x > 0) then
                pos.x = pos.x + rm.region.x1 - 1;
