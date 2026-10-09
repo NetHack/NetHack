@@ -198,7 +198,9 @@ struct monst {
     long mlstmv;           /* for catching up with lost time */
     long mstate;           /* debugging info on monsters stored here */
     long migflags;         /* migrating flags */
-    long mspare1;
+    /* Meaningful only while mfrozen is nonzero and mcanmove is clear.
+       Reuses the former mspare1 slot without changing the save layout. */
+    long mtimed_sleep;
     struct obj *minvent;   /* mon's inventory */
     struct obj *mw;        /* mon's weapon */
     long misc_worn_check;  /* mon's wornmask */
@@ -260,6 +262,8 @@ struct monst {
 
 #define engulfing_u(mon) (u.uswallow && (u.ustuck == (mon)))
 #define helpless(mon) ((mon)->msleeping || !(mon)->mcanmove)
+#define timed_sleep(mon) \
+    ((mon)->mtimed_sleep && (mon)->mfrozen && !(mon)->mcanmove)
 
 #define mon_perma_blind(mon) (!mon->mcansee && !mon->mblinded)
 

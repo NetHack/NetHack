@@ -1214,6 +1214,7 @@ paralyze_monst(struct monst *mon, int amt)
 
     mon->mcanmove = 0;
     mon->mfrozen = amt;
+    mon->mtimed_sleep = 0;
     mon->meating = 0; /* terminate any meal-in-progress */
     mon->mstrategy &= ~STRAT_WAITFORU;
 }
@@ -1237,6 +1238,7 @@ sleep_monst(struct monst *mon, int amt, int how)
         if (amt > 0) { /* sleep for N turns */
             mon->mcanmove = 0;
             mon->mfrozen = min(amt, 127);
+            mon->mtimed_sleep = 1;
         } else { /* sleep until awakened */
             mon->msleeping = 1;
         }
