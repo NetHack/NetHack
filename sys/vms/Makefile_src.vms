@@ -35,11 +35,11 @@ WINSHIM=[-.win.shim]
 WINCHAIN=[-.win.chain]
 
 # Lua
-LUAVER=548
+#LUAVER=548
 # Lua location relative to src
-LUAINC=[-.lib.lua.lua$(LUAVER).src]
-LUALIB=[-.lib.lua]lua$(LUAVER).olb
-LUASRCDIR =[-.lib.lua.lua$(LUAVER).src]
+LUAINC=[-.nhlua.lua.src]
+LUALIB=[-.src]liblua.olb
+LUASRCDIR =[-.nhlua.lua.src]
 LUASRCINCDIR=$(LUASRCDIR)
 
 #
@@ -123,7 +123,7 @@ HACKFILES := allmain alloc apply artifact attrib ball bones botl \
 	   nhlua nhlsel nhlobj objnam o_init objects \
 	   options pager pickup pline polyself potion pray \
 	   priest quest questpgr read rect region report restore \
-	   rip rnd role rumors save selvar sfbase sfstruct \
+	   revision rip rnd role rumors save selvar sfbase sfstruct \
 	   shk shknam sit sounds \
 	   sp_lev spell stairs steal steed strutil symbols sys teleport \
 	   timeout topten track trap u_init utf8map \
@@ -303,7 +303,7 @@ $(GAMEBIN):	$(LUALIB) $(MAINOBJ) $(ALLOBJS) $(DATEOBJ)
 #		 +sys$$common:[lua.lib]liblua.olb/library
 	$(AT)$(TARGET_LINK) $(TARGET_LFLAGS) $(MAINOBJ), \
 		$(LINKOBJLIST) $(DATEOBJ) \
-		 /EXECUTABLE=$@\
+		 /EXECUTABLE=$@ \
 		 +$(LUALIB)/library
 
 hacklib.olb: $(HACKLIBOBJLIST)
@@ -313,14 +313,18 @@ hacklib.olb: $(HACKLIBOBJLIST)
 
 #$(WINLIB) $(TARGET_LIBS) $(LUALIB)
 
-$(LUALIB): [-.lib.lua]lua$(LUAVER).dir $(LUAOBJS) luaplaceholder.obj
+$(LUALIB): $(LUAOBJS) luaplaceholder.obj
 	if f$$search("$(LUALIB)").eqs."" then library/create/obj $(LUALIB)
 	library/insert/replace $(LUALIB) $(LUALIBOBJS) luaplaceholder.obj
 
 
 lapi.obj: 	$(LUASRCDIR)lapi.c
 lauxlib.obj:    $(LUASRCDIR)lauxlib.c
-lbaselib.obj: 	$(LUASRCDIR)lbaselib.c
+	$(CC) $(CFLAGS) /WARNINGS=DISABLE=(MISSINGRETURN) \
+		/define=(LUA_USE_C89) $(LUASRCDIR)lauxlib.c /OBJECT=$@
+lbaselib.obj:   $(LUASRCDIR)lbaselib.c
+	$(CC) $(CFLAGS) /WARNINGS=DISABLE=(MISSINGRETURN) \
+		/define=(LUA_USE_C89) $(LUASRCDIR)lbaselib.c /OBJECT=$@
 lcode.obj: 	$(LUASRCDIR)lcode.c
 lcorolib.obj: 	$(LUASRCDIR)lcorolib.c
 lctype.obj: 	$(LUASRCDIR)lctype.c
@@ -361,7 +365,7 @@ lzio.obj: 	$(LUASRCDIR)lzio.c
 luaplaceholder.obj: luaplaceholder.c
 	$(CC) $(CFLAGS) luaplaceholder.c /OBJECT=$@
 luaplaceholder.c:
-	@echo int placeholder = 1; >luaplaceholder.c
+	@echo "int placeholder = 1;" >luaplaceholder.c
 
 [-.lib]lua.dir:
 	create/directory [-.lib.lua]

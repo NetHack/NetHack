@@ -54,9 +54,9 @@ WINSHIM=[.win.shim]
 WINCHAIN=[.win.chain]
 
 # Lua macros
-LUAINC=[.lib.lua.lua.src]
-LUALIB=[.lib.lua]lua.olb
-LUASRCDIR =[.lib.lua.lua.src]
+LUAINC=[.nhlua.lua.src]
+LUALIB=[.src]liblua.olb
+LUASRCDIR =[.nhlua.lua.src]
 LUASRCINCDIR=$(LUASRCDIR)
 LUATESTTARGET = $(LUAINC)lua.h
 LUABASELIB = liblua.olb
@@ -149,12 +149,11 @@ all:    $(ALLDEP)
 	pipe true
 	@echo "Done."
 
-$(GAME): lua_support
-	pipe set default $(SRC) && $(MAKE) $(GAME) \
-		&& set def [-]
+$(GAME):
+	pipe set default $(SRC) && $(MAKE) $(GAME) && set def [-]
 
-lua_support: [.include]nhlua.h
-	@true
+#lua_support: [.include]nhlua.h
+#	@echo lua_support
 
 # Note: many of the dependencies below are here to allow parallel make
 # to generate valid output
@@ -239,7 +238,7 @@ title.img:
 	pipe set def $(DAT) && $(MAKE) title.img && set def [-]
 
 check-dlb: options
-	echo disabled $@
+	echo "disabled $@"
 #	@if egrep -s librarian dat/options ; then $(MAKE) dlb ; else true ; fi
 
 dlb:
@@ -261,7 +260,7 @@ recover: $(GAME)
 	pipe set def $(UTIL) && $(MAKE) recover && set def [-]
 
 dofiles:
-	echo disabled $@
+	echo "disabled $@"
 #	target=`sed -n					\
 #		-e '/librarian/{' 			\
 #		-e	's/.*/dlb/p' 			\
@@ -316,7 +315,7 @@ dofiles-nodlb:
 # customizations or such.  Unlike 'make install', it doesn't delete everything
 # from the target directory to have a clean start.
 update: $(GAME) recover $(VARDAT) spec_levs
-	echo disabled $@
+	"echo disabled $@"
 #	(don't yank the old version out from under people who're playing it)
 #	-mv $(INSTDIR)/$(GAME) $(INSTDIR)/$(GAME).old
 #	-mv $(INSTDIR)/nhdat $(INSTDIR)/nhdat.old
@@ -332,7 +331,7 @@ rootcheck:
 
 install: rootcheck $(GAME) recover $(VARDAT) spec_levs
 	true; $(PREINSTALL)
-	echo disabled $@
+	"echo disabled $@"
 # set up the directories
 # not all mkdirs have -p; those that don't will create a -p directory
 #	-if test -n '$(SHELLDIR)'; then \
@@ -355,7 +354,7 @@ install: rootcheck $(GAME) recover $(VARDAT) spec_levs
 #			chmod $(VARFILEPERM) perm record logfile xlogfile livelog )
 #	true; $(POSTINSTALL)
 # and a reminder
-#	@echo You may also want to reinstall the man pages via the doc Makefile.
+#	@echo "You may also want to reinstall the man pages via the doc Makefile."
 
 
 # 'make clean' removes all the .o files, but leaves around all the executables
