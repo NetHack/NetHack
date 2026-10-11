@@ -1,5 +1,5 @@
-#------------------------------------------------------------------------------
-# NetHack 5.0  misc $NHDT-Date: 1668359836 2022/11/13 17:17:16 $  $NHDT-Branch: NetHack-5.0 $
+#==============================================================================
+# NetHack 5.0  misc $NHDT-Date: 1791741243 2026/10/11 17:54:03 $  $NHDT-Branch: NetHack-5.0 $ $NHDT-Revision: 1.16 $
 #
 # Further set-up  for miscellaneous odds and ends (after compiler.NNN)
 #
@@ -106,5 +106,5 @@ endif  # end groff-specific
 endif  # not USE_MANDOC
 
 #end of hints/include/misc
-#------------------------------------------------------------------------------
+#==============================================================================
 

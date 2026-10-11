@@ -1,13 +1,13 @@
-#------------------------------------------------------------------------------
-# NetHack 5.0  directories $NHDT-Date: 1668359835 2022/11/13 17:17:15 $  $NHDT-Branch: NetHack-5.0 $
+#==============================================================================
+# NetHack 5.0  directories $NHDT-Date: 1791741288 2026/10/11 17:54:48 $  $NHDT-Branch: NetHack-5.0 $ $NHDT-Revision: 1.2 $
 
 ifndef WANT_SHARED_INSTALL
 PREFIX=$(abspath $(NHSROOT))
 SOURCEINSTALL=1
 
-# -----------------------------------------
+# =========================================
 # This is for the Linux source tree install
-# -----------------------------------------
+# =========================================
 ifeq "$(WHICH_OS)" "Linux"
 
 HACKDIR ?=$(PREFIX)/playground
@@ -20,9 +20,9 @@ VARDIRPERM ?= 0700
 
 else   # macOS
 #
-# -----------------------------------------
+# =========================================
 # This is for the macOS source tree install
-# -----------------------------------------
+# =========================================
 #
 # The macOS setup sets things up two different
 # ways, depending on whether an explicit
@@ -57,9 +57,9 @@ endif  # not WANT_SHARED_INSTALL
 ifneq "$(SOURCEINSTALL)" "1"
 ifdef WANT_SHARED_INSTALL
 ifeq "$(WHICH_OS)" "Linux"
-# -----------------------------------------
+# =========================================
 # This is for the Linux system-wide install
-# -----------------------------------------
+# =========================================
 
 PREFIX ?=$(wildcard ~)/nh/install
 HACKDIR ?=$(PREFIX)/games/lib/nethackdir
@@ -72,14 +72,14 @@ VARDIRPERM ?= 0755
 VARFILEPERM ?= 0600
 GAMEPERM ?= 0755
 
-# ----------------------------------
+# ==================================
 # End of Linux system-wide install
-# ----------------------------------
+# ==================================
 
 else  # macOS
-# ------------------------------------------------
+# ================================================
 # This is for the macOS system-wide shared install
-# ------------------------------------------------
+# ================================================
 
 # if $GAMEUID is root, we install into roughly
 # proper Mac locations, otherwise we install
@@ -111,13 +111,13 @@ VARDIR ?=$(HACKDIR)
 VARFILEPERM ?= 0664
 VARDIRPERM ?= 0775
 
-# ---------------------------------------
+# =======================================
 # End of macOS system-wide shared install
-# --------------------------------------
+# ======================================
 endif  # WHICH_OS?
 endif  # WANT_SHARED_INSTALL
 endif  # SOURCEINSTALL != 1
 
 #end of dirs-perms
-#--------------------------------------
+#======================================
 

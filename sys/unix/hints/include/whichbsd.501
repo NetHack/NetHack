@@ -1,5 +1,5 @@
 #=================================================================
-# NetHack 5.0  include/whichbsd $NHDT-Date: 1778861905 2026/05/15 16:18:25 $  $NHDT-Branch: NetHack-5.0 $
+# NetHack 5.0  include/whichbsd $NHDT-Date: 1791741359 2026/10/11 17:55:59 $  $NHDT-Branch: NetHack-5.0 $ $NHDT-Revision: 1.4 $
 # 
 #
 .ifdef WHICHBSD

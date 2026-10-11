@@ -1,5 +1,5 @@
-#------------------------------------------------------------------------------
-# NetHack 5.0  multiw-2 $NHDT-Date: 1599337709 2020/09/05 20:28:29 $  $NHDT-Branch: NetHack-5.0 $
+#==============================================================================
+# NetHack 5.0  multiw-2 $NHDT-Date: 1791741359 2026/10/11 17:55:59 $  $NHDT-Branch: NetHack-5.0 $ $NHDT-Revision: 1.26 $
 #
 # Sorts out support for multiple window ports (interfaces) to included in the build.
 #
@@ -13,7 +13,7 @@
 #     - WINCFLAGS
 #     - WINSRC
 #     - WINOBJ0
-#---
+#===
 # User selections could be specified as combinations of any of the following:
 # WANT_WIN_TTY=1, WANT_WIN_CURSES=1, WANT_WIN_QT=1, WANT_WIN_X11=1
 # The selections will all be linked into the same binary.
@@ -210,5 +210,5 @@ WINCFLAGS += -DNOCRASHREPORT
 endif
 
 #end of hints/include/multiw-2
-#------------------------------------------------------------------------------
+#==============================================================================
 

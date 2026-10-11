@@ -1,5 +1,5 @@
-#===============-=================================================
-# NetHack 5.0  include/cross-post $NHDT-Date: 1597332785 2020/08/13 15:33:05 $  $NHDT-Branch: NetHack-5.0 $
+#=================================================================
+# NetHack 5.0  include/cross-post $NHDT-Date: 1791741376 2026/10/11 17:56:16 $  $NHDT-Branch: NetHack-5.0 $ $NHDT-Revision: 1.101 $
 #
 # Cross-compiling -POST section
 
@@ -575,7 +575,7 @@ $(GAMEBIN) : $(HOBJ) $(DATE_O) $(TARGET_HACKLIB) $(LUACROSSLIB)
 	$(TARGET_LINK) $(TARGET_LFLAGS) -o $(GAMEBIN) \
 	$(HOBJ) $(DATE_O) $(TARGET_HACKLIB) $(LUACROSSLIB) $(WINLIB) $(TARGET_LIBS)
 
-# --- PPC UI resource compiles (mirror of the 68k rules) ---
+# === PPC UI resource compiles (mirror of the 68k rules) ===
 $(TARGETPFX)nhvers.rsrc : ../sys/mac68k/nhvers.r
 	@mkdir -p $(dir $@)
 	$(RETRO68)/bin/Rez ../sys/mac68k/nhvers.r -I $(RETRO68)/multiversal/RIncludes -o $@
@@ -591,7 +591,7 @@ $(TARGETPFX)nhmenus.rsrc : ../sys/mac68k/nhmenus.r ../sys/mac68k/nhtitle.r
 $(TARGETPFX)nhcfrg.rsrc : ../sys/mac68k/nhcfrg.r
 	@mkdir -p $(dir $@)
 	$(RETRO68)/bin/Rez ../sys/mac68k/nhcfrg.r -I $(RETRO68)/multiversal/RIncludes -o $@
-# --- Recover helper (PPC): link XCOFF; MakePEF happens in the pkg recipe ---
+# === Recover helper (PPC): link XCOFF; MakePEF happens in the pkg recipe ===
 $(TARGETPFX)mrecover.o: ../sys/mac68k/mrecover.c
 	$(TARGET_CC) $(TARGET_CFLAGS) -o $@ ../sys/mac68k/mrecover.c
 $(TARGETPFX)Recover.xcoff: $(TARGETPFX)mrecover.o
@@ -683,7 +683,7 @@ macppcpkg: $(GAMEBIN) $(TARGETPFX)Recover.xcoff \
 	@test -f $(TARGETPFX)NetHack.sit && \
 	  echo "StuffIt: $(TARGETPFX)NetHack.sit" || true
 
-# --- Fat (68k + PowerPC) binary -----------------------------------------
+# === Fat (68k + PowerPC) binary =========================================
 # One app whose resource fork holds the 68k CODE/DATA/RELA + a cfrg + the
 # shared UI resources, and whose data fork holds the PPC PEF.  68k Macs run
 # the CODE resources; PowerPC Macs see the cfrg and run the PEF natively.
@@ -1000,4 +1000,4 @@ $(TARGETPFX)pdcutil.o : $(PDCPORT)/pdcutil.c
 endif  # BUILD_PDCURSES
 #
 # End of cross-compiling -POST section
-#===============-=================================================
+#=================================================================
