@@ -1,5 +1,5 @@
 #==============================================================================
-# NetHack 5.0  multiw-2 $NHDT-Date: 1791245096 2026/10/06 00:04:56 $  $NHDT-Branch: keni-headercleanup $ $NHDT-Revision: 1.25 $
+# NetHack 5.0  multiw-2 $NHDT-Date: 1791741359 2026/10/11 17:55:59 $  $NHDT-Branch: NetHack-5.0 $ $NHDT-Revision: 1.26 $
 #
 # Sorts out support for multiple window ports (interfaces) to included in the build.
 #

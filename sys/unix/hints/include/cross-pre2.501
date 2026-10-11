@@ -1,5 +1,5 @@
 #=================================================================
-# NetHack 5.0  include/cross-pre2 $NHDT-Date: 1791245095 2026/10/06 00:04:55 $  $NHDT-Branch: keni-headercleanup $ $NHDT-Revision: 1.120 $
+# NetHack 5.0  include/cross-pre2 $NHDT-Date: 1791741331 2026/10/11 17:55:31 $  $NHDT-Branch: NetHack-5.0 $ $NHDT-Revision: 1.121 $
 #
 # Cross-compiling -PRE section 2
 #

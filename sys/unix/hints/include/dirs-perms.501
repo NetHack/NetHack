@@ -1,5 +1,5 @@
 #==============================================================================
-# NetHack 5.0  directories $NHDT-Date: 1791245095 2026/10/06 00:04:55 $  $NHDT-Branch: keni-headercleanup $ $NHDT-Revision: 1.1 $
+# NetHack 5.0  directories $NHDT-Date: 1791741288 2026/10/11 17:54:48 $  $NHDT-Branch: NetHack-5.0 $ $NHDT-Revision: 1.2 $
 
 ifndef WANT_SHARED_INSTALL
 PREFIX=$(abspath $(NHSROOT))

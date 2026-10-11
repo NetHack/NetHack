@@ -1,5 +1,5 @@
 #==============================================================================
-# NetHack 5.0  multiw-1 $NHDT-Date: 1791245096 2026/10/06 00:04:56 $  $NHDT-Branch: keni-headercleanup $ $NHDT-Revision: 1.6 $
+# NetHack 5.0  multiw-1 $NHDT-Date: 1791741358 2026/10/11 17:55:58 $  $NHDT-Branch: NetHack-5.0 $ $NHDT-Revision: 1.7 $
 
 # 1. Which windowing interface(s) should be included in this binary?
 # One or more of these can be manually uncommented and/or can be specified

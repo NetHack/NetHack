@@ -1,5 +1,5 @@
 #==============================================================================
-# NetHack 5.0  multisnd2-pre $NHDT-Date: 1791245096 2026/10/06 00:04:56 $  $NHDT-Branch: keni-headercleanup $ $NHDT-Revision: 1.4 $
+# NetHack 5.0  multisnd2-pre $NHDT-Date: 1791741287 2026/10/11 17:54:47 $  $NHDT-Branch: NetHack-5.0 $ $NHDT-Revision: 1.5 $
 #
 
 ifdef NEEDS_WAV
