@@ -57,7 +57,7 @@ staticfn void tipcontainer(struct obj *);
 #define FOLLOW(curr, flags) \
     (((flags) & BY_NEXTHERE) ? (curr)->nexthere : (curr)->nobj)
 
-#define GOLD_WT(n) (((n) + 50L) / 100L)
+#define GOLD_WT(n) ((n) > 0L ? max(((n) + 50L) / 100L, 1L) : 0L)
 /* if you can figure this out, give yourself a hearty pat on the back... */
 #define GOLD_CAPACITY(w, n) (((w) * -100L) - ((n) + 50L) - 1L)
 
