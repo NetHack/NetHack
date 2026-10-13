@@ -92,6 +92,7 @@ alias rings of constitution, strength, and damage, spellbook/scroll of
 	identification, amulet of flight
 pets left on another level no longer have their hunger postponed by the
 	time spent away
+make probing reveal egg type in inventory
 
 
 Platform- and/or Interface-Specific Fixes

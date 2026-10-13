@@ -617,7 +617,7 @@ probe_objchain(struct obj *otmp)
             otmp->lknown = 1;
             if (!SchroedingersBox(otmp))
                 otmp->cknown = 1;
-        } else if (otmp->otyp == TIN)
+        } else if (otmp->otyp == TIN || otmp->otyp == EGG)
             otmp->known = 1;
     }
 }
