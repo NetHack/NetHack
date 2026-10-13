@@ -191,7 +191,13 @@ Resists_Elem(struct monst *mon, int propindx)
                    we check both so won't need to know which one that is */
                 && o->otyp == ALCHEMY_SMOCK
                 && (propindx == POISON_RES || propindx == ACID_RES))
-            || (o->oartifact && defends_when_carried(damgtype, o)))
+            || (o->oartifact && defends_when_carried(damgtype, o))
+            || ((o->owornmask & W_ARM) != 0L
+                /* similar to aprons, yellow dragon scale (mail) also confers two resistances
+                   so we check stoning resistance here */
+                && propindx == STONE_RES
+                && defends(AD_STON, o)))
+
             return TRUE;
     return FALSE;
 }
