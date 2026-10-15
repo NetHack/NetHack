@@ -281,6 +281,7 @@ X11: remove the limit on the number of widgets managed in winlabel.c; it was
 	display tabs produced by the unpaid inventory command
 	(pr #1668 by chasonr)
 Unix: don't complain about MAXPLAYERS with unknown command line param
+Qt: menus and toolbar buttons did not work correctly with ext cmd filtering
 
 
 General New Features
