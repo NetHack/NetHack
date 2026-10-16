@@ -2,6 +2,8 @@ NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.36 $ $NHDT-Date: 1781062909 2026/06
 	
 General Fixes and Modified Features
 -----------------------------------
+recognize timed monster sleep when checking resistance to light-induced
+	blindness, without treating paralysis or armor delays as sleep
 fix some cross-compile package filenames that still referenced 370 instead
 	of 500
 Use NHV macro (NHV=500) for filenames in Makefiles and/or hints files to make
