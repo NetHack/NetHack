@@ -95,6 +95,7 @@ pets left on another level no longer have their hunger postponed by the
 make probing reveal egg type in inventory
 prevent monster spawning in Fort Ludios treasure vaults
 fix level gain maxhp change when polymorphed
+make #wizlevelteleport accept special level proto name
 
 
 Platform- and/or Interface-Specific Fixes
