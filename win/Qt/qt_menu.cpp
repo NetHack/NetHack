@@ -115,20 +115,29 @@ QSize NetHackQtMenuListBox::sizeHint() const
     return QSize(TotalWidth() + vsize, TotalHeight() + hsize);
 }
 
-//
-//  FIXME:
-//      Inventory displays reuse the same menu window and so far this
-//      is not updating the size as intended.  The size of the first
-//      instance persists.
-//
-
 // resize current menu window and the table (rows of entries) inside it
 void NetHackQtMenuWindow::MenuResize()
 {
-    // when this was just 'adjustSize()', our sizeHints() was not
-    // being called so explicitly indicate the table widget
-    table->adjustSize();
-    this->adjustSize();
+    // The layout caches the table's size hint and nothing invalidated
+    // that cache when the contents changed, so a reused window (the
+    // core's WIN_INVEN) kept the size of the first menu shown in it.
+    // Invalidate explicitly, then size from the fresh hint.  Resizing
+    // here instead of via adjustSize() also drops the latter's
+    // two-thirds-of-screen cap, which is too small for a long inventory
+    // in a large font.
+    table->updateGeometry();
+    if (layout())
+        layout()->invalidate();
+    QSize want = sizeHint();
+#if QT_VERSION < 0x060000
+    QRect avail = QApplication::desktop()->availableGeometry(this);
+#else
+    QRect avail = screen()->availableGeometry();
+#endif
+    int maxw = avail.width() * 9 / 10, maxh = avail.height() * 9 / 10;
+    if (want.height() > maxh) // vertical scroll bar will be needed
+        want.rwidth() += table->verticalScrollBar()->sizeHint().width();
+    resize(std::min(want.width(), maxw), std::min(want.height(), maxh));
 
     // Temporary? workaround for scrolling becoming wedged if using
     // all/none/invert removes all counts so we narrow a non-empty
@@ -1126,7 +1135,16 @@ void NetHackQtTextWindow::Display(bool block UNUSED)
         showNormal();
     } else {
 	move(0, 0);
-	adjustSize();
+	// size to content, capped at 90% of the screen rather than
+	// adjustSize()'s two thirds
+	QSize want = sizeHint();
+#if QT_VERSION < 0x060000
+	QRect avail = QApplication::desktop()->availableGeometry(this);
+#else
+	QRect avail = screen()->availableGeometry();
+#endif
+	resize(std::min(want.width(), avail.width() * 9 / 10),
+	       std::min(want.height(), avail.height() * 9 / 10));
 	centerOnMain(this);
 	show();
     }
