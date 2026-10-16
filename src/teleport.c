@@ -1179,7 +1179,7 @@ level_tele(void)
                  || !svd.dungeons[newlevel.dnum].num_dunlevs);
         newlevel.dlevel = 1 + rn2(dunlevs_in_dungeon(&newlevel));
         assign_level(&u.ucamefrom, &u.uz);
-        schedule_goto(&newlevel, UTOTYPE_NONE, (char *) 0, (char *) 0);
+        schedule_goto(&newlevel, UTOTYPE_LEVEL_TELE, (char *) 0, (char *) 0);
         return;
     }
     if ((u.uhave.amulet || In_endgame(&u.uz) || In_sokoban(&u.uz))
@@ -1314,7 +1314,7 @@ level_tele(void)
         }
         newlevel.dnum = u.uz.dnum;
         newlevel.dlevel = llimit + newlev;
-        schedule_goto(&newlevel, UTOTYPE_NONE, (char *) 0, (char *) 0);
+        schedule_goto(&newlevel, UTOTYPE_LEVEL_TELE, (char *) 0, (char *) 0);
         return;
     }
 
@@ -1423,7 +1423,7 @@ level_tele(void)
         }
     }
 
-    schedule_goto(&newlevel, UTOTYPE_NONE, (char *) 0,
+    schedule_goto(&newlevel, UTOTYPE_LEVEL_TELE, (char *) 0,
                   flags.verbose ? "You materialize on a different level!"
                                 : (char *) 0);
 #if 0   /* always wait until end of turn to change level, otherwise code
