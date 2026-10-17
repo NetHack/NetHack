@@ -3152,9 +3152,7 @@ default_checkinput(
              * advantage and do a game checkpoint,
              * then resume the wait.
              */
-#ifdef INSURANCE
-            save_currentstate();
-#endif  /* INSURANCE */
+            do_idlecheckpoint();
             done_a_checkpoint = TRUE;
         } else
         {

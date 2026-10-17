@@ -805,6 +805,7 @@ struct sinfo {
     int in_role_selection;      /* role/race/&c selection menus in progress */
     int in_getlin;              /* inside interface getlin routine */
     int in_sanity_check;        /* for impossible() during sanity checking */
+    int in_idlecheckpoint;      /* an input timeout has triggered idlecheckpoint */
     int config_error_ready;     /* config_error_add is ready, available */
     int beyond_savefile_load;   /* set when past savefile loading */
     int savefile_completed;     /* savefile has completed writing */

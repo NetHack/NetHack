@@ -687,9 +687,7 @@ qt_timer_fire(void)
          * advantage and do a game checkpoint,
          * then resume the wait.
          */
-#if defined(INSURANCE)
-        save_currentstate();
-#endif /* INSURANCE */
+        do_idlecheckpoint();
     }
     if (qt_input_timer->isActive())
         qt_input_timer->stop();

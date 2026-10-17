@@ -512,17 +512,17 @@ savelev_core(NHFILE *nhfp, xint8 lev)
      */
     if (nhfp->mode != FREEING) {
         /* WRITING (probably ORed with FREEING), or COUNTING */
-
-        /* purge any dead monsters (necessary if we're starting
-           a panic save rather than a normal one, or sometimes
-           when changing levels without taking time -- e.g.
-           create statue trap then immediately level teleport) */
-        if (iflags.purge_monsters)
-            dmonsfree();
-        /* clear objs_deleted list too */
-        if (go.objs_deleted)
-            dobjsfree(); /* really free deleted objects */
-
+        if (!program_state.in_idlecheckpoint) {
+            /* purge any dead monsters (necessary if we're starting
+               a panic save rather than a normal one, or sometimes
+               when changing levels without taking time -- e.g.
+               create statue trap then immediately level teleport) */
+            if (iflags.purge_monsters)
+                dmonsfree();
+            /* clear objs_deleted list too */
+            if (go.objs_deleted)
+                dobjsfree(); /* really free deleted objects */
+        }
         if (lev >= 0 && lev <= maxledgerno())
             svl.level_info[lev].flags |= VISITED;
         Sfo_int(nhfp, &svh.hackpid, "gamestate-hackpid");
