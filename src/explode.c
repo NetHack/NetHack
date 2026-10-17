@@ -209,8 +209,7 @@ explode(
     boolean visible, any_shield;
     int uhurt = 0, /* 0=unhurt, 1=items damaged, 2=you and items damaged */
         do_hallu = 0;
-    const char *str = (const char *) 0;
-    char *unmorphed_str = (char *) 0;
+    const char *str = (const char *) 0, *unmorphed_str = (const char *) 0;
     struct monst *mtmp, *mdef = 0;
     uchar adtyp;
     int explmask[3][3]; /* 0=normal explosion, 1=do shieldeff, 2=do nothing */
