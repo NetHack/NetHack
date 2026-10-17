@@ -1222,6 +1222,7 @@ level_tele(void)
             if (wizard && (protolev = find_level(buf)) != 0) {
                 newlevel.dnum = protolev->dlevel.dnum;
                 newlevel.dlevel = protolev->dlevel.dlevel;
+                newlev = depth(&u.uz);
                 force_dest = TRUE;
             } else if (wizard && !strcmp(buf, "?")) {
                 schar destlev;
