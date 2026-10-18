@@ -2505,9 +2505,7 @@ set_mimic_sym(struct monst *mtmp)
                 otmp = mkobj((char) s_sym, FALSE);
                 appear = otmp->otyp;
                 /* make sure container contents are free'ed */
-                gw.whitelist_shk |= 0x02;
                 obfree(otmp, (struct obj *) 0);
-                gw.whitelist_shk &= ~0x02;
             }
         }
     }
