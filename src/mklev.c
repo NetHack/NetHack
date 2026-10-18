@@ -1408,8 +1408,10 @@ makelevel(void)
         for (croom = svr.rooms; croom->hx > 0; croom++) {
             boolean fillable = ROOM_IS_FILLABLE(croom);
 
+            gw.whitelist_shk |= 0x02;
             fill_ordinary_room(croom,
                                fillable && bonus_item_room_countdown == 0);
+            gw.whitelist_shk &= ~0x02;
             if (fillable)
                 --bonus_item_room_countdown;
         }
@@ -1417,7 +1419,9 @@ makelevel(void)
     /* Fill all special rooms now, regardless of whether this is a special
      * level, proto level, or ordinary level. */
     for (i = 0; i < svn.nroom; ++i) {
+        gw.whitelist_shk |= 0x04;
         fill_special_room(&svr.rooms[i]);
+        gw.whitelist_shk &= ~0x04;
     }
     level_status.shkready = 1;
     themerooms_post_level_generate();
