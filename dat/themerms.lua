@@ -281,12 +281,16 @@ themeroom_fills = {
    {
       name = "Meat",
       contents = function(rm)
-         local meats = { "meatball", "meatball", "meat stick", "enormous meatball" };
+         local meats = { "meatball", "meatball", "meat ring",
+                         "meat stick", "enormous meatball" };
          local i = d(5, 5);
          while (i > 0) do
             local meatidx = math.random(#meats);
             des.object({ id = meats[meatidx] });
             i = i - meatidx;
+         end
+         if (nh.level_difficulty() > 8 and percent(75)) then
+            des.monster({ id = "flesh golem", waiting = true });
          end
       end,
    },
