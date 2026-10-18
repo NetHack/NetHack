@@ -831,7 +831,9 @@ static const struct instance_globals_w g_init_w = {
     UNDEFINED_PTR, /* wportal */
     /* new */
     { wdmode_traditional, NO_COLOR },       /* wsettings */
-    0L,                                     /* were.c, allmain.c */
+    /* were.c, allmain.c */
+    0L,                                     /* were_changes */
+    0L,                                     /* whitelist_shk */
     TRUE, /* havestate*/
 };
 

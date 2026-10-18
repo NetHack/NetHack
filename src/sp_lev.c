@@ -2342,12 +2342,14 @@ create_object(object *o, struct mkroom *croom)
     }
     /* container */
     if (o->containment & SP_OBJ_CONTAINER) {
+        gw.whitelist_shk |= 1;
         delete_contents(otmp);
         if (container_idx < MAX_CONTAINMENT) {
             container_obj[container_idx] = otmp;
             container_idx++;
         } else
             impossible("create_object: too deeply nested containers.");
+        gw.whitelist_shk &= ~1;
     }
 
     /* Medusa level special case: statues are petrified monsters, so they
