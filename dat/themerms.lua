@@ -277,6 +277,20 @@ themeroom_fills = {
          end
       end,
    },
+
+   {
+      name = "Meat",
+      contents = function(rm)
+         local meats = { "meatball", "meatball", "meat stick", "enormous meatball" };
+         local i = d(5, 5);
+         while (i > 0) do
+            local meatidx = math.random(#meats);
+            des.object({ id = meats[meatidx] });
+            i = i - meatidx;
+         end
+      end,
+   },
+
 };
 
 themerooms = {

@@ -96,6 +96,7 @@ make probing reveal egg type in inventory
 prevent monster spawning in Fort Ludios treasure vaults
 fix level gain maxhp change when polymorphed
 make #wizlevelteleport accept special level proto name
+add meat theme room
 
 
 Platform- and/or Interface-Specific Fixes
