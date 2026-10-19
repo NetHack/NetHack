@@ -2796,6 +2796,12 @@ immune_to_trap(struct monst *mon, unsigned ttype)
     pm = mon->data;
     is_you = (mon == &gy.youmonst);
 
+    /* Match dotrap()/mintrap(): flying and levitation bypass
+       floor-triggered traps, except for Sokoban pits and holes. */
+    if (floor_trigger(ttype) && check_in_air(mon, 0U)
+        && !(Sokoban && (is_pit(ttype) || is_hole(ttype))))
+        return TRAP_CLEARLY_IMMUNE;
+
     switch (ttype) {
     case ARROW_TRAP:
     case DART_TRAP:
@@ -3006,6 +3012,13 @@ dotrap(struct trap *trap, unsigned trflags)
             plunged = (trflags & TOOKPLUNGE) != 0,
             conj_pit = conjoined_pits(trap, t_at(u.ux0, u.uy0), TRUE),
             adj_pit = adj_nonconjoined_pit(trap);
+
+    /* Flying or levitating over a floor trap does not activate it.
+       During travel, preserve the route and omit the per-trap message. */
+    if (svc.context.run == 8 && !forcetrap
+        && !(Sokoban && (is_pit(ttype) || is_hole(ttype)))
+        && floor_trigger(ttype) && check_in_air(&gy.youmonst, trflags))
+        return;
 
     nomul(0);
 
