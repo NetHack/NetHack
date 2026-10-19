@@ -97,6 +97,7 @@ prevent monster spawning in Fort Ludios treasure vaults
 fix level gain maxhp change when polymorphed
 make #wizlevelteleport accept special level proto name
 add meat theme room
+fix tknown handling for boxes known not to be trapped
 
 
 Platform- and/or Interface-Specific Fixes

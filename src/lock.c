@@ -121,7 +121,7 @@ picklock(void)
                 alreadyunlocked = !(gx.xlock.door->doormask & D_LOCKED);
             } else {
                 gx.xlock.box->otrapped = 0;
-                gx.xlock.box->tknown = 0;
+                gx.xlock.box->tknown = 1; /* known not trapped */
                 what = (gx.xlock.box->otyp == CHEST) ? "chest" : "box";
                 alreadyunlocked = !gx.xlock.box->olocked;
             }
