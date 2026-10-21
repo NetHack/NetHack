@@ -52,63 +52,63 @@ SRCDIR = $(NHSROOT)/src
 
 # flags may have to be changed as required
 # flags for 286 Xenix:
-# CFLAGS = -Ml2t16 -O -LARGE -I../include
+# CFLAGS = -Ml2t16 -O -LARGE -I../include -I../nhlua/lua/src
 # LFLAGS = -Ml -F 4000 -SEG 512
 
 # flags for 286 Microport SysV-AT
-# CFLAGS = -DDUMB -Ml -I../include
+# CFLAGS = -DDUMB -Ml -I../include -I../nhlua/lua/src
 # LFLAGS = -Ml
 
 # flags for Atari GCC (3.2.1)
 # CFLAGS = -O -I../include
 # LFLAGS = -s
 # flags for Atari GCC (3.3)
-# CFLAGS = -mshort -O2 -I../include
+# CFLAGS = -mshort -O2 -I../include -I../nhlua/lua/src
 # LFLAGS = -mshort -s
 
 # flags for Apollos using their native cc
 # (as long as it claims to be __STDC__ but isn't)
-# CFLAGS = -DAPOLLO -O -I../include
+# CFLAGS = -DAPOLLO -O -I../include -I../nhlua/lua/src
 
 # flags for AIX 3.1 cc on IBM RS/6000 to define
 # a suitable subset of standard libraries
 # (note that there is more info regarding the "-qchars=signed"
 # switch in file Install.unx note 8)
-# CFLAGS = -D_NO_PROTO -D_XOPEN_SOURCE -O -I../include -qchars=signed
+# CFLAGS = -D_NO_PROTO -D_XOPEN_SOURCE -O -I../include -I../nhlua/lua/src -qchars=signed
 # and for AIX 3.2:
-# CFLAGS = -D_NO_PROTO -D_XOPEN_SOURCE -D_ALL_SOURCE -O -I../include -qchars=signed
+# CFLAGS = -D_NO_PROTO -D_XOPEN_SOURCE -D_ALL_SOURCE -O -I../include -I../nhlua/lua/src -qchars=signed
 
 # flags for A/UX 2.01 using native cc or c89
 # gcc predefines AUX so that's not needed there
-# CFLAGS = -ZS -D_POSIX_SOURCE -O -I../include -DAUX
+# CFLAGS = -ZS -D_POSIX_SOURCE -O -I../include -I../nhlua/lua/src -DAUX
 
 # flags for IRIX 4.0.x using native cc
 # SGI cc 3.10 will fail to compile makedefs with -O
-# CFLAGS = -I../include -D__STDC__ -woff 100,293
+# CFLAGS = -I../include -I../nhlua/lua/src -D__STDC__ -woff 100,293
 
 # flags for Linux
 #   compile normally
-# CFLAGS = -O2 -fomit-frame-pointer -I../include
+# CFLAGS = -O2 -fomit-frame-pointer -I../include -I../nhlua/lua/src
 # LFLAGS = -L/usr/lib64
 #   OR compile backwards compatible a.out format
-# CFLAGS = -O2 -b i486-linuxaout -fomit-frame-pointer -I../include
+# CFLAGS = -O2 -b i486-linuxaout -fomit-frame-pointer -I../include -I../nhlua/lua/src
 # LFLAGS = -b i486-linuxaout -L/usr/X11R6/lib
 
 # flags for BeOS using the command line
 #   BeOS on a Mac/BeBox:
 #CC = mwcc
-#CFLAGS = -I../include
+#CFLAGS = -I../include -I../nhlua/lua/src
 #   BeOS on Intel:
 # the default values are fine
 
 # flags for debugging:
-# CFLAGS = -g -I../include
+# CFLAGS = -g -I../include -I../nhlua/lua/src
 
-#CFLAGS = -O -I../include
+#CFLAGS = -O -I../include -I../nhlua/lua/src
 #LFLAGS =
 
 #fallback defaults if not set
-CFLAGS ?= -I../include
+CFLAGS ?= -I../include -I../nhlua/lua/src
 
 # -lm required by Lua
 LFLAGS += -lm

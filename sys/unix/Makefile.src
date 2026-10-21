@@ -106,18 +106,18 @@ SYSOBJ ?= $(TARGETPFX)ioctl.o $(TARGETPFX)unixmain.o $(TARGETPFX)unixtty.o \
 
 # flags may have to be changed as required
 # flags for 286 Xenix:
-# CFLAGS = -Ml2t16 -O -LARGE -I../include
+# CFLAGS = -Ml2t16 -O -LARGE -I../include -I../nhlua/lua/src
 # LFLAGS = -Ml -F 4000 -SEG 512
 
 # flags for 286 Microport SysV-AT
-# CFLAGS = -DDUMB -Ml -I../include
+# CFLAGS = -DDUMB -Ml -I../include -I../nhlua/lua/src
 # LFLAGS = -Ml
 
 # flags for Atari gcc (3.2.1)
-# CFLAGS = -O -I../include
+# CFLAGS = -O -I../include -I../nhlua/lua/src
 # LFLAGS = -s
 # flags for Atari gcc (3.3)
-# CFLAGS = -mshort -O2 -fomit-frame-pointer -I../include
+# CFLAGS = -mshort -O2 -fomit-frame-pointer -I../include -I../nhlua/lua/src
 # LFLAGS = -mshort -s
 
 # Curses, use one of the following:
@@ -129,51 +129,51 @@ SYSOBJ ?= $(TARGETPFX)ioctl.o $(TARGETPFX)unixmain.o $(TARGETPFX)unixtty.o \
 # a suitable subset of standard libraries
 # (note that there is more info regarding the "-qchars=signed"
 # switch in file Install.unx note 8)
-# CFLAGS = -D_NO_PROTO -D_XOPEN_SOURCE -O -I../include -qchars=signed
+# CFLAGS = -D_NO_PROTO -D_XOPEN_SOURCE -O -I../include -I../nhlua/lua/src -qchars=signed
 #
 # Some of our subroutines are complex enough that this is required for full
 # optimization under AIX 3.2 (I don't know about 3.1).
 #
-# CFLAGS = -D_NO_PROTO -D_XOPEN_SOURCE -D_ALL_SOURCE -O -I../include -qchars=signed -qmaxmem=5000
+# CFLAGS = -D_NO_PROTO -D_XOPEN_SOURCE -D_ALL_SOURCE -O -I../include -I../nhlua/lua/src -qchars=signed -qmaxmem=5000
 
 # flags for A/UX 2.01 using native cc or c89
 # gcc predefines AUX so that's not needed there
 # Remember to use -lcurses for WINLIB below !
-# CFLAGS = -ZS -D_POSIX_SOURCE -O -I../include -DAUX
+# CFLAGS = -ZS -D_POSIX_SOURCE -O -I../include -I../nhlua/lua/src -DAUX
 
 # flags for IRIX 4.0.x using native cc
 # The include files are __STDC__, but have bugs involving const
-# CFLAGS = -O -I../include -D__STDC__ -Dconst= -woff 100,293
+# CFLAGS = -O -I../include -I../nhlua/lua/src -D__STDC__ -Dconst= -woff 100,293
 # LFLAGS = -s
 
 # flags for BSD/OS 2.0
-# CFLAGS = -O -I../include -I/usr/X11/include
+# CFLAGS = -O -I../include -I../nhlua/lua/src -I/usr/X11/include
 # LFLAGS = -L/usr/X11/lib
 
 # flags for Linux
 #   compile normally
-# CFLAGS = -O2 -fomit-frame-pointer -I../include
+# CFLAGS = -O2 -fomit-frame-pointer -I../include -I../nhlua/lua/src
 # LFLAGS = -L/usr/lib64
 #   OR compile backwards compatible a.out format
-# CFLAGS = -O2 -b i486-linuxaout -fomit-frame-pointer -I../include
+# CFLAGS = -O2 -b i486-linuxaout -fomit-frame-pointer -I../include -I../nhlua/lua/src
 # LFLAGS = -b i486-linuxaout -L/usr/X11R6/lib
 
 # flags for BeOS
 #   on a Mac/BeBox:
 #CC = mwcc
-#CFLAGS = -r -I../include
+#CFLAGS = -r -I../include -I../nhlua/lua/src
 #LINK = mwld
 #LFLAGS = -map nethack.xMAP
 #   on Intel:
-#CFLAGS = -O -I../include
+#CFLAGS = -O -I../include -I../nhlua/lua/src
 #LINK = gcc
 #LFLAGS = -Xlinker -soname=_APP_
 
 # Compile with PDCurses installed in a separate directory that doesn't
 # conflict with the system curses/ncurses library
-#CFLAGS = -O -I../include -I/usr/local/include/pdcurses
+#CFLAGS = -O -I../include -I../nhlua/lua/src -I/usr/local/include/pdcurses
 # Same as above, but for XCurses
-#CFLAGS = -O -DXCURSES -I../include -I/usr/local/include/pdcurses
+#CFLAGS = -O -DXCURSES -I../include -I../nhlua/lua/src -I/usr/local/include/pdcurses
 # Compile against system curses library, such as ncurses
 #CFLAGS = -O -I../include
 #
@@ -184,13 +184,13 @@ SYSOBJ ?= $(TARGETPFX)ioctl.o $(TARGETPFX)unixmain.o $(TARGETPFX)unixtty.o \
 #X11CFLAGS=
 
 # flags for debugging:
-# CFLAGS = -g -I../include
+# CFLAGS = -g -I../include -I../nhlua/lua/src
 
-#CFLAGS = -O -I../include
+#CFLAGS = -O -I../include -I../nhlua/lua/src
 #LFLAGS =
 
 #fallback values, only if these are not already set
-CFLAGS ?= -I../include
+CFLAGS ?= -I../include -I../nhlua/lua/src
 LINK ?= $(CC)
 
 AR ?= ar
