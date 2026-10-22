@@ -924,14 +924,17 @@ savemonchn(NHFILE *nhfp, struct monst *mtmp)
 
     while (mtmp) {
         mtmp2 = mtmp->nmon;
-        if (update_file(nhfp)) {
+        if (update_file(nhfp)
+            /* during idlecheckpoint, dmonsfree() intentionally does not run,
+               so we need to skip the writing of any dead monsters */
+            && !(program_state.in_idlecheckpoint && DEADMONSTER(mtmp))) {
             mtmp->mnum = monsndx(mtmp->data);
             if (mtmp->ispriest)
                 forget_temple_entry(mtmp); /* EPRI() */
             savemon(nhfp, mtmp);
+            if (mtmp->minvent)
+                saveobjchn(nhfp, &mtmp->minvent);
         }
-        if (mtmp->minvent)
-            saveobjchn(nhfp, &mtmp->minvent);
         if (release_data(nhfp)) {
             if (mtmp == svc.context.polearm.hitmon) {
                 svc.context.polearm.m_id = mtmp->m_id;
