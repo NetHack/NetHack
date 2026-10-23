@@ -1293,7 +1293,7 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
     int tim_tmp;
     struct obj *otmp2, *nextobj;
     int i;
-    boolean physical_damage = FALSE;
+    boolean physical_damage = FALSE, total_digestion = FALSE;
 
     if (!u.uswallow) { /* swallows you */
         int omx = mtmp->mx, omy = mtmp->my;
@@ -1423,6 +1423,7 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
             u.uswldtim = 0;
             tmp = 0;
         } else if (u.uswldtim == 0) {
+            total_digestion = TRUE;
             pline("%s totally digests you!", Monnam(mtmp));
             tmp = u.uhp;
             if (Half_physical_damage)
@@ -1548,7 +1549,7 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
 
     if (physical_damage) {
         /* same damage reduction for AC as in hitmu */
-        if (u.uac < 0)
+        if (u.uac < 0 && !total_digestion)
             tmp -= rnd(-u.uac);
         if (tmp < 0)
             tmp = 1;
