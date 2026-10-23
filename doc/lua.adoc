@@ -736,8 +736,8 @@ the map are not relative to it.
 | parameter | description
 | x, y      | Coordinates on the level.
 | coord     | Coordinates in table format.
-| halign    | Horizontal alignment on a rough 3x3 grid.
-| valign    | Vertical alignment on a rough 3x3 grid.
+| halign    | Horizontal alignment on a rough 5x3 grid, one of "left", "half-left", "center", "half-right", "right", or "none"
+| valign    | Vertical alignment on a rough 5x3 grid, one of "top", "center", "bottom", or "none"
 | map       | Multi-line string describing the map. See <<_map_characters>>
 | lit       | Boolean. Are the map grids lit? Default is false.
 | contents  | A function called with one parameter, a table with "width" and "height", the map width and height. All coordinates in the function will be relative to the map.

@@ -98,6 +98,7 @@ fix level gain maxhp change when polymorphed
 make #wizlevelteleport accept special level proto name
 add meat theme room
 fix tknown handling for boxes known not to be trapped
+change the monk quest locate level
 
 
 Platform- and/or Interface-Specific Fixes
