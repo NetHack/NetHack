@@ -3823,8 +3823,7 @@ stolen_value(
             value += get_pricing_units(obj) * get_cost(obj, shkp);
 
         if (Has_contents(obj)) {
-            boolean ininv =
-                (obj->where == OBJ_INVENT || obj->where == OBJ_FREE);
+            boolean ininv = obj->where == OBJ_INVENT;
 
             value += stolen_container(obj, shkp, 0L, ininv);
             if (!ininv)
