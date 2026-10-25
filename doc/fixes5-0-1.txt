@@ -99,6 +99,7 @@ make #wizlevelteleport accept special level proto name
 add meat theme room
 fix tknown handling for boxes known not to be trapped
 change the monk quest locate level
+fix travel using up turns trying to displace pet that cannot move
 
 
 Platform- and/or Interface-Specific Fixes
