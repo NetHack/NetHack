@@ -52,6 +52,7 @@ staticfn void dofiretrap(struct obj *);
 staticfn void domagictrap(void);
 staticfn void pot_acid_damage(struct obj *, boolean, boolean);
 staticfn boolean emergency_disrobe(boolean *);
+staticfn boolean lava_protected(unsigned, unsigned *, int);
 staticfn int untrap_prob(struct trap *);
 staticfn void move_into_trap(struct trap *);
 staticfn int try_disarm(struct trap *, boolean);
@@ -6797,6 +6798,19 @@ unconscious(void)
 
 static const char lava_killer[] = "molten lava";
 
+/* lava_effects(): is oid one of the items a caller had in use when the
+   hero fell in, which it expects to still hold afterwards? */
+staticfn boolean
+lava_protected(unsigned oid, unsigned *oids, int n)
+{
+    int i;
+
+    for (i = 0; i < n; ++i)
+        if (oids[i] == oid)
+            return TRUE;
+    return FALSE;
+}
+
 /* hero enters pool of molten lava; returns True if hero is killed and
    then life-saved (with teleport to safe spot), False for other survival;
    no return at all if hero dies and isn't life-saved */
@@ -6805,7 +6819,8 @@ lava_effects(void)
 {
     struct obj *obj, *obj2, *nextobj;
     boolean usurvive, boil_away;
-    unsigned protect_oid = 0;
+    unsigned protect_oid[4]; /* items a caller still expects to hold */
+    int nprotect = 0;
     int burncount = 0, burnmesgcount = 0;
     const int dmg = d(6, 6); /* only applicable for water walking */
 
@@ -6833,19 +6848,22 @@ lava_effects(void)
         for (obj = gi.invent; obj; obj = nextobj) {
             nextobj = obj->nobj;
             if (obj->in_use) { /* remove_worn_item() sets in_use */
-                /* one item can be protected from burning up [accommodates
+                /* an item in use is protected from burning up [accommodates
                    steal(AMULET_OF_FLYING) -> remove_worn_item() -> fall
                    into lava (which happens before item is transferred
-                   from invent to thief->minvent)]; item will still be in
-                   inventory when we return to caller or save bones (or
-                   perform hangup save if that occurs) */
-                if (!protect_oid) {
-                    protect_oid = obj->o_id;
+                   from invent to thief->minvent)]; several can be in use
+                   at once - the scroll being read and the boots it
+                   destroys - and each caller expects to retain access to
+                   its own; item will still be in inventory when we return
+                   to caller or save bones (or perform hangup save if that
+                   occurs) */
+                if (nprotect < SIZE(protect_oid)) {
+                    protect_oid[nprotect++] = obj->o_id;
                     obj->in_use = 0;
                 } else {
                     impossible(
-                     "lava_effects: '%s' (#%u) is already in use; so is #%u.",
-                               simpleonames(obj), obj->o_id, protect_oid);
+                       "lava_effects: '%s' (#%u) is in use; so are %d others.",
+                               simpleonames(obj), obj->o_id, nprotect);
                 }
                 continue;
             }
@@ -6872,7 +6890,7 @@ lava_effects(void)
         ++burnmesgcount;
         iflags.in_lava_effects++; /* (see above) */
         (void) Boots_off();
-        if (obj->o_id != protect_oid)
+        if (!lava_protected(obj->o_id, protect_oid, nprotect))
             useup(obj);
         iflags.in_lava_effects--;
         ++burncount;
@@ -6901,9 +6919,9 @@ lava_effects(void)
 
         for (obj = gi.invent; obj; obj = obj2) {
             obj2 = obj->nobj;
-            if (obj->o_id == protect_oid) {
+            if (lava_protected(obj->o_id, protect_oid, nprotect)) {
                 /* skip protected item; caller expects to retain access */
-                obj->in_use = 1; /* was cleared when setting protect_oid */
+                obj->in_use = 1; /* was cleared when recording protect_oid */
             } else if (obj->otyp == SPE_BOOK_OF_THE_DEAD) {
                 if (usurvive && !Blind)
                     pline("%s glows a strange %s, but remains intact.",
