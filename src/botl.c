@@ -4233,7 +4233,9 @@ status_hilite_menu_add(int origfld)
  choose_color:
     clr = query_color(colorqry, NO_COLOR);
     if (clr == -1) {
-        if (behavior != BL_TH_ALWAYS_HILITE)
+        if (behavior == BL_TH_VAL_PERCENTAGE
+            || behavior == BL_TH_VAL_ABSOLUTE
+            || (behavior == BL_TH_UPDOWN && initblstats[fld].anytype != ANY_STR))
             goto choose_value;
         else
             goto choose_behavior;
