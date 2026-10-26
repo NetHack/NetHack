@@ -7,6 +7,7 @@
 
 staticfn void m_lose_armor(struct monst *, struct obj *, boolean) NONNULLPTRS;
 staticfn void clear_bypass(struct obj *) NO_NNARGS;
+staticfn int altprop(struct obj *) NONNULLARG1;
 staticfn void m_dowear_type(struct monst *, long, boolean, boolean)
                                                                   NONNULLARG1;
 staticfn int extra_pref(struct monst *, struct obj *) NONNULLARG1;
@@ -531,9 +532,10 @@ mon_adjust_speed(
     }
 
     for (otmp = mon->minvent; otmp; otmp = otmp->nobj)
-        if (otmp->owornmask && objects[otmp->otyp].oc_oprop == FAST)
+        if (otmp->owornmask && (objects[otmp->otyp].oc_oprop == FAST
+                                || altprop(otmp) == FAST))
             break;
-    if (otmp) /* speed boots */
+    if (otmp) /* speed boots or blue dragon scales */
         mon->mspeed = MFAST;
     else
         mon->mspeed = mon->permspeed;
@@ -568,11 +570,17 @@ mon_adjust_speed(
    if it is poison resistance, alternate property is acid resistance;
    if someone changes it to acid resistance, alt becomes poison resist;
    if someone changes it to hallucination resistance, all bets are off
-   [TODO: handle alternate properties conferred by dragon scales/mail] */
-#define altprop(o) \
-    (((o)->otyp == ALCHEMY_SMOCK)                               \
-     ? (POISON_RES + ACID_RES - objects[(o)->otyp].oc_oprop)    \
-     : 0)
+   [TODO: handle alternate properties conferred by dragon other scales/mail] */
+staticfn int
+altprop(struct obj *o)
+{
+    if (o->otyp == ALCHEMY_SMOCK)
+        return POISON_RES + ACID_RES - objects[o->otyp].oc_oprop;
+    if (o->otyp == BLUE_DRAGON_SCALES || o->otyp == BLUE_DRAGON_SCALE_MAIL)
+        return SHOCK_RES + FAST - objects[o->otyp].oc_oprop;
+    return 0;
+}
+
 
 /* armor put on or taken off; might be magical variety */
 void
