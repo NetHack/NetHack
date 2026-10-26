@@ -510,15 +510,21 @@ savelev_core(NHFILE *nhfp, xint8 lev)
      *  portion (which has some freeing to do), then jump quite a bit
      *  further ahead to the middle of the 'actual level data' portion.
      */
+    /* purge any dead monsters (necessary if we're starting
+       a panic save rather than a normal one, or sometimes
+       when changing levels without taking time -- e.g.
+       create statue trap then immediately level teleport);
+       do this when only freeing too: entering the endgame or
+       leaving the tutorial discards the level without writing
+       it, and savemonchn() below would otherwise free a still
+       pending detached monster without crediting the purge
+       count, which the next dmonsfree() then reports as a
+       count mismatch */
+    if (!program_state.in_idlecheckpoint && iflags.purge_monsters)
+        dmonsfree();
     if (nhfp->mode != FREEING) {
         /* WRITING (probably ORed with FREEING), or COUNTING */
         if (!program_state.in_idlecheckpoint) {
-            /* purge any dead monsters (necessary if we're starting
-               a panic save rather than a normal one, or sometimes
-               when changing levels without taking time -- e.g.
-               create statue trap then immediately level teleport) */
-            if (iflags.purge_monsters)
-                dmonsfree();
             /* clear objs_deleted list too */
             if (go.objs_deleted)
                 dobjsfree(); /* really free deleted objects */
