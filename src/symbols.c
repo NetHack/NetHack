@@ -1149,9 +1149,6 @@ do_symset(boolean rogueflag)
     if (gs.symset[which_set].name) {
         /* non-default symbols */
         int ok;
-        if (!glyphname_hash_indices_loaded()) {
-            populate_glyphname_hash_indices();
-        }
         ok = read_sym_file(which_set);
         if (glyphname_hash_indices_loaded()) {
             empty_glyphname_hash_indices();

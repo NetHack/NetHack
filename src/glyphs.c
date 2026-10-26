@@ -1045,27 +1045,16 @@ parse_id(
         }
     }
     if (is_G && id) {
-        if (glyphname_hash_indices_ptr) {
-            /* Fast path: bsearch the populated index. */
-            int val = find_glyph_in_hashtable(id);
+        int val;
 
-            if (val >= 0) {
-                findwhat->findtype = find_glyph;
-                findwhat->val = val;
-                findwhat->loadsyms_offset = 0;
-                return 1;
-            }
-        } else {
-            /* Unpopulated: linear scan, no alloc. */
-            for (glyph = 0; glyph < MAX_GLYPH; ++glyph) {
-                if (compose_glyph_name(glyph, buf, sizeof buf)
-                    && !strcmpi(id, buf)) {
-                    findwhat->findtype = find_glyph;
-                    findwhat->val = glyph;
-                    findwhat->loadsyms_offset = 0;
-                    return 1;
-                }
-            }
+        if (!glyphname_hash_indices_ptr)
+            populate_glyphname_hash_indices();
+        val = find_glyph_in_hashtable(id);
+        if (val >= 0) {
+            findwhat->findtype = find_glyph;
+            findwhat->val = val;
+            findwhat->loadsyms_offset = 0;
+            return 1;
         }
         return 0;
     }
