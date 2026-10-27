@@ -357,6 +357,7 @@ enum utotypes {
     UTOTYPE_ATSTAIRS = 0x01,
     UTOTYPE_FALLING  = 0x02,
     UTOTYPE_PORTAL   = 0x04,
+    UTOTYPE_LEVEL_TELE = 0x08, /* level teleportation */
     UTOTYPE_RMPORTAL = 0x10,  /* remove portal */
     UTOTYPE_DEFERRED = 0x20   /* deferred_goto */
 };
