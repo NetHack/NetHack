@@ -870,7 +870,10 @@ TODO: add set_impossible(), impossible -> func pointer,
                    (n < 0) ? "format error" : "overflow",
                    func, line);
 #endif
-        str[size - 1] = '\0'; /* make sure it is nul terminated */
+        /* make sure it is nul terminated; with a size of 0 nothing was
+           written, and str[-1] would be outside the buffer */
+        if (size > 0)
+            str[size - 1] = '\0';
     }
 }
 
