@@ -1410,7 +1410,7 @@ m_consume_obj(struct monst *mtmp, struct obj *otmp)
     } else if (otmp == uchain) {
         unpunish(); /* frees uchain */
     } else {
-        boolean deadmimic, slimer;
+        boolean deadmimic, slimer, pyroegg;
         int poly, grow, heal, eyes, mstone, vis = canseemon(mtmp);
         int corpsenm = (otmp->otyp == CORPSE ? otmp->corpsenm : NON_PM);
 
@@ -1418,6 +1418,8 @@ m_consume_obj(struct monst *mtmp, struct obj *otmp)
                                               || corpsenm == PM_LARGE_MIMIC
                                               || corpsenm == PM_GIANT_MIMIC));
         slimer = (otmp->otyp == GLOB_OF_GREEN_SLIME);
+        /* not 'corpsenm', which is only set for corpses */
+        pyroegg = (otmp->otyp == EGG && otmp->corpsenm == PM_PYROLISK);
         poly = polyfood(otmp);
         grow = mlevelgain(otmp);
         heal = mhealup(otmp);
@@ -1450,7 +1452,7 @@ m_consume_obj(struct monst *mtmp, struct obj *otmp)
             mcureblindness(mtmp, canseemon(mtmp));
         if (ispet && deadmimic)
             quickmimic(mtmp);
-        if (otmp->otyp == EGG && corpsenm == PM_PYROLISK)
+        if (pyroegg)
             explode(mtmp->mx, mtmp->my, -11, d(3, 6), 0, EXPL_FIERY);
         if (corpsenm != NON_PM)
             mon_givit(mtmp, &mons[corpsenm]);
@@ -1615,6 +1617,9 @@ meatobj(struct monst *mtmp) /* for gelatinous cubes */
         /* lastly, edible items; yum! */
         } else {
             /* devour */
+            boolean pyroegg = (otmp->otyp == EGG
+                               && otmp->corpsenm == PM_PYROLISK);
+
             ++count;
             if (cansee(mtmp->mx, mtmp->my)) {
                 /* (see above; distant_name() sometimes has side-effects */
@@ -1636,6 +1641,9 @@ meatobj(struct monst *mtmp) /* for gelatinous cubes */
             ptr = mtmp->data;
             if (ptr != original_ptr)
                 return !ptr ? 2 : 1;
+            /* a pyrolisk egg's explosion can burn up otmp2, so stop */
+            if (pyroegg)
+                otmp2 = (struct obj *) 0;
         }
 
         /* Engulf & devour is instant, so don't set meating */
