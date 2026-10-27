@@ -7,6 +7,8 @@
 #define PATCHLEVEL_H
 
 /* NetHack 5.0.x */
+/* CAUTION: Do not change the format of the next 2 lines without
+ * adjusting the code for $PREFIX-Ver in DEVEL. */
 #define VERSION_MAJOR 5
 #define VERSION_MINOR 0
 /*
