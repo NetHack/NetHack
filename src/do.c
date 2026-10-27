@@ -1370,7 +1370,18 @@ currentlevel_rewrite(void)
     return nhfp;
 }
 
+void
+do_idlecheckpoint(void)
+{
+    program_state.in_idlecheckpoint = 1;
 #ifdef INSURANCE
+    save_currentstate();
+#endif /* INSURANCE */
+    program_state.in_idlecheckpoint = 0;
+}
+
+#ifdef INSURANCE
+
 void
 save_currentstate(void)
 {

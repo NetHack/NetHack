@@ -1060,7 +1060,7 @@ struct instance_globals_w {
     /* new */
     struct win_settings wsettings;      /* wintype.h */
     long were_changes;                  /* were.c, allmain.c */
-
+    long whitelist_shk;
     boolean havestate;
 };
 

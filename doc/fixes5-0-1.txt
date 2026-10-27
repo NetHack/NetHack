@@ -92,6 +92,14 @@ alias rings of constitution, strength, and damage, spellbook/scroll of
 	identification, amulet of flight
 pets left on another level no longer have their hunger postponed by the
 	time spent away
+make probing reveal egg type in inventory
+prevent monster spawning in Fort Ludios treasure vaults
+fix level gain maxhp change when polymorphed
+make #wizlevelteleport accept special level proto name
+add meat theme room
+fix tknown handling for boxes known not to be trapped
+change the monk quest locate level
+fix travel using up turns trying to displace pet that cannot move
 
 
 Platform- and/or Interface-Specific Fixes
@@ -279,6 +287,7 @@ X11: remove the limit on the number of widgets managed in winlabel.c; it was
 	display tabs produced by the unpaid inventory command
 	(pr #1668 by chasonr)
 Unix: don't complain about MAXPLAYERS with unknown command line param
+Qt: menus and toolbar buttons did not work correctly with ext cmd filtering
 
 
 General New Features

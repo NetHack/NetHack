@@ -5815,7 +5815,7 @@ disarm_box(struct obj *box, boolean force, boolean confused)
         exercise(A_DEX, TRUE);
     } else {
         pline("That %s was not trapped.", xname(box));
-        box->tknown = 0;
+        box->tknown = 1; /* known not trapped */
     }
 }
 
@@ -5826,9 +5826,14 @@ untrap_box(
     boolean force,
     boolean confused)
 {
+    if (box->tknown && !box->otrapped) {
+        You("know %s is not trapped.", the(xname(box)));
+        return;
+    }
+
     if ((box->otrapped
          && (force || (!confused && rn2(MAXULEV + 1 - u.ulevel) < 10)))
-        || box->tknown
+        || (box->tknown && box->otrapped)
         || (!force && confused && !rn2(3))) {
         if (!(box->tknown && box->dknown))
             You("find a trap on %s!", the(xname(box)));
@@ -5899,7 +5904,7 @@ untrap(
 
     if (here) /* are there are one or more containers here? */
         for (otmp = svl.level.objects[x][y]; otmp; otmp = otmp->nexthere)
-            if (Is_box(otmp)) {
+            if (Is_box(otmp) && !(otmp->tknown && !otmp->otrapped)) {
                 if (++boxcnt > 1)
                     break;
             }
@@ -6004,7 +6009,9 @@ untrap(
             for (otmp = svl.level.objects[x][y]; otmp; otmp = otmp->nexthere) {
                 if (!Is_box(otmp))
                     continue;
-                if (otmp->tknown && otmp->dknown)
+                if (otmp->tknown && !otmp->otrapped)
+                    continue;
+                if (otmp->tknown && otmp->otrapped && otmp->dknown)
                     (void) safe_qbuf(qbuf, "Disarm this ", NULL,
                                      otmp, xname, ansimpleoname, "a box");
                 else
@@ -6015,7 +6022,7 @@ untrap(
                     case 'q':
                         return 0;
                     case 'y':
-                        if (otmp->tknown && otmp->dknown)
+                        if (otmp->tknown && otmp->otrapped && otmp->dknown)
                             disarm_box(otmp, force, confused);
                         else
                             untrap_box(otmp, force, confused);

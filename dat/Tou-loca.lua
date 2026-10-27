@@ -163,7 +163,7 @@ if percent(10) then
 end
 if percent(10) then
 	des.monster({id="wizard", name="Ridcully", male=1, peaceful=1, keep_default_invent=false})
-end=
+end
 if percent(10) then
 	des.monster({id="wizard", name="the Bursar", male=1, peaceful=1, keep_default_invent=false})
 end

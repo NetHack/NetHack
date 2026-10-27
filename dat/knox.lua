@@ -79,6 +79,14 @@ des.region(selection.area(19,06,21,06),"lit")
 des.region(selection.area(46,06,48,06),"lit")
 des.region(selection.area(19,13,21,13),"lit")
 des.region(selection.area(46,13,48,13),"lit")
+
+--  Monsters are not allowed to spawn in the vault and treasuries
+des.exclusion({ type = "monster-generation", region = {21,08,35,11} })
+des.exclusion({ type = "monster-generation", region = {19,06,21,06} })
+des.exclusion({ type = "monster-generation", region = {19,13,21,13} })
+des.exclusion({ type = "monster-generation", region = {46,06,48,06} })
+des.exclusion({ type = "monster-generation", region = {46,13,48,13} })
+
 --   A welcoming committee
 des.region({ region={03,10,07,13},lit=1,type="zoo",filled=1,irregular=1 })
 --   arrival chamber; needs to be a real room to control migrating monsters,

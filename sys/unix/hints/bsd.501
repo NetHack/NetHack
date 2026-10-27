@@ -33,7 +33,7 @@ VARDIR=/var/games/nethackdir
 # Suggest leaving /usr/games as-is from bsdgames.tgz.
 SHELLDIR=$(PREFIX)/bin
 
-CFLAGS=-O -I../include -USYSV -DBSD -DHACKDIR='"$(HACKDIR)"' -DVAR_PLAYGROUND='"$(VARDIR)"'
+CFLAGS=-O -I../include -I../nhlua/lua/src -USYSV -DBSD -DHACKDIR='"$(HACKDIR)"' -DVAR_PLAYGROUND='"$(VARDIR)"'
 LINK=$(CC)
 
 WINSRC = $(WINTTYSRC)

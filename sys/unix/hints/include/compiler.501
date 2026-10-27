@@ -1,5 +1,5 @@
 #==============================================================================
-# NetHack 5.0  compiler $NHDT-Date: 1791245094 2026/10/06 00:04:54 $  $NHDT-Branch: keni-headercleanup $ $NHDT-Revision: 1.57 $
+# NetHack 5.0  compiler $NHDT-Date: 1791741243 2026/10/11 17:54:03 $  $NHDT-Branch: NetHack-5.0 $ $NHDT-Revision: 1.58 $
 
 # compiler flags:  CCFLAGS is used to construct a value for CFLAGS with
 #	various -I, -D, and -W settings appended below;

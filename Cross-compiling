@@ -417,9 +417,8 @@ Using the cross-compiler, build the following targets:
                            loadlib.c, lobject.c, lopcodes.c,
                            loslib.c, lparser.c, lstate.c, lstring.c,
                            lstrlib.c, ltable.c, ltablib.c, ltm.c,
-                           lundump.c, lutf8lib.c, lvm.c, lzio.c,
-                           lbitlib.c
-       
+                           lundump.c, lutf8lib.c, lvm.c, lzio.c
+
        generated (if req'd):
                           src/tile.c
 

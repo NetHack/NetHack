@@ -986,9 +986,11 @@ $(DLBLST): $(LUAFILES) | $(DAT_CLEAN) $(DAT_NOCLEAN)
 	echo tribute >> $(DLBLST)
 	cd $(DAT) ; ls -1 *.lua >> $(DLBLST)
 
-$(DLB): $(U)dlb.exe $(DLBLST) | $(GAMEDIR)
+$(DLB): $(SRC)/nhdat$(NHV) | $(GAMEDIR)
+	cp $(SRC)/nhdat$(NHV) $@
+
+$(SRC)/nhdat$(NHV): $(U)dlb.exe $(DLBLST)
 	$(U)dlb.exe CcIf $(dir $(DLBLST)) $(notdir $(DLBLST)) $(SRC)/nhdat
-	mv $(SRC)/nhdat$(NHV) $@
 
 CLEAN_DIR += $(ODLB)
 CLEAN_FILE += $(DTARGETS) $(DLBOBJS) $(INCL)/date.h

@@ -1,4 +1,4 @@
-# NetHack 5.0  luahelper    $NHDT-Date: 1791235988 2026/10/05 21:33:08 $  $NHDT-Branch: keni-headercleanup $ $NHDT-Revision: 1.7 $
+# NetHack 5.0  luahelper    $NHDT-Date: 1791741018 2026/10/11 17:50:18 $  $NHDT-Branch: NetHack-5.0 $ $NHDT-Revision: 1.8 $
 #
 #  Makefile to assist developers in adding lines to various build
 #  Makefiles, or project files, as lua files are added or removed.

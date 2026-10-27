@@ -630,7 +630,7 @@ vms_get_saved_games(
             if (filename[l - 1] != ' ')
                 break;
         filename[l] = '\0';
-        if ((charname = plname_from_file(filename, FALSE)) != 0)
+        if ((charname = plname_from_file(filename, FALSE, 0)) != 0)
             savefile(charname, count++, &asize, outarray);
     }
     (void) lib$find_file_end(&context);

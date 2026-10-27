@@ -33,9 +33,9 @@ WINCHAIN=[-.win.chain]
 LUAVER=548
 LUADOTVER=5.4.8
 LUAUNDERVER=5_4_8
-LUAINC=[-.lib.lua.lua$(LUAVER).src]
-LUALIB=[-.lib.lua]lua$(LUAVER).olb
-LUASRCDIR =[-.lib.lua.lua$(LUAVER).src]
+LUAINC=[-.nhlua.lua.src]
+LUALIB=[-.src]liblua.olb
+LUASRCDIR =[-.nhlua.lua.src]
 LUASRCINCDIR=$(LUASRCDIR)
 #LUASRCINCDIR=SYS$COMMON:[LUA.INCLUDE]
 
@@ -159,7 +159,7 @@ makedefs.obj: makedefs.c $(SRC)mdlib.c $(CONFIG_H) \
 	$(CC) $(CFLAGS) $(CSTD) makedefs.c /OBJ=$@
 
 uplaceholder.c:
-	echo int uplaceholder = 1; >$@
+	echo "int uplaceholder = 1;" >$@
 
 uplaceholder.obj: uplaceholder.c
 

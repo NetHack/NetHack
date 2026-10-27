@@ -347,7 +347,7 @@ extern void disregard_all_config_statements(void);
 extern void heed_this_config_statement(int);
 extern void disregard_this_config_statement(int);
 extern boolean config_unmatched_ignored(void);
-extern void clear_ignore_errors_on_unmatched(void);
+extern void clear_ignore_errors_on_unmatch(void);
 extern void set_ignore_errors_on_unmatched(void);
 extern void rcfile_only_this_statement(int);
 #ifdef WIN32
@@ -688,6 +688,7 @@ extern int dowipe(void);
 extern void legs_in_no_shape(const char *, boolean) NONNULLARG1;
 extern void set_wounded_legs(long, int);
 extern void heal_legs(int);
+extern void do_idlecheckpoint(void);
 
 /* ### do_name.c ### */
 

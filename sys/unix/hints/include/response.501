@@ -1,5 +1,5 @@
 #==============================================================================
-# NetHack 5.0  response $NHDT-Date: 1791245097 2026/10/06 00:04:57 $  $NHDT-Branch: keni-headercleanup $ $NHDT-Revision: 1.4 $
+# NetHack 5.0  response $NHDT-Date: 1791741359 2026/10/11 17:55:59 $  $NHDT-Branch: NetHack-5.0 $ $NHDT-Revision: 1.5 $
 
 ifeq "$(RESP)" "1"
 USE_RESPONSEFILE=1
