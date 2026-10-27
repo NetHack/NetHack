@@ -369,7 +369,7 @@ sub Header {
 	return undef unless(defined $rv{$k});
     }
 
-    return "$rv{project} $rv{ver}  $rv{file}\t $rv{date} $rv{branch}:$rv{revision}";
+    return "$rv{project} $rv{ver} $rv{file} $rv{date} $rv{branch}:$rv{revision}";
 }
 
 sub Brev {

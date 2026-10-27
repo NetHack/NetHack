@@ -559,7 +559,7 @@ sub Header {
     $rv{date} = &PREFIX::Date;
     $rv{branch} = &PREFIX::Branch;
     $rv{revision} = &PREFIX::Revision;
-    return "$rv{project} $rv{ver}  $rv{file}\t $rv{date} $rv{branch}:$rv{revision}"
+    return "$rv{project} $rv{ver} $rv{file} $rv{date} $rv{branch}:$rv{revision}"
 }
 
 sub File {
