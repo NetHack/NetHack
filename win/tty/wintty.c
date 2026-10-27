@@ -543,6 +543,7 @@ tty_init_nhwindows(int *argcp UNUSED, char **argv UNUSED)
     ttyDisplay->inmore = ttyDisplay->inread = ttyDisplay->intr = 0;
     ttyDisplay->dismiss_more = 0;
     ttyDisplay->color = NO_COLOR;
+    ttyDisplay->framecolor = NO_COLOR;
     ttyDisplay->attrs = 0;
     ttyDisplay->topl_utf8 = 0;
     ttyDisplay->mixed = 0;
