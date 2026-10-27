@@ -120,6 +120,7 @@ zombifying corpses are considered completely rotten when eaten
 give feedback message when chatting with a silent monster
 fix possible buffer underrun in nh_snprintf with long item call name
 fix crash when book is destroyed in the middle of studying
+fix monsters eating pyrolisk eggs
 
 
 Platform- and/or Interface-Specific Fixes
