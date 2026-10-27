@@ -134,6 +134,7 @@ fix lava death loop reading a used-up amulet
 allow wizgenesis to create long worms of specific length
 fix drawbridge stranding long worm's tail
 fix panic when landmine scattered saddle burns in lava
+fix farlook buffer overflow on a long engraving
 
 
 Platform- and/or Interface-Specific Fixes
