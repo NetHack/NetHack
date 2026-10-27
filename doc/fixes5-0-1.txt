@@ -118,6 +118,7 @@ menu for interactively setting status fields to highlight listed
 fix #therecmdmenu directional inputs and when used with mouse
 zombifying corpses are considered completely rotten when eaten
 give feedback message when chatting with a silent monster
+fix possible buffer underrun in nh_snprintf with long item call name
 
 
 Platform- and/or Interface-Specific Fixes
