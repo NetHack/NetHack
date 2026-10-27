@@ -978,15 +978,11 @@ struct xlock_s {
 #define FREEING      0x04
 #define CONVERTING   0x08
 #define UNCONVERTING 0x10
-#if 0
-/* operations of the various saveXXXchn & co. routines */
-#define perform_bwrite(nhfp) ((nhfp)->mode & (COUNTING | WRITING))
-#define release_data(nhfp) ((nhfp)->mode & FREEING)
-#endif
 
 /* operations of the various saveXXXchn & co. routines */
 #define update_file(nhfp) ((nhfp)->mode & (COUNTING | WRITING))
 #define release_data(nhfp) ((nhfp)->mode & FREEING)
+#define freeing_only(nhfp) ((nhfp)->mode == FREEING)
 
 enum saveformats {
     invalid = 0,
