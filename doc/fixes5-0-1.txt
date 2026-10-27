@@ -109,6 +109,7 @@ fix chameleon shape change working on petrified monster
 fix checking if dungeon has too many dungeons or levels
 fix long key name overflowing unlock prompt buffer
 fix exploding named box buffer overflow
+fix aobjnam buffer overflow when adding a verb
 
 
 Platform- and/or Interface-Specific Fixes
