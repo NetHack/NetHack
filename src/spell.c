@@ -361,6 +361,15 @@ learn(void)
     boolean costly = TRUE, faded_to_blank = FALSE;
     struct obj *book = svc.context.spbook.book;
 
+    /* the book can be destroyed mid-study without interrupting the hero
+       (burned by a fire explosion, for one); book_disappears() has
+       cleared the pointer, so just stop */
+    if (!book) {
+        svc.context.spbook.delay = 0;
+        svc.context.spbook.o_id = 0;
+        return 0;
+    }
+
     /* JDS: lenses give 50% faster reading; 33% smaller read time */
     if (svc.context.spbook.delay && ublindf
         && ublindf->otyp == LENSES && rn2(2))
