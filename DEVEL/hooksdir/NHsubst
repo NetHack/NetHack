@@ -311,12 +311,36 @@ print TRACE "MVM: -$varname-$oursval-$theirval-\n";
 
 package PREFIX;
 # Resolve the conflict of a single var's 2 values.  Return undef to leave the conflict.
+
+use POSIX qw/mktime/;
+
 sub Date {
     my($PREFIX, $varname, $mine, $theirs) = @_;
-    my $m = ($mine =~ m/(\d+)/)[0];
-    my $t = ($theirs =~ m/(\d+)/)[0];
-    return undef unless ($m>0) && ($t>0);
+#    my $m = ($mine =~ m/(\d+)/)[0];
+#    my $t = ($theirs =~ m/(\d+)/)[0];
+my $m = length $mine;
+my $t = length $theirs;
+#    return undef unless ($m>0) && ($t>0);
+if($m == 0 || $t == 0){
+    if($m>0){ return $mine }
+    if($t>0){ return $theirs }
+}
 
+#change to convert back to time_t then use existing compare
+    sub str2time2 {
+	my $str = $_[0];
+	    # parse strftime("%Y/%m/%d_%H:%M:%S");
+	return undef unless($str =~ m!^(\d\d\d\d)/(\d\d)/(\d\d)_(\d\d):(\d\d):(\d\d)$!);
+# $1 year
+# $2 month 01-12
+# $3 day 01-31
+# $4 hour 00-23
+# $5 minute 00-59
+# $6 second 00-60
+	return POSIX::mktime($6, $5, $4, $3, $2-1, $1);
+    }
+$m = str2timet($mine);
+$t = str2timet($theirs);
     return (($m>$t)?$mine:$theirs);
 }
 

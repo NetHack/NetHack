@@ -545,8 +545,8 @@ sub Date {
 	chomp($now = `git cat-file -p $hash | awk '/author/{print \$4}'`);
     }
 
-    my $fmt = length $val ? $val : "%s %Y/%m/%d %H:%M:%S";
-	# YYYY/MM/DD HH:MM:SS
+    my $fmt = length $val ? $val : "%Y/%m/%d_%H:%M:%S";
+	# YYYY/MM/DD_HH:MM:SS
     $val = strftime($fmt, gmtime($now));
     return $val;
 }
