@@ -942,6 +942,9 @@ autopick_testobj(struct obj *otmp, boolean calc_costly)
     /* first check: reject if an unpaid item in a shop */
     if (costly && !otmp->no_charge)
         return FALSE;
+    /* or if it's in use, such as a bag of holding blowing up */
+    if (otmp->in_use)
+        return FALSE;
 
     /* pickup_thrown/pickup_stolen/nopick_dropped override pickup_types and
        exceptions */
@@ -2671,6 +2674,10 @@ in_container(struct obj *obj)
         /* did not actually insert obj yet */
         if (was_unpaid)
             addtobill(obj, FALSE, FALSE, TRUE);
+        /* keep the bag where it is until it's used up below; things
+           landing at the hero's feet can knock it down a hole, and a
+           change of form can drop it if it's wielded */
+        gc.current_container->in_use = 1;
         if (obj->otyp == BAG_OF_HOLDING) /* one bag of holding into another */
             do_boh_explosion(obj, (boolean) (obj->where == OBJ_FLOOR));
         obfree(obj, (struct obj *) 0);
@@ -3807,6 +3814,8 @@ tipcontainer(struct obj *box) /* or bag */
                    "As %s %s inside, you are blasted by a magical explosion!",
                                  doname(otmp), otense(otmp, "tumble"));
 
+                    /* keep the bag until it's used up below */
+                    targetbox->in_use = 1;
                     /* if putting one bag of holding into another, first
                        blow up the one going in, then (below) blow up the
                        one it's going into */
