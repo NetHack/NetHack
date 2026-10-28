@@ -2669,13 +2669,17 @@ dozap(void)
             pline("%s glows and fades.", The(xname(obj)));
         /* make him pay for knowing !NODIR */
     } else if (need_dir && !u.dx && !u.dy && !u.dz) {
-        if ((damage = zapyourself(obj, TRUE)) != 0) {
-            char buf[BUFSZ];
+        char buf[BUFSZ];
 
-            Sprintf(buf, "zapped %sself with %s",
-                    uhim(), killer_xname(obj));
+        /* the effect might use up the wand, so name it first and track
+           it through current_wand, which dealloc_obj() clears */
+        Sprintf(buf, "zapped %sself with %s", uhim(), killer_xname(obj));
+        gc.current_wand = obj;
+        damage = zapyourself(obj, TRUE);
+        obj = gc.current_wand;
+        gc.current_wand = 0;
+        if (damage)
             losehp(Maybe_Half_Phys(damage), buf, NO_KILLER_PREFIX);
-        }
     } else {
         /*      Are we having fun yet?
          * weffects -> buzz(obj->otyp) -> zhitm (temple priest) ->
@@ -2719,6 +2723,8 @@ int
 zapyourself(struct obj *obj, boolean ordinary)
 {
     boolean learn_it = FALSE;
+    /* dozap() tracks the wand being zapped through gc.current_wand */
+    boolean tracked = (obj == gc.current_wand);
     int damage = 0;
     int orig_dmg = 0; /* for passing to destroy_items() */
 
@@ -3019,6 +3025,10 @@ zapyourself(struct obj *obj, boolean ordinary)
         impossible("zapyourself: object %d used?", obj->otyp);
         break;
     }
+    /* the effect might have used up the wand (dealloc_obj() clears
+       current_wand when it does) */
+    if (tracked && !gc.current_wand)
+        learn_it = FALSE;
     /* if effect was observable then discover the wand type provided
        that the wand itself has been seen */
     if (learn_it)
