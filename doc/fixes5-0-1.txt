@@ -129,6 +129,7 @@ avoid asking for confirmation for unambiguous char combos at start
 	(pr #1667 by aoeixsz4)
 name the container in loot prompts (pr #1672 by crissman)
 fix zapped wand used after god's bolt destroyed it
+fix zapped wand freed mid-zap
 
 
 Platform- and/or Interface-Specific Fixes
