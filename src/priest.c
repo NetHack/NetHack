@@ -797,7 +797,6 @@ ghod_hitsu(struct monst *priest)
 {
     struct mkroom *troom;
     struct monst *oldbuzzer;
-    struct obj *oldcurrwand;
     coordxy x, y, ax, ay;
     int roomno = (int) temple_occupied(u.urooms);
 
@@ -862,14 +861,14 @@ ghod_hitsu(struct monst *priest)
         break;
     }
 
-    /* bolt of lightning cast by unspecified monster */
-    oldcurrwand = gc.current_wand;
-    gc.current_wand = 0;
+    /* bolt of lightning cast by unspecified monster; leave current_wand
+       alone: the bolt might destroy the wand the hero is zapping, and
+       maybe_destroy_item() clears current_wand when that happens so the
+       zap code knows the wand is gone */
     oldbuzzer = gb.buzzer;
     gb.buzzer = 0;
     buzz(BZ_M_SPELL(BZ_OFS_AD(AD_ELEC)), 6, x, y, sgn(gt.tbx), sgn(gt.tby));
     gb.buzzer = oldbuzzer;
-    gc.current_wand = oldcurrwand;
     exercise(A_WIS, FALSE);
 }
 
