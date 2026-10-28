@@ -136,6 +136,7 @@ fix drawbridge stranding long worm's tail
 fix panic when landmine scattered saddle burns in lava
 fix farlook buffer overflow on a long engraving
 fix panic when bag of holding blows up and falls through a trap door
+fix panic when exploding bag causes hero to change position
 
 
 Platform- and/or Interface-Specific Fixes
