@@ -2545,8 +2545,8 @@ trapeffect_landmine(
         boolean forcetrap = ((trflags & FORCETRAP) != 0
                              || (trflags & FAILEDUNTRAP) != 0);
         boolean forcebungle = (trflags & FORCEBUNGLE) != 0;
-        unsigned steed_mid = 0;
-        struct obj *saddle = 0;
+        unsigned steed_mid = 0, saddle_oid = 0;
+        struct obj *saddle;
 
         if ((Levitation || Flying) && !forcetrap) {
             if (!already_seen && rn2(3))
@@ -2580,7 +2580,10 @@ trapeffect_landmine(
             recursive_mine = TRUE;
             (void) steedintrap(trap, (struct obj *) 0);
             recursive_mine = FALSE;
-            saddle = sobj_at(SADDLE, u.ux, u.uy);
+            /* the blast below can throw the saddle into lava, where it
+               burns up, so remember it by o_id rather than by pointer */
+            if ((saddle = sobj_at(SADDLE, u.ux, u.uy)) != 0)
+                saddle_oid = saddle->o_id;
             set_wounded_legs(LEFT_SIDE, rn1(35, 41));
             set_wounded_legs(RIGHT_SIDE, rn1(35, 41));
             exercise(A_DEX, FALSE);
@@ -2591,7 +2594,8 @@ trapeffect_landmine(
         trap->madeby_u = FALSE;
         losehp(Maybe_Half_Phys(damage), "land mine", KILLED_BY_AN);
         blow_up_landmine(trap);
-        if (steed_mid && saddle && !u.usteed)
+        if (steed_mid && saddle_oid && !u.usteed
+            && (saddle = o_on(saddle_oid, fobj)) != 0)
             (void) keep_saddle_with_steedcorpse(steed_mid, fobj, saddle);
         newsym(u.ux, u.uy); /* update trap symbol */
         /* fall recursively into the pit... */
