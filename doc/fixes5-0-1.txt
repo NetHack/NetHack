@@ -135,6 +135,7 @@ allow wizgenesis to create long worms of specific length
 fix drawbridge stranding long worm's tail
 fix panic when landmine scattered saddle burns in lava
 fix farlook buffer overflow on a long engraving
+fix panic when bag of holding blows up and falls through a trap door
 
 
 Platform- and/or Interface-Specific Fixes
