@@ -137,6 +137,7 @@ fix panic when landmine scattered saddle burns in lava
 fix farlook buffer overflow on a long engraving
 fix panic when bag of holding blows up and falls through a trap door
 fix panic when exploding bag causes hero to change position
+fix impossible when shape changer reverted before placed on the map
 
 
 Platform- and/or Interface-Specific Fixes
