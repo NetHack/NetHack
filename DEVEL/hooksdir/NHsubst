@@ -312,7 +312,7 @@ print TRACE "MVM: -$varname-$oursval-$theirval-\n";
 package PREFIX;
 # Resolve the conflict of a single var's 2 values.  Return undef to leave the conflict.
 
-use POSIX qw/mktime/;
+use POSIX qw/mktime tzset/;
 
 sub Date {
     my($PREFIX, $varname, $mine, $theirs) = @_;
@@ -337,6 +337,8 @@ if($m == 0 || $t == 0){
 # $4 hour 00-23
 # $5 minute 00-59
 # $6 second 00-60
+	local $ENV{TZ} = 'UTC';
+	POSIX::tzset();
 	return POSIX::mktime($6, $5, $4, $3, $2-1, $1);
     }
 $m = str2timet($mine);
