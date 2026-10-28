@@ -6909,6 +6909,11 @@ lava_effects(void)
                     pline("%s glows a strange %s, but remains intact.",
                           The(xname(obj)), hcolor("dark red"));
             } else if (obj->in_use) {
+                /* taking off burning gloves while wielding a cockatrice
+                   corpse turns the hero to stone, and life-saving then
+                   uses up the amulet, which might be obj2 */
+                unsigned nextoid = obj2 ? obj2->o_id : 0;
+
                 if (obj->owornmask) {
                     if (usurvive) {
                         pline("%s into flame!", Yobjnam2(obj, "burst"));
@@ -6918,6 +6923,9 @@ lava_effects(void)
                 }
                 useupall(obj);
                 ++burncount;
+                /* if so, start over; whatever was already burned is gone */
+                if (nextoid && !o_on(nextoid, gi.invent))
+                    obj2 = gi.invent;
             }
         }
         if (usurvive && burncount > burnmesgcount)
