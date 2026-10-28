@@ -133,6 +133,7 @@ fix zapped wand freed mid-zap
 fix lava death loop reading a used-up amulet
 allow wizgenesis to create long worms of specific length
 fix drawbridge stranding long worm's tail
+fix panic when landmine scattered saddle burns in lava
 
 
 Platform- and/or Interface-Specific Fixes
