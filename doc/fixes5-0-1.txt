@@ -138,6 +138,7 @@ fix farlook buffer overflow on a long engraving
 fix panic when bag of holding blows up and falls through a trap door
 fix panic when exploding bag causes hero to change position
 fix impossible when shape changer reverted before placed on the map
+fix nested lua calls breaking time limit
 
 
 Platform- and/or Interface-Specific Fixes
