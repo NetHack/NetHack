@@ -2432,7 +2432,7 @@ the kami of %H before you return again.]],
          synopsis = "[Enter %i and recover %o from %n.]",
          output = "text",
          text = [["Yes, you've become a great %c since I last saw you.
-		 
+
 "Sadly, things haven't been going so well here in %H.  A new
 %nt was appointed, and he hosted a dinner to meet other civic
 leaders.  At the door, one of his henchmen offered to look after my wallet.
@@ -2443,15 +2443,16 @@ know the Royal Mint has been trialing credit cards, so we won't have to carry
 bags of gold around?  Most of the prototypes haven't worked, and are only
 good for picking locks.  This one, %o, is
 one of a kind.  As the highest spending and most often mugged resident of
-%H, it was entrusted to me.  But when I got my wallet back, the Card was
-missing.  I appealed to the Patrician, and he said the matter fell under the
-doctrine of _detectores custodes_.
+%H, it was entrusted to me.  But when I got my wallet back,
+the Card was missing.  I appealed to the Patrician, and he said the matter
+fell under the doctrine of _detectores custodes_.
 
 "We believe %n has the Card, and that he's holed himself
-up in %i.  With the power of %o, the
-Thieves are bolder than ever.  Citizens are frightened, and tourism is
-down. We need somebody to find their way into %i and
-recover the Card before there are no %cp left!
+up in %i.  With the power of
+%o, the Thieves are bolder than ever.
+Citizens are frightened, and tourism is down.  We need somebody to find
+their way into %i and recover the Card before there
+are no %cp left!
 
 "So, %p, are you ready for a little Detour?"]],
       },
@@ -2577,7 +2578,8 @@ you thought you could hear hoofbeats.]],
 
 Listen, I'm so sorry to cut your vacation short, but we've got a little bit
 of a situation here.  Somebody has to do something about
-%n!  Could that somebody be you?  Let me take a look at you..."]],
+%n!  Could that somebody be you?
+Let me take a look at you..."]],
       },
       leader_last = {
          synopsis = "[Leave %H and never return.]",
@@ -2659,7 +2661,7 @@ to get here."]],
       },
       othertime = {
          text = [[You are back at %H.  Things are looking so dead,
-you feel there may soon be no %cs here at all.]],
+you feel there may soon be no %cp here at all.]],
       },
       posthanks = {
          text = [["Just look at you, %p!  Tell me all about your Tour.  Did you
