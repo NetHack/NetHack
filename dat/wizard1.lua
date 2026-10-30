@@ -1,4 +1,4 @@
--- $NHDT-Header: NetHack 5.0 wizard1.lua 2026/10/27_14:25:59 keni-gitset7:1.6 $
+-- $NHDT-Header: NetHack 5.0 wizard1.lua 2026/10/30_21:33:13 NetHack-5.0:1.7 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1992 by M. Stephenson and Izchak Miller
 -- NetHack may be freely redistributed.  See license for details.

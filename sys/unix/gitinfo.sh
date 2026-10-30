@@ -1,5 +1,5 @@
 #!/bin/sh
-# $NHDT-Header$
+# $NHDT-Header: NetHack 5.0 gitinfo.sh 2026/10/30_21:37:48 NetHack-5.0:1.5 $
 # Copyright (c) 2018 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
 

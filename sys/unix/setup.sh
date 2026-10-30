@@ -1,5 +1,5 @@
 #!/bin/sh
-# $NHDT-Header$
+# $NHDT-Header: NetHack 5.0 setup.sh 2026/10/30_21:37:48 NetHack-5.0:1.20 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2007.
 # NetHack may be freely redistributed.  See license for details.
 #

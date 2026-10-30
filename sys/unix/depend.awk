@@ -1,4 +1,4 @@
-# $NHDT-Header$
+# $NHDT-Header: NetHack 5.0 depend.awk 2026/10/30_21:37:48 NetHack-5.0:1.25 $
 # Copyright (c) Robert Patrick Rankin, 2023
 # NetHack may be freely redistributed.  See license for details.
 
