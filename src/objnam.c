@@ -2280,8 +2280,15 @@ aobjnam(struct obj *otmp, const char *verb)
         bp = strprepend(bp, prefix);
     }
     if (verb) {
-        Strcat(bp, " ");
-        Strcat(bp, otense(otmp, verb));
+        const char *vt = otense(otmp, verb);
+        char *outbuf = nextobuf();
+
+        /* the name can fill its obuf right to the end, leaving no room
+           for the verb there; build the result in a fresh obuf instead,
+           shortening the name if necessary so that the verb fits */
+        Snprintf(outbuf, BUFSZ, "%.*s %s",
+                 (int) (BUFSZ - 2 - strlen(vt)), bp, vt);
+        bp = outbuf;
     }
     return bp;
 }
