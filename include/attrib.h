@@ -1,4 +1,4 @@
-/* NetHack 5.0	attrib.h	$NHDT-Date: 1781973077 2026/06/20 16:31:17 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.18 $ */
+/* $NHDT-Header$ */
 /* Copyright 1988, Mike Stephenson                                */
 /* NetHack may be freely redistributed.  See license for details. */
 

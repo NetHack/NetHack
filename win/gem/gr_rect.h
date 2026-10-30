@@ -1,7 +1,4 @@
-/* gr_rect.h */
-/*
- * $NHDT-Date: 1432512809 2015/05/25 00:13:29 $  $NHDT-Branch: master $:$NHDT-Revision: 1.4 $
- */
+/* $NHDT-Header$ */
 #include <e_gem.h>
 /********** structs **********/
 typedef struct {

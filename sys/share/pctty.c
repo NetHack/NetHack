@@ -1,4 +1,4 @@
-/* NetHack 5.0	pctty.c	$NHDT-Date: 1596498284 2020/08/03 23:44:44 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.13 $ */
+/* $NHDT-Header$ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2005. */
 /* NetHack may be freely redistributed.  See license for details. */

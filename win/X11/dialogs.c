@@ -54,7 +54,7 @@
  *    + Make 'okay' button same width as 'cancel', and both wider than
  *      default by a small arbitrary amount.
  *
- * $NHDT-Date: 1455157470 2016/02/11 02:24:30 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.9 $
+ * $NHDT-Header$
  */
 
 #ifndef SYSV

@@ -1,6 +1,6 @@
 #!/bin/perl
 #
-#  $NHDT-Date: 1524689313 2018/04/25 20:48:33 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.5 $
+# $NHDT-Header$
 # Copyright (c) 2015 by Derek S. Ray
 # NetHack may be freely redistributed.  See license for details.
 #

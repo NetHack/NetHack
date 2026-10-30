@@ -1,4 +1,4 @@
-$NHDT-Branch$:$NHDT-Revision$ $NHDT-Date$
+$NHDT-Header$
 
 General Fixes and Modified Features
 -----------------------------------

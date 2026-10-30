@@ -1,4 +1,4 @@
-/* NetHack 5.0	tiletext.c	$NHDT-Date: 1781973099 2026/06/20 16:31:39 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.31 $ */
+/* $NHDT-Header$ */
 /*      Copyright (c) 2016 by Pasi Kallinen                       */
 /* NetHack may be freely redistributed.  See license for details. */
 

@@ -1,5 +1,7 @@
-# NetHack 5.0 Makefile.nmake
-#       Copyright (c) NetHack Development Team 1993-2026
+# $NHDT-Header$
+# Copyright (c) Michael Allison, 2026
+# Copyright (c) NetHack Development Team 1993-2026
+# NetHack may be freely redistributed.  See license for details.
 #
 #==============================================================================
 # Build Tools Environment

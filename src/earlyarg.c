@@ -1,4 +1,4 @@
-/* NetHack 5.0	earlyarg.c	$NHDT-Date: 1782016695 2026/06/20 23:38:15 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.11 $ */
+/* $NHDT-Header$ */
 /* Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 

@@ -1,4 +1,5 @@
         Microsoft Windows specific help file for NetHack 5.0
+        Copyright (c) Michael Allison, 2026
         Copyright (c) NetHack PC Development Team 1993-2026.
         NetHack may be freely distributed.  See license for details.
                    (Last Revision: June 20, 2026)
@@ -265,5 +266,4 @@ most of these keys:
         Ctrl-Shift-End   (1)     Scroll (Pan) map left to rightmost corner
         Ctrl-Shift-PgUp  (9)     Scroll (Pan) map left to uppermost corner
         Ctrl-Shift-PgDn  (3)     Scroll (Pan) map left to lowermost corner
-
 

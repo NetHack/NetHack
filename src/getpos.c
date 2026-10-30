@@ -1,4 +1,4 @@
-/* NetHack 5.0	getpos.c	$NHDT-Date: 1781973050 2026/06/20 16:30:50 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.11 $ */
+/* $NHDT-Header$ */
 /*-Copyright (c) Pasi Kallinen, 2023. */
 /* NetHack may be freely redistributed.  See license for details. */
 

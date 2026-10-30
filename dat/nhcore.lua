@@ -1,4 +1,4 @@
--- NetHack core nhcore.lua	$NHDT-Date: 1781994886 2026/06/20 22:34:46 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.5 $
+-- $NHDT-Header$
 --	Copyright (c) 2021 by Pasi Kallinen
 -- NetHack may be freely redistributed.  See license for details.
 -- This file contains lua code used by NetHack core.

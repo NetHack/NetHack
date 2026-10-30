@@ -1,5 +1,7 @@
-/* NetHack 5.0	oldcrtl.c	$NHDT-Date: 1596498304 2020/08/03 23:45:04 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.9 $ */
-/*       Pat Rankin  May'90                                       */
+/* $NHDT-Header$ */
+/* Copyright (c) 1990 by Robert Patrick Rankin */
+/* NetHack may be freely redistributed.  See license for details. */
+
 /* VMS NetHack support, not needed for vms 4.6,4.7,5.x,or later   */
 
 #ifdef VERYOLD_VMS

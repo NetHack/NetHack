@@ -1,4 +1,4 @@
-/* NetHack 5.0	savefile.h	$NHDT-Date: 1781973087 2026/06/20 16:31:27 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.5 $ */
+/* $NHDT-Header$ */
 /* Copyright (c) Michael Allison, 2025.                           */
 /* NetHack may be freely redistributed.  See license for details. */
 

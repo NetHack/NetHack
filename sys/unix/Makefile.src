@@ -1,7 +1,7 @@
-#	NetHack Makefile.
-# NetHack 5.0  Makefile.src    $NHDT-Date: 1697316523 2023/10/14 20:48:43 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.164 $
+# $NHDT-Header$
 # Copyright (c) 2018 by Pasi Kallinen
 # NetHack may be freely redistributed.  See license for details.
+#	NetHack Makefile.
 
 # Root of source tree:
 NHSROOT ?=..

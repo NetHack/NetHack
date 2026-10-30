@@ -1,4 +1,4 @@
-/* NetHack 5.0	wc_chainin.c	$NHDT-Date: 1781973093 2026/06/20 16:31:33 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.28 $ */
+/* $NHDT-Header$ */
 /* Copyright (c) Kenneth Lorber, 2012                             */
 /* NetHack may be freely redistributed.  See license for details. */
 

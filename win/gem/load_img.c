@@ -1,6 +1,4 @@
-/*
- * $NHDT-Date: 1432512809 2015/05/25 00:13:29 $  $NHDT-Branch: master $:$NHDT-Revision: 1.5 $
- */
+/* $NHDT-Header$ */
 #define __TCC_COMPAT__
 #include <stdio.h>
 #include <string.h>

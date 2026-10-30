@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $NHDT-Date: 1693357449 2023/08/30 01:04:09 $ $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.3 $
+# $NHDT-Header$
 # Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
 

@@ -1,4 +1,4 @@
--- NetHack gehennom baalz.lua	$NHDT-Date: 1781994878 2026/06/20 22:34:38 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.6 $
+-- $NHDT-Header$
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1992 by M. Stephenson and Izchak Miller
 -- NetHack may be freely redistributed.  See license for details.

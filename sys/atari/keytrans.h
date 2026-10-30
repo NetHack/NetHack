@@ -1,4 +1,5 @@
-/* NetHack 5.0	keytrans.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* $NHDT-Header$ */
+/* Copyright (c) Ingo Paschke, 2026 */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*

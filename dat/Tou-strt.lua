@@ -1,4 +1,4 @@
--- NetHack Tourist Tou-strt.lua	$NHDT-Date: 1781994875 2026/06/20 22:34:35 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.4 $
+-- $NHDT-Header$
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1991,92 by M. Stephenson, P. Winner
 -- NetHack may be freely redistributed.  See license for details.

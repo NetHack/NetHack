@@ -1,7 +1,8 @@
-#      NetHack Top-level Makefile.
-# NetHack 5.0  Makefile.vms    $NHDT-Date: 1642630921 2022/01/19 22:22:01 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.72 $
+# $NHDT-Header$
 # Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
+
+# NetHack Top-level Makefile.
 
 #	Root of source tree:  (Note: dot is after setup.sh has been used
 #	to create the active Makefiles from sys/unix/Makefile.*.

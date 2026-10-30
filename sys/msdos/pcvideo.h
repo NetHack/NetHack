@@ -1,4 +1,4 @@
-/* NetHack 5.0	pcvideo.h	$NHDT-Date: 1596498273 2020/08/03 23:44:33 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.11 $ */
+/* $NHDT-Header$ */
 /*   Copyright (c) NetHack PC Development Team 1993, 1994           */
 /*   NetHack may be freely redistributed.  See license for details. */
 /*                                                                  */

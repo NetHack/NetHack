@@ -1,4 +1,4 @@
-/* NetHack 5.0    tileset.h    $NHDT-Date: 1781973089 2026/06/20 16:31:29 $ $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.6 $ */
+/* $NHDT-Header$ */
 /* Copyright (c) Ray Chason, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
 

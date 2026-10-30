@@ -1,4 +1,4 @@
-/* NetHack 5.0	lint.h	$NHDT-Date: 1781973081 2026/06/20 16:31:21 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.10 $ */
+/* $NHDT-Header$ */
 /*      Copyright (c) 2016 by Robert Patrick Rankin               */
 /* NetHack may be freely redistributed.  See license for details. */
 

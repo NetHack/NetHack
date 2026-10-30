@@ -1,4 +1,6 @@
-NetHack 5.0  window.txt	$NHDT-Date: 1666390558 2022/10/21 22:15:58 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.70 $
+$NHDT-Header$
+Copyright (c) Michael Allison, 2024
+NetHack may be freely redistributed.  See license for details.
 
 Introduction
 

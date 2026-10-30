@@ -1,6 +1,6 @@
--- NetHack Tourist Tou-goal.lua	$NHDT-Date: 1781994874 2026/06/20 22:34:34 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.6 $
+-- $NHDT-Header$
 --	Copyright (c) 1989 by Jean-Christophe Collet
---	Copyright (c) 1991,92 by M. Stephenson, P. Winner
+--	Copyright (c) 1991,1992 by M. Stephenson, P. Winner
 -- NetHack may be freely redistributed.  See license for details.
 --
 des.level_init({ style = "solidfill", fg = " " });

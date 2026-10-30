@@ -1,4 +1,4 @@
-/* NetHack 5.0	warnings.h	$NHDT-Date: 1781973090 2026/06/20 16:31:30 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.11 $ */
+/* $NHDT-Header$ */
 /* Copyright (c) Michael Allison, 2021. */
 
 #ifndef WARNINGS_H

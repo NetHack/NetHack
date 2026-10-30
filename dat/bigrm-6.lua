@@ -1,4 +1,4 @@
--- NetHack bigroom bigrm-6.lua	$NHDT-Date: 1781994880 2026/06/20 22:34:40 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.3 $
+-- $NHDT-Header$
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1990 by M. Stephenson
 -- NetHack may be freely redistributed.  See license for details.

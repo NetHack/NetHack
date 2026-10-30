@@ -1,4 +1,5 @@
-/* NetHack 5.0	win32api.h	$NHDT-Date: 1596498320 2020/08/03 23:45:20 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.15 $ */
+/* $NHDT-Header$ */
+/* Copyright (c) Michael Allison, 2024 */
 /* Copyright (c) NetHack PC Development Team 1996                 */
 /* NetHack may be freely redistributed.  See license for details. */
 

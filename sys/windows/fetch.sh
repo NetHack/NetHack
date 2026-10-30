@@ -1,5 +1,8 @@
 #!/bin/sh
-
+# $NHDT-Header$
+# Copyright (c) Michael Allison, 2024
+# NetHack may be freely redistributed.  See license for details.
+ 
 if [ ! -d lib ]; then
 mkdir -p lib
 fi

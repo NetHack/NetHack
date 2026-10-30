@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.5 $ $NHDT-Date: 1524689548 2018/04/25 20:52:28 $
+$NHDT-Header$
 
 [This is a partial list supplied by Ken Arromdee long after the fact]
 

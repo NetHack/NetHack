@@ -1,3 +1,7 @@
+:$NHDT-Header$
+:Copyright (c) Michael Allison, 2024
+:NetHack may be freely redistributed.  See license for details.
+
 @echo on
 
 if exist %cd%\..\sys\windows\Makefile.nmake set LIBDIR=..\lib

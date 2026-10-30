@@ -1,4 +1,4 @@
--- NetHack Monk Mon-strt.lua	$NHDT-Date: 1781994869 2026/06/20 22:34:29 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.9 $
+-- $NHDT-Header$
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1991-2 by M. Stephenson
 -- NetHack may be freely redistributed.  See license for details.

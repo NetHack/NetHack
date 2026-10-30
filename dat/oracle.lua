@@ -1,4 +1,4 @@
--- NetHack oracle oracle.lua	$NHDT-Date: 1781994886 2026/06/20 22:34:46 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.2 $
+-- $NHDT-Header$
 -- Copyright (c) 2015 by Pasi Kallinen
 -- NetHack may be freely redistributed.  See license for details.
 --

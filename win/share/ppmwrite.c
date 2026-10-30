@@ -1,4 +1,4 @@
-/* NetHack 5.0  ppmwrite.c	$NHDT-Date: 1781973098 2026/06/20 16:31:38 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.10 $ */
+/* $NHDT-Header$ */
 /* this produces a raw ppm file, with a 15-character header of
  * "P6 3-digit-width 3-digit-height 255\n"
  */

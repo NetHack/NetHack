@@ -1,4 +1,4 @@
-/* NetHack 5.0	windsound.c	$NHDT-Date: $  $NHDT-Branch: $NHDT-Revision: $ */
+/* $NHDT-Header$ */
 /* Copyright (c) Michael Allison, 2022                                */
 /* NetHack may be freely redistributed.  See license for details. */
 

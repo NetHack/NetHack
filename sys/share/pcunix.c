@@ -1,4 +1,4 @@
-/* NetHack 5.0	pcunix.c	$NHDT-Date: 1596498285 2020/08/03 23:44:45 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.42 $ */
+/* $NHDT-Header$ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */

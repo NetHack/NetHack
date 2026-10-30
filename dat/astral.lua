@@ -1,4 +1,4 @@
--- NetHack endgame astral.lua	$NHDT-Date: 1781994877 2026/06/20 22:34:37 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.9 $
+-- $NHDT-Header$
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1992,1993 by Izchak Miller, David Cohrs,
 --                      and Timo Hakulinen

@@ -1,4 +1,4 @@
-/* NetHack 5.0	selvar.c	$NHDT-Date: 1781973066 2026/06/20 16:31:06 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.6 $ */
+/* $NHDT-Header$ */
 /* Copyright (c) 2024 by Pasi Kallinen */
 /* NetHack may be freely redistributed.  See license for details. */
 

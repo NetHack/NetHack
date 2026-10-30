@@ -1,4 +1,4 @@
-/* NetHack 5.0	mfndpos.h	$NHDT-Date: 1781973082 2026/06/20 16:31:22 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.19 $ */
+/* $NHDT-Header$ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2005. */
 /* NetHack may be freely redistributed.  See license for details. */

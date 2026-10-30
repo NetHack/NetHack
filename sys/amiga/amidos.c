@@ -1,4 +1,4 @@
-/* NetHack 3.6	amidos.c	$NHDT-Date: 1432512796 2015/05/25 00:13:16 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $ */
+/* $NHDT-Header$ */
 /* Copyright (c) Olaf Seibert, Nijmegen, The Netherlands, 1988,1990.    */
 /* Copyright (c) Kenneth Lorber, Bethesda, Maryland, 1991,1992,1993,1996.  */
 /* NetHack may be freely redistributed.  See license for details.	*/

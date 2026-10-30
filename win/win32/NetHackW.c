@@ -1,4 +1,4 @@
-/* NetHack 5.0    NetHackW.c    $NHDT-Date: 1693359674 2023/08/30 01:41:14 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.79 $ */
+/* $NHDT-Header$ */
 /* Copyright (C) 2001 by Alex Kompel      */
 /* NetHack may be freely redistributed.  See license for details. */
 
