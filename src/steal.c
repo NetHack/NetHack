@@ -818,6 +818,7 @@ mdrop_obj(
 {
     coordxy omx = mon->mx, omy = mon->my;
     long unwornmask = obj->owornmask;
+    struct obj objcopy; /* for update_mon_extrinsics() if obj gets used up */
     /* call distant_name() for its possible side-effects even if the result
        might not be printed, and do it before extracting obj from minvent */
     char *obj_name = distant_name(obj, doname);
@@ -834,9 +835,14 @@ mdrop_obj(
     /* obj_no_longer_held(obj); -- done by place_object */
     if (verbosely && cansee(omx, omy))
         pline_mon(mon, "%s drops %s.", Monnam(mon), obj_name);
+    /* flooreffects() might destroy obj (a worn item that burns up in
+       lava), so keep a copy for update_mon_extrinsics() to look at */
+    objcopy = *obj;
     if (!flooreffects(obj, omx, omy, "fall")) {
         place_object(obj, omx, omy);
         stackobj(obj);
+    } else {
+        obj = &objcopy;
     }
     /* do this last, after placing obj on floor; removing steed's saddle
        throws rider, possibly inflicting fatal damage and producing bones; this
