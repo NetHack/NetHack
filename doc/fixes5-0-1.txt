@@ -101,7 +101,8 @@ fix tknown handling for boxes known not to be trapped
 change the monk quest locate level
 fix travel using up turns trying to displace pet that cannot move
 replace generic gem tile asterisk with a cut gem shape with shadow,
-	generic potion tile exclamation point with potion shape
+	generic potion tile exclamation point with potion shape,
+	generic spellbook plus-tile with a spellbook shape
 
 
 Platform- and/or Interface-Specific Fixes
