@@ -18,6 +18,7 @@ Status values:
 - **lost** — not used; none of the inventory items were dropped
 
 The per-id results are in section 20. Nothing in this inventory was lost.
+A short human-readable log of changes is in VERSION_CHANGES.txt.
 
 ---
 

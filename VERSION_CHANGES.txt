@@ -1,0 +1,26 @@
+VERSION_CHANGES.txt
+
+A short log of what changed in RighteousHack, newest first.
+Each entry is a date and a sentence or two, enough to know that
+something changed. The full customization inventory is
+RIGHTEOUSHACK_CHANGES.md.
+
+2026-10-31
+The new NetHack 5.0 wand was added as the Rod of Stillness
+(Psalm 46:10). Zapping it still makes the current level block
+teleportation for a short time.
+
+2026-10-31
+Windows builds: build.bat now refreshes src\Makefile from
+sys\windows\Makefile.nmake before compiling, so an old 3.7
+makefile is not reused.
+
+2026-10-31
+Upgraded the game from its NetHack 3.7 base to NetHack 5.0.0.
+RighteousHack's own names, items, roles, and quests were kept.
+Save files from the 3.7 version will not load.
+
+2026-07-19
+RighteousHack v0.1, the version this upgrade started from: a
+Christian retelling of NetHack 3.7, with renamed gear, fewer
+roles, new quest artifacts, and a browser map editor.
