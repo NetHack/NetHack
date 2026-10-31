@@ -555,6 +555,24 @@ so the item is "rod of stillness" and the object enum is
 5.0 behavior. 5.0's shield of drain resistance and shield of shock
 resistance are kept under those names, and ancient defense is kept too.
 
+### Food (2026-10-31)
+
+Monster bodies are shown as raw meat. The noun comes from
+`include/meatnoun.h` (one word per monster class): dragons are
+steak, sea monsters (`S_EEL`) are fillet, fungi are cap, jellies
+are jelly, puddings are pudding, and everything else is meat.
+Cooked meat is the same object with a cooked flag, so poison,
+acid, petrification, and intrinsics stay the same. Humanoids,
+humans, and elves leave no meat. Death, Pestilence, Famine, and
+trolls still do, because the game brings them back from that body.
+Every role starts with a flint and tinder box. `#cook` uses it
+and does not use it up. Raw meat cannot be blessed, except lizard
+meat and sea-monster fillets. Blessed cooked meat never spoils.
+The workbook `docs/RighteousHack_Food.xlsx` lists every food and
+every monster; regenerate it with `tools/gen_food_xlsx.py` when
+those tables change. `EDITLEVEL` is 1, so saves from before this
+change will not load.
+
 ### Planned (not done)
 
 Lawful, neutral, and chaotic will eventually be replaced by two

@@ -992,6 +992,10 @@ TOOL("tinning kit",         NoDes, 1, 0, 0, 1, 15,100, 30, IRON, HI_METAL,
                                                                 TINNING_KIT),
 TOOL("tin opener",          NoDes, 1, 0, 0, 0, 35,  4, 30, IRON, HI_METAL,
                                                                 TIN_OPENER),
+/* reusable; not used up and not generated in the dungeon (prob 0).
+   Every role is given one at the start of the game. */
+TOOL("flint and tinder box", NoDes, 1, 0, 0, 0, 0, 15, 10, WOOD, HI_WOOD,
+                                                        FLINT_AND_TINDER),
 TOOL("can of grease",       NoDes, 1, 0, 0, 1, 15, 15, 20, IRON, HI_METAL,
                                                                 CAN_OF_GREASE),
 TOOL("figurine",            NoDes, 1, 0, 1, 0, 25, 50, 80, MINERAL, HI_MINERAL,

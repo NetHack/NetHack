@@ -17,7 +17,7 @@
  * Incrementing EDITLEVEL can be used to force invalidation of old bones
  * and save files.
  */
-#define EDITLEVEL 0
+#define EDITLEVEL 1 /* food rework: cooked-meat bit on corpses */
 
 /*
  * Development status possibilities.

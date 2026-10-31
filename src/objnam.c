@@ -4,6 +4,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#include "meatnoun.h"
 
 /* "an uncursed greased partly eaten guardian naga hatchling [corpse]" */
 #define PREFIX 80 /* (56) */
@@ -27,6 +28,7 @@ struct _readobjnam_data {
     int tmp, tinv, tvariety, mgend;
     int wetness, gsize;
     int ftype;
+    int cooked_meat; /* 1 if the wish said "cooked" */
     boolean zombify;
     char globbuf[BUFSZ];
     char fruitbuf[BUFSZ];
@@ -784,6 +786,22 @@ xname_flags(
                doname() so we've added an external flag to request it */
             Concat(buf, 0, "partly eaten ");
         }
+        if (typ == CORPSE) {
+            char *save_xp = gx.xnamep;
+            unsigned cx = (cxn_flags & CXN_SINGULAR) ? CXN_SINGULAR
+                                                     : CXN_NORMAL;
+            char *cxstr = corpse_xname(obj, (const char *) 0, cx);
+
+            /* corpse_xname() switches obufs; copy, then restore ours.
+               Drop any "partly eaten" already queued; doname() adds it. */
+            buf[0] = '\0';
+            ConcUpdate(buf);
+            Concat(buf, 0, cxstr);
+            releaseobuf(cxstr);
+            gx.xnamep = save_xp;
+            pluralize = FALSE; /* plural is already in cxstr */
+            break;
+        }
         if (obj->globby) { /* 5.0 added "medium" to replace no-prefix */
             ConcatF2(buf, 0, "%s %s", (obj->owt <= 100) ? "small"
                                       : (obj->owt <= 300) ? "medium"
@@ -1540,22 +1558,21 @@ doname_base(
         if (obj->oeaten)
             Strcat(prefix, "partly eaten ");
         if (obj->otyp == CORPSE) {
-            /* (quan == 1) => want corpse_xname() to supply article,
-               (quan != 1) => already have count or "some" as prefix;
-               "corpse" is already in the buffer returned by xname() */
-            unsigned cxarg = (((obj->quan != 1L) ? 0 : CXN_ARTICLE)
-                              | CXN_NOCORPSE);
+            /* xname() already put the meat name in bp. Rebuild it so
+               blessed / partly eaten / a count (all sitting in prefix)
+               are part of that name, then drop prefix so they are not
+               applied twice. */
+            unsigned cxarg = (obj->quan != 1L) ? 0 : CXN_ARTICLE;
             char *cxstr, *save_xnamep;
 
-            /* corpse_xname() sets xnamep; callers other than doname_base()
-               itself shouldn't care about xnamep (pointer to start of
-               current obuf[]) but keep it accurate anyway */
             save_xnamep = gx.xnamep;
             cxstr = corpse_xname(obj, prefix, cxarg);
-            Sprintf(prefix, "%s ", cxstr);
-            /* avoid having doname(corpse) consume an extra obuf */
+            Strcpy(bp, cxstr);
             releaseobuf(cxstr);
             gx.xnamep = save_xnamep;
+            prefix[0] = '\0';
+            bp_eos = eos(bp);
+            bpspaceleft = (size_t) (bp_end - bp_eos);
         } else if (obj->otyp == EGG) {
 #if 0 /* corpses don't tell if they're stale either */
             if (known && stale_egg(obj))
@@ -1853,8 +1870,83 @@ not_fully_identified(struct obj *otmp)
         return (boolean) is_damageable(otmp);
 }
 
+/* Player-facing noun for a monster's meat. From include/meatnoun.h. */
+const char *
+meat_noun(struct permonst *ptr)
+{
+    if (!ptr)
+        return "meat";
+    switch (ptr->mlet) {
+#define MEAT_NOUN(sym, word) \
+    case sym: \
+        return word;
+        MEAT_NOUN_ROWS
+#undef MEAT_NOUN
+    default:
+        break;
+    }
+    return "meat";
+}
+
+/* True if a wish word is one of the meat nouns or its plural. */
+boolean
+meat_noun_word(const char *word)
+{
+    if (!word || !*word)
+        return FALSE;
+    if (!strcmpi(word, "meat") || !strcmpi(word, "meats"))
+        return TRUE;
+#define MEAT_NOUN(sym, w) \
+    if (!strcmpi(word, w)) \
+        return TRUE; \
+    { \
+        char *pl = makeplural(w); \
+        \
+        if (!strcmpi(word, pl)) { \
+            releaseobuf(pl); \
+            return TRUE; \
+        } \
+        releaseobuf(pl); \
+    }
+    MEAT_NOUN_ROWS
+#undef MEAT_NOUN
+    return FALSE;
+}
+
+/* Humanoids, humans, and elves leave no meat. Two exceptions, because
+   the game brings the monster back from that body:
+   - Riders (Death, Pestilence, Famine)
+   - Trolls (S_TROLL), which are flagged humanoid */
+boolean
+monster_leaves_meat(struct permonst *ptr)
+{
+    if (!ptr)
+        return FALSE;
+    if (is_rider(ptr) || ptr->mlet == S_TROLL)
+        return TRUE;
+    if (humanoid(ptr) || is_human(ptr) || is_elf(ptr))
+        return FALSE;
+    return TRUE;
+}
+
+/* Lizard meat, and every sea monster in class S_EEL (jellyfish, piranha,
+   shark, giant eel, electric eel, kraken), never takes the 5% raw-meat
+   poisoning roll. The same set may be blessed while still raw. */
+boolean
+raw_meat_poison_exempt(struct permonst *ptr)
+{
+    if (!ptr)
+        return FALSE;
+    if (ptr == &mons[PM_LIZARD])
+        return TRUE;
+    if (ptr->mlet == S_EEL)
+        return TRUE;
+    return FALSE;
+}
+
 /* format a corpse name (xname() omits monster type; doname() calls us);
-   eatcorpse() also uses us for death reason when eating tainted glob */
+   eatcorpse() also uses us for death reason when eating tainted glob.
+   Player-facing text says "raw <monster> <noun>" or "cooked <monster> <noun>". */
 char *
 corpse_xname(
     struct obj *otmp,
@@ -1910,36 +2002,52 @@ corpse_xname(
        to precede capitalized unique monsters (pnames are handled above) */
     if (the_prefix)
         Strcat(nambuf, "the ");
-    /* note: over time, various instances of the(mon_name()) have crept
-       into the code, so the() has been modified to deal with capitalized
-       monster names; we could switch to using it below like an() */
-
-    if (!adjective || !*adjective) {
-        /* normal case:  newt corpse */
-        Strcat(nambuf, mnam);
-    } else {
-        /* adjective positioning depends upon format of monster name */
-        if (possessive) /* Medusa's cursed partly eaten corpse */
-            Sprintf(eos(nambuf), "%s %s", mnam, adjective);
-        else /* cursed partly eaten troll corpse */
-            Sprintf(eos(nambuf), "%s %s", adjective, mnam);
-        /* in case adjective has a trailing space, squeeze it out */
-        mungspaces(nambuf);
-        /* doname() might include a count in the adjective argument;
-           if so, don't prepend an article */
-        if (digit(*adjective))
-            any_prefix = FALSE;
-    }
 
     if (glob) {
-        ; /* omit_corpse doesn't apply; quantity is always 1 */
-    } else if (!omit_corpse) {
-        Strcat(nambuf, " corpse");
-        /* makeplural(nambuf) => append "s" to "corpse" */
-        if (otmp->quan > 1L && !ignore_quan) {
-            Strcat(nambuf, "s");
-            any_prefix = FALSE; /* avoid "a newt corpses" */
+        /* globs keep their own object name ("glob of <foo>") */
+        if (!adjective || !*adjective)
+            Strcat(nambuf, mnam);
+        else
+            Sprintf(eos(nambuf), "%s %s", adjective, mnam);
+    } else {
+        const char *prep = (otmp->otyp == CORPSE && otmp->ocooked)
+                               ? "cooked" : "raw";
+        const char *noun = (ismnum(omndx) ? meat_noun(&mons[omndx]) : "meat");
+        char nounbuf[32];
+
+        Strcpy(nounbuf, noun);
+        if (otmp->quan > 1L && !ignore_quan && !omit_corpse) {
+            char *pn = makeplural(nounbuf);
+
+            Strcpy(nounbuf, pn);
+            releaseobuf(pn);
+            any_prefix = FALSE; /* avoid "a newt steaks" */
         }
+        if (omit_corpse) {
+            /* caller wants the monster name only */
+            if (!adjective || !*adjective)
+                Strcat(nambuf, mnam);
+            else if (possessive)
+                Sprintf(eos(nambuf), "%s %s", mnam, adjective);
+            else
+                Sprintf(eos(nambuf), "%s %s", adjective, mnam);
+        } else if (possessive) {
+            /* "Death's cursed partly eaten raw meat" */
+            if (!adjective || !*adjective)
+                Sprintf(eos(nambuf), "%s %s %s", mnam, prep, nounbuf);
+            else
+                Sprintf(eos(nambuf), "%s %s %s %s", mnam, adjective, prep,
+                        nounbuf);
+        } else if (!adjective || !*adjective) {
+            /* "raw gray dragon steak" */
+            Sprintf(eos(nambuf), "%s %s %s", prep, mnam, nounbuf);
+        } else {
+            /* "cursed partly eaten raw gray dragon steak" */
+            Sprintf(eos(nambuf), "%s%s %s %s", adjective, prep, mnam, nounbuf);
+        }
+        mungspaces(nambuf);
+        if (adjective && *adjective && digit(*adjective))
+            any_prefix = FALSE;
     }
 
     /* it's safe to overwrite our nambuf[] after an() has copied its
@@ -3969,6 +4077,7 @@ readobjnam_init(char *bp, struct _readobjnam_data *d)
 {
     d->otmp = (struct obj *) 0;
     d->cnt = d->spe = d->spesgn = d->typ = 0;
+    d->cooked_meat = 0;
     d->very = d->rechrg = d->blessed = d->uncursed = d->iscursed
         = d->ispoisoned = d->isgreased = d->eroded = d->eroded2
         = d->erodeproof = d->halfeaten = d->islit = d->unlabeled
@@ -4127,6 +4236,10 @@ readobjnam_preparse(struct _readobjnam_data *d)
         } else if (!strncmpi(d->bp, "partly eaten ", l = 13)
                    || !strncmpi(d->bp, "partially eaten ", l = 16)) {
             d->halfeaten = 1;
+        } else if (!strncmpi(d->bp, "cooked ", l = 7)) {
+            d->cooked_meat = 1;
+        } else if (!strncmpi(d->bp, "raw ", l = 4)) {
+            d->cooked_meat = 0;
         } else if (!strncmpi(d->bp, "historic ", l = 9)) {
             d->ishistoric = 1;
         } else if (!strncmpi(d->bp, "diluted ", l = 8)) {
@@ -4463,6 +4576,11 @@ readobjnam_postparse1(struct _readobjnam_data *d)
                 /* no referent; they don't really mean a monster type */
                 d->bp = obp;
                 d->mntmp = NON_PM;
+            }
+            /* "raw gray dragon steak" / "cooked electric eel fillet" */
+            if (d->mntmp >= LOW_PM && meat_noun_word(d->bp)) {
+                d->typ = CORPSE;
+                return 2; /* goto typfnd */
             }
         }
     }
@@ -5248,12 +5366,16 @@ readobjnam(char *bp, struct obj *no_wish)
             }
             break;
         case CORPSE:
+            if (d.cooked_meat)
+                d.otmp->ocooked = 1;
             if ((!(mons[d.mntmp].geno & G_UNIQ) || wizard)
                 && !(svm.mvitals[d.mntmp].mvflags & G_NOCORPSE)) {
                 if (mons[d.mntmp].msound == MS_GUARDIAN)
                     d.mntmp = genus(d.mntmp, 1);
                 set_corpsenm(d.otmp, d.mntmp);
             }
+            if (d.otmp->ocooked && ismnum(d.otmp->corpsenm))
+                refresh_meat_timer(d.otmp);
             if (d.zombify && zombie_form(&mons[d.mntmp])) {
                 (void) start_timer(rn1(5, 10), TIMER_OBJECT,
                                    ZOMBIFY_MON, obj_to_any(d.otmp));
@@ -5296,8 +5418,16 @@ readobjnam(char *bp, struct obj *no_wish)
         d.otmp->blessed = 0;
         d.otmp->cursed = (Luck < 0 && !wizard);
     } else if (d.blessed) {
-        d.otmp->blessed = (Luck >= 0 || wizard);
-        d.otmp->cursed = (Luck < 0 && !wizard);
+        if (!can_bless(d.otmp)) {
+            pline("You can't bless %s!", yname(d.otmp));
+            d.otmp->blessed = 0;
+            d.otmp->cursed = 0;
+        } else {
+            d.otmp->blessed = (Luck >= 0 || wizard);
+            d.otmp->cursed = (Luck < 0 && !wizard);
+            if (d.otmp->otyp == CORPSE && d.otmp->ocooked && d.otmp->blessed)
+                refresh_meat_timer(d.otmp);
+        }
     } else if (d.spesgn < 0) {
         curse(d.otmp);
     }

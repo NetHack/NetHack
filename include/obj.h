@@ -147,14 +147,15 @@ struct obj {
     Bitfield(how_lost, 3);  /* stolen by mon or thrown, dropped by hero, etc */
 
     Bitfield(named_how, 1);  /* source of name per TODO in resetobjs() */
+    Bitfield(ocooked, 1);    /* corpse has been cooked; clear means raw meat */
 #if 0
     /* not implemented */
     Bitfield(eknown, 1); /* effect known for wands zapped or rings worn when
                           * not seen yet after being picked up while blind
                           * [maybe for remaining stack of used potion too] */
-    /* 5 free bits */
+    /* 4 free bits */
 #else
-    /* 6 free bits */
+    /* 5 free bits */
 #endif
 
     int corpsenm;         /* type of corpse is mons[corpsenm] */

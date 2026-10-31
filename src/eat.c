@@ -46,6 +46,11 @@ staticfn boolean maybe_cannibal(int, boolean);
 staticfn int eat_ok(struct obj *);
 staticfn int offer_ok(struct obj *);
 staticfn int tin_ok(struct obj *);
+staticfn long meat_rotted(struct obj *, boolean);
+staticfn void apply_raw_meat_poison(boolean);
+staticfn int cook_ok(struct obj *);
+staticfn int finish_cooking(void);
+staticfn struct obj *find_cook_obj(void);
 
 /* also used to see if you're allowed to eat cats and dogs */
 #define CANNIBAL_ALLOWED() (Role_if(PM_CAVE_DWELLER) || Race_if(PM_ORC))
@@ -64,6 +69,56 @@ staticfn int tin_ok(struct obj *);
    as if rotten if they are cursed (fortune cookies handled elsewhere) */
 #define nonrotting_food(otyp) \
     ((otyp) == LEMBAS_WAFER || (otyp) == CRAM_RATION)
+
+/* How rotten this meat is. Blessed cooked meat never rots.
+   Other cooked meat reaches the same thresholds about 10x slower.
+   worst==TRUE uses the fastest divisor so the pre-eat prompt
+   matches the cautious check in edibility_prompts(). */
+staticfn long
+meat_rotted(struct obj *otmp, boolean worst)
+{
+    int mnum;
+    long age, div, rotted;
+
+    if (!otmp || otmp->otyp != CORPSE)
+        return 0L;
+    mnum = otmp->corpsenm;
+    if (!ismnum(mnum) || nonrotting_corpse(mnum))
+        return 0L;
+    if (otmp->ocooked && otmp->blessed)
+        return 0L;
+    age = peek_at_iced_corpse_age(otmp);
+    div = worst ? 10L : (10L + (long) rn2(20));
+    if (otmp->ocooked)
+        div *= 10L;
+    rotted = (svm.moves - age) / div;
+    if (otmp->cursed)
+        rotted += 2L;
+    else if (otmp->blessed)
+        rotted -= 2L;
+    return rotted;
+}
+
+/* 5% fatal food poisoning from raw meat. Same illness as tainted meat
+   (SICK_VOMITABLE), so a unicorn horn or prayer cures it. Stacks with
+   tainted sickness by shortening an illness that is already running. */
+staticfn void
+apply_raw_meat_poison(boolean do_it)
+{
+    long sick_time;
+
+    if (!do_it)
+        return;
+    if (Sick_resistance) {
+        pline("The raw meat smells dangerous, but you feel fine.");
+        return;
+    }
+    sick_time = (long) rn1(10, 10);
+    if (Sick && sick_time > Sick)
+        sick_time = (Sick > 1L) ? Sick - 1L : 1L;
+    make_sick(sick_time, "raw meat", TRUE, SICK_VOMITABLE);
+    You("feel deathly sick from the raw meat!");
+}
 
 /* see hunger states in hack.h - texts used on bottom line
    Also used in botl.c and insight.c  */
@@ -1858,6 +1913,7 @@ eatcorpse(struct obj *otmp)
     long rotted = 0L;
     int ll_conduct = 0;
     boolean stoneable,
+            raw_poison = FALSE,
             slimeable = (mnum == PM_GREEN_SLIME && !Slimed && !Unchanging
                          && !slimeproof(gy.youmonst.data)),
             glob = otmp->globby ? TRUE : FALSE;
@@ -1881,15 +1937,12 @@ eatcorpse(struct obj *otmp)
                            an(food_xname(otmp, FALSE)));
         violated_vegetarian();
     }
-    if (!nonrotting_corpse(mnum)) {
-        long age = peek_at_iced_corpse_age(otmp);
-
-        rotted = (svm.moves - age) / (10L + rn2(20));
-        if (otmp->cursed)
-            rotted += 2L;
-        else if (otmp->blessed)
-            rotted -= 2L;
-    }
+    rotted = meat_rotted(otmp, FALSE);
+    /* Fresh raw meat: 1 in 20 is fatal food poisoning, on top of taint.
+       Cooked meat, lizard meat, and sea-monster fillets never roll it. */
+    if (!otmp->ocooked && !glob
+        && !raw_meat_poison_exempt(&mons[mnum]) && !rn2(20))
+        raw_poison = TRUE;
 
     /* 5.0: globs don't become tainted, they shrink away */
     if (!glob && !stoneable && !slimeable && rotted > 5L) {
@@ -1915,6 +1968,8 @@ eatcorpse(struct obj *otmp)
 
             pline("(It must have died too long ago to be safe to eat.)");
         }
+        /* Stacks with taint: a second illness on top of the first. */
+        apply_raw_meat_poison(raw_poison);
         if (carried(otmp))
             useup(otmp);
         else
@@ -1923,14 +1978,14 @@ eatcorpse(struct obj *otmp)
     } else if (acidic(&mons[mnum]) && !Acid_resistance) {
         tp++;
         You("have a very bad case of stomach acid.");   /* not body_part() */
-        losehp(rnd(15), !glob ? "acidic corpse" : "acidic glob",
+        losehp(rnd(15), !glob ? "acidic meat" : "acidic glob",
                KILLED_BY_AN); /* acid damage */
     } else if (poisonous(&mons[mnum]) && rn2(5)) {
         tp++;
         pline("Ecch - that must have been poisonous!");
         if (!Poison_resistance) {
             poison_strdmg(rnd(4), rnd(15),
-                          !glob ? "poisonous corpse" : "poisonous glob",
+                          !glob ? "poisonous meat" : "poisonous glob",
                           KILLED_BY_AN);
         } else
             You("seem unaffected by the poison.");
@@ -1939,26 +1994,30 @@ eatcorpse(struct obj *otmp)
     } else if ((rotted > 5L || (rotted > 3L && rn2(5))) && !Sick_resistance) {
         tp++;
         You_feel("%ssick.", (Sick) ? "very " : "");
-        losehp(rnd(8), !glob ? "cadaver" : "rotted glob", KILLED_BY_AN);
+        losehp(rnd(8), !glob ? "spoiled meat" : "rotted glob", KILLED_BY_AN);
     }
 
     /* delay is weight dependent */
     svc.context.victual.reqtime
         = 3 + ((!glob ? mons[mnum].cwt : otmp->owt) >> 6);
 
-    if (!tp && !nonrotting_corpse(mnum) && (otmp->orotten || !rn2(7))) {
+    if (!tp && !nonrotting_corpse(mnum)
+        && !(otmp->ocooked && otmp->blessed)
+        && (otmp->orotten || !rn2(7))) {
         if (rottenfood(otmp)) {
             otmp->orotten = TRUE;
             otmp = touchfood(otmp);
-            if (!otmp)
+            if (!otmp) {
+                apply_raw_meat_poison(raw_poison);
                 return 1;
+            }
             retcode = 1;
         }
 
         if (!mons[otmp->corpsenm].cnutrit) {
             /* no nutrition: rots away, no message if you passed out */
             if (!retcode)
-                pline_The("corpse rots away completely.");
+                pline_The("meat rots away completely.");
             if (carried(otmp))
                 useup(otmp);
             else
@@ -2014,6 +2073,7 @@ eatcorpse(struct obj *otmp)
               (yummy || !palatable) ? '!' : '.');
     }
 
+    apply_raw_meat_poison(raw_poison);
     return retcode;
 }
 
@@ -2651,17 +2711,8 @@ edibility_prompts(struct obj *otmp)
         if (mnum == PM_GREEN_SLIME || otmp->otyp == GLOB_OF_GREEN_SLIME)
             stoneorslime = (!Unchanging && !slimeproof(gy.youmonst.data));
 
-        if (cadaver && !nonrotting_corpse(mnum)) {
-            long age = peek_at_iced_corpse_age(otmp);
-
-            /* worst case rather than random
-               in this calculation to force prompt */
-            rotted = (svm.moves - age) / (10L + 0 /* was rn2(20) */);
-            if (otmp->cursed)
-                rotted += 2L;
-            else if (otmp->blessed)
-                rotted -= 2L;
-        }
+        if (cadaver)
+            rotted = meat_rotted(otmp, TRUE);
     }
 
     /*
@@ -3965,6 +4016,132 @@ Finish_digestion(void)
         gc.corpsenm_digested = NON_PM;
     }
     return 0;
+}
+
+/* #cook — the flint and tinder box is not used up. */
+static unsigned cook_oid = 0;
+static char cook_nomove[] = "";
+
+staticfn struct obj *
+find_cook_obj(void)
+{
+    struct obj *otmp;
+
+    if (!cook_oid)
+        return (struct obj *) 0;
+    for (otmp = gi.invent; otmp; otmp = otmp->nobj)
+        if (otmp->o_id == cook_oid)
+            return otmp;
+    for (otmp = fobj; otmp; otmp = otmp->nobj)
+        if (otmp->o_id == cook_oid)
+            return otmp;
+    return (struct obj *) 0;
+}
+
+staticfn int
+cook_ok(struct obj *obj)
+{
+    if (!obj)
+        return GETOBJ_EXCLUDE;
+    if (obj->otyp != CORPSE)
+        return (obj->oclass == FOOD_CLASS) ? GETOBJ_EXCLUDE_SELECTABLE
+                                           : GETOBJ_EXCLUDE;
+    if (obj->ocooked)
+        return GETOBJ_DOWNPLAY;
+    return GETOBJ_SUGGEST;
+}
+
+staticfn int
+finish_cooking(void)
+{
+    struct obj *otmp = find_cook_obj();
+    char beforebuf[BUFSZ], afterbuf[BUFSZ];
+
+    cook_oid = 0;
+    if (!otmp || otmp->otyp != CORPSE || otmp->ocooked) {
+        if (otmp && otmp->ocooked)
+            pline("%s is already cooked.", Yname2(otmp));
+        else
+            You("have nothing left to cook.");
+        return 0;
+    }
+    Strcpy(beforebuf, yname(otmp));
+    otmp->ocooked = 1;
+    refresh_meat_timer(otmp);
+    Strcpy(afterbuf, yname(otmp));
+    /* yname() may share a buffer; both names are already copied. */
+    pline("%s is now %s.", upstart(beforebuf), afterbuf);
+    return 0;
+}
+
+int
+docook(void)
+{
+    struct obj *otmp = (struct obj *) 0;
+    char qbuf[QBUFSZ], qsfx[QBUFSZ];
+
+    if (Strangled) {
+        pline("If you can't breathe air, how can you cook?");
+        return ECMD_OK;
+    }
+    if (!carrying(FLINT_AND_TINDER)) {
+        You("need a flint and tinder box to cook.");
+        return ECMD_OK;
+    }
+    if (can_reach_floor(TRUE) && !iflags.menu_requested && !u.usteed) {
+        struct obj *floorobj;
+
+        for (floorobj = svl.level.objects[u.ux][u.uy]; floorobj;
+             floorobj = floorobj->nexthere) {
+            boolean one;
+            char c;
+
+            if (floorobj->otyp != CORPSE || floorobj->ocooked)
+                continue;
+            if (will_feel_cockatrice(floorobj, FALSE)) {
+                feel_cockatrice(floorobj, FALSE);
+                return ECMD_TIME;
+            }
+            one = (floorobj->quan == 1L);
+            Sprintf(qbuf, "There %s ", otense(floorobj, "are"));
+            Sprintf(qsfx, " here; cook %s?", one ? "it" : "one");
+            (void) safe_qbuf(qbuf, qbuf, qsfx, floorobj, doname,
+                             ansimpleoname,
+                             one ? something : (const char *) "things");
+            c = yn_function(qbuf, ynqchars, 'n', TRUE);
+            if (c == 'y') {
+                otmp = floorobj;
+                break;
+            }
+            if (c == 'q')
+                return ECMD_OK;
+        }
+    }
+    if (!otmp)
+        otmp = getobj("cook", cook_ok, GETOBJ_NOFLAGS);
+    if (!otmp)
+        return ECMD_OK;
+    if (otmp->otyp != CORPSE) {
+        You_cant("cook that!");
+        return ECMD_OK;
+    }
+    if (otmp->ocooked) {
+        pline("%s is already cooked.", Yname2(otmp));
+        return ECMD_OK;
+    }
+    if (will_feel_cockatrice(otmp, FALSE)) {
+        feel_cockatrice(otmp, FALSE);
+        return ECMD_TIME;
+    }
+    if (otmp->quan > 1L)
+        otmp = splitobj(otmp, 1L);
+    You("start cooking %s.", yname(otmp));
+    cook_oid = otmp->o_id;
+    nomul(-3);
+    gm.multi_reason = "cooking";
+    gn.nomovemsg = cook_nomove;
+    ga.afternmv = finish_cooking;
+    return ECMD_TIME;
 }
 
 /*eat.c*/

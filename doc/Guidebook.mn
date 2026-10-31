@@ -2993,14 +2993,18 @@ Food stored in
 ice boxes or tins (\(lqcans\(rq) will usually stay fresh, but
 ice boxes are heavy, and tins take a while to open.
 .pg
-When you kill monsters, they usually leave corpses which are also
-\(lqfood.\(rq
+When you kill a monster, it usually leaves raw meat (a dragon steak,
+a fish fillet, and so on).  Human-like monsters leave nothing to eat.
+Raw meat can spoil, and eating it raw sometimes causes fatal food
+poisoning.  #cook, with a flint and tinder box, makes cooked meat that
+spoils much more slowly.  Blessed cooked meat does not spoil.  This
+meat is \(lqfood.\(rq
 Many, but not all, of these are edible; some also give you
 special powers when you eat them.
 A good rule of thumb is \(lqyou are what you eat.\(rq
 .pg
 Some character roles and some monsters are vegetarian.  Vegetarian monsters
-will typically never eat animal corpses, while vegetarian players can,
+will typically never eat animal meat, while vegetarian players can,
 but with some rather unpleasant side-effects.
 .pg
 You can name one food item after something you like to eat with the

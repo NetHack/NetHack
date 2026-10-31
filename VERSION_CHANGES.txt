@@ -11,6 +11,15 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-10-31
+Monster bodies are raw meat now (a dragon leaves a raw dragon steak).
+Human-like monsters leave none, except trolls, who still do so
+they can come back. Eating raw meat can fatally poison
+you. #cook, with a flint and tinder box, makes cooked meat that
+spoils much more slowly. Blessed cooked meat does not spoil. The
+full list is in docs/RighteousHack_Food.xlsx. Saves from before
+this change will not load.
+
+2026-10-31
 The attributes screen no longer says your god is opposed by the
 other names in the pantheon. It only says which god you are on a
 mission for. Planned, not done: those three alignments will

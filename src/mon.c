@@ -622,6 +622,9 @@ make_corpse(struct monst *mtmp, unsigned int corpseflags)
     case PM_VAMPIRE_LEADER:
         /* include mtmp in the mkcorpstat() call */
         num = undead_to_corpse(mndx);
+        /* That body is human meat. Humanoids leave none. */
+        if (!monster_leaves_meat(&mons[num]))
+            break;
         corpstatflags |= CORPSTAT_INIT;
         obj = mkcorpstat(CORPSE, mtmp, &mons[num], x, y, corpstatflags);
         obj->age -= (TAINT_AGE + 1); /* this is an *OLD* corpse */
@@ -643,6 +646,10 @@ make_corpse(struct monst *mtmp, unsigned int corpseflags)
     case PM_GIANT_ZOMBIE:
     case PM_ETTIN_ZOMBIE:
         num = undead_to_corpse(mndx);
+        /* Kobold through ettin: the old body is that race's meat.
+           Humanoids, humans, and elves leave none. */
+        if (!monster_leaves_meat(&mons[num]))
+            break;
         corpstatflags |= CORPSTAT_INIT;
         obj = mkcorpstat(CORPSE, mtmp, &mons[num], x, y, corpstatflags);
         obj->age -= (TAINT_AGE + 1); /* this is an *OLD* corpse */
@@ -890,6 +897,12 @@ make_corpse(struct monst *mtmp, unsigned int corpseflags)
     default:
 #endif
  default_1:
+        /* Humanoids, humans, and elves leave no meat. Riders are
+           humanoid but still leave a body so they can come back.
+           Dragon scales, unicorn horns, and the worm tooth were
+           already dropped above; only the meat is skipped. */
+        if (!monster_leaves_meat(mdat))
+            return (struct obj *) 0;
         if (svm.mvitals[mndx].mvflags & G_NOCORPSE) {
             return (struct obj *) 0;
         } else {
@@ -3626,7 +3639,7 @@ xkilled(
             gz.zombify = FALSE; /* reset */
             if (burycorpse && cadaver && cansee(x, y) && !mtmp->minvis
                 && cadaver->where == OBJ_BURIED && !nomsg) {
-                pline("%s corpse ends up buried.", s_suffix(Monnam(mtmp)));
+                pline("%s meat ends up buried.", s_suffix(Monnam(mtmp)));
             }
         }
     }

@@ -4420,7 +4420,8 @@ mergable(
         return FALSE;
 
     if (obj->oclass == FOOD_CLASS
-        && (obj->oeaten != otmp->oeaten || obj->orotten != otmp->orotten))
+        && (obj->oeaten != otmp->oeaten || obj->orotten != otmp->orotten
+            || obj->ocooked != otmp->ocooked))
         return FALSE;
 
     if (obj->dknown != otmp->dknown
