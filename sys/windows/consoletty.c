@@ -1,4 +1,4 @@
-/* $NHDT-Header$ */
+/* $NHDT-Header: NetHack 5.0 consoletty.c 2026/10/17_14:49:13 NetHack-5.0:1.210 $ */
 /* Copyright (c) Michael Allison, 2026 */
 /* Copyright (c) NetHack PC Development Team 1993    */
 /* NetHack may be freely redistributed.  See license for details. */

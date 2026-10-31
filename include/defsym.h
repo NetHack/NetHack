@@ -1,4 +1,4 @@
-/* $NHDT-Header$ */
+/* $NHDT-Header: NetHack 5.0 defsym.h 2026/06/20_22:26:43 NetHack-5.0:1.29 $ */
 /*      Copyright (c) 2016 by Pasi Kallinen              */
 /* NetHack may be freely redistributed.  See license for details. */
 

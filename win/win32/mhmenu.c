@@ -1,4 +1,4 @@
-/* $NHDT-Header$ */
+/* $NHDT-Header: NetHack 5.0 mhmenu.c 1970/01/01_00:00:00 NetHack-5.0:1.100 $ */
 /* Copyright (c) Alex Kompel, 2002                                */
 /* NetHack may be freely redistributed.  See license for details. */
 

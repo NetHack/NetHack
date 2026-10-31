@@ -1,4 +1,4 @@
-/* $NHDT-Header$ */
+/* $NHDT-Header: NetHack 5.0 oldcrtl.c 2026/04/26_14:47:48 NetHack-5.0:1.14 $ */
 /* Copyright (c) 1990 by Robert Patrick Rankin */
 /* NetHack may be freely redistributed.  See license for details. */
 

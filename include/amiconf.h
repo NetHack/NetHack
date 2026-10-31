@@ -1,4 +1,4 @@
-/* $NHDT-Header$ */
+/* $NHDT-Header: NetHack 5.0 amiconf.h 2026/09/30_14:47:34 NetHack-5.0:1.36 $ */
 /* Copyright (c) Kenneth Lorber, Bethesda, Maryland, 1990, 1991, 1992, 1993.
  */
 /* NetHack may be freely redistributed.  See license for details. */

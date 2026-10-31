@@ -1,4 +1,4 @@
-/* $NHDT-Header$ */
+/* $NHDT-Header: NetHack 5.0 amirip.c 2026/09/30_14:47:34 NetHack-5.0:1.32 $ */
 /* Copyright (c) Kenneth Lorber, Bethesda, Maryland 1991,1992,1993,1995,1996.
  */
 /* NetHack may be freely redistributed.  See license for details. */

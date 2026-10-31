@@ -1,4 +1,4 @@
--- $NHDT-Header$
+-- $NHDT-Header: NetHack 5.0 Sam-goal.lua 2026/06/20_22:35:38 NetHack-5.0:1.4 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1991-92 by M. Stephenson, P. Winner
 -- NetHack may be freely redistributed.  See license for details.

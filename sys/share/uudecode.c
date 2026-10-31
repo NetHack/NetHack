@@ -46,7 +46,7 @@
  * Modified 09 Apr 2026 to change mode variable from (int) to (unsigned int)
  * to match prototype of sscanf %o.
  *
- * $NHDT-Header$
+ * $NHDT-Header: NetHack 5.0 uudecode.c 2026/04/26_14:47:48 NetHack-5.0:1.24 $
  */
 
 #ifndef lint

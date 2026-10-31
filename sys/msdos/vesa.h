@@ -1,4 +1,4 @@
-/* $NHDT-Header$ */
+/* $NHDT-Header: NetHack 5.0 vesa.h 2026/04/26_14:47:48 NetHack-5.0:1.4 $ */
 
 /* VESA structures from the VESA BIOS Specification, retrieved 15 Jan 2016
  * from http://flint.cs.yale.edu/cs422/readings/hardware/vbe3.pdf

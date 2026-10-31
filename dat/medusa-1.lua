@@ -1,4 +1,4 @@
--- $NHDT-Header$
+-- $NHDT-Header: NetHack 5.0 medusa-1.lua 2026/10/05_16:04:29 NetHack-5.0:1.10 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1990, 1991 by M. Stephenson
 -- NetHack may be freely redistributed.  See license for details.

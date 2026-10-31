@@ -1,4 +1,4 @@
-$ ! $NHDT-Header$
+$ ! $NHDT-Header: NetHack 5.0 install.com 2023/05/23_21:50:24 NetHack-5.0:1.19 $
 $ ! Copyright (c) 2016 by Robert Patrick Rankin
 $ ! NetHack may be freely redistributed.  See license for details.
 $ !

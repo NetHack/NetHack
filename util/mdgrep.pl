@@ -1,5 +1,5 @@
 #!perl
-# $NHDT-Header: NetHack 5.0 mdgrep.pl 2026/10/30_01:28:41 NetHack-5.0:1.29 $
+# $NHDT-Header: NetHack 5.0 mdgrep.pl 1970/01/01_00:00:00 NetHack-5.0:1.30 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
 
@@ -59,7 +59,7 @@ $specials = {
 
 $outfile = "mdgrep.h";
 sub start_file {
-	(my $rev) = ('$NHDT-Revision: 1.29 $') =~ m/: (.*) .$/;
+	(my $rev) = ('$NHDT-Revision: 1.30 $') =~ m/: (.*) .$/;
 	open(OUT, ">$outfile") || die "open $outfile: $!";
 # NB: Header below will be modified when mdgrep.h is written to
 # git - this is correct (but it means you must commit changes to mdgrep.pl

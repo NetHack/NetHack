@@ -1,4 +1,4 @@
-$ ! $NHDT-Header$
+$ ! $NHDT-Header: NetHack 5.0 vmssetup.com 2026/09/25_13:07:53 NetHack-5.0:1.3 $
 $ ! NetHack may be freely redistributed.  See license for details.
 $ ! Copyright (c) Michael Allison, 2024
 $ ! vmssetup.com -- place GNU Makefiles in their target directories

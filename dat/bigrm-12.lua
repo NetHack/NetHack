@@ -1,4 +1,4 @@
--- $NHDT-Header$
+-- $NHDT-Header: NetHack 5.0 bigrm-12.lua 2026/10/11_17:56:42 NetHack-5.0:1.4 $
 --	Copyright (c) 2024 by Pasi Kallinen
 -- NetHack may be freely redistributed.  See license for details.
 --

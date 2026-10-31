@@ -259,6 +259,6 @@ by code within the game itself. That was done to facilitate cross-compiling of
 NetHack on one platform for game execution on another.
 
 
-# $NHDT-Header$
+# $NHDT-Header: NetHack 5.0 Porting 2026/10/04_12:05:14 NetHack-5.0:1.26 $
 # Copyright (c) 2005 by Michael Allison
 # NetHack may be freely redistributed.  See license for details.

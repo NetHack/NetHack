@@ -1,4 +1,4 @@
--- $NHDT-Header$
+-- $NHDT-Header: NetHack 5.0 soko3-2.lua 2026/06/20_22:35:38 NetHack-5.0:1.7 $
 --	Copyright (c) 1998-1999 by Kevin Hugo
 -- NetHack may be freely redistributed.  See license for details.
 --

@@ -1,4 +1,4 @@
-/* $NHDT-Header$ */
+/* $NHDT-Header: NetHack 5.0 winos.h 2026/04/26_14:47:48 NetHack-5.0:1.7 $ */
 /* Copyright (c) Michael Allison, 2021 */
 /* Copyright (c) NetHack PC Development Team 2018 */
 /* NetHack may be freely redistributed.  See license for details. */

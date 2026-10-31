@@ -1,4 +1,4 @@
-# $NHDT-Header$
+# $NHDT-Header: NetHack 5.0 tiles.mak 2018/04/25_20:54:50 NetHack-5.0:1.6 $
 # Copyright (c) 2002 by Michael Allison
 # NetHack may be freely redistributed.  See license for details.
 

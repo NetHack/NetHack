@@ -1,5 +1,5 @@
 /*
- * $NHDT-Header: NetHack 5.0 mdgrep.pl 2026/10/30_01:20:30 NetHack-5.0:1.29 $
+ * $NHDT-Header: NetHack 5.0 mdgrep.h 2026/06/20_22:26:43 NetHack-5.0:1.24 $
  * Copyright (c) Kenneth Lorber, Kensington, Maryland, 2008
  * NetHack may be freely redistributed.  See license for details.
  *

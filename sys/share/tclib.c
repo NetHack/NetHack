@@ -1,4 +1,4 @@
-/* $NHDT-Header$ */
+/* $NHDT-Header: NetHack 5.0 tclib.c 2026/04/26_14:47:48 NetHack-5.0:1.18 $ */
 /* Copyright (c) Robert Patrick Rankin, 1995                      */
 /* NetHack may be freely redistributed.  See license for details. */
 

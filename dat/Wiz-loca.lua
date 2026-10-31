@@ -1,4 +1,4 @@
--- $NHDT-Header$
+-- $NHDT-Header: NetHack 5.0 Wiz-loca.lua 2026/06/20_22:35:38 NetHack-5.0:1.5 $
 --	Copyright (c) 1992 by David Cohrs
 -- NetHack may be freely redistributed.  See license for details.
 --

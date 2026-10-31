@@ -1,4 +1,4 @@
--- $NHDT-Header$
+-- $NHDT-Header: NetHack 5.0 Kni-filb.lua 2026/06/20_22:35:38 NetHack-5.0:1.5 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1991,1992 by M. Stephenson
 -- NetHack may be freely redistributed.  See license for details.

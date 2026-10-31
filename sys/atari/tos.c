@@ -1,4 +1,4 @@
-/* $NHDT-Header$ */
+/* $NHDT-Header: NetHack 5.0 tos.c 2026/09/30_14:47:34 NetHack-5.0:1.18 $ */
 /* Copyright (c) Ingo Paschke, 2026 */
 /* NetHack may be freely redistributed.  See license for details. */
 

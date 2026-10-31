@@ -1,5 +1,5 @@
 #!/usr/bin/osascript
-# $NHDT-Header$
+# $NHDT-Header: NetHack 5.0 NetHackTerm.applescript 2023/02/10_06:55:49 NetHack-5.0:1.13 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2011
 # NetHack may be freely redistributed.  See license for details.
 

@@ -1,4 +1,4 @@
-/* $NHDT-Header: NetHack 5.0 unixunix.c 2026/10/30_21:37:48 NetHack-5.0:1.50 $ */
+/* $NHDT-Header: NetHack 5.0 unixunix.c 2026/05/15_20:40:34 NetHack-5.0:1.52 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */

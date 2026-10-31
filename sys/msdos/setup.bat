@@ -1,5 +1,5 @@
 @echo off
-REM    $NHDT-Header$
+REM    $NHDT-Header: NetHack 5.0 setup.bat 2026/04/26_14:47:48 NetHack-5.0:1.23 $
 REM    Copyright (c) Michael Allison, 2026
 REM    Copyright (c) NetHack PC Development Team 1990 - 2019
 REM    NetHack may be freely redistributed.  See license for details.

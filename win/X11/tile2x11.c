@@ -1,4 +1,4 @@
-/* $NHDT-Header$ */
+/* $NHDT-Header: NetHack 5.0 tile2x11.c 2024/02/20_18:04:32 NetHack-5.0:1.20 $ */
 /*      Copyright (c) 2017 by Pasi Kallinen                       */
 /* NetHack may be freely redistributed.  See license for details. */
 

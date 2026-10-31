@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $NHDT-Header$
+# $NHDT-Header: NetHack 5.0 gitinfo.pl 2020/08/04_02:07:36 NetHack-5.0:1.5 $
 # Copyright (c) 2018 by Michael Allison
 # NetHack may be freely redistributed.  See license for details.
 

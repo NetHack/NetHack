@@ -1,4 +1,4 @@
-$ ! $NHDT-Header$
+$ ! $NHDT-Header: NetHack 5.0 vmsbuild.com 2026/09/25_13:07:53 NetHack-5.0:1.51 $
 $ ! Copyright (c) 2018 by Robert Patrick Rankin
 $ ! NetHack may be freely redistributed.  See license for details.
 $ !

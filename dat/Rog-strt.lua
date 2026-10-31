@@ -1,4 +1,4 @@
--- $NHDT-Header$
+-- $NHDT-Header: NetHack 5.0 Rog-strt.lua 2026/06/20_22:35:38 NetHack-5.0:1.9 $
 --	Copyright (c) 1992 by Dean Luick
 -- NetHack may be freely redistributed.  See license for details.
 --

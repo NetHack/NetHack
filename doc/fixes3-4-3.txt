@@ -1,4 +1,4 @@
-$NHDT-Header$
+$NHDT-Header: NetHack 5.0 fixes3-4-3.txt 2022/01/29_21:28:06 NetHack-5.0:1.109 $
 
 General Fixes and Modified Features
 -----------------------------------

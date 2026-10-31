@@ -1,4 +1,4 @@
-$! $NHDT-Header$
+$! $NHDT-Header: NetHack 5.0 nethack.com 2018/04/25_20:54:50 NetHack-5.0:1.7 $
 $! Copyright (c) 2016 by Robert Patrick Rankin
 $! NetHack may be freely redistributed.  See license for details.
 $!

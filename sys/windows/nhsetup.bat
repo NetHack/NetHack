@@ -1,4 +1,4 @@
-@REM  $NHDT-Header$
+@REM  $NHDT-Header: NetHack 5.0 nhsetup.bat 2026/04/26_14:47:48 NetHack-5.0:1.51 $
 @REM  Copyright (c) Copyright (c) Michael Allison, 2026
 @REM  Copyright (c) NetHack Development Team 1993-2024
 @REM  NetHack may be freely redistributed.  See license for details.

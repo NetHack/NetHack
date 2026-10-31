@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# $NHDT-Header$
+# $NHDT-Header: NetHack 5.0 recover.pl 2026/06/20_22:55:28 NetHack-5.0:1.17 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2009
 # NetHack may be freely redistributed.  See license for details.
 

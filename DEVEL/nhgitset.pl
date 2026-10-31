@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $NHDT-Header$
+# $NHDT-Header: NetHack 5.0 nhgitset.pl 2026/06/20_00:44:46 NetHack-5.0:1.11 $
 # Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
 

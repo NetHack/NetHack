@@ -1,4 +1,4 @@
-/* $NHDT-Header$ */
+/* $NHDT-Header: NetHack 5.0 gr_rect.h 2026/09/30_14:47:34 NetHack-5.0:1.9 $ */
 #include <e_gem.h>
 /********** structs **********/
 typedef struct {

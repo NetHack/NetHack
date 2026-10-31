@@ -1,4 +1,4 @@
--- $NHDT-Header$
+-- $NHDT-Header: NetHack 5.0 hellfill.lua 2026/04/26_16:13:14 NetHack-5.0:1.18 $
 --	Copyright (c) 2022 by Pasi Kallinen
 -- NetHack may be freely redistributed.  See license for details.
 --

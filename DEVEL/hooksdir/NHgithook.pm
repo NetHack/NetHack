@@ -1,5 +1,5 @@
 #
-# $NHDT-Header$
+# $NHDT-Header: NetHack 5.0 NHgithook.pm 2026/06/20_00:44:46 NetHack-5.0:1.12 $
 # Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
 

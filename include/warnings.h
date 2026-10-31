@@ -1,4 +1,4 @@
-/* $NHDT-Header$ */
+/* $NHDT-Header: NetHack 5.0 warnings.h 2026/06/20_22:26:43 NetHack-5.0:1.13 $ */
 /* Copyright (c) Michael Allison, 2021. */
 
 #ifndef WARNINGS_H

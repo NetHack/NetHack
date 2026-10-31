@@ -1,4 +1,4 @@
--- $NHDT-Header$
+-- $NHDT-Header: NetHack 5.0 dungeon.lua 2026/06/20_22:35:38 NetHack-5.0:1.13 $
 -- Copyright (c) 1990-1995 by M. Stephenson
 -- NetHack may be freely redistributed.  See license for details.
 --
