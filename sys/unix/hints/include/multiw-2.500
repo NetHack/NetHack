@@ -1,0 +1,218 @@
+#------------------------------------------------------------------------------
+# NetHack 5.0  multiw-2.500 $NHDT-Date: 1599337709 2020/09/05 20:28:29 $  $NHDT-Branch: NetHack-5.0 $
+#
+# Sorts out support for multiple window ports (interfaces) to included in the build.
+#
+# Included from:
+#           hints/linux.500
+#           hints/macOS.500
+#
+# The following will be set appropriately following this:
+#     - WANT_WIN_XXX  (at least one will be set; default is TTY)
+#     - WANT_DEFAULT (set to match one of the enabled WANT_WIN_XXX)
+#     - WINCFLAGS
+#     - WINSRC
+#     - WINOBJ0
+#---
+# User selections could be specified as combinations of any of the following:
+# WANT_WIN_TTY=1, WANT_WIN_CURSES=1, WANT_WIN_QT=1, WANT_WIN_X11=1
+# The selections will all be linked into the same binary.
+#
+# Assuming you have the prerequisite packages mentioned above, you can
+# specify, right on the make command line, which window ports (or interfaces)
+# to include in your build. Doing it via the make command line means that won't
+# have to edit the Makefile.
+#
+# make WANT_WIN_QT=1 WANT_WIN_X11=1 WANT_WIN_CURSES=1 WANT_WIN_TTY=1 install
+#
+# Add WANT_DEFAULT=Qt (or other interface) if you want nethack to use
+# something other than tty as the default interface.
+#
+
+ifdef WANT_WIN_ALL
+WANT_WIN_TTY=1
+WANT_WIN_CURSES=1
+WANT_WIN_X11=1
+WANT_WIN_QT=1
+else
+# Make sure that at least one interface is enabled.
+ifndef WANT_WIN_TTY
+ifndef  WANT_WIN_CURSES
+ifndef   WANT_WIN_X11
+ifndef    WANT_WIN_QT
+WANT_WIN_TTY=1
+endif
+endif
+endif
+endif
+endif
+
+ifdef WANT_LIBNH
+WANT_DEFAULT=shim
+endif
+
+# Make sure that a default interface is specified; this doesn't guarantee
+# sanity for something like 'make WANT_WIN_CURSES=1 WANT_DEFAULT=X11' but
+# 'makedefs -v' would notice, complain, and quit causing 'make' to quit.
+ifndef WANT_DEFAULT
+# pick the first one enabled among { tty, curses, X11, Qt }
+ifdef WANT_WIN_TTY
+WANT_DEFAULT=tty
+else
+ifdef  WANT_WIN_CURSES
+WANT_DEFAULT=curses
+else
+ifdef   WANT_WIN_X11
+WANT_DEFAULT=X11
+else
+ifdef    WANT_WIN_QT
+WANT_DEFAULT=Qt
+else
+# ? shouldn't be able to get here...
+endif
+endif
+endif
+endif
+endif
+
+WINCFLAGS=
+WINSRC =
+WINOBJ0 =
+SND_CFLAGS=
+XTRASRC =
+XTRAOBJ =
+
+ifdef WANT_WIN_TTY
+WINSRC += $(WINTTYSRC)
+WINOBJ0 += $(WINTTYOBJ)
+else
+WINCFLAGS += -DNOTTYGRAPHICS
+endif
+
+ifdef WANT_WIN_CURSES
+WINCFLAGS += -DCURSES_GRAPHICS
+ifeq "$(USE_GENL_PUTMIXED)" "1"
+WINCFLAGS += -DUSE_GENL_PUTMIXED
+else
+WINCFLAGS += -D_XOPEN_SOURCE_EXTENDED=1
+endif
+WINSRC += $(WINCURSESSRC)
+WINOBJ0 += $(WINCURSESOBJ)
+endif
+
+ifdef WANT_WIN_X11
+WINCFLAGS += -DX11_GRAPHICS
+WINSRC += $(WIINX11SRC)
+WINOBJ0 += $(WINX11OBJ)
+XTRASRC += tile.c
+XTRAOBJ += $(TARGETPFX)tile.o
+endif
+
+ifndef WANT_WIN_QT
+ifdef WANT_WIN_ALL
+WANT_WIN_QT=1
+endif
+ifdef WANT_WIN_QT4
+ifndef WANT_WIN_QT
+WANT_WIN_QT=1
+endif   # not WANT_WIN_QT
+endif   # WANT_WIN_QT4
+ifdef WANT_WIN_QT5
+ifndef WANT_WIN_QT
+WANT_WIN_QT=1
+endif   # not WANT_WIN_QT
+endif   # WANT_WIN_QT5
+ifdef WANT_WIN_QT6
+ifndef WANT_WIN_QT
+WANT_WIN_QT=1
+endif   # not WANT_WIN_QT
+endif   # WANT_WIN_QT6
+endif   # not def WANT_WIN_QT
+
+ifdef WANT_WIN_QT
+# WANT_WIN_QT5 is the default
+ifndef WANT_WIN_QT4
+ifndef WANT_WIN_QT5
+ifndef WANT_WIN_QT6
+WANT_WIN_QT5=1
+endif   # not WANT_WIN_QT6
+endif   # not WANT_WIN_QT5
+endif   # not WANT_WIN_QT4
+ifdef WANT_WIN_QT4
+#Slackware 14.2 puts Qt4 here
+#if your Qt4 is elsewhere, change this to match
+QT4DIR=/usr/lib64/qt
+QTDIR=$(QT4DIR)
+endif  # WANT_WIN_QT4
+endif   # WANT_WIN_QT
+
+ifdef WANT_WIN_QT
+WINCFLAGS += -DQT_GRAPHICS
+WINSRC += $(WINQTSRC)
+WINOBJ0 += $(WINQTOBJ)
+ifndef WANT_WIN_QT4
+SNDCFLAGS += -DSND_LIB_QTSOUND
+endif #! WANT_WIN_QT4
+HAVE_SNDLIB = 1
+NEEDS_SND_USERSOUNDS = 1
+NEEDS_SND_SEAUTOMAP = 1
+XTRASRC += tile.c
+XTRAOBJ += $(TARGETPFX)tile.o
+#
+ifndef CPLUSPLUS_NEEDED
+CPLUSPLUS_NEEDED = 1
+endif   # CPLUSPLUS_NEEDED
+ifdef WANT_WIN_QT6
+CPLUSPLUS_NEED20 = 1
+CPLUSPLUS_NEED_DEPSUPPRESS = 1
+endif   # WANT_WIN_QT6
+endif   # WANT_WIN_QT
+
+ifeq "$(GIT)" "1"
+ifndef GITSUBMODULES
+GITSUBMODULES=1
+endif
+endif
+
+ifeq "$(git)" "1"
+ifndef GITSUBMODULES
+GITSUBMODULES=1
+endif
+endif
+
+ifeq "$(CPPREGEX)" "1"
+REGEXOBJ=$(TARGETPFX)cppregex.o
+ifndef CPLUSPLUS_NEEDED
+CPLUSPLUS_NEEDED = 1
+endif
+endif
+
+ifeq "$(cppregex)" "1"
+REGEXOBJ=$(TARGETPFX)cppregex.o
+ifndef CPLUSPLUS_NEEDED
+CPLUSPLUS_NEEDED = 1
+endif
+endif
+
+ifeq "$(musl)" "1"
+MUSL=1
+endif
+ifeq "$(MUSL)" "1"
+ifneq "$(NOCRASHREPORT)" "1"
+NOCRASHREPORT=1
+endif
+WINCFLAGS += -DMUSL_LIBC
+# use this instead of col -bx
+COLCMD=../util/stripbs
+STRIPBS=../util/stripbs
+else
+WINCFLAGS += -DGNU_LIBC
+endif
+
+ifeq "$(NOCRASHREPORT)" "1"
+WINCFLAGS += -DNOCRASHREPORT
+endif
+
+#end of hints/include/multiw-2.500
+#------------------------------------------------------------------------------
+

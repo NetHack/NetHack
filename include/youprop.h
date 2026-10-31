@@ -1,4 +1,4 @@
-/* NetHack 3.7	youprop.h	$NHDT-Date: 1725653018 2024/09/06 20:03:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.45 $ */
+/* NetHack 5.0	youprop.h	$NHDT-Date: 1725653018 2024/09/06 20:03:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.45 $ */
 /* Copyright (c) 1989 Mike Threepoint                             */
 /* NetHack may be freely redistributed.  See license for details. */
 

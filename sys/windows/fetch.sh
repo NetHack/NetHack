@@ -6,12 +6,12 @@ fi
 
 if [ $1 == "lua" ]; then
  if [ -z "$LUA_VERSION" ]; then
- export LUA_VERSION=5.4.6
+ export LUA_VERSION=5.4.8
  export LUASRC=../lib/lua
  fi
 
- export CURLLUASRC=http://www.lua.org/ftp/lua-5.4.6.tar.gz
- export CURLLUADST=lua-5.4.6.tar.gz
+ export CURLLUASRC=http://www.lua.org/ftp/lua-5.4.8.tar.gz
+ export CURLLUADST=lua-5.4.8.tar.gz
 
  if [ ! -f lib/lua.h ] ;then
 	cd lib

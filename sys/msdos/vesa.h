@@ -1,4 +1,4 @@
-/* NetHack 3.7	vesa.h	$NHDT-Date: 1596498276 2020/08/03 23:44:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.0 $ */
+/* NetHack 5.0	vesa.h	$NHDT-Date: 1596498276 2020/08/03 23:44:36 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.0 $ */
 
 /* VESA structures from the VESA BIOS Specification, retrieved 15 Jan 2016
  * from http://flint.cs.yale.edu/cs422/readings/hardware/vbe3.pdf

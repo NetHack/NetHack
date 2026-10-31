@@ -1,5 +1,5 @@
 /* vim:set cin ft=c sw=4 sts=4 ts=8 et ai cino=Ls\:0t0(0 : -*- mode:c;fill-column:80;tab-width:8;c-basic-offset:4;indent-tabs-mode:nil;c-file-style:"k&r" -*-*/
-/* NetHack 3.7 cursstat.c */
+/* NetHack 5.0 cursstat.c */
 /* Copyright (c) Andy Thomson, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -254,12 +254,13 @@ draw_horizontal(boolean border)
     /* almost all fields already come with a leading space;
        "xspace" indicates places where we'll generate an extra one */
     static const enum statusfields
-    twolineorder[3][16] = {
+    twolineorder[3][19] = {
         { BL_TITLE,
           /*xspace*/ BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH,
           /*xspace*/ BL_ALIGN,
           /*xspace*/ BL_SCORE,
-          BL_FLUSH, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD },
+          BL_FLUSH, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD,
+          blPAD, blPAD, blPAD },
         { BL_LEVELDESC,
           /*xspace*/ BL_GOLD,
           /*xspace*/ BL_HP, BL_HPMAX,
@@ -267,32 +268,35 @@ draw_horizontal(boolean border)
           /*xspace*/ BL_AC,
           /*xspace*/ BL_XP, BL_EXP, BL_HD,
           /*xspace*/ BL_TIME,
-          /*xspace*/ BL_HUNGER, BL_CAP, BL_CONDITION, BL_VERS,
+          /*xspace*/ BL_HUNGER, BL_CAP,
+          BL_WEAPON, BL_ARMOR, BL_TERRAIN, BL_CONDITION, BL_VERS,
           BL_FLUSH },
         { BL_FLUSH, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD,
-          blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD }
+          blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD,
+          blPAD, blPAD, blPAD }
     },
-    threelineorder[3][16] = { /* moves align to line 2, leveldesc+ to 3 */
+    threelineorder[3][19] = { /* moves align to line 2, leveldesc+ to 3 */
         { BL_TITLE,
           /*xspace*/ BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH,
           /*xspace*/ BL_SCORE,
-          BL_FLUSH, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD },
+          BL_FLUSH, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD,
+          blPAD, blPAD, blPAD },
         { BL_ALIGN,
           /*xspace*/ BL_GOLD,
           /*xspace*/ BL_HP, BL_HPMAX,
           /*xspace*/ BL_ENE, BL_ENEMAX,
           /*xspace*/ BL_AC,
           /*xspace*/ BL_XP, BL_EXP, BL_HD,
-          /*xspace*/ BL_HUNGER, BL_CAP,
+          /*xspace*/ BL_HUNGER, BL_CAP, BL_WEAPON, BL_ARMOR, BL_TERRAIN,
           BL_FLUSH, blPAD, blPAD, blPAD },
         { BL_LEVELDESC,
           /*xspace*/ BL_TIME,
           /*xspecial*/ BL_CONDITION,
           /*xspecial*/ BL_VERS,
           BL_FLUSH, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD,
-          blPAD, blPAD, blPAD, blPAD }
+          blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD }
     };
-    const enum statusfields (*fieldorder)[16];
+    const enum statusfields (*fieldorder)[19];
     coordxy spacing[MAXBLSTATS], valline[MAXBLSTATS];
     enum statusfields fld, prev_fld;
     char *text, *p, cbuf[BUFSZ], ebuf[STATVAL_WIDTH];
@@ -401,6 +405,9 @@ draw_horizontal(boolean border)
             case BL_ENEMAX:
                 spacing[fld] = 0; /* no leading or extra space */
                 break;
+            case BL_WEAPON:
+            case BL_ARMOR:
+            case BL_TERRAIN:
             case BL_DX:
             case BL_CO:
             case BL_IN:
@@ -705,16 +712,18 @@ draw_vertical(boolean border)
         /* 6:blank (if any of hunger, encumbrance, or conditions appear) */
         BL_HUNGER, BL_CAP, /* these two are shown on same line */
         BL_CONDITION, /* shown three per line so may take up to four lines */
+        BL_WEAPON, BL_ARMOR, BL_TERRAIN, /* same line if 2, two lines if 3 */
         /* 1:blank (bottom justified) */
         BL_VERS,
         BL_FLUSH
     };
     static const enum statusfields shrinkorder[] = {
-         BL_VERS, BL_STR, BL_SCORE, BL_TIME, BL_LEVELDESC, BL_HP,
-         BL_CONDITION, BL_CAP, BL_HUNGER
+        BL_VERS, BL_STR, BL_SCORE, BL_TIME, BL_LEVELDESC, BL_HP,
+        BL_TERRAIN, BL_ARMOR, BL_WEAPON,
+        BL_CONDITION, BL_CAP, BL_HUNGER
     };
     coordxy spacing[MAXBLSTATS];
-    int i, fld, cap_and_hunger, time_and_score, cond_count,
+    int i, fld, cap_and_hunger, time_and_score, cond_count, wep_arm_ter,
         sho_vers, per_line;
     char *text;
 #ifdef STATUS_HILITES
@@ -758,6 +767,13 @@ draw_vertical(boolean border)
     }
     per_line = 2; /* will be changed to 3 if status becomes too tall */
     sho_vers = (status_activefields[BL_VERS] ? 1 : 0);
+    wep_arm_ter = 0;
+    if (status_activefields[BL_WEAPON] && *status_vals_long[BL_WEAPON])
+        wep_arm_ter |= 1;
+    if (status_activefields[BL_ARMOR] && *status_vals_long[BL_ARMOR])
+        wep_arm_ter |= 2;
+    if (status_activefields[BL_TERRAIN] && *status_vals_long[BL_TERRAIN])
+        wep_arm_ter |= 4;
 
     /* count how many lines we'll need; we normally space several groups of
        fields with blank lines but might need to compress some of those out */
@@ -801,6 +817,32 @@ draw_vertical(boolean border)
             /* first line handled via '+= spacing[]' below */
             if (cond_count > per_line)
                 height_needed += (cond_count - 1) / per_line;
+            break;
+        case BL_WEAPON:
+            /* two lines if no hunger or encumbrance and no conditions,
+               otherwise one line if weapon status being is shown */
+            spacing[fld] = ((wep_arm_ter & 1) == 1) /* show wep */
+                           ? ((!cond_count && !cap_and_hunger) ? 2 : 1)
+                           : 0; /* no wep */
+            break;
+        case BL_ARMOR:
+            /* two lines if no hunger or encumbrance and no conditions
+               and no weapon status, otherwise one line if no weapon
+               status, else same line as weapon status */
+            spacing[fld] = ((wep_arm_ter & 3) == 2) /* show arm, no wep */
+                           ? ((!cond_count && !cap_and_hunger) ? 2 : 1)
+                           : 0; /* wep and arm (on same line) or no arm */
+            break;
+        case BL_TERRAIN:
+            /* two lines if no hunger or encumbrance and no conditions
+               and no weapon status and no armor status, otherwise one
+               line if both weapon status and armor status or neither of
+               them and terrain status is being shown */
+            spacing[fld] = ((wep_arm_ter & 7) == 4) /* show ter, no wep|arm */
+                           ? ((!cond_count && !cap_and_hunger) ? 2 : 1)
+                           /* if all three, put terrain on next line; else
+                              same line for wep+ter or arm+ter or no ter */
+                           : (((wep_arm_ter & 7) == 7) ? 1 : 0);
             break;
         case BL_VERS:
             spacing[fld] = sho_vers ? 2 : 0;
@@ -883,7 +925,11 @@ draw_vertical(boolean border)
                the first (or only) and keep it for the second (if both) */
             if (*text == ' '
                 && (fld == BL_HUNGER
-                    || (fld == BL_CAP && cap_and_hunger != 3)))
+                    || (fld == BL_CAP && cap_and_hunger != 3)
+                    || fld == BL_WEAPON
+                    || (fld == BL_ARMOR && (wep_arm_ter & 3) == 2)
+                    || (fld == BL_TERRAIN && ((wep_arm_ter & 7) == 4
+                                              || (wep_arm_ter & 7) == 7))))
                 ++text;
 #ifdef STATUS_HILITES
             coloridx = curses_status_colors[fld]; /* includes attributes */
@@ -1239,6 +1285,9 @@ curs_vert_status_vals(int win_width)
             case BL_EXP:
             case BL_HUNGER:
             case BL_CAP:
+            case BL_WEAPON:
+            case BL_ARMOR:
+            case BL_TERRAIN:
             case BL_TITLE:
                 use_name = FALSE;
                 break;

@@ -1,4 +1,4 @@
-/* NetHack 3.7	winprocs.h	$NHDT-Date: 1736530208 2025/01/10 09:30:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.83 $ */
+/* NetHack 5.0	winprocs.h	$NHDT-Date: 1736530208 2025/01/10 09:30:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.83 $ */
 /* Copyright (c) David Cohrs, 1992                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -11,12 +11,15 @@
 #endif
 
 enum wp_ids { wp_tty = 1, wp_X11, wp_Qt, wp_mswin, wp_curses,
-              wp_chainin, wp_chainout, wp_safestartup, wp_shim,
+              wp_chainin, wp_chainout, wp_shim,
               wp_hup, wp_guistubs, wp_ttystubs,
-#ifdef OUTDATED_STUFF
-              wp_mac, wp_Gem, wp_Gnome, wp_amii, wp_amiv,
+#if defined(AMIGA)
+              wp_amii, wp_amiv,
 #endif
-              wp_trace	// XXX do we need this?  should chainin/out get an id? TBD
+#ifdef OUTDATED_STUFF
+              wp_mac, wp_Gem, wp_Gnome,
+#endif
+              wp_trace  // XXX do we need this?  should chainin/out get an id? TBD
 };
 
 /* NB: this MUST match chain_procs below */
@@ -73,7 +76,7 @@ struct window_procs {
     void (*win_delay_output)(void);
 #ifdef CHANGE_COLOR
     void (*win_change_color)(int, long, int);
-#ifdef MAC
+#ifdef MACOS9
     void (*win_change_background)(int);
     short (*win_set_font_name)(winid, char *);
 #endif
@@ -124,7 +127,7 @@ extern
 #define display_file (*windowprocs.win_display_file)
 #define start_menu (*windowprocs.win_start_menu)
 #define end_menu (*windowprocs.win_end_menu)
-/* 3.7: There are real add_menu() and select_menu in the core now.
+/* 5.0: There are real add_menu() and select_menu in the core now.
  *      add_menu does some common activities, such as menu_colors.
  *      select_menu does some before and after activities.
  *      add_menu() and select_menu() are in windows.c
@@ -148,7 +151,7 @@ extern
 #define nh_poskey (*windowprocs.win_nh_poskey)
 #define nhbell (*windowprocs.win_nhbell)
 #define nh_doprev_message (*windowprocs.win_doprev_message)
-/* 3.7: There is a real getlin() in the core now, which does
+/* 5.0: There is a real getlin() in the core now, which does
  *      some before and after activities.
  *      [alternative fix for menu search via ':'.]
  *      getlin() is in windows.c
@@ -159,7 +162,7 @@ extern
 #define nh_delay_output (*windowprocs.win_delay_output)
 #ifdef CHANGE_COLOR
 #define change_color (*windowprocs.win_change_color)
-#ifdef MAC
+#ifdef MACOS9
 #define change_background (*windowprocs.win_change_background)
 #define set_font_name (*windowprocs.win_set_font_name)
 #endif
@@ -259,6 +262,9 @@ extern
 #define WC2_U_UTF8STR    0x020000L /* 18 utf8str support */
 #define WC2_EXTRACOLORS  0x040000L /* 19 color support beyond NH_BASIC_COLOR */
                                    /* 13 free bits */
+#define WC2_EXTRASTATUS  0x080000L /* 20 optional weaponstatus, armorstatus,
+                                    *    terrainstatus */
+                                   /* 12 free bits */
 
 #define ALIGN_LEFT   1
 #define ALIGN_RIGHT  2
@@ -291,7 +297,7 @@ struct wc_Opt {
 /* Macro for the currently active Window Port whose function
    pointers have been loaded */
 #if 0
-/* 3.7 The string comparison version isn't used anymore */
+/* 5.0 The string comparison version isn't used anymore */
 #define WINDOWPORT(wn) \
     (windowprocs.name && !strncmpi((#wn), windowprocs.name, strlen((#wn))))
 #endif
@@ -388,7 +394,7 @@ struct chain_procs {
     void (*win_delay_output)(CARGS);
 #ifdef CHANGE_COLOR
     void (*win_change_color)(CARGS, int, long, int);
-#ifdef MAC
+#ifdef MACOS9
     void (*win_change_background)(CARGS, int);
     short (*win_set_font_name)(CARGS, winid, char *);
 #endif
@@ -412,79 +418,4 @@ struct chain_procs {
 };
 #endif /* WINCHAIN */
 
-#ifdef SAFEPROCS
-/*
- * window port routines available in sys/share/safeproc.c
- */
-extern struct window_procs *get_safe_procs(int);
-extern void safe_init_nhwindows(int *, char **);
-extern void safe_player_selection(void);
-extern void safe_askname(void);
-extern void safe_get_nh_event(void);
-extern void safe_exit_nhwindows(const char *);
-extern void safe_suspend_nhwindows(const char *);
-extern void safe_resume_nhwindows(void);
-extern winid safe_create_nhwindow(int);
-extern void safe_clear_nhwindow(winid);
-extern void safe_display_nhwindow(winid, boolean);
-extern void safe_destroy_nhwindow(winid);
-extern void safe_curs(winid, int, int);
-extern void safe_putstr(winid, int, const char *);
-extern void safe_putmixed(winid, int, const char *);
-extern void safe_display_file(const char *, boolean);
-extern void safe_start_menu(winid, unsigned long);
-extern void safe_add_menu(winid, const glyph_info *, const ANY_P *,
-                          char, char, int, int, const char *,
-                          unsigned int);
-extern void safe_end_menu(winid, const char *);
-extern int safe_select_menu(winid, int, MENU_ITEM_P **);
-extern char safe_message_menu(char, int, const char *);
-extern void safe_mark_synch(void);
-extern void safe_wait_synch(void);
-#ifdef CLIPPING
-extern void safe_cliparound(int, int);
-#endif
-#ifdef POSITIONBAR
-extern void safe_update_positionbar(char *);
-#endif
-extern void safe_print_glyph(winid, coordxy, coordxy,
-                             const glyph_info *, const glyph_info *);
-extern void safe_raw_print(const char *);
-extern void safe_raw_print_bold(const char *);
-extern int safe_nhgetch(void);
-extern int safe_nh_poskey(coordxy *, coordxy *, int *);
-extern void safe_nhbell(void);
-extern int safe_doprev_message(void);
-extern char safe_yn_function(const char *, const char *, char);
-extern void safe_getlin(const char *, char *);
-extern int safe_get_ext_cmd(void);
-extern void safe_number_pad(int);
-extern void safe_delay_output(void);
-#ifdef CHANGE_COLOR
-extern void safe_change_color(int, long, int);
-#ifdef MAC
-extern void safe_change_background(int);
-extern short safe_set_font_name(winid, char *);
-#endif
-extern char *safe_get_color_string(void);
-#endif
-extern void safe_outrip(winid, int, time_t);
-extern void safe_preference_update(const char *);
-extern char *safe_getmsghistory(boolean);
-extern void safe_putmsghistory(const char *, boolean);
-extern void safe_status_init(void);
-extern void safe_status_finish(void);
-extern void safe_status_enablefield(int, const char *, const char *,
-                                    boolean);
-extern void safe_status_update(int, genericptr_t, int, int, int,
-                               unsigned long *);
-extern boolean safe_can_suspend(void);
-extern void stdio_raw_print(const char *);
-extern void stdio_nonl_raw_print(const char *);
-extern void stdio_raw_print_bold(const char *);
-extern void stdio_wait_synch(void);
-extern void safe_update_inventory(int);
-extern win_request_info *safe_ctrl_nhwindow(winid, int, win_request_info *);
-extern int stdio_nhgetch(void);
-#endif /* SAFEPROCS */
 #endif /* WINPROCS_H */

@@ -3,6 +3,9 @@
   <Import Project="..\config.props" />
   <Import Project="..\dirs.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <VCToolsVersion />
+  </PropertyGroup>
   <Import Project="..\default.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <Import Project="..\NetHackProperties.props" />
@@ -74,11 +77,11 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
       <AdditionalIncludeDirectories>$(WinWin32Dir);$(IncDir);$(SysWindDir);$(SysShareDir);$(WinShareDir);$(LuaDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32CON;NO_TILE_C;DLB;SAFEPROCS;SND_LIB_WINDSOUND;USER_SOUNDS;SND_SOUNDEFFECTS_AUTOMAP;_LIB;HAS_STDINT_H;HAS_INTTYPES_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32CON;NO_TILE_C;DLB;SND_LIB_WINDSOUND;USER_SOUNDS;SND_SOUNDEFFECTS_AUTOMAP;_LIB;HAS_STDINT_H;HAS_INTTYPES_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard_C>stdclatest</LanguageStandard_C>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>hacklib.lib;lualib.lib;kernel32.lib;dbghelp.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;Winmm.lib;UserEnv.lib;bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>hacklib.lib;lualib.lib;kernel32.lib;dbghelp.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;Winmm.lib;UserEnv.lib;Rpcrt4.lib;bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ResourceCompile>
       <AdditionalIncludeDirectories>$(SndWavDir);$(SysWindDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -113,6 +116,7 @@
     <ClCompile Include="$(SrcDir)do_wear.c" />
     <ClCompile Include="$(SrcDir)drawing.c" />
     <ClCompile Include="$(SrcDir)dungeon.c" />
+    <ClCompile Include="$(SrcDir)earlyarg.c" />
     <ClCompile Include="$(SrcDir)eat.c" />
     <ClCompile Include="$(SrcDir)end.c" />
     <ClCompile Include="$(SrcDir)engrave.c" />
@@ -125,6 +129,7 @@
     <ClCompile Include="$(SrcDir)glyphs.c" />
     <ClCompile Include="$(SrcDir)hack.c" />
     <ClCompile Include="$(SrcDir)insight.c" />
+    <ClCompile Include="$(SrcDir)iactions.c" />
     <ClCompile Include="$(SrcDir)invent.c" />
     <ClCompile Include="$(SrcDir)isaac64.c" />
     <ClCompile Include="$(SrcDir)light.c" />
@@ -216,7 +221,6 @@
     <ClCompile Include="$(SysWindDir)windmain.c" />
     <ClCompile Include="$(SysWindDir)windsys.c" />
     <ClCompile Include="$(SndWindDir)windsound.c" />
-    <ClCompile Include="$(WinShareDir)safeproc.c" />
     <ClCompile Include="$(WinTtyDir)getline.c" />
     <ClCompile Include="$(WinTtyDir)topl.c" />
     <ClCompile Include="$(WinTtyDir)wintty.c" />
@@ -258,6 +262,7 @@
     <ClInclude Include="$(IncDir)isaac64.h" />
     <ClInclude Include="$(IncDir)lint.h" />
     <ClInclude Include="$(IncDir)load_img.h" />
+    <ClInclude Include="$(IncDir)mcastu.h" />
     <ClInclude Include="$(IncDir)mextra.h" />
     <ClInclude Include="$(IncDir)mfndpos.h" />
     <ClInclude Include="$(IncDir)mkroom.h" />

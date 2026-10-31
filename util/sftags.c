@@ -548,8 +548,8 @@ static void parseExtensionFields (struct tagstruct *tmptag, char *buf)
             if (colon == (char *)0) {
                 tmptag->tagtype = *field;
             } else {
-                const char *key = field;
-                const char *value = colon + 1;
+                char *key = field;
+                char *value = colon + 1;
                 *colon = '\0';
                 if ((strcmp (key, "struct") == 0) ||
                     (strcmp (key, "union") == 0)) {
@@ -971,7 +971,7 @@ static void output_types(FILE *fp1)
 
     for (k = 0; k < SIZE(readtagstypes); ++k) {
         if (readtagstypes[k].dtclass == NHTYPE_SIMPLE) {
-            Fprintf(fp1,"\t{NHTYPE_SIMPLE, (char *) \"%s\", sizeof(%s)},\n",
+            Fprintf(fp1,"    {NHTYPE_SIMPLE, (char *) \"%s\", sizeof(%s)},\n",
                 readtagstypes[k].dtype,
                 (strncmpi(readtagstypes[k].dtype, "Bitfield", 8) == 0) ?
                 "uint8_t" :
@@ -981,10 +981,10 @@ static void output_types(FILE *fp1)
                                 "anything" : readtagstypes[k].dtype);
 /*                dtmacro(readtagstypes[k].dtype,0)); */
 #if 0
-            Fprintf(fp2, "#define %s\t%s%d\n", dtmacro(readtagstypes[k].dtype,1),
+            Fprintf(fp2, "#define %s    %s%d\n", dtmacro(readtagstypes[k].dtype,1),
                     (strlen(readtagstypes[k].dtype) > 12) ? "" :
-                (strlen(readtagstypes[k].dtype) < 5) ? "\t\t" :
-                "\t", hcnt++);
+                (strlen(readtagstypes[k].dtype) < 5) ? "        " :
+                "    ", hcnt++);
 #endif
         }
     }
@@ -997,7 +997,7 @@ static void output_types(FILE *fp1)
             }
             if (cnt > 0)
                 Fprintf(fp1, "%s", ",\n");
-            Fprintf(fp1, "\t{NHTYPE_COMPLEX, (char *) \"%s\", sizeof(%s %s)}",
+            Fprintf(fp1, "    {NHTYPE_COMPLEX, (char *) \"%s\", sizeof(%s %s)}",
                     t->tag,
                     (t->tagtype == 's') ? "struct" : "union", t->tag);
             cnt += 1;
@@ -1005,7 +1005,7 @@ static void output_types(FILE *fp1)
         t = t->next;
     }
     Fprintf(fp1, "%s", "\n};\n\n");
-    Fprintf(fp1, "int nhdatatypes_size(void)\n{\n\treturn SIZE(nhdatatypes);\n}\n\n");
+    Fprintf(fp1, "int nhdatatypes_size(void)\n{\n    return SIZE(nhdatatypes);\n}\n\n");
 }
 
 static void generate_c_files(void)
@@ -1357,7 +1357,7 @@ static void generate_c_files(void)
                             "d_%s->%s = bitfield;\n\n",
                             readtagstypes[k].dtype, t->tag);
                     Fprintf(SFDATATMP,
-                            "\t\"%s:%s:%s\",\n",
+                            "    \"%s:%s:%s\",\n",
                             sfparent, t->tag, ft);
                 } else {
                     /**************** not a bitfield ****************/
@@ -1571,7 +1571,7 @@ static void generate_c_files(void)
                         strcmp(altbuf, "char") != 0 ? "" : arrbuf);
                     Fprintf(SFI_DATA, "%s", lbuf);
                     Fprintf(SFDATATMP,
-                        "\t\"%s:%s:%s\",\n",
+                        "    \"%s:%s:%s\",\n",
                         sfparent, t->tag,fieldfix(ft,ssdef));
                     kludge_sbrooms = FALSE;
                     array_of_ptrs = FALSE;
@@ -1604,7 +1604,7 @@ static void generate_c_files(void)
     }
 
     Fprintf(SFDATATMP,"};\n\n");
-    Fprintf(SFDATATMP, "int critical_members_count(void)\n{\n\treturn SIZE(critical_members);\n}\n\n");
+    Fprintf(SFDATATMP, "int critical_members_count(void)\n{\n    return SIZE(critical_members);\n}\n\n");
 
     fclose(SFO_DATA);
     fclose(SFI_DATA);
@@ -1724,7 +1724,7 @@ dtmacro(const char *str,
     } else if (strncmpi(c, "const ", 6) == 0) {
         c = buf + 6;
     } else if ((strncmpi(c, "struct ", 7) == 0) ||
-           (strncmpi(c, "struct\t", 7) == 0)) {
+           (strncmpi(c, "struct    ", 7) == 0)) {
         c = buf + 7;
     } else if (strncmpi(c, "union ", 6) == 0) {
         c = buf + 6;
@@ -1785,7 +1785,7 @@ dtfn(const char *str,
     } else if (strncmpi(c, "const ", 6) == 0) {
         c = buf + 6;
     } else if ((strncmpi(c, "struct ", 7) == 0) ||
-                   (strncmpi(c, "struct\t", 7) == 0)) {
+                   (strncmpi(c, "struct    ", 7) == 0)) {
         c = buf + 7;
     } else if (strncmpi(c, "union ", 6) == 0) {
         c = buf + 6;
@@ -1844,14 +1844,15 @@ static char *
 bfsize(const char *str)
 {
     static char buf[128];
-    const char *c1;
-    char *c2, *subst;
+    char *copy_str, *c1, *c2, *subst;
+    char *retval = buf;
 
     if (!str)
         return (char *)0;
 
+    copy_str = dupstr(str);
     /* kludge */
-    subst = strstr(str, ",$/");
+    subst = strstr(copy_str, ",$/");
     if (subst != 0) {
         subst++;
         *subst++ = ' ';
@@ -1859,7 +1860,7 @@ bfsize(const char *str)
     }
 
     c2 = buf;
-    c1 = str;
+    c1 = copy_str;
     while (*c1) {
         if (*c1 == ',')
             break;
@@ -1873,9 +1874,10 @@ bfsize(const char *str)
         }
         *c2 = '\0';
     } else {
-        return (char *)0;
+        retval = (char *) 0; 
     }
-    return buf;
+    free((genericptr_t) copy_str);
+    return retval;
 }
 
 /* Read one line from input, up to and including the next newline

@@ -1,4 +1,4 @@
-/* NetHack 3.7	dbridge.c	$NHDT-Date: 1702349063 2023/12/12 02:44:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.62 $ */
+/* NetHack 5.0	dbridge.c	$NHDT-Date: 1772771734 2026/03/05 20:35:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.70 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet              */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -399,7 +399,9 @@ e_survives_at(struct entity *etmp, coordxy x, coordxy y)
 }
 
 staticfn void
-e_died(struct entity *etmp, int xkill_flags, int how)
+e_died(
+    struct entity *etmp,
+    int xkill_flags, int how)
 {
     if (is_u(etmp)) {
         if (how == DROWNING) {
@@ -444,6 +446,26 @@ e_died(struct entity *etmp, int xkill_flags, int how)
                       mk_message(xkill_flags), mk_corpse(xkill_flags));
         else /* you caused it */
             xkilled(etmp->emon, xkill_flags);
+
+        /* if etmp gets life-saved, kill it again; otherwise we might end up
+           trying to place another monster (probably a xorn) on same spot */
+        if (!DEADMONSTER(etmp->emon)) {
+            int seeit = canspotmon(etmp->emon);
+
+            xkill_flags |= XKILL_NOMSG | XKILL_NOCONDUCT;
+            if (svc.context.mon_moving)
+                monkilled(etmp->emon, "", mk_corpse(xkill_flags));
+            else /* you caused it */
+                xkilled(etmp->emon, xkill_flags);
+
+            if (DEADMONSTER(etmp->emon)) {
+                if (seeit)
+                    pline("Unfortunately for %s, %s is still crushed.",
+                          mon_nam(etmp->emon), mhe(etmp->emon));
+            } else {
+                ; /* FIXME: still not dead?  What should we do now? */
+            }
+        }
         etmp->edata = (struct permonst *) 0;
 
         /* dead long worm handling */

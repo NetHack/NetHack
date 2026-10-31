@@ -1,0 +1,57 @@
+/* NetHack 3.6	winami.p	$NHDT-Date: 1433806595 2015/06/08 23:36:35 $  $NHDT-Branch: master $:$NHDT-Revision: 1.7 $ */
+/*    Copyright (c) Gregg Wonderly, Naperville, IL, 1992, 1993	 */
+/* NetHack may be freely redistributed. See license for details. */
+/* winami.c */
+void amii_raw_print(const char *);
+void amii_raw_print_bold(const char *);
+void amii_start_menu(winid , unsigned long );
+void amii_add_menu(winid, const glyph_info *, const anything *, char, char, int, int, const char *, unsigned int);
+void amii_end_menu(winid  , char  , const char * , const char *);
+char amii_select_menu(winid );
+void amii_update_inventory(int);
+void amii_mark_synch (void);
+void amii_wait_synch (void);
+void amii_setclipped (void);
+void amii_cliparound(int  , int );
+void amii_askname (void);
+void amii_player_selection (void);
+void flush_output (void);
+void amii_destroy_nhwindow(winid );
+int amii_create_nhwindow(int );
+void amii_init_nhwindows (void);
+int amii_get_ext_cmd(void);
+char amii_yn_function(const char * , const char * , char );
+void amii_addtopl(const char *);
+void TextSpaces(struct RastPort * , int );
+void amii_putstr(winid  , int  , const char *);
+void amii_putsym(winid  , int  , int  , CHAR_P );
+void amii_clear_nhwindow(winid );
+void amii_exit_nhwindows(const char *);
+int amii_nh_poskey(coordxy *, coordxy *, int *);
+int amii_nhgetch (void);
+void amii_get_nh_event (void);
+void amii_remember_topl (void);
+int amii_doprev_message (void);
+void amii_display_nhwindow(winid  , boolean );
+void amii_display_file(const char * , boolean );
+void amii_curs(winid  , int  , int );
+void amii_print_glyph(winid, coordxy, coordxy, const glyph_info *, const glyph_info *);
+void DoMenuScroll(int  , int );
+void DisplayData(int  , int  , int );
+void SetPropInfo(struct Window * , struct Gadget * , long  , long  , long );
+void kill_nhwindows(int );
+void amii_cl_end(struct amii_WinDesc * , int );
+void cursor_off(winid );
+void cursor_on(winid );
+void amii_getret (void);
+void amii_getlin(const char * , char *);
+void getlind(const char * , char * , const char *);
+void amii_suspend_nhwindows(char * );
+void amii_resume_nhwindows(void);
+void amii_bell(void);
+void EditColor(void);
+void DrawCol( struct Window *, int, UWORD * ) ;
+void  DispCol( struct Window *w, int idx, UWORD * ) ;
+void  SetBorder(struct Gadget *) ;
+void  port_help (void);
+void  dismiss_nhwindow(winid) ;

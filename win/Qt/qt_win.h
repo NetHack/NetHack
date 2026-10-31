@@ -2,7 +2,7 @@
 // Qt4 conversion copyright (c) Ray Chason, 2012-2014.
 // NetHack may be freely redistributed.  See license for details.
 
-// Qt Binding for NetHack 3.7
+// Qt Binding for NetHack 5.0
 //
 // [original comment from Warwick]
 // Unfortunately, this doesn't use Qt as well as I would like,

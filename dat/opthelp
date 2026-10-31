@@ -3,6 +3,7 @@ Boolean options not under specific compile flags (with default values in []):
 option setting, which is reached via the 'O' command.)
 
 acoustics      can your character hear anything                    [True]
+armorstatus    show extra status field summarizing worn armor     [False]
 autodescribe   describe the terrain under cursor                  [False]
 autodig        dig if moving and wielding digging tool            [False]
 autoopen       walking into a door attempts to open it             [True]
@@ -48,14 +49,17 @@ nudist         start your character without armor                 [False]
 null           allow nulls to be sent to your terminal             [True]
                try turning this option off (forcing NetHack to use its own
                delay code) if moving objects seem to teleport across rooms
+pauper         start your character with no possessions           [False]
 perm_invent    keep inventory in a permanent window               [False]
 pickup_stolen  override pickup_types for stolen objects            [True]
 pickup_thrown  override pickup_types for thrown objects            [True]
+price_quotes   show remembered price quotes for unIDed items      [False]
 pushweapon     when wielding a new weapon, put your previously    [False]
                wielded weapon into the secondary weapon slot
 quick_farsight usually skip the chance to browse the map when     [False]
                randomly triggered clairvoyance takes place
 rawio          allow the use of raw I/O                           [False]
+reroll         allow rerolling of starting inventory              [False]
 rest_on_space  count the space bar as a rest character            [False]
 safe_pet       prevent you from (knowingly) attacking your pet(s)  [True]
 safe_wait      require use of 'm' prefix before '.' or 's' to      [True]
@@ -70,6 +74,7 @@ sparkle        display sparkly effect for resisted magical         [True]
                attacks (e.g. fire attack on fire-resistant monster)
 standout       use standout mode for --More-- on messages         [False]
 status_updates update the status lines                             [True]
+terrainstatus  show extra status field describing current location  [False]
 time           display elapsed game time, in moves                [False]
 tips           show some helpful tips during gameplay              [True]
 tombstone      print tombstone when you die                        [True]
@@ -80,6 +85,7 @@ travel         enables travelling via mouse click if supported;    [True]
 use_darkgray   use bold black instead of blue for black glyphs.    [True]
 use_inverse    display detected monsters in highlighted manner    [False]
 verbose        print more commentary during the game               [True]
+weaponstatus   show extra status field listing wielded weapon(s)  [False]
 whatis_menu    show menu when getting a map location              [False]
 whatis_moveskip skip same glyphs when getting a map location      [False]
 

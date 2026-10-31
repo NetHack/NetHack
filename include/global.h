@@ -1,4 +1,4 @@
-/* NetHack 3.7	global.h	$NHDT-Date: 1704225560 2024/01/02 19:59:20 $  $NHDT-Branch: keni-luabits2 $:$NHDT-Revision: 1.159 $ */
+/* NetHack 5.0	global.h	$NHDT-Date: 1704225560 2024/01/02 19:59:20 $  $NHDT-Branch: keni-luabits2 $:$NHDT-Revision: 1.159 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -102,17 +102,19 @@ typedef unsigned readLenType;
 #endif
 #define BOOL_RANDOM (-1)
 
-enum optchoice { opt_in, opt_out};
-
 /*
  * type nhsym: loadable symbols go into this type
  */
 typedef uchar nhsym;
 
 #ifndef STRNCMPI
-#ifndef __SASC_60 /* SAS/C already shifts to stricmp */
+/* SAS/C already shifts to stricmp */
+#if !defined(__SASC_60) && !defined(CROSS_TO_AMIGA)
 #define strcmpi(a, b) strncmpi((a), (b), -1)
 #endif
+#endif
+#ifdef CROSS_TO_AMIGA
+#define strcmpi(a, b) stricmp(a, b)
 #endif
 
 /* #define SPECIALIZATION */ /* do "specialized" version of new topology */
@@ -183,7 +185,7 @@ typedef uchar nhsym;
 #ifdef AMIGA
 #define PORT_ID "Amiga"
 #endif
-#ifdef MAC
+#ifdef MACOS9
 #define PORT_ID "Mac"
 #endif
 #ifdef __APPLE__
@@ -420,7 +422,7 @@ extern struct nomakedefs_s nomakedefs;
 #include "color.h"
 
 /*
- * Version 3.7.x has aspirations of portable file formats. We
+ * Version 5.0.x has aspirations of portable file formats. We
  * make a distinction between MAIL functionality and MAIL_STRUCTURES
  * so that the underlying structures are consistent, whether MAIL is
  * defined or not.
@@ -570,6 +572,45 @@ typedef enum NHL_pcall_action {
     NHLpa_panic,
     NHLpa_impossible
 } NHL_pcall_action;
+
+enum optchoice { opt_in, opt_out};
+/*
+ * option setting restrictions
+ */
+enum optset_restrictions {
+    set_in_sysconf = 0, /* system config file option only */
+    set_in_config = 1,  /* config file option only */
+    set_viaprog = 2,    /* may be set via extern program, not seen in game */
+    set_gameview = 3,   /* may be set via extern program, displayed in game */
+    set_in_game = 4,    /* may be set via extern program or set in the game */
+    set_wizonly = 5,    /* may be set in the game if wizmode */
+    set_wiznofuz = 6,   /* wizard-mode only, but not by fuzzer */
+    set_hidden = 7      /* placeholder for prefixed entries, never show it  */
+};
+
+/* these aren't the same as set_xxx */
+enum option_phases {
+    phase_not_set = 0,
+    builtin_opt = 1, /* compiled-in default value of an option */
+    syscf_opt,       /* sysconf setting of an option, overrides builtin */
+    rc_file_opt, /* player's run-time config file setting, overrides syscf */
+    environ_opt, /* player's environment NETHACKOPTIONS, overrides rc_file */
+    cmdline_opt, /* program invocation command-line, overrides environ */
+    play_opt,    /* 'O' command, interactively set so overrides all */
+    num_opt_phases
+};
+
+#define SET__IS_VALUE_VALID(s) ((s < set_in_sysconf) || (s > set_wiznofuz))
+#include "optlist.h"
+enum opt {
+    opt_prefix_only = -1,
+#define NHOPT_ENUM
+#include "optlist.h"
+#undef NHOPT_ENUM
+    OPTCOUNT
+};
+
+
 
 #define SFCTOOL_BIT (1UL << 30)
 

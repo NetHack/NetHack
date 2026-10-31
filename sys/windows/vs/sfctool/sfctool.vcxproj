@@ -87,39 +87,39 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>$(DefaultPlatformToolset)</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>$(DefaultPlatformToolset)</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>$(DefaultPlatformToolset)</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>$(DefaultPlatformToolset)</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>$(DefaultPlatformToolset)</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>$(DefaultPlatformToolset)</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -150,7 +150,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>$(WinWin32Dir);$(IncDir);$(SysWindDir);$(SysShareDir);$(WinShareDir);$(LuaDir);$(UtilDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;WIN32CON;NO_TILE_C;DLB;SAFEPROCS;SND_LIB_WINDSOUND;USER_SOUNDS;_LIB;HAS_STDINT_H;HAS_INTTYPES_H;SFCTOOL;NOPANICTRACE;NOCRASHREPORT;NO_CHRONICLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;WIN32CON;NO_TILE_C;DLB;SND_LIB_WINDSOUND;USER_SOUNDS;_LIB;HAS_STDINT_H;HAS_INTTYPES_H;SFCTOOL;NOPANICTRACE;NOCRASHREPORT;NO_CHRONICLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
       <LanguageStandard_C>stdclatest</LanguageStandard_C>
       <SDLCheck>true</SDLCheck>
@@ -166,7 +166,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>$(WinWin32Dir);$(IncDir);$(SysWindDir);$(SysShareDir);$(WinShareDir);$(LuaDir);$(UtilDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_NDEBUG;_CONSOLE;WIN32CON;NO_TILE_C;DLB;SAFEPROCS;SND_LIB_WINDSOUND;USER_SOUNDS;_LIB;HAS_STDINT_H;HAS_INTTYPES_H;SFCTOOL;NOPANICTRACE;NOCRASHREPORT;NO_CHRONICLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_NDEBUG;_CONSOLE;WIN32CON;NO_TILE_C;DLB;SND_LIB_WINDSOUND;USER_SOUNDS;_LIB;HAS_STDINT_H;HAS_INTTYPES_H;SFCTOOL;NOPANICTRACE;NOCRASHREPORT;NO_CHRONICLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
       <LanguageStandard_C>stdclatest</LanguageStandard_C>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -186,7 +186,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>$(WinWin32Dir);$(IncDir);$(SysWindDir);$(SysShareDir);$(WinShareDir);$(LuaDir);$(UtilDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;WIN32CON;NO_TILE_C;DLB;SAFEPROCS;SND_LIB_WINDSOUND;USER_SOUNDS;_LIB;HAS_STDINT_H;HAS_INTTYPES_H;SFCTOOL;NOPANICTRACE;NOCRASHREPORT;NO_CHRONICLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;WIN32CON;NO_TILE_C;DLB;SND_LIB_WINDSOUND;USER_SOUNDS;_LIB;HAS_STDINT_H;HAS_INTTYPES_H;SFCTOOL;NOPANICTRACE;NOCRASHREPORT;NO_CHRONICLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
       <LanguageStandard_C>stdclatest</LanguageStandard_C>
       <SDLCheck>true</SDLCheck>
@@ -202,7 +202,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <ClCompile>
       <AdditionalIncludeDirectories>$(WinWin32Dir);$(IncDir);$(SysWindDir);$(SysShareDir);$(WinShareDir);$(LuaDir);$(UtilDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;WIN32CON;NO_TILE_C;DLB;SAFEPROCS;SND_LIB_WINDSOUND;USER_SOUNDS;_LIB;HAS_STDINT_H;HAS_INTTYPES_H;SFCTOOL;NOPANICTRACE;NOCRASHREPORT;NO_CHRONICLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;WIN32CON;NO_TILE_C;DLB;SND_LIB_WINDSOUND;USER_SOUNDS;_LIB;HAS_STDINT_H;HAS_INTTYPES_H;SFCTOOL;NOPANICTRACE;NOCRASHREPORT;NO_CHRONICLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
       <LanguageStandard_C>stdclatest</LanguageStandard_C>
       <SDLCheck>true</SDLCheck>
@@ -218,7 +218,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>$(WinWin32Dir);$(IncDir);$(SysWindDir);$(SysShareDir);$(WinShareDir);$(LuaDir);$(UtilDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_NDEBUG;_CONSOLE;WIN32CON;NO_TILE_C;DLB;SAFEPROCS;SND_LIB_WINDSOUND;USER_SOUNDS;_LIB;HAS_STDINT_H;HAS_INTTYPES_H;SFCTOOL;NOPANICTRACE;NOCRASHREPORT;NO_CHRONICLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_NDEBUG;_CONSOLE;WIN32CON;NO_TILE_C;DLB;SND_LIB_WINDSOUND;USER_SOUNDS;_LIB;HAS_STDINT_H;HAS_INTTYPES_H;SFCTOOL;NOPANICTRACE;NOCRASHREPORT;NO_CHRONICLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
       <LanguageStandard_C>stdclatest</LanguageStandard_C>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -238,7 +238,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <ClCompile>
       <AdditionalIncludeDirectories>$(WinWin32Dir);$(IncDir);$(SysWindDir);$(SysShareDir);$(WinShareDir);$(LuaDir);$(UtilDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_NDEBUG;_CONSOLE;WIN32CON;NO_TILE_C;DLB;SAFEPROCS;SND_LIB_WINDSOUND;USER_SOUNDS;_LIB;HAS_STDINT_H;HAS_INTTYPES_H;SFCTOOL;NOPANICTRACE;NOCRASHREPORT;NO_CHRONICLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_NDEBUG;_CONSOLE;WIN32CON;NO_TILE_C;DLB;SND_LIB_WINDSOUND;USER_SOUNDS;_LIB;HAS_STDINT_H;HAS_INTTYPES_H;SFCTOOL;NOPANICTRACE;NOCRASHREPORT;NO_CHRONICLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
       <LanguageStandard_C>stdclatest</LanguageStandard_C>
       <FunctionLevelLinking>true</FunctionLevelLinking>

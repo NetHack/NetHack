@@ -1,0 +1,528 @@
+# NetHack 5.0  linux.500 $NHDT-Date: 1693519390 2023/08/31 22:03:10 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.61 $
+# Copyright (c) Kenneth Lorber, Kensington, Maryland, 2007.
+# NetHack may be freely redistributed.  See license for details.
+#
+#---------------------------------------------------------------------
+# Linux hints file with support for multiple window ports (interfaces)
+# Tested on:
+#     - Ubuntu focal
+#
+# If this doesn't work for your distribution, consider making a new
+# hints file for it, rather than changing this one.
+# And let us know about it.
+#
+
+#-PRE
+# linux.500 hints file provides a single-user build for Linux (such
+# as Ubuntu focal).
+
+# note: '#-INCLUDE' is not just a comment
+#        multiw-1.500 contains sections 1 to 2
+#-INCLUDE multiw-1.500
+
+HINTSVERSION := 500
+
+ifdef MAKEFILE_TOP
+ifeq ($(MAKELEVEL),0)
+PRECHECK+=checkmakefiles
+# all files included from this hints file get listed
+# in HINTSINCLNAMES (without suffix and without a path)
+HINTSINCLNAMES := compiler cross-pre1 cross-pre2 cross-post \
+		gbdates-pre gbdates-post \
+		multiw-1 multiw-2 misc \
+		multisnd1-pre multisnd2-pre multisnd-post
+HINTSINCLFILES := $(addsuffix .$(HINTSVERSION), $(HINTSINCLNAMES))
+endif
+endif
+
+ifndef LIBXPM
+LIBXPM= -L/opt/X11/lib -lXpm
+endif
+
+#4. Other
+GAMEUID  = $(USER)
+GAMEGRP  = games
+
+# This gives better backtraces by making all core functions global; this
+# works around a limitation in glibc's backtrace(3) function.
+# This will be turned on automatically with CRASHREPROT.
+# 1 to enable, 0 to disable
+USE_NOSTATICFN = 1
+# If you want CRASHREPORT but absolutely don't want NOSTATICFN, define this:
+#USE_NONOSTATICFN = 1
+
+#-----------------------------------------------------------------------------
+#-INCLUDE cross-pre1.500
+
+
+#-----------------------------------------------------------------------------
+# You shouldn't need to change anything below here (in the hints file; if
+# you're reading this in Makefile augmented by hints, that may not be true).
+#
+
+#-INCLUDE multiw-2.500
+
+# compiler.500 contains compiler detection and adjustments common
+# to both linux and macOS
+
+#-INCLUDE compiler.500
+
+ifdef WANT_WIN_QT
+ifdef WANT_WIN_QT5
+QTDIR=/usr
+endif  # WANT_WIN_QT5
+ifdef WANT_WIN_QT6
+#if your Qt6 is elsewhere, change this to match
+QTDIR=/usr/local/qt6
+ifeq "$(GPPGTEQ14)" "1"
+CCXXFLAGS += -Wno-template-id-cdtor
+endif    # g++ greater than or equal to 14
+endif   # WANT_WIN_QT6
+endif  # WANT_WIN_QT
+
+# misc.500 must come after compiler.500
+# and after QTDIR is defined.
+#
+#-INCLUDE misc.500
+
+ifeq "$(USE_ASAN)" "1"
+CFLAGS+=-fsanitize=address
+LFLAGS+=-fsanitize=address
+endif
+
+ifeq "$(USE_UBSAN)" "1"
+CFLAGS+=-fsanitize=undefined
+LFLAGS+=-fsanitize=undefined
+endif
+
+ifeq "$(USE_CURSESLIB)" "1"
+# default
+CURSESLIB = -lncurses -ltinfo
+# If CURSES_UNICODE is defined, we need ncursesw.
+# Without CURSES_UNICODE the following simpler setting works.
+# CURSESLIB = -lncurses -ltinfo
+ifdef MAKEFILE_SRC
+comma:=,
+NCURSES_LFLAGS = $(shell pkg-config ncursesw --libs)
+NCURSES_CFLAGS = $(shell pkg-config ncursesw --cflags)
+ifeq (,$(findstring ncursesw, $(NCURSES_LFLAGS)))
+ifeq (,$(findstring ncurses, $(NCURSES_LFLAGS)))
+#this indicates that pkg-config itself was unavailable
+NCURSES_LFLAGS = -lncursesw -ltinfo
+endif
+endif
+#$(info $(NCURSES_LFLAGS))
+ifeq (,$(findstring ncursesw, $(NCURSES_LFLAGS)))
+HAVE_NCURSESW=0
+else
+HAVE_NCURSESW=1
+endif
+#$(info $(NCURSES_LFLAGS))
+#$(info HAVE_NCURSESW=$(HAVE_NCURSESW))
+ifeq "$(HAVE_NCURSESW)" "1"
+# remove unnecessary -Wl,-Bsymbolic-functions if present
+ifneq (,$(findstring -Wl$(comma)-Bsymbolic-functions, $(NCURSES_LFLAGS)))
+CURSESLIB = $(subst -Wl$(comma)-Bsymbolic-functions,,$(NCURSES_LFLAGS))
+else
+CURSESLIB = $(NCURSES_LFLAGS)
+endif
+endif      #HAVE_NCURSESW
+#$(info $(CURSESLIB))
+ifeq (,$(findstring ncursesw, $(NCURSES_LFLAGS)))
+ifeq (,$(findstring ncurses, $(NCURSES_LFLAGS)))
+#this indicates that pkg-config itself was unavailable
+NOPKGCONFIG = 1
+endif      #ncurses not in NCURSES_LFLAGS?
+endif      #ncursesw not in NCURSES_LFLAGS?
+#
+ifeq "$(NOPKGCONFIG)" "1"
+NCURSES_CFLAGS = -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=600
+ifeq "$(HAVE_NCURSESW)" "1"
+ifeq (,$(wildcard /usr/include/ncursesw/curses.h))
+NCURSES_CFLAGS += -I/usr/include
+else
+NCURSES_CFLAGS += -I/usr/include/ncursesw
+endif
+NCURSES_LFLAGS = -lncursesw -ltinfo
+else       #HAVE_NCURSESW
+ifeq (,$(wildcard /usr/include/ncurses/curses.h))
+NCURSES_CFLAGS += -I/usr/include
+else
+NCURSES_CFLAGS += -I/usr/include/ncurses
+endif
+NCURSES_LFLAGS = -lncurses -ltinfo
+endif      #HAVE_NCURSESW
+endif      #NOPKGCONFIG
+endif      #MAKEFILE_SRC
+endif      #USE_CURSESLIB
+
+# NetHack sources control
+NHCFLAGS+=-DDLB
+NHCFLAGS+=-DHACKDIR=\"$(HACKDIR)\"
+NHCFLAGS+=-DDEFAULT_WINDOW_SYS=\"$(WANT_DEFAULT)\"
+NHCFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE
+NHCFLAGS+=-DTIMED_DELAY
+NHCFLAGS+=-DDUMPLOG
+NHCFLAGS+=-DCONFIG_ERROR_SECURE=FALSE
+#NHCFLAGS+=-DGREPPATH=\"/usr/bin/grep\"
+NHCFLAGS+=-DCOMPRESS=\"/bin/gzip\" -DCOMPRESS_EXTENSION=\".gz\"
+#NHCFLAGS+=-DNOMAIL
+#NHCFLAGS+=-DEXTRA_SANITY_CHECKS
+#NHCFLAGS+=-DEDIT_GETLIN
+#NHCFLAGS+=-DSCORE_ON_BOTL
+#NHCFLAGS+=-DMSGHANDLER
+#NHCFLAGS+=-DTTY_TILES_ESCCODES
+#NHCFLAGS+=-DTTY_SOUND_ESCCODES
+#NHCFLAGS+=-DNO_CHRONICLE
+#NHCFLAGS+=-DLIVELOG
+#NHCFLAGS+=-DCHANGE_COLOR
+NHCFLAGS+=-DSELF_RECOVER
+ifdef WANT_WIN_CURSES
+NHCFLAGS+=$(NCURSES_CFLAGS)
+ifeq "$(HAVE_NCURSESW)" "1"
+NHCFLAGS+=-DCURSES_UNICODE
+else
+ifdef MAKEFILE_SRC
+$(info Attention: CURSES_UNICODE is not being defined without ncursesw)
+endif   #MAKEFILE_SRC
+endif   #HAVE_NCURSESW
+endif   #WANT_WIN_CURSES
+
+#
+#-INCLUDE multisnd1-pre.500
+#
+
+ifeq "$(CCISCLANG)" "1"
+# clang-specific starts
+# clang-specific ends
+else
+# gcc-specific starts
+LIBCFLAGS+=-DSIG_RET_TYPE=__sighandler_t
+# gcc-specific ends
+endif
+
+# WINCFLAGS set from multiw-2.500
+# SNDCFLAGS set from multisnd-pre.500
+CFLAGS+= $(WINCFLAGS)
+CFLAGS+= $(SNDCFLAGS)
+CFLAGS+= $(NHCFLAGS)
+CFLAGS+= $(LIBCFLAGS)
+
+# WINCFLAGS set from multiw-2.500
+# SNDCFLAGS set from multisnd-pre.500
+CCXXFLAGS+= $(WINCFLAGS)
+CCXXFLAGS+= $(SNDCFLAGS)
+CCXXFLAGS+= $(NHCFLAGS)
+CCXXFLAGS+= $(LIBCFLAGS)
+
+VARDATND =
+VARDATND0 =
+
+#ifdef WANT_WIN_CHAIN
+#HINTSRC=$(CHAINSRC)
+#HINTOBJ=$(CHAINOBJ)
+#endif # WANT_WIN_CHAIN
+
+ifdef MAKEFILE_SRC
+ifdef CURSESLIB
+WINLIB += $(CURSESLIB)
+endif   #CURSESLIB
+
+ifneq "$(NO_NHUUID)" "1"
+UUID_LIB_CHECK := $(shell echo `/sbin/ldconfig -p | grep libuuid`)
+#$(info UUID_LIB_CHECK=$(UUID_LIB_CHECK))
+ifneq "$(UUID_LIB_CHECK)" ""
+UUID_LIB=1
+else
+UUID_LIB=0
+endif
+#$(info UUID_LIB=$(UUID_LIB))
+#
+# check for uuid development headers
+UUID_HEADERS_CHECK := $(wildcard /usr/include/uuid/uuid.h)
+#$(info UUID_HEADERS_CHECK=$(UUID_HEADERS_CHECK))
+ifneq "$(UUID_HEADERS_CHECK)" ""
+UUID_HEADERS = 1
+else
+UUID_HEADERS = 0
+endif
+#$(info UUID_HEADERS=$(UUID_HEADERS))
+
+ifeq "$(UUID_LIB)" "1"
+ifeq "$(UUID_HEADERS)" "1"
+ifndef WANT_NHUUID
+WANT_NHUUID=1
+endif
+endif
+endif
+else    # NO_NHUUID
+WANT_NHUUID=0
+endif   # NO_NHUUID
+
+ifeq "$(WANT_NHUUID)" "1"
+#$(info NHUUID support will be included)
+CFLAGS+= -DNHUUID
+LIBS+=-luuid
+else    # WANT_NHUUID
+$(info Attention - No NHUUID support will be included)
+endif   # WANT_NHUUID
+endif   # MAKEFILE_SRC
+
+ifdef WANT_WIN_X11
+USE_XPM=1
+WINX11LIB = -lXaw -lXmu -lXext -lXt -lX11
+VARDATND0 += x11tiles NetHack.ad pet_mark.xbm pilemark.xbm
+# -x: if built without dlb, some versions of mkfontdir think *.lev are fonts
+POSTINSTALL += bdftopcf win/X11/nh10.bdf > $(HACKDIR)/nh10.pcf; ( cd $(HACKDIR); mkfontdir -x .lev );
+# separate from CFLAGS so that we don't pass it to every file
+X11CFLAGS = -I/opt/X11/include
+# avoid repeated complaints about _X_NONNULL(args...) in <X11/Xfuncproto.h>
+X11CFLAGS += -Wno-variadic-macros
+ifdef USE_XPM
+CFLAGS += -DUSE_XPM
+WINX11LIB += -lXpm
+VARDATND0 += rip.xpm
+endif
+WINLIB += $(WINX11LIB)
+LFLAGS+=-L/opt/X11/lib
+endif	# WANT_WIN_X11
+
+ifdef WANT_WIN_QT
+LINK = $(CXX)
+ifdef WANT_WIN_QT4
+QTCXXFLAGS += $(sort $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config QtGui --cflags)) -DQT_NO_SOUND=1
+WINLIB += $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config QtGui --libs)
+endif    # WANT_WIN_QT4
+ifdef WANT_WIN_QT5
+QTCXXFLAGS += $(sort $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --cflags))
+WINLIB += $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --libs)
+endif    # WANT_WIN_QT5
+ifdef WANT_WIN_QT6
+ifdef QT6MANUAL
+# Try some likely spots for a self-built Qt6.
+# You'll have to change these manually before using the hints file
+# if they don't match the installed location on your system.
+ifneq "$(HOSTTYPE)" ""
+QTHOST=$(HOSTTYPE)
+else
+QTHOST=x86_64
+endif
+QTTOP=/usr/include/$(HOSTTYPE)-linux-gnu/qt6
+ifneq ($(wildcard $(QTTOP)/*),)
+#we don't set QTLOCATED=1 for this
+QTINCDIR=/usr/include/$(QTHOST)-linux-gnu/qt6
+QTLIBDIR=/usr/lib/$(QTHOST)-linux.gnu
+QTCXXFLAGS += -DQT_WIDGETS_LIB -DQT_MULTIMEDIA_LIB -DQT_NETWORK_LIB -DQT_GUI_LIB -DQT_CORE_LIB
+QTCXXFLAGS += -I$(QTINCDIR)/QtWidgets -I$(QTINCDIR) -I$(QTINCDIR)/QtMultimedia
+QTCXXFLAGS += -I$(QTINCDIR)/QtNetwork -I$(QTINCDIR)/QtGui -I$(QTINCDIR)/QtCore
+WINLIB += -L$(QTLIBDIR) -lQt6Widgets -lQt6Multimedia -lQt6Network -lQt6Gui -lQt6Core
+MOCPATH = /usr/lib/qt6/libexec/moc
+#/usr/lib/x86_64-linux-gnu/libQt6EglFSDeviceIntegration.so
+endif    # QTTOP/*
+ifndef QTINCDIR
+ifneq ($(wildcard /usr/local/Qt6/*),)
+QTDIR=/usr/local/Qt6
+QTLOCATED=1
+endif    # wildcard /usr/local/Qt6
+ifneq ($(wildcard /usr/local/qt6/*),)
+QTDIR=/usr/local/qt6
+QTLOCATED=1
+endif    # wildcard /usr/local/qt6
+endif    # !QTINCDIR
+ifdef QTLOCATED
+QTCXXFLAGS += -I$(QTDIR)/include/QtCore
+QTCXXFLAGS += -I$(QTDIR)/include/QtGui
+QTCXXFLAGS += -I$(QTDIR)/include/QtMultimedia
+QTCXXFLAGS += -I$(QTDIR)/include/QtWidgets
+MOCPATH = $(QTDIR)/libexec/moc
+WINLIB += -L$(QTDIR)/lib -lQt6Widgets -lQt6Multimedia -lQt6Network -lQt6Gui -lQt6Core
+endif   # QTLOCATED
+else    # !QT6MANUAL
+MOCDIR = $(shell pkg-config Qt6Gui --variable=libexecdir)
+ifneq ($(wildcard $(MOCDIR)/*),)
+MOCPATH = $(MOCDIR)/moc
+else
+MOCPATH = /usr/lib/qt6/libexec/moc
+endif   # MOCDIR
+QTCXXFLAGS += $(sort $(shell pkg-config Qt6Gui Qt6Widgets Qt6Multimedia --cflags))
+WINLIB += $(shell pkg-config Qt6Gui Qt6Widgets Qt6Multimedia --libs)
+endif   # QT6MANUAL
+endif   # WANT_WIN_QT6
+ifndef QTDIR
+$(error QTDIR not defined in the environment or Makefile)
+endif	# QTDIR
+# XXX if /Developer/qt exists and QTDIR not set, use that
+# XXX make sure QTDIR points to something reasonable
+QTCXXFLAGS += -fPIC
+POSTINSTALL+= bdftopcf win/X11/nh10.bdf > $(INSTDIR)/nh10.pcf; \
+		( cd $(INSTDIR); mkfontdir -x .lev );
+VARDATND0 += nhtiles.bmp rip.xpm nhsplash.xpm
+else    # WANT_WIN_QT
+LINK = $(CC)
+endif	# !WANT_WIN_QT
+
+# prevent duplicate tile.o in WINOBJ
+WINOBJ = $(WINOBJ0) $(sort $(XTRAOBJ))
+# prevent duplicates in VARDATND if both X11 and Qt are being supported
+VARDATND += $(sort $(VARDATND0))
+
+GIT_HASH := $(shell echo `git rev-parse --verify HEAD` 2>&1)
+GIT_BRANCH := $(shell echo `git rev-parse --abbrev-ref HEAD` 2>&1)
+GIT_PREFIX := $(shell echo `git config nethack.substprefix` 2>&1)
+
+ifdef GIT_HASH
+GITHASH = -DNETHACK_GIT_SHA=\"$(GIT_HASH)\"
+endif
+ifdef GIT_BRANCH
+GITBRANCH = -DNETHACK_GIT_BRANCH=\"$(GIT_BRANCH)\"
+endif
+ifdef GIT_PREFIX
+GITPREFIX = -DNETHACK_GIT_PREFIX=\"$(GIT_PREFIX)\"
+endif
+
+ifdef WANT_LIBNH
+CFLAGS += -DSHIM_GRAPHICS -DNOTTYGRAPHICS -DNOSHELL -DLIBNH -fpic
+LIBNHSYSSRC = ../sys/libnh/libnhmain.c \
+		../sys/share/ioctl.c ../sys/share/unixtty.c \
+		../sys/unix/unixunix.c ../sys/unix/unixres.c \
+		../win/shim/winshim.c
+LIBNHSYSOBJ = $(TARGETPFX)libnhmain.o $(TARGETPFX)ioctl.o \
+		$(TARGETPFX)unixtty.o $(TARGETPFX)unixunix.o \
+		$(TARGETPFX)unixres.o $(TARGETPFX)winshim.o \
+		$(TARGETPFX)date.o
+#don't bother building the game executable as it will fail
+#without winshim
+override GAME=
+MOREALL += ( cd src ; $(MAKE) pregame ; $(MAKE) $(TARGETPFX)libnh.a )
+endif  # WANT_LIBNH
+
+SYSCONFCREATE = cp sys/unix/sysconf $(INSTDIR)/sysconf
+SYSCONFINSTALL = $(SYSCONFCREATE) && \
+	 $(CHOWN) $(GAMEUID) $(INSTDIR)/sysconf && \
+	 $(CHGRP) $(GAMEGRP) $(INSTDIR)/sysconf && \
+	 chmod $(VARFILEPERM) $(INSTDIR)/sysconf;
+SYSCONFENSURE = (if ! test -f $(INSTDIR)/sysconf ; then \
+	 $(SYSCONFCREATE) && \
+	 $(CHOWN) $(GAMEUID) $(INSTDIR)/sysconf && \
+	 $(CHGRP) $(GAMEGRP) $(INSTDIR)/sysconf && \
+	 chmod $(VARFILEPERM) $(INSTDIR)/sysconf; fi );
+
+ifdef WANT_SOURCE_INSTALL
+PREFIX=$(abspath $(NHSROOT))
+#SHELLDIR=
+HACKDIR=$(PREFIX)/playground
+GAMEPERM = 0700
+VARFILEPERM = 0600
+VARDIRPERM = 0700
+CFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE
+MOREALL=$(MAKE) install
+else #!WANT_SOURCE_INSTALL
+#PREFIX=/usr
+PREFIX=$(wildcard ~)/nh/install
+HACKDIR=$(PREFIX)/games/lib/nethackdir
+SHELLDIR = $(PREFIX)/games
+VARDIRPERM = 0755
+VARFILEPERM = 0600
+GAMEPERM = 0755
+endif #?WANT_SOURCE_INSTALL
+
+INSTDIR=$(HACKDIR)
+VARDIR = $(HACKDIR)
+
+ifdef MAKEFILE_TOP
+TESTGDBPATH=/usr/bin/gdb
+POSTINSTALL+= test -f $(TESTGDBPATH) || \
+		sed -i -e 's;^GDBPATH=/usr/bin/gdb;\#GDBPATH=/usr/bin/gdb;' \
+		-e 's;PANICTRACE_GDB=1;PANICTRACE_GDB=0;' $(INSTDIR)/sysconf;
+POSTUPDATE+= test -f $(TESTGDBPATH) || \
+		sed -i -e 's;^GDBPATH=/usr/bin/gdb;\#GDBPATH=/usr/bin/gdb;' \
+		-e 's;PANICTRACE_GDB=1;PANICTRACE_GDB=0;' $(INSTDIR)/sysconf;
+endif  #MAKEFILE_TOP
+
+ifeq '$(USE_NONOSTATICFN)' '1'
+CFLAGS += -DNONOSTATICFN
+else
+ifeq '$(USE_NOSTATICFN)' '1'
+CFLAGS += -DNOSTATICFN
+endif
+endif
+
+# Lua
+# when building liblua.a, avoid warning that use of tmpnam() should be
+# replaced by mkstemp(); the lua code doesn't use nethack's config.h so
+# this needs to be passed via make rather than defined in unixconf.h
+SYSCFLAGS=-DLUA_USE_LINUX
+ifdef GITSUBMODULES
+LUAFLAGS=CC='$(CC)' SYSCFLAGS='$(SYSCFLAGS)'
+ifeq "$(CCISCLANG)" "1"
+# clang
+LUAFLAGS +=CWARNGCC=''
+endif   # clang
+override LUAHEADERS = submodules/lua
+override LUA2NHTOP = ../..
+override LUAMAKEFLAGS=$(LUAFLAGS)
+endif   # GITSUBMODULES
+DLLIB = -ldl
+
+# Only needed for GLIBC stack trace:
+LFLAGS+=-rdynamic
+
+# if TTY_TILES_ESCCODES
+#WINSRC += tile.c
+#WINOBJ += tile.o
+# endif
+
+CHOWN=true
+CHGRP=true
+
+# manpages directory
+MANDIR=/usr/share/man/man6
+#
+#-INCLUDE cross-pre2.500
+#
+
+#
+#-INCLUDE gbdates-pre.500
+#
+
+#
+#-INCLUDE multisnd2-pre.500
+#
+
+#
+#-INCLUDE response.500
+#
+
+#-POST
+
+#
+#-INCLUDE gbdates-post.500
+#
+#
+#-INCLUDE multisnd-post.500
+#
+
+ifdef MAKEFILE_TOP
+ifeq ($(MAKELEVEL),0)
+.PHONY: checkmakefiles
+checkmakefiles:
+	@$(MAKE) -f sys/unix/Makefile.check \
+		HINTSFILE="$(HINTSFILE)" HINTSINCLFILES="$(HINTSINCLFILES)"
+endif
+endif
+
+ifdef WANT_LIBNH
+$(TARGETPFX)libnh.a: $(HOBJ) $(LIBNHSYSOBJ) ../lib/lua/liblua-$(LUA_VERSION).a
+	$(AR) rcs $@ $(HOBJ) $(LIBNHSYSOBJ) ../lib/lua/liblua-$(LUA_VERSION).a
+	@echo "$@ built."
+$(TARGETPFX)libnhmain.o : ../sys/libnh/libnhmain.c $(HACK_H)
+	$(CC) $(CFLAGS) -c -o$@ $<
+#dependency tool added this to Makefile.src
+#$(TARGETPFX)winshim.o : ../win/shim/winshim.c $(HACK_H)
+#	$(CC) $(CFLAGS) -c -o$@ $<
+endif  # WANT_LIBNH
+
+#
+#-INCLUDE cross-post.500
+#
+

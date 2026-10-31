@@ -1,4 +1,4 @@
-/* NetHack 3.7	role.c	$NHDT-Date: 1737607158 2025/01/22 20:39:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.107 $ */
+/* NetHack 5.0	role.c	$NHDT-Date: 1737607158 2025/01/22 20:39:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.107 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985-1999. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1742,6 +1742,9 @@ role_init(void)
     }
     /* 0 or 1; no gods are neuter, nor is gender randomized */
     svq.quest_status.godgend = !strcmpi(align_gtitle(alignmnt), "goddess");
+
+    if (Role_if(PM_CLERIC))
+        objects[SPE_LIGHT].oc_skill = P_CLERIC_SPELL;
 
 #if 0
 /*

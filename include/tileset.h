@@ -1,4 +1,4 @@
-/* NetHack 3.7    tileset.h    $NHDT-Date: 1596498564 2020/08/03 23:49:24 $ $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.2 $ */
+/* NetHack 5.0    tileset.h    $NHDT-Date: 1596498564 2020/08/03 23:49:24 $ $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.2 $ */
 /* Copyright (c) Ray Chason, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
 

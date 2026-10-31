@@ -74,9 +74,9 @@ BUGS
 
 COPYRIGHT
        This   file   is   Copyright  (C)  Kenneth  Lorber,  2024  for  version
-       NetHack-3.7:1.12.  NetHack may be freely  redistributed.   See  license
-       for details.
+       NetHack-5:1.12.  NetHack may be freely redistributed.  See license  for
+       details.
 
 
 
-NETHACK                        25 December 2024                     RECOVER(6)
+NETHACK                          26 April 2026                      RECOVER(6)

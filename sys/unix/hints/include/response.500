@@ -1,0 +1,33 @@
+#------------------------------------------------------------------------------
+# NetHack 5.0  response.500 $NHDT-Date: 1668359835 2022/11/13 17:17:15 $  $NHDT-Branch: NetHack-5.0 $
+
+ifeq "$(RESP)" "1"
+USE_RESPONSEFILE=1
+endif
+ifeq "$(resp)" "1"
+USE_RESPONSEFILE=1
+endif
+ifeq "$(RESPONSE)" "1"
+USE_RESPONSEFILE=1
+endif
+ifeq "$(response)" "1"
+USE_RESPONSEFILE=1
+endif
+
+ifeq "$(USE_RESPONSEFILE)" "1"
+RESPONSEFILES=create_responsefiles
+CXXFLAGS = $(CCXXFLAGS) -I. -I$(QTDIR)/include $(QTCXXFLAGS)
+CC_COMPILER_SWITCHES := $(subst \,\\,$(CFLAGS))
+CC_COMPILER_SWITCHES := $(subst ",\",$(CC_COMPILER_SWITCHES))
+CXX_COMPILER_SWITCHES := $(subst \,\\,$(CXXFLAGS))
+CXX_COMPILER_SWITCHES := $(subst ",\",$(CXX_COMPILER_SWITCHES))
+CC_RESPONSEFILE=../src/nethack_cc.rsp
+CXX_RESPONSEFILE=../src/nethack_cxx.rsp
+CFLAGS=@$(CC_RESPONSEFILE)
+CXXFLAGS=@$(CXX_RESPONSEFILE)
+CLEAN_CC_RESPONSEFILE=rm -f $(CC_RESPONSEFILE);
+CLEAN_CXX_RESPONSEFILE=rm -f $(CXX_RESPONSEFILE);
+endif
+
+#end of response.500
+#------------------------------------------------------------------------------

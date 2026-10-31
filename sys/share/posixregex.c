@@ -1,4 +1,4 @@
-/* NetHack 3.7  posixregex.c	$NHDT-Date: 1596498286 2020/08/03 23:44:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.7 $ */
+/* NetHack 5.0  posixregex.c	$NHDT-Date: 1596498286 2020/08/03 23:44:46 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.7 $ */
 /* Copyright (c) Sean Hunt  2015.                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 

@@ -1,4 +1,4 @@
-/* NetHack 3.7	hack.h	$NHDT-Date: 1736530208 2025/01/10 09:30:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.266 $ */
+/* NetHack 5.0	hack.h	$NHDT-Date: 1736530208 2025/01/10 09:30:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.266 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -252,7 +252,7 @@ struct cmd {
     boolean swap_yz;       /* QWERTZ keyboards; use z to move NW, y to zap */
     const char *dirchars;      /* current movement/direction characters */
     const char *alphadirchars; /* same as dirchars if !numpad */
-    const struct ext_func_tab *commands[256]; /* indexed by input character */
+    struct Cmd_bind *cmdbinds;
     const struct ext_func_tab *mousebtn[NUM_MOUSE_BUTTONS];
     char spkeys[NUM_NHKF];
     char extcmd_char;      /* key that starts an extended command ('#') */
@@ -571,6 +571,11 @@ enum hunger_state_types {
     STARVED    = 6
 };
 
+/* fake inventory letters, not 'a'..'z' or 'A'..'Z' */
+#define NOINVSYM '#'      /* overflow because all 52 letters are in use */
+#define CONTAINED_SYM '>' /* designator for inside a container */
+#define HANDS_SYM '-'     /* hands|fingers|self depending on context */
+
 /* inventory counts (slots in tty parlance)
  * a...zA..Z    invlet_basic (52)
  * $a...zA..Z#  2 special additions
@@ -582,6 +587,13 @@ enum inventory_counts {
     invlet_max = invlet_basic + invlet_gold + invlet_overflow,
     /* 2023/11/30 invlet_max is not yet used anywhere */
 };
+
+#ifndef IDLECHECKPOINT_WAIT_TIME
+#define IDLECHECKPOINT_WAIT_TIME 10  /* seconds to wait before executing a checkpoint;
+                                      * always #define'd but only has meaning if
+                                      * IDLECHECKPOINT is defined.
+                                      */
+#endif
 
 struct kinfo {
     struct kinfo *next; /* chain of delayed killers */
@@ -697,21 +709,7 @@ enum nhcb_calls {
     NUM_NHCB
 };
 
-/*
- * option setting restrictions
- */
-
-enum optset_restrictions {
-    set_in_sysconf = 0, /* system config file option only */
-    set_in_config  = 1, /* config file option only */
-    set_viaprog    = 2, /* may be set via extern program, not seen in game */
-    set_gameview   = 3, /* may be set via extern program, displayed in game */
-    set_in_game    = 4, /* may be set via extern program or set in the game */
-    set_wizonly    = 5, /* may be set in the game if wizmode */
-    set_wiznofuz   = 6, /* wizard-mode only, but not by fuzzer */
-    set_hidden     = 7  /* placeholder for prefixed entries, never show it  */
-};
-#define SET__IS_VALUE_VALID(s) ((s < set_in_sysconf) || (s > set_wiznofuz))
+#define NHUUIDSZ 37
 
 struct plinemsg_type {
     xint16 msgtype;  /* one of MSGTYP_foo */
@@ -776,7 +774,7 @@ struct selectionvar {
 
 /* structure for 'program_state'; not saved and restored */
 struct sinfo {
-    int gameover;               /* self explanatory? */
+    int gameover;               /* self-explanatory? */
     int stopprint;              /* inhibit further end of game disclosure */
 #ifdef HANGUPHANDLING
     volatile int done_hup;      /* SIGHUP or moral equivalent received
@@ -802,6 +800,7 @@ struct sinfo {
     int config_error_ready;     /* config_error_add is ready, available */
     int beyond_savefile_load;   /* set when past savefile loading */
     int savefile_completed;     /* savefile has completed writing */
+    int reading_bonesfile;      /* in the midst of trying to read bones file */
 #ifdef PANICLOG
     int in_paniclog;            /* writing a panicloc entry */
 #endif
@@ -812,6 +811,7 @@ struct sinfo {
        interface to suppress menu commands in similar conditions;
        readchar() always resets it to 'otherInp' prior to returning */
     int input_state; /* whether next key pressed will be entering a command */
+    int early_options; /* inside early_options processing */
 #ifdef TTY_GRAPHICS
     /* resize_pending only matters when handling a SIGWINCH signal for tty;
        getting_char is used along with that and also separately for UNIX;
@@ -1345,7 +1345,7 @@ typedef uint32_t mmflags_nht;     /* makemon MM_ flags */
 
 /* Macros for launching objects */
 #define ROLL 0x01          /* the object is rolling */
-#define FLING 0x02         /* the object is flying thru the air */
+#define FLING 0x02         /* the object is flying through the air */
 #define LAUNCH_UNSEEN 0x40 /* hero neither caused nor saw it */
 #define LAUNCH_KNOWN 0x80  /* the hero caused this by explicit action */
 

@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1737556914 2025/01/22 06:41:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.753 $ */
+/* NetHack 5.0	options.c	$NHDT-Date: 1737556914 2025/01/22 06:41:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.753 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -56,21 +56,13 @@ NEARDATA struct accessibility_data a11y;
 #include "optlist.h"
 #undef NHOPT_PROTO
 
-#define NHOPT_ENUM
-enum opt {
-    opt_prefix_only = -1,
-#include "optlist.h"
-    OPTCOUNT
-};
-#undef NHOPT_ENUM
-
 #define NHOPT_PARSE
 static struct allopt_t allopt_init[] = {
 #include "optlist.h"
     {(const char *) 0, OptS_Advanced, 0, 0, 0, set_in_sysconf, BoolOpt,
      No, No, No, No, Term_False, 0, (boolean *) 0,
      (int (*)(int, int, boolean, char *, char *)) 0,
-     (char *) 0, (const char *) 0, (const char *) 0, 0, 0, 0 }
+     (char *) 0, (const char *) 0, (const char *) 0, 0, 0, 0, TRUE }
 };
 #undef NHOPT_PARSE
 
@@ -93,16 +85,6 @@ enum optn_result {
 };
 enum requests {
     do_nothing, do_init, do_set, do_handler, get_val, get_cnf_val
-};
-/* these aren't the same as set_xxx in optlist.h */
-enum option_phases {
-    builtin_opt=1,/* compiled-in default value of an option */
-    syscf_opt,    /* sysconf setting of an option, overrides builtin */
-    rc_file_opt,  /* player's run-time config file setting, overrides syscf */
-    environ_opt,  /* player's environment NETHACKOPTIONS, overrides rc_file */
-    cmdline_opt,  /* program invocation command-line, overrides environ */
-    play_opt,     /* 'O' command, interactively set so overrides all */
-    num_opt_phases
 };
 
 static struct allopt_t allopt[SIZE(allopt_init)];
@@ -391,6 +373,7 @@ staticfn boolean parse_role_opt(int, boolean, const char *, char *, char **);
 staticfn char *get_cnf_role_opt(int);
 staticfn unsigned int longest_option_name(int, int);
 staticfn int doset_simple_menu(void);
+staticfn void reset_needed_visuals(void);
 staticfn void doset_add_menu(winid, const char *, const char *, int, int);
 staticfn int handle_add_list_remove(const char *, int);
 staticfn void all_options_conds(strbuf_t *);
@@ -595,7 +578,7 @@ parseoptions(
          * placed that number into each option's allopt[n].minmatch.
          *
          */
-        if (!got_match)
+        if (!got_match && allopt[i].name)
             got_match = match_optname(opts, allopt[i].name,
                                       allopt[i].minmatch, TRUE);
         if (got_match) {
@@ -634,7 +617,8 @@ parseoptions(
     /* allow optfn's to test whether they were called from parseoptions() */
     program_state.in_parseoptions++;
 
-    if (got_match && matchidx >= 0) {
+    if (got_match && (matchidx >= 0 && matchidx < OPTCOUNT)
+                      && !allopt[matchidx].disregarded) {
         duplicate = duplicate_opt_detection(matchidx);
         if (duplicate && !allopt[matchidx].dupeok)
             complain_about_duplicate(matchidx);
@@ -684,7 +668,9 @@ parseoptions(
         }
     }
 
-    if (optresult == optn_silenterr)
+    if (optresult == optn_silenterr
+        || (got_match && allopt[matchidx].disregarded)
+            || (!got_match && config_unmatched_ignored()))
         return FALSE;
     if (pfx_match && optresult == optn_err) {
         char pfxbuf[BUFSZ], *pfxp;
@@ -1519,7 +1505,8 @@ optfn_disclose(
                                              DISCLOSE_NO_WITHOUT_PROMPT,
                                              DISCLOSE_SPECIAL_WITHOUT_PROMPT,
                                              '\0' };
-            char c, *dop;
+            char c;
+            const char *dop;
 
             c = lowc(*op);
             if (c == 'k')
@@ -1992,6 +1979,8 @@ optfn_map_mode(
          */
         op = string_for_opt(opts, negated);
         if (op != empty_optstr && !negated) {
+            int save_map_mode = iflags.wc_map_mode;
+
             if (!strcmpi(op, "tiles"))
                 iflags.wc_map_mode = MAP_MODE_TILES;
             else if (!strncmpi(op, "ascii4x6", sizeof "ascii4x6" - 1))
@@ -2025,6 +2014,11 @@ optfn_map_mode(
                 config_error_add("Unknown %s parameter '%s'",
                                  allopt[optidx].name, op);
                 return optn_err;
+            }
+            if (wc_supported("map_mode")) {
+                if (!iflags.wc_map_mode
+                    || save_map_mode != iflags.wc_map_mode)
+                    preference_update("map_mode");
             }
         } else if (negated) {
             bad_negation(allopt[optidx].name, TRUE);
@@ -2737,7 +2731,7 @@ optfn_palette(
 }
 
 #if 0
-/* old MAC OS9 code */
+/* old MACOS9 OS9 code */
 staticfn int
 optfn_palette(
     int optidx UNUSED, int req, boolean negated UNUSED,
@@ -3686,7 +3680,7 @@ optfn_scores(
         if ((op = string_for_opt(opts, FALSE)) == empty_optstr)
             return optn_err;
 
-        /* 3.7: earlier versions left old values for unspecified arguments
+        /* 5.0: earlier versions left old values for unspecified arguments
            if player's scores:foo option only specified some of the three;
            in particular, attempting to use 'scores:own' rather than
            'scores:0 top/0 around/own' didn't work as intended */
@@ -4970,17 +4964,20 @@ optfn_windowtype(
          * _end_ because comma-separated option strings are processed from
          * right to left.
          */
-        if (iflags.windowtype_locked)
-            return optn_ok;
+        if (!iflags.window_inited) {
+            if (iflags.windowtype_locked)
+                return optn_ok;
 
-        if ((op = string_for_env_opt(allopt[optidx].name, opts, FALSE))
-            != empty_optstr) {
-            nmcpy(gc.chosen_windowtype, op, WINTYPELEN);
-            if (!iflags.windowtype_deferred) {
-                choose_windows(gc.chosen_windowtype);
+            if ((op = string_for_env_opt(allopt[optidx].name, opts, FALSE))
+                != empty_optstr) {
+                nmcpy(gc.chosen_windowtype, op, WINTYPELEN);
+                if (!iflags.windowtype_deferred) {
+                    choose_windows(gc.chosen_windowtype);
+                }
+            } else {
+                return optn_err;
             }
-        } else
-            return optn_err;
+        }
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
@@ -5111,7 +5108,7 @@ pfxfn_font(int optidx, int req, boolean negated, char *opts, char *op)
         if (opttype > 0
             && (op = string_for_opt(opts, FALSE)) != empty_optstr) {
             wc_set_font_name(opttype, op);
-#ifdef MAC
+#ifdef MACOS9
             set_font_name(opttype, op);
 #endif
             return optn_ok;
@@ -5192,7 +5189,7 @@ pfxfn_IBM_(int optidx UNUSED, int req, boolean negated UNUSED,
  *    (Use optidx to reference the specific option)
  */
 
-staticfn int
+int
 optfn_boolean(
     int optidx, int req, boolean negated,
     char *opts, char *op)
@@ -5314,6 +5311,14 @@ optfn_boolean(
 #endif
             go.opt_need_redraw = TRUE;
             break;
+#ifndef IDLECHECKPOINT
+        case opt_idlecheckpoint:
+            pline("There is no underlying support for 'idlecheckpoint'"
+                  " compiled in."); 
+            iflags.idlecheckpoint = FALSE;
+            give_opt_msg = FALSE;
+            break;
+#endif
         default:
             break;
         }
@@ -5324,17 +5329,30 @@ optfn_boolean(
             return optn_ok;
 
         switch (optidx) {
-        case opt_time:
-#ifdef SCORE_ON_BOTL
+        case opt_terrainstatus:
+            classify_terrain(); /* bring iflags.terrain_typ up to date */
+            FALLTHROUGH;
+            /*FALLTHRU*/
+        case opt_weaponstatus:
+        case opt_armorstatus:
+            if (!wc2_supported(allopt[optidx].name)) {
+                /* not actually an error */
+                config_error_add("'%s' is not supported.",
+                                 allopt[optidx].name);
+                return optn_ok;
+            }
+            FALLTHROUGH;
+            /*FALLTHRU*/
         case opt_showscore:
-#endif
         case opt_showvers:
         case opt_showexp:
+        case opt_time:
             if (VIA_WINDOWPORT())
                 status_initialize(REASSESS_ONLY);
             disp.botl = TRUE;
             break;
         case opt_fixinv:
+        case opt_price_quotes:
         case opt_sortpack:
         case opt_implicit_uncursed:
         case opt_wizweight:
@@ -5492,9 +5510,6 @@ can_set_perm_invent(void)
 
 #ifdef TTY_PERM_INVENT
     if ((WINDOWPORT(tty)
-#ifdef WIN32
-         || WINDOWPORT(safestartup)
-#endif
          ) && !go.opt_initial) {
         perm_invent_toggled(FALSE);
         /* perm_invent_toggled()
@@ -6777,12 +6792,12 @@ complain_about_duplicate(int optidx)
 {
     char buf[BUFSZ];
 
-#ifdef MAC
+#ifdef MACOS9
     /* the Mac has trouble dealing with the output of messages while
      * processing the config file.  That should get fixed one day.
      * For now just return.
      */
-#else /* !MAC */
+#else /* !MACOS9 */
     buf[0] = '\0';
     if (using_alias)
         Sprintf(buf, " (via alias: %s)", allopt[optidx].alias);
@@ -6790,7 +6805,7 @@ complain_about_duplicate(int optidx)
                      (allopt[optidx].opttyp == CompOpt) ? "compound"
                                                         : "boolean",
                      allopt[optidx].name, buf);
-#endif /* ?MAC */
+#endif /* ?MACOS9 */
     return;
 }
 
@@ -7064,29 +7079,14 @@ txt2key(char *txt)
 void
 initoptions(void)
 {
-    int i;
-
     /*
      * Most places that call initoptions_init()/initoptions() would
      * have the calls next to each other, so instead of adding
      * initoptions_init() everywhere, just add it where it's needed in
      * a non-adjacent place and call it here for all the other cases.
      */
-    if(go.opt_phase != builtin_opt)
+    if (go.opt_phase != builtin_opt)
          initoptions_init();
-
-    /*
-     * Call each option function with an init flag and give it a chance
-     * to make any preparations that it might require.  We do this
-     * whether or not the option itself is ever specified; that's
-     * irrelevant for the init call.  Doing this allows the prep code for
-     * option settings to remain adjacent to, and in the same function as,
-     * the code that processes those options.
-     */
-    for (i = 0; i < OPTCOUNT; ++i) {
-        if (allopt[i].optfn)
-            (*allopt[i].optfn)(i, do_init, FALSE, empty_optstr, empty_optstr);
-    }
 #ifdef SYSCF
 /* someday there may be other SYSCF alternatives besides text file */
 #ifdef SYSCF_FILE
@@ -7128,9 +7128,7 @@ initoptions_init(void)
     go.opt_phase = builtin_opt;    /* Did I need to move this here? */
     /* initialize the function pointers for saving the game */
     sf_init();
-    memcpy(allopt, allopt_init, sizeof(allopt));
-    determine_ambiguities();
-
+    allopt_array_init();
     /* if windowtype has been specified on the command line, set it up
        early so windowtype-specific options use it as their base */
     if (gc.cmdline_windowsys) {
@@ -7284,6 +7282,27 @@ initoptions_init(void)
     /* since this is done before init_objects(), do partial init here */
     objects[SLIME_MOLD].oc_name_idx = SLIME_MOLD;
     nmcpy(svp.pl_fruit, OBJ_NAME(objects[SLIME_MOLD]), PL_FSIZ);
+
+#ifdef SYSCF
+/* someday there may be other SYSCF alternatives besides text file */
+#ifdef SYSCF_FILE
+    /* If SYSCF_FILE is specified, it _must_ exist... */
+    assure_syscf_file();
+    config_error_init(TRUE, SYSCF_FILE, FALSE);
+
+    /* ... and _must_ parse correctly. */
+    go.opt_phase = syscf_opt;
+    if (!read_config_file(SYSCF_FILE, set_in_sysconf)) {
+        if (config_error_done() && !iflags.initoptions_noterminate)
+            nh_terminate(EXIT_FAILURE);
+    }
+    config_error_done();
+    /*
+     * TODO [maybe]: parse the sysopt entries which are space-separated
+     * lists of usernames into arrays with one name per element.
+     */
+#endif
+#endif /* SYSCF */
 }
 
 /*
@@ -7304,71 +7323,9 @@ initoptions_init(void)
  */
 void
 initoptions_finish(void)
-{
-    nhsym sym = 0;
-    char *opts = 0, *xtraopts = 0;
-#ifndef MAC
-    const char *envname, *namesrc, *nameval;
+{   nhsym sym = 0;
 
-    /* getenv() instead of nhgetenv(): let total length of options be long;
-       parseoptions() will check each individually */
-    envname = "NETHACKOPTIONS";
-    opts = getenv(envname);
-    if (!opts) {
-        /* fall back to original name; discouraged */
-        envname = "HACKOPTIONS";
-        opts = getenv(envname);
-    }
-
-    if (gc.cmdline_rcfile) {
-        namesrc = "command line";
-        nameval = gc.cmdline_rcfile;
-        xtraopts = opts;
-        if (opts && (*opts == '/' || *opts == '\\' || *opts == '@'))
-            xtraopts = 0; /* NETHACKOPTIONS is a file name; ignore it */
-    } else if (opts && (*opts == '/' || *opts == '\\' || *opts == '@')) {
-        /* NETHACKOPTIONS is a file name; use that instead of the default */
-        if (*opts == '@')
-            ++opts; /* @filename */
-        namesrc = envname;
-        nameval = opts;
-        xtraopts = 0;
-    } else
-#endif /* !MAC */
-    /*else*/ {
-        /* either no NETHACKOPTIONS or it wasn't a file name;
-           read the default configuration file */
-        nameval = namesrc = 0;
-        xtraopts = opts;
-    }
-
-    /* seemingly arbitrary name length restriction is to prevent error
-       messages, if any were to be delivered while accessing the file,
-       from potentially overflowing buffers */
-    if (nameval && (int) strlen(nameval) >= BUFSZ / 2) {
-        go.opt_phase = rc_file_opt;
-        config_error_init(TRUE, namesrc, FALSE);
-        config_error_add(
-                   "nethackrc file name \"%.40s\"... too long; using default",
-                         nameval);
-        config_error_done();
-        nameval = namesrc = 0; /* revert to default nethackrc */
-    }
-
-    config_error_init(TRUE, nameval, nameval ? CONFIG_ERROR_SECURE : FALSE);
-    (void) read_config_file(nameval, set_in_config);
-    config_error_done();
-    if (xtraopts) {
-        /* NETHACKOPTIONS is present and not a file name */
-        go.opt_phase = environ_opt;
-        config_error_init(FALSE, envname, FALSE);
-        (void) parseoptions(xtraopts, TRUE, FALSE);
-        config_error_done();
-    }
-
-    if (gc.cmdline_rcfile)
-        free((genericptr_t) gc.cmdline_rcfile), gc.cmdline_rcfile = 0;
-    /*[end of nethackrc handling]*/
+    rcfile();
 
     (void) fruitadd(svp.pl_fruit, (struct fruit *) 0);
     /*
@@ -7399,12 +7356,10 @@ initoptions_finish(void)
      * Option processing can take place before a user-decided WindowPort
      * is even initialized, so check for that too.
      */
-    if (!WINDOWPORT(safestartup)) {
-        if (iflags.hilite_delta && !wc2_supported("statushilites")) {
-            raw_printf("Status highlighting not supported for %s interface.",
-                       windowprocs.name);
-            iflags.hilite_delta = 0;
-        }
+    if (iflags.hilite_delta && !wc2_supported("statushilites")) {
+        raw_printf("Status highlighting not supported for %s interface.",
+                    windowprocs.name);
+        iflags.hilite_delta = 0;
     }
 #endif
     update_rest_on_space();
@@ -7419,18 +7374,17 @@ initoptions_finish(void)
              && wc_supported("tiled_map"))
         iflags.wc_ascii_map = FALSE, iflags.wc_tiled_map = TRUE;
 
-    if (iflags.wc_tiled_map && !opt_set_in_config[opt_color])
-        iflags.wc_color = TRUE;
-    if (iflags.wc_ascii_map && !iflags.wc_color
-        && !opt_set_in_config[opt_bgcolors])
-        iflags.bgcolors = FALSE;
-
+#ifdef ENHANCED_SYMBOLS
     if (glyphid_cache_status())
         free_glyphid_cache();
     apply_customizations(gc.currentgraphics,
-                        (do_custom_colors | do_custom_symbols));
+                         do_custom_symbols | do_custom_colors);
+#endif
     go.opt_initial = FALSE;
+    return;
+}
 
+#if 0
     /*
      * Do these after clearing the 'opt_initial' flag.
      */
@@ -7445,7 +7399,38 @@ initoptions_finish(void)
         if (can_set_perm_invent())
             iflags.perm_invent = TRUE;
     }
-    return;
+}
+#endif
+
+void
+allopt_array_init(void)
+{
+    int i;
+    static boolean options_array_inited_already = FALSE;
+
+    if (!options_array_inited_already) {
+        memcpy(allopt, allopt_init, sizeof(allopt));
+        determine_ambiguities();
+        for (i = 0; allopt[i].name; i++) {
+            if (allopt[i].addr)
+                *(allopt[i].addr) = allopt[i].initval;
+        }
+        heed_all_options();
+        /*
+         * Call each option function with an init flag and give it a chance
+         * to make any preparations that it might require.  We do this
+         * whether or not the option itself is ever specified; that's
+         * irrelevant for the init call.  Doing this allows the prep code for
+         * option settings to remain adjacent to, and in the same function as,
+         * the code that processes those options.
+         */
+        for (i = 0; i < OPTCOUNT; ++i) {
+            if (allopt[i].optfn)
+                (*allopt[i].optfn)(i, do_init, FALSE, empty_optstr,
+                                   empty_optstr);
+        }
+        options_array_inited_already = TRUE;
+    }
 }
 
 /*
@@ -7682,7 +7667,7 @@ parsebindings(char *bindings)
     }
 
     /* extended command? */
-    if (!bind_key(key, bind)) {
+    if (!bind_key(key, bind, TRUE)) {
         config_error_add("Unknown key binding command '%s'", bind);
         return FALSE;
     }
@@ -8722,8 +8707,8 @@ doset_simple_menu(void)
 int
 doset_simple(void)
 {
-    int pickedone = 0,
-        opt_crt_flags = docrtNocls;
+    int pickedone = 0;
+    boolean flush = FALSE;
 
     if (iflags.menu_requested) {
         /* doset() checks for 'm' and calls doset_simple(); clear the
@@ -8738,40 +8723,13 @@ doset_simple(void)
     give_opt_msg = FALSE;
     do {
         pickedone = doset_simple_menu();
+        flush = go.opt_need_redraw;
 
-        /* some option choices warrant immediate updating beyond the
-           option value itself */
-        if (go.opt_need_glyph_reset) {
-            reset_glyphmap(gm_optionchange);
-        }
-        if (go.opt_need_redraw) {
-            check_gold_symbol();
-            reglyph_darkroom();
-            if (go.opt_symset_changed)
-                opt_crt_flags &= ~docrtRefresh;
-            docrt_flags(opt_crt_flags);
+        reset_needed_visuals();
+        if (flush) {
             flush_screen(1);
+            flush = FALSE;
         }
-        if (go.opt_need_promptstyle)
-            adjust_menu_promptstyle(WIN_INVEN, &iflags.menu_headings);
-        if (go.opt_update_basic_palette) {
-#ifdef CHANGE_COLOR
-            change_palette();
-#endif
-            go.opt_update_basic_palette = FALSE;
-        }
-        if (go.opt_reset_customcolors || go.opt_reset_customsymbols) {
-            if (go.opt_reset_customcolors)
-                reset_customcolors();
-            if (go.opt_reset_customsymbols)
-                reset_customsymbols();
-            docrt_flags(opt_crt_flags);
-        }
-        /* status may need updating if terminal is tall enough that
-           doset_simple menu doesn't cover up status or wide enough for
-           curses to honor player's choice of align_status:Right|Left */
-        if (disp.botl || disp.botlx)
-            bot();
     } while (pickedone > 0);
     give_opt_msg = TRUE;
     return ECMD_OK;
@@ -8899,7 +8857,7 @@ doset(void) /* changing options via menu by Per Liboriussen */
                     enhance_menu_text(buf, sizeof buf, pass, bool_p,
                                       &allopt[i]);
                 add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
-                         ATR_NONE, clr, buf, MENU_ITEMFLAGS_NONE);
+                         ATR_NONE, clr, buf, MENU_ITEMFLAGS_SKIPINVERT);
             }
 
     add_menu_str(tmpwin, "");
@@ -8964,6 +8922,7 @@ doset(void) /* changing options via menu by Per Liboriussen */
             if (opt_indx < -1)
                 opt_indx++; /* -1 offset for select_menu() */
             opt_indx -= indexoffset;
+            assert(IndexOk(opt_indx, allopt));
             if (allopt[opt_indx].opttyp == BoolOpt) {
                 /* boolean option */
                 Sprintf(buf, "%s%s", *allopt[opt_indx].addr ? "!" : "",
@@ -9012,6 +8971,15 @@ doset(void) /* changing options via menu by Per Liboriussen */
         goto rerun;
     }
 
+    reset_needed_visuals();
+    return ECMD_OK;
+}
+
+#undef HELP_IDX
+
+staticfn void
+reset_needed_visuals(void)
+{
     if (go.opt_need_glyph_reset) {
         reset_glyphmap(gm_optionchange);
     }
@@ -9039,10 +9007,12 @@ doset(void) /* changing options via menu by Per Liboriussen */
     if (disp.botl || disp.botlx) {
         bot();
     }
-    return ECMD_OK;
+    go.opt_need_redraw = FALSE;
+    go.opt_need_glyph_reset = FALSE;
+    go.opt_reset_customcolors = FALSE;
+    go.opt_reset_customsymbols = FALSE;
+    go.opt_update_basic_palette = FALSE;
 }
-
-#undef HELP_IDX
 
 /* doset(#optionsfull command) menu entries for compound options */
 staticfn void
@@ -9092,7 +9062,7 @@ doset_add_menu(
     indent = !any.a_int ? "    " : "";
     Sprintf(buf, fmtstr, indent, option, value);
     add_menu(win, &nul_glyphinfo, &any, 0, 0,
-             ATR_NONE, clr, buf, MENU_ITEMFLAGS_NONE);
+             ATR_NONE, clr, buf, MENU_ITEMFLAGS_SKIPINVERT);
 }
 
 
@@ -9304,6 +9274,29 @@ dotogglepickup(void)
     return ECMD_OK;
 }
 
+/* toggle any (settable in-game) boolean option by name */
+int
+toggle_bool_option(const char *p)
+{
+    int i;
+    int ret = ECMD_FAIL;
+
+    for (i = 0; i < OPTCOUNT; i++)
+        if (!strncmpi(allopt[i].name, p, strlen(p))
+            && allopt[i].opttyp == BoolOpt
+            && allopt[i].setwhere == set_in_game
+            && allopt[i].addr != 0) {
+            char buf[BUFSZ];
+
+            Sprintf(buf, "%s%s", *allopt[i].addr ? "!" : "", allopt[i].name);
+            if (parseoptions(buf, FALSE, FALSE))
+                ret = ECMD_OK;
+
+            reset_needed_visuals();
+        }
+    return ret;
+}
+
 int
 add_autopickup_exception(const char *mapping)
 {
@@ -9439,7 +9432,7 @@ static const char *opt_intro[] = {
     "                 NetHack Options Help:", "",
 #define CONFIG_SLOT 3 /* fill in next value at run-time */
     (char *) 0,
-#if !defined(MICRO) && !defined(MAC)
+#if !defined(MICRO) && !defined(MACOS9)
     "or use `NETHACKOPTIONS=\"<options>\"' in your environment",
 #endif
     "(<options> is a list of options separated by commas)",
@@ -9829,6 +9822,7 @@ static struct wc_Opt wc_options[] = {
     { (char *) 0, 0L }
 };
 static struct wc_Opt wc2_options[] = {
+    { "armorstatus", WC2_EXTRASTATUS },
     { "fullscreen", WC2_FULLSCREEN },
     { "guicolor", WC2_GUICOLOR },
     { "hilite_status", WC2_HILITE_STATUS },
@@ -9843,7 +9837,9 @@ static struct wc_Opt wc2_options[] = {
     { "statuslines", WC2_STATUSLINES },
     { "term_cols", WC2_TERM_SIZE },
     { "term_rows", WC2_TERM_SIZE },
+    { "terrainstatus", WC2_EXTRASTATUS },
     { "use_darkgray", WC2_DARKGRAY },
+    { "weaponstatus", WC2_EXTRASTATUS },
     { "windowborders", WC2_WINDOWBORDERS },
     { "wraptext", WC2_WRAPTEXT },
     { (char *) 0, 0L }
@@ -10183,6 +10179,39 @@ enhance_menu_text(
 #endif
     return;
 }
+
+void
+heed_all_options(void)
+{
+    int i;
+
+    for (i = 0; i < OPTCOUNT; i++)
+        allopt[i].disregarded = FALSE;
+}
+
+void
+disregard_all_options(void)
+{
+    int i;
+
+    for (i = 0; i < OPTCOUNT ; i++)
+        allopt[i].disregarded = TRUE;
+}
+
+void
+heed_this_option(enum opt optidx)
+{
+    if (optidx >= 0 && optidx < (enum opt) OPTCOUNT)
+         allopt[optidx].disregarded = FALSE;
+}
+void
+disregard_this_option(enum opt optidx)
+{
+    if (optidx >= 0 && optidx < (enum opt) OPTCOUNT)
+        allopt[optidx].disregarded = TRUE;
+}
+
+
 
 #undef OPTIONS_HEADING
 #undef CONFIG_SLOT

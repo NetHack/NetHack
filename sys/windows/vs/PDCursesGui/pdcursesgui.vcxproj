@@ -35,6 +35,9 @@
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <VCToolsVersion />
+  </PropertyGroup>
   <Import Project="..\default_lib.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ItemGroup>

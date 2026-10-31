@@ -1,4 +1,4 @@
-/* NetHack 3.7	context.h	$NHDT-Date: 1753856387 2025/07/29 22:19:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.58 $ */
+/* NetHack 5.0	context.h	$NHDT-Date: 1753856387 2025/07/29 22:19:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.58 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -168,7 +168,7 @@ struct context_info {
     boolean bypasses;    /* bypass flag is set on at least one fobj */
     boolean door_opened; /* set to true if door was opened during test_move */
     boolean resume_wish; /* game was exited while in wish prompt */
-    boolean tips[NUM_TIPS];
+    unsigned long tips;
     struct dig_info digging;
     struct victual_info victual;
     struct engrave_info engraving;

@@ -1,4 +1,4 @@
-/* NetHack 3.7	version.c	$NHDT-Date: 1737622664 2025/01/23 00:57:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.105 $ */
+/* NetHack 5.0	version.c	$NHDT-Date: 1737622664 2025/01/23 00:57:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.105 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -118,7 +118,7 @@ status_version(char *buf, size_t bufsz, boolean indent)
 #if 0
         /* note: it's possible for branch name to be a prefix of game name
            but that's unlikely enough that we won't bother with it; having
-           branch "nethack-3.7" be a superset of game "nethack" seems like
+           branch "nethack-5.0" be a superset of game "nethack" seems like
            including both is redundant, but having branch "net" be a subset
            of game "nethack" doesn't feel that way; optimizing "net" out
            seems like it would be a mistake */
@@ -156,6 +156,9 @@ int
 doversion(void)
 {
     char buf[BUFSZ];
+
+    if (iflags.menu_requested)
+        return doextversion();
 
     pline("%s", getversionstring(buf, sizeof buf));
     return ECMD_OK;

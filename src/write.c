@@ -1,4 +1,4 @@
-/* NetHack 3.7	write.c	$NHDT-Date: 1702023275 2023/12/08 08:14:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.41 $ */
+/* NetHack 5.0	write.c	$NHDT-Date: 1702023275 2023/12/08 08:14:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.41 $ */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -105,7 +105,7 @@ dowrite(struct obj *pen)
                  : "scroll";
     if (Blind) {
         if (!paper->dknown) {
-            You("don't know if that %s is blank or not.", typeword);
+            You("don't know whether that %s is blank or not.", typeword);
             return ECMD_OK;
         } else if (paper->oclass == SPBOOK_CLASS) {
             /* can't write a magic book while blind */
@@ -120,6 +120,7 @@ dowrite(struct obj *pen)
         exercise(A_WIS, FALSE);
         return ECMD_TIME;
     }
+    makeknown(SCR_BLANK_PAPER);
 
     /* what to write */
     Sprintf(qbuf, "What type of %s do you want to write?", typeword);

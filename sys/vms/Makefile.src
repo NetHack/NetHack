@@ -1,5 +1,5 @@
 #	NetHack Makefile (VMS) - for building nethack itself.
-#	NetHack 3.7	Makefile.src	$NHDT-Date: 1683748060 2023/05/10 19:47:40 $	$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.60 $
+#	NetHack 5.0	Makefile.src	$NHDT-Date: 1683748060 2023/05/10 19:47:40 $	$NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.60 $
 # Copyright (c) 2011 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
 
@@ -136,7 +136,7 @@ RANDOBJ = isaac64.obj,random.obj
 # Other things that have to be reconfigured are in vmsconf.h,
 # and config.h
 
-VERSION  = 3.7.0
+VERSION  = 5.0.0
 
 MAKEDEFS = $(UTL)makedefs.exe;
 
@@ -149,9 +149,9 @@ HACK_H	= $(SRC)hack.h-t
 HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
 	   botl.c calendar.c cfgfiles.c cmd.c coloratt.c dbridge.c decl.c detect.c \
 	   dig.c display.c dlb.c do.c do_name.c do_wear.c dog.c dogmove.c dokick.c \
-	   dothrow.c drawing.c dungeon.c eat.c end.c engrave.c exper.c \
+	   dothrow.c drawing.c dungeon.c earlyarg.c eat.c end.c engrave.c exper.c \
 	   explode.c extralev.c files.c fountain.c getpos.c glyphs.c hack.c \
-	   hacklib.c insight.c invent.c light.c lock.c \
+	   hacklib.c iactions.c insight.c invent.c light.c lock.c \
 	   mail.c makemon.c mcastu.c mhitm.c mhitu.c minion.c \
 	   mklev.c mkmap.c mkmaze.c mkobj.c mkroom.c mon.c mondata.c \
 	   monmove.c monst.c mplayer.c mthrowu.c muse.c music.c o_init.c \
@@ -198,9 +198,9 @@ HOBJ1 = allmain.obj,alloc.obj,apply.obj,artifact.obj,attrib.obj, \
 	coloratt.obj,dbridge.obj,decl.obj,detect.obj,dig.obj,display.obj, \
 	dlb.obj,do.obj,do_name.obj,do_wear.obj
 HOBJ2 = dog.obj,dogmove.obj,dokick.obj,dothrow.obj,drawing.obj, \
-	dungeon.obj,eat.obj,end.obj,engrave.obj,exper.obj,explode.obj, \
+	dungeon.obj,earlyarg.obj,eat.obj,end.obj,engrave.obj,exper.obj,explode.obj, \
 	extralev.obj,files.obj,fountain.obj,getpos.obj,glyphs.obj,hack.obj, \
-	hacklib.obj,insight.obj,invent.obj
+	hacklib.obj,iactions.obj,insight.obj,invent.obj
 HOBJ3 = light.obj,lock.obj,mail.obj,makemon.obj,mcastu.obj, \
 	mhitm.obj,mhitu.obj,minion.obj,mklev.obj,mkmap.obj,mkmaze.obj, \
 	mkobj.obj,mkroom.obj,mon.obj,mondata.obj,monmove.obj
@@ -519,6 +519,7 @@ dokick.obj :	dokick.c $(HACK_H)
 dothrow.obj :	dothrow.c $(HACK_H)
 drawing.obj :	drawing.c $(HACK_H) $(INC)tcap.h
 dungeon.obj :	dungeon.c $(HACK_H) $(INC)dgn_file.h $(INC)dlb.h
+earlyarg.obj :	earlyarg.c $(HACK_H)
 eat.obj :	eat.c $(HACK_H)
 end.obj :	end.c $(HACK_H) $(INC)dlb.h
 engrave.obj :	engrave.c $(HACK_H)
@@ -529,6 +530,7 @@ files.obj :	files.c $(HACK_H) $(INC)dlb.h $(INC)wintty.h #zlib.h
 fountain.obj :	fountain.c $(HACK_H)
 hack.obj :	hack.c $(HACK_H)
 hacklib.obj :	hacklib.c $(HACK_H)
+iactions.obj :	iactions.c $(HACK_H)
 insight.obj :	insight.c $(HACK_H)
 invent.obj :	invent.c $(HACK_H)
 light.obj :	light.c $(HACK_H)

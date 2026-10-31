@@ -1,4 +1,4 @@
-/* NetHack 3.7	wield.c	$NHDT-Date: 1707525193 2024/02/10 00:33:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.110 $ */
+/* NetHack 5.0	wield.c	$NHDT-Date: 1707525193 2024/02/10 00:33:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.110 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -86,7 +86,7 @@ static const char
  * 1.  Initializing the slot during character generation or a
  *     restore.
  * 2.  Setting the slot due to a player's actions.
- * 3.  If one of the objects in the slot are split off, these
+ * 3.  If one of the objects in the slot is split off, these
  *     functions can be used to put the remainder back in the slot.
  * 4.  Putting an item that was thrown and returned back into the slot.
  * 5.  Emptying the slot, by passing a null object.  NEVER pass
@@ -103,10 +103,15 @@ setuwep(struct obj *obj)
 
     if (obj == uwep)
         return; /* necessary to not set gu.unweapon */
-    /* This message isn't printed in the caller because it happens
-     * *whenever* Sunsword is unwielded, from whatever cause.
-     */
     setworn(obj, W_WEP);
+    /* handle Ogresmasher before Sunsword; even though they can't be happening
+       at the same time, botl flag update should come before pline message */
+    if (uwep == obj
+        && ((uwep && uwep->oartifact == ART_OGRESMASHER)
+            || (olduwep && olduwep->oartifact == ART_OGRESMASHER)))
+        disp.botl = TRUE; /* gaining or losing Con bonus */
+    /* This message isn't printed in the caller because it happens
+     * *whenever* Sunsword is unwielded, from whatever cause. */
     if (uwep == obj && artifact_light(olduwep) && olduwep->lamplit) {
         end_burn(olduwep, FALSE);
         if (!Blind)
@@ -828,7 +833,11 @@ drop_uswapwep(void)
 void
 set_twoweap(boolean on_off)
 {
-    u.twoweap = on_off;
+    if (on_off != u.twoweap) {
+        u.twoweap = on_off;
+        if (flags.weaponstatus)
+            disp.botl = TRUE;
+    }
 }
 
 /* the #twoweapon command */
@@ -1021,7 +1030,7 @@ chwepon(struct obj *otmp, int amount)
 
     /*
      * Enchantment, which normally improves a weapon, has an
-     * addition adverse reaction on Magicbane whose effects are
+     * additional adverse reaction on Magicbane whose effects are
      * spe dependent.  Give an obscure clue here.
      */
     if (u_wield_art(ART_MAGICBANE) && uwep->spe >= 0) {

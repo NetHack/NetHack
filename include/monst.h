@@ -1,4 +1,4 @@
-/* NetHack 3.7	monst.h	$NHDT-Date: 1738640524 2025/02/03 19:42:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.67 $ */
+/* NetHack 5.0	monst.h	$NHDT-Date: 1738640524 2025/02/03 19:42:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.67 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -64,6 +64,7 @@ enum m_ap_types {
 #define MON_ENDGAME_FREE 0x20
 #define MON_ENDGAME_MIGR 0x40
 #define MON_OBLITERATE   0x80
+#define MON_STILL_ARRIVING 0x100
 
 #define M_AP_TYPMASK  0x7
 #define M_AP_F_DKNOWN 0x8
@@ -162,6 +163,9 @@ struct monst {
     Bitfield(meverseen, 1); /* mon has been seen at some point */
 
     Bitfield(mspotted, 1);  /* mon is currently seen by hero */
+    Bitfield(mwandexp, 1);  /* mon has experience with wands */
+    Bitfield(mgenmklev, 1); /* made by the level generation */
+    /* 5 spare bits */
 
     unsigned long mstrategy; /* for monsters with mflag3: current strategy */
 #ifdef NHSTDC

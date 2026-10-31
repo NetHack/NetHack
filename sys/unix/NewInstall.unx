@@ -1,5 +1,5 @@
 
-                Instructions for installing NetHack 3.7
+                Instructions for installing NetHack 5.0
 			using the new hints system
                 =======================================
 
@@ -155,6 +155,6 @@ additional interfaces. See below.
 |          |       |                 |  qt6-multimedia-dev                  |
 +----------+-------+-----------------+--------------------------------------+
 
-# NetHack 3.7  NewInstall.unx       $NHDT-Date: 1652276817 2022/05/11 13:46:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.11 $
+# NetHack 5.0  NewInstall.unx       $NHDT-Date: 1652276817 2022/05/11 13:46:57 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.11 $
 # Copyright (c) 2009 by Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.

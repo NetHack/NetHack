@@ -1,4 +1,4 @@
-/* NetHack 3.7	nhlobj.c	$NHDT-Date: 1576097301 2019/12/11 20:48:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.0 $ */
+/* NetHack 5.0	nhlobj.c	$NHDT-Date: 1576097301 2019/12/11 20:48:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.0 $ */
 /*      Copyright (c) 2019 by Pasi Kallinen */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -345,12 +345,13 @@ DISABLE_WARNING_UNREACHABLE_CODE
 
 /* create a new object via wishing routine */
 /* local o = obj.new("rock"); */
+/* local o = obj.new({ id = "food ration", class = "%" }); */
 staticfn int
 l_obj_new_readobjnam(lua_State *L)
 {
     int argc = lua_gettop(L);
 
-    if (argc == 1) {
+    if (argc == 1 && lua_type(L, 1) == LUA_TSTRING) {
         char buf[BUFSZ];
         struct obj *otmp;
 
@@ -358,6 +359,22 @@ l_obj_new_readobjnam(lua_State *L)
         lua_pop(L, 1);
         if ((otmp = readobjnam(buf, NULL)) == &hands_obj)
             otmp = NULL;
+        (void) l_obj_push(L, otmp);
+        return 1;
+    } else if (argc == 1 && lua_type(L, 1) == LUA_TTABLE) {
+        short id = get_table_objtype(L);
+        xint16 class = get_table_objclass(L);
+        struct obj *otmp;
+
+        if (id >= FIRST_OBJECT) {
+            otmp = mksobj(id, TRUE, FALSE);
+        } else {
+            class = def_char_to_objclass(class);
+            if (class >= MAXOCLASSES)
+                class = RANDOM_CLASS;
+            otmp = mkobj(class, FALSE);
+        }
+        lua_pop(L, 1);
         (void) l_obj_push(L, otmp);
         return 1;
     } else

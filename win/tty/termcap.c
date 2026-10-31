@@ -1,4 +1,4 @@
-/* NetHack 3.7	termcap.c	$NHDT-Date: 1701946349 2023/12/07 10:52:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.60 $ */
+/* NetHack 5.0	termcap.c	$NHDT-Date: 1701946349 2023/12/07 10:52:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.60 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -39,6 +39,7 @@ struct tc_lcl_data tc_lcl_data = { 0, 0, 0, 0, 0, 0, 0, FALSE };
 static char *nh_VI = (char *) 0; /* cursor_invisible */
 static char *nh_VE = (char *) 0; /* cursor_normal */
 /*static char *nh_VS = (char *) 0;*/ /* cursor_visible (highlighted cursor) */
+static char *nh_Ic = (char *) 0; /* initialize_color */
 
 static char *HO, *CL, *CE, *UP, *XD, *BC, *SO, *SE, *TI, *TE;
 static char *VS, *VE;
@@ -289,6 +290,8 @@ term_startup(int *wid, int *hgt)
     /*nh_VS = Tgetstr(nhStr("vs"));*/
     if (!nh_VI || !nh_VE /*|| !nh_VS*/ )
         nh_VI = nh_VE = /*nh_VS =*/ (char *) 0;
+
+    nh_Ic = Tgetstr(nhStr("Ic"));
 
     /* Get rid of padding numbers for nh_HI and nh_HE.  Hope they
      * aren't really needed!!!  nh_HI and nh_HE are outputted to the
@@ -1508,9 +1511,40 @@ term_curs_set(int visibility)
 
 #ifdef CHANGE_COLOR
 void
-tty_change_color(int color UNUSED, long rgb UNUSED, int reverse UNUSED)
+tty_change_color(int color, long rgb, int reverse UNUSED)
 {
-    return;
+    char buf[BUFSZ];
+    int i;
+    char *c, *fmt;
+
+    /* FIXME: colors are not reset back when exiting NetHack */
+    if (nh_Ic && *nh_Ic) {
+        long clr = color, r, g, b;
+
+        /* color * 3 seems to work correctly? */
+        /* this probably depends on the termcap definition */
+        r = ((rgb >> 16) & 0xFF) * 3;
+        g = ((rgb >> 8) & 0xFF) * 3;
+        b = (rgb & 0xFF) * 3;
+
+
+        fmt = tparm(nh_Ic, clr, r, g, b);
+
+        c = fmt;
+
+        i = 0;
+        while (*c) {
+            if (*c == '\033') {
+                buf[i++] = '\\';
+                buf[i++] = 'E';
+            } else {
+                buf[i++] = *c;
+            }
+            c++;
+        }
+        buf[i++] = '\0';
+        xputs(fmt);
+    }
 }
 #endif /* CHANGE_COLOR */
 

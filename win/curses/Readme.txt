@@ -29,7 +29,7 @@ sys/unix/Install.unx.  By default, the Makefile is setup to compile
 against ncurses.  Edit Makefile.src if you wish to compile against a
 different curses library, such as PDCurses for SDL.
 See sys/unix/NewInstall.unx for more information about building
-NetHack 3.7 and above.
+NetHack 5.0 and above.
 
 Windows build instructions:
 

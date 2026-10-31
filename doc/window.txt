@@ -1,4 +1,4 @@
-NetHack 3.7  window.txt	$NHDT-Date: 1666390558 2022/10/21 22:15:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.70 $
+NetHack 5.0  window.txt	$NHDT-Date: 1666390558 2022/10/21 22:15:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.70 $
 
 Introduction
 
@@ -227,7 +227,7 @@ print_glyph(window, x, y, glyphinfo, bkglyphinfo)
                     int ttychar;  /* the character mapping for the original tty
                                    * interface. Most or all window ports wanted
                                    * and used this for various things so it is
-                                   * provided in 3.7+ */
+                                   * provided in 5.0+ */
                     short int symidx;    /* offset into syms array */
                     unsigned glyphflags; /* more detail about the entity */
 

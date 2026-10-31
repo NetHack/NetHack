@@ -1,4 +1,4 @@
-/* NetHack 3.7	spell.h	$NHDT-Date: 1646838388 2022/03/09 15:06:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.14 $ */
+/* NetHack 5.0	spell.h	$NHDT-Date: 1646838388 2022/03/09 15:06:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.14 $ */
 /* Copyright 1986, M. Stephenson                                  */
 /* NetHack may be freely redistributed.  See license for details. */
 

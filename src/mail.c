@@ -1,4 +1,4 @@
-/* NetHack 3.7	mail.c	$NHDT-Date: 1762750699 2025/11/09 20:58:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.77 $ */
+/* NetHack 5.0	mail.c	$NHDT-Date: 1762750699 2025/11/09 20:58:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.77 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -372,7 +372,7 @@ md_rush(struct monst *md,
             SetVoice(md, 0, 80, 0);
             verbalize("This place's too crowded.  I'm outta here.");
         } else {
-            pline1(Never_mind);
+            pline("%s.", Never_mind);
         }
         remove_monster(fx, fy);
 

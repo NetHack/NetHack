@@ -26,14 +26,14 @@ RR        RRRR    IIIIIIIIII     GGGGGGGGGGG     HH     HHH        TTT        EE
 
 # RighteousHack 0.1
 
-**RighteousHack** is a fork of NetHack 3.7.0, transformed into a biblically inspired adventure. All elements of the occult, witchcraft, idolatry, and immorality have been modified to align with Christian doctrine and Scripture. For example, scrolls contain **verses of Scripture**. Artifacts are holy relics like the **Sword of the Spirit** or **Breastplate of Righteousness**. 
+**RighteousHack** is a fork of NetHack 5.0.0, transformed into a biblically inspired adventure. All elements of the occult, witchcraft, idolatry, and immorality have been modified to align with Christian doctrine and Scripture. For example, scrolls contain **verses of Scripture**. Artifacts are holy relics like the **Sword of the Spirit** or **Breastplate of Righteousness**. 
 
 Play to glorify God, meditate on His Word in the caves of reflection and redemption.
 
 
 ## Installation and Compilation
 
-RighteousHack uses the NetHack 3.7.0 codebase with Christian reforms. Source at: https://github.com/jonK1984/RighteousHack/tree/righteoushack-0.1
+RighteousHack uses the NetHack 5.0.0 codebase with Christian reforms. Source at: https://github.com/jonK1984/RighteousHack/tree/righteoushack-0.1
 
 
 ## How to Play
@@ -58,7 +58,7 @@ Report bugs: GitHub Issues.
 
 ## License and Credits
 
-- **Base**: NetHack 3.7.0 (c) NetHack DevTeam. Freely redistributable.
+- **Base**: NetHack 5.0.0 (c) NetHack DevTeam. Freely redistributable.
 - **Fork**: (c) jonK1984, 2025. MIT-like (see `license`).
 - **Scripture**: ESV/KJV 
 

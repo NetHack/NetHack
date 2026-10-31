@@ -1,4 +1,4 @@
-/* NetHack 3.7	objnam.c	$NHDT-Date: 1745114235 2025/04/19 17:57:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.453 $ */
+/* NetHack 5.0	objnam.c	$NHDT-Date: 1745114235 2025/04/19 17:57:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.453 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -784,7 +784,7 @@ xname_flags(
                doname() so we've added an external flag to request it */
             Concat(buf, 0, "partly eaten ");
         }
-        if (obj->globby) { /* 3.7 added "medium" to replace no-prefix */
+        if (obj->globby) { /* 5.0 added "medium" to replace no-prefix */
             ConcatF2(buf, 0, "%s %s", (obj->owt <= 100) ? "small"
                                       : (obj->owt <= 300) ? "medium"
                                         : (obj->owt <= 500) ? "large"
@@ -1212,7 +1212,8 @@ add_erosion_words(struct obj *obj, char *prefix)
                          : is_corrodeable(obj) ? "corrodeproof "
                            : is_flammable(obj) ? "fireproof "
                              : is_crackable(obj) ? "tempered " /* hardened */
-                               : "");
+                               : is_rottable(obj) ? "rotproof "
+                                 : "");
 }
 
 /* used to prevent rust on items where rust makes no difference */
@@ -1693,6 +1694,8 @@ doname_base(
         Sprintf(pricebuf, "%ld %s", quotedprice, currency(quotedprice));
         ConcatF2(bp, 0, " (%s, %s)",
                  obj->unpaid ? "unpaid" : "contents", pricebuf);
+
+        record_price_quote(obj->otyp, quotedprice / obj->quan, TRUE);
     } else if (with_price) { /* on floor or in container on floor */
         int nochrg = 0;
         long price = get_cost_of_shop_item(obj, &nochrg);
@@ -1705,7 +1708,14 @@ doname_base(
                      nochrg ? "contents" : "for sale", pricebuf);
         } else if (nochrg > 0) {
             Concat(bp, 0, " (no charge)");
+        } else if (iflags.pricequotes && !objects[obj->otyp].oc_name_known) {
+            append_price_quote(bp, &bp_eos, obj->otyp);
         }
+
+        if (price > 0L)
+            record_price_quote(obj->otyp, price / obj->quan, TRUE);
+    } else if (iflags.pricequotes && !objects[obj->otyp].oc_name_known) {
+        append_price_quote(bp, &bp_eos, obj->otyp);
     }
 
     if (!strncmp(prefix, "a ", 2)) {
@@ -2220,7 +2230,8 @@ the(const char *str)
         insert_the = TRUE;
     } else {
         /* Probably a proper name, might not need an article */
-        char *tmp, *named, *called;
+        char *named, *called;
+        const char *tmp;
         int l;
 
         /* some objects have capitalized adjectives in their names */
@@ -4132,9 +4143,9 @@ readobjnam_preparse(struct _readobjnam_data *d)
                 break;
             d->gsize = 1;
         } else if (!strncmpi(d->bp, "medium ", l = 7)) {
-            /* 3.7: in 3.6, "medium" was only used during wishing and the
+            /* 5.0: in 3.6, "medium" was only used during wishing and the
                mid-size glob had no adjective when formatted, but as of
-               3.7, "medium" has become an explicit part of the name for
+               5.0, "medium" has become an explicit part of the name for
                combined globs of at least 5 individual ones (owt >= 100)
                and less than 15 (owt < 300) */
             d->gsize = 2;

@@ -1,4 +1,4 @@
-  NetHack Porting Guidelines		v 3.7			2023-04-23
+  NetHack Porting Guidelines		v 5.0			2023-04-23
 
 
      1.0	Introduction
@@ -201,7 +201,7 @@ need to be included in the packaging of the game.
      4.3. Lua
 
 	Compile and link into a library, or obtain a prebuilt Lua library for
-your platform. Place the Lua source into lib/lua-5.4.6 (or other folder
+your platform. Place the Lua source into lib/lua-5.4.8 (or other folder
 representing an appropriate Lua version); place the compiled Lua library into
 lib.
 
@@ -229,7 +229,7 @@ libraries.
 
      5.0	Design Updates
 
-The following design updates were introduced in NetHack 3.7.
+The following design updates were introduced in NetHack 5.0.
 
      5.1  Quest text files
 

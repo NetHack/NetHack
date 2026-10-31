@@ -1,4 +1,4 @@
-/* NetHack 3.7	rip.c	$NHDT-Date: 1597967808 2020/08/20 23:56:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.33 $ */
+/* NetHack 5.0	rip.c	$NHDT-Date: 1597967808 2020/08/20 23:56:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.33 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -9,7 +9,8 @@
    necessarily have to be used by a binary with multiple window-ports */
 
 #if defined(TTY_GRAPHICS) || defined(X11_GRAPHICS) || defined(GEM_GRAPHICS) \
-    || defined(DUMPLOG) || defined(CURSES_GRAPHICS) || defined(SHIM_GRAPHICS)
+    || defined(DUMPLOG) || defined(CURSES_GRAPHICS) || defined(SHIM_GRAPHICS) \
+    || defined(AMII_GRAPHICS)
 #define TEXT_TOMBSTONE
 #endif
 #if defined(mac) || defined(__BEOS__)

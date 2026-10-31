@@ -50,11 +50,14 @@ des.trap("pit",01,03)
 des.trap("pit",01,04)
 des.trap("pit",01,05)
 des.trap("pit",01,06)
-des.trap("pit",01,07)
+des.trap("rolling boulder",01,07)
+
+des.trap("pit",01,08)
+des.trap("pit",02,08)
 des.trap("pit",03,08)
 des.trap("pit",04,08)
 des.trap("pit",05,08)
-des.trap("pit",06,08)
+des.trap("rolling boulder",06,08)
 
 -- A little help
 des.object("verse of shaken earth",01,09)

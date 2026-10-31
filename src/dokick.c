@@ -1,4 +1,4 @@
-/* NetHack 3.7	dokick.c	$NHDT-Date: 1712453347 2024/04/07 01:29:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.223 $ */
+/* NetHack 5.0	dokick.c	$NHDT-Date: 1712453347 2024/04/07 01:29:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.223 $ */
 /* Copyright (c) Izchak Miller, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -601,13 +601,13 @@ really_kick_object(coordxy x, coordxy y)
         || closed_door(x + u.dx, y + u.dy))
         range = 1;
 
-    /* 3.7: this used to skip 'costly' handling if kickedobj->no_charge
+    /* 5.0: this used to skip 'costly' handling if kickedobj->no_charge
        was set but that optimization could result in no_charge staying set
        for objects kicked out of the shop */
     shkp = find_objowner(gk.kickedobj, x, y);
     costly = (shkp && (costly_spot(x, y) || (costly_adjacent(shkp, x, y)
                                              && gk.kickedobj->unpaid)));
-    /* 3.7: give feedback about the item being kicked; some follow-on
+    /* 5.0: give feedback about the item being kicked; some follow-on
        messages refer to "it" */
     Norep("You kick %s.",
           !isgold ? singular(gk.kickedobj, doname) : doname(gk.kickedobj));

@@ -1,4 +1,4 @@
-/* NetHack 3.7	tradstdc.h	$NHDT-Date: 1744938651 2025/04/17 17:10:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.67 $ */
+/* NetHack 5.0	tradstdc.h	$NHDT-Date: 1744938651 2025/04/17 17:10:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.67 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -157,7 +157,7 @@ typedef const char *vA;
    [nethack's core doesn't use VA_NEXT() so doesn't use VA_SHIFT()
    either, and this definition is just retained for completeness.
    lev_comp does use VA_NEXT(), but it passes all 'argX' arguments.
-   Note: as of 3.7.0, lev_comp doesn't exist anymore.]
+   Note: as of 5.0.0, lev_comp doesn't exist anymore.]
  */
 #define VA_SHIFT()                                                    \
     (arg1 = arg2, arg2 = arg3, arg3 = arg4, arg4 = arg5, arg5 = arg6, \
@@ -317,7 +317,7 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
  * Language
  * Standard
  *
- *          NetHack 3.7 range
+ *          NetHack 5.0 range
  *         /
  *        /
  *   C2y X      NetHack 3.6 and earlier range
@@ -328,7 +328,7 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
  *   C89      X
  *
  *
- * The NetHack 3.7 source code currently makes use of the following
+ * The NetHack 5.0 source code currently makes use of the following
  * C99 (and above) language features:
  *
  *     commas at the end of enumerator lists
@@ -337,7 +337,7 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
  *     variadic macros
  *     'long long'
  *
- * The NetHack 3.7 source code adheres to the following greater-than C99
+ * The NetHack 5.0 source code adheres to the following greater-than C99
  * language restrictions:
  *
  *     Removal of K&R function definitions

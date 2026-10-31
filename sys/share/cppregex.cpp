@@ -1,5 +1,5 @@
-/* NetHack 3.7  cppregex.cpp */
-/* $NHDT-Date: 1596498279 2020/08/03 23:44:39 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.9 $ */
+/* NetHack 5.0  cppregex.cpp */
+/* $NHDT-Date: 1596498279 2020/08/03 23:44:39 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.9 $ */
 /* Copyright (c) Sean Hunt  2015.                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 

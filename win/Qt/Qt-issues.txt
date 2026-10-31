@@ -43,7 +43,7 @@ ESC and maybe also initiate quitting.
 Map column #0, which the core reserves for its own purposes and isn't
 intended to be displayed, is displayed (as blank terrain).
 
-3.7 status conditions haven't been implemented.
+5.0 status conditions haven't been implemented.
 
 3.6 status conditions (Stone, Slime, Strngl, Deaf, Lev, Fly, Ride)
 have been implemented but need icon artwork (one 40x40 tile for each).

@@ -1,4 +1,4 @@
-/* NetHack 3.7	monmove.c	$NHDT-Date: 1737392015 2025/01/20 08:53:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.266 $ */
+/* NetHack 5.0	monmove.c	$NHDT-Date: 1737392015 2025/01/20 08:53:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.266 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1069,9 +1069,7 @@ itsstuck(struct monst *mtmp)
 boolean
 should_displace(
     struct monst *mtmp,
-    coord *poss, /* coord poss[9] */
-    long *info,  /* long info[9] */
-    int cnt,
+    const struct mfndposdata *data,
     coordxy ggx,
     coordxy ggy)
 {
@@ -1081,11 +1079,11 @@ should_displace(
     int i, nx, ny;
     int ndist;
 
-    for (i = 0; i < cnt; i++) {
-        nx = poss[i].x;
-        ny = poss[i].y;
+    for (i = 0; i < data->cnt; i++) {
+        nx = data->poss[i].x;
+        ny = data->poss[i].y;
         ndist = dist2(nx, ny, ggx, ggy);
-        if (MON_AT(nx, ny) && (info[i] & ALLOW_MDISP) && !(info[i] & ALLOW_M)
+        if (MON_AT(nx, ny) && (data->info[i] & ALLOW_MDISP) && !(data->info[i] & ALLOW_M)
             && !undesirable_disp(mtmp, nx, ny)) {
             if (shortest_with_displacing == -1
                 || (ndist < shortest_with_displacing))
@@ -1513,6 +1511,8 @@ postmov(
             if (mtmp->mx)
                 newsym(mtmp->mx, mtmp->my);
             return MMOVE_DIED; /* it died */
+        } else if (mon_offmap(mtmp)) {
+            return MMOVE_DONE;
         }
         ptr = mtmp->data; /* in case mintrap() caused polymorph */
 
@@ -1726,7 +1726,7 @@ m_move(struct monst *mtmp, int after)
     struct permonst *ptr;
     int chi, mmoved = MMOVE_NOTHING, /* not strictly nec.: chi >= 0 will do */
         preferredrange_min = 0, preferredrange_max = 0;
-    long info[9];
+    struct mfndposdata mfp;
     long flag;
     coordxy omx = mtmp->mx, omy = mtmp->my;
 
@@ -1786,21 +1786,20 @@ m_move(struct monst *mtmp, int after)
          * attack it.
          */
         if (intruder && intruder != mtmp
-            /* 3.7: this used to use 'dist2() < 2' which meant that intended
+            /* 5.0: this used to use 'dist2() < 2' which meant that intended
                attack was disallowed if they were adjacent diagonally */
             && dist2(mtmp->mx, mtmp->my, tx, ty) <= 2) {
             gb.bhitpos.x = tx, gb.bhitpos.y = ty;
             gn.notonhead = (intruder->mx != tx || intruder->my != ty);
             covetousattack = mattackm(mtmp, intruder);
-            /* 3.7: this used to erroneously use '== 2' (M_ATTK_DEF_DIED) */
+            /* 5.0: this used to erroneously use '== 2' (M_ATTK_DEF_DIED) */
             if (covetousattack & M_ATTK_AGR_DIED)
                 return MMOVE_DIED;
             mmoved = MMOVE_MOVED;
-        } else {
-            mmoved = MMOVE_NOTHING;
+            return postmov(mtmp, ptr, omx, omy, mmoved,
+                           seenflgs, can_tunnel, can_unlock, can_open);
         }
-        return postmov(mtmp, ptr, omx, omy, mmoved,
-                       seenflgs, can_tunnel, can_unlock, can_open);
+        /* otherwise continue with normal AI routine */
     }
 
     /* likewise for shopkeeper, guard, or priest */
@@ -1922,9 +1921,8 @@ m_move(struct monst *mtmp, int after)
         int jcnt, cnt;
         int ndist, nidist;
         coord *mtrk;
-        coord poss[9];
 
-        cnt = mfndpos(mtmp, poss, info, flag);
+        cnt = mfndpos(mtmp, &mfp, flag);
         if (cnt == 0 && !is_unicorn(mtmp->data)) {
             if (find_defensive(mtmp, TRUE) && use_defensive(mtmp))
                 return MMOVE_DONE;
@@ -1941,22 +1939,22 @@ m_move(struct monst *mtmp, int after)
         if (is_unicorn(ptr) && noteleport_level(mtmp)) {
             /* on noteleport levels, perhaps we cannot avoid hero */
             for (i = 0; i < cnt; i++)
-                if (!(info[i] & NOTONL))
+                if (!(mfp.info[i] & NOTONL))
                     avoid = TRUE;
         }
         better_with_displacing =
-            should_displace(mtmp, poss, info, cnt, ggx, ggy);
+            should_displace(mtmp, &mfp, ggx, ggy);
         for (i = 0; i < cnt; i++) {
-            if (avoid && (info[i] & NOTONL))
+            if (avoid && (mfp.info[i] & NOTONL))
                 continue;
-            nx = poss[i].x;
-            ny = poss[i].y;
+            nx = mfp.poss[i].x;
+            ny = mfp.poss[i].y;
 
             if (m_avoid_kicked_loc(mtmp, nx, ny))
                 continue;
 
-            if (MON_AT(nx, ny) && (info[i] & ALLOW_MDISP)
-                && !(info[i] & ALLOW_M) && !better_with_displacing)
+            if (MON_AT(nx, ny) && (mfp.info[i] & ALLOW_MDISP)
+                && !(mfp.info[i] & ALLOW_M) && !better_with_displacing)
                 continue;
             if (appr != 0) {
                 mtrk = &mtmp->mtrack[0];
@@ -2004,8 +2002,8 @@ m_move(struct monst *mtmp, int after)
          * mfndpos) has no effect for normal attacks, though it lets a
          * confused monster attack you by accident.
          */
-        assert(IndexOk(chi, info));
-        if (info[chi] & ALLOW_U) {
+        assert(IndexOk(chi, mfp.info));
+        if (mfp.info[chi] & ALLOW_U) {
             nix = mtmp->mux;
             niy = mtmp->muy;
         }
@@ -2020,11 +2018,11 @@ m_move(struct monst *mtmp, int after)
          * Pets get taken care of above and shouldn't reach this code.
          * Conflict gets handled even farther away (movemon()).
          */
-        if ((info[chi] & ALLOW_M) != 0
+        if ((mfp.info[chi] & ALLOW_M) != 0
             || (nix == mtmp->mux && niy == mtmp->muy))
             return m_move_aggress(mtmp, nix, niy);
 
-        if ((info[chi] & ALLOW_MDISP) != 0) {
+        if ((mfp.info[chi] & ALLOW_MDISP) != 0) {
             struct monst *mtmp2;
             int mstatus;
 
@@ -2041,7 +2039,7 @@ m_move(struct monst *mtmp, int after)
         if (!m_in_out_region(mtmp, nix, niy))
             return MMOVE_DONE;
 
-        if ((info[chi] & ALLOW_ROCK) && m_can_break_boulder(mtmp)) {
+        if ((mfp.info[chi] & ALLOW_ROCK) && m_can_break_boulder(mtmp)) {
             (void) m_break_boulder(mtmp, nix, niy);
             return MMOVE_DONE;
         }

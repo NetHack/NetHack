@@ -1,4 +1,4 @@
-/* NetHack 3.7	monflag.h	$NHDT-Date: 1596498549 2020/08/03 23:49:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.21 $ */
+/* NetHack 5.0	monflag.h	$NHDT-Date: 1596498549 2020/08/03 23:49:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.21 $ */
 /* Copyright (c) 1989 Mike Threepoint                             */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -85,9 +85,9 @@ enum ms_sounds {
 #define M1_FLY          0x00000001L /* can fly or float */
 #define M1_SWIM         0x00000002L /* can traverse water */
 #define M1_AMORPHOUS    0x00000004L /* can flow under doors */
-#define M1_WALLWALK     0x00000008L /* can phase thru rock */
+#define M1_WALLWALK     0x00000008L /* can phase through rock */
 #define M1_CLING        0x00000010L /* can cling to ceiling */
-#define M1_TUNNEL       0x00000020L /* can tunnel thru rock */
+#define M1_TUNNEL       0x00000020L /* can tunnel through rock */
 #define M1_NEEDPICK     0x00000040L /* needs pick to tunnel */
 #define M1_CONCEAL      0x00000080L /* hides under objects */
 #define M1_HIDE         0x00000100L /* mimics, blends in with ceiling */

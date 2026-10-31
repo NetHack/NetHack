@@ -1,4 +1,4 @@
-/* NetHack 3.7	windconf.h	$NHDT-Date: 1596498552 2020/08/03 23:49:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.89 $ */
+/* NetHack 5.0	windconf.h	$NHDT-Date: 1596498552 2020/08/03 23:49:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.89 $ */
 /* Copyright (c) NetHack PC Development Team 1993, 1994.  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -31,6 +31,13 @@
 #define QWERTZ_SUPPORT  /* when swap_yz is True, numpad 7 is 'z' not 'y' */
 
 #define OPTIONS_AT_RUNTIME  /* build info done at runtime not text file */
+
+#define EARLY_CONFIGFILE_PASS
+#define TTY_PERM_INVENT
+
+#ifdef WIN32CON
+#define IDLECHECKPOINT
+#endif
 
 /*
  * -----------------------------------------------------------------

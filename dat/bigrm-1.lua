@@ -28,10 +28,10 @@ des.map([[
 ]]);
 
 
-if percent(75) then
+if percent(80) then
    local terrains = { "-", "F", "L", "T", "C" };
    local tidx = math.random(1, #terrains);
-   local choice = math.random(0, 4);
+   local choice = math.random(0, 5);
    if choice == 0 then
       -- one horizontal line
       des.terrain(selection.line(10,8, 65,8), terrains[tidx]);
@@ -48,6 +48,14 @@ if percent(75) then
       des.terrain(selection.rect(4,4, 70,13), terrains[tidx]);
       local sel = selection.line(25,4, 50,4) | selection.line(25,13, 50,13);
       des.terrain(sel, '.');
+   elseif choice == 4 then
+      -- snake
+      des.terrain(selection.fillrect(5,5, 69, 12), terrains[tidx]);
+      for i = 0, 7 do
+         local x = 6 + i*8;
+         local y = 5 + (i%2);
+         des.terrain(selection.fillrect(x, y, x+6, y+6), '.');
+      end
    else
       -- nothing
    end

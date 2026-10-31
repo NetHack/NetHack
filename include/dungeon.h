@@ -1,4 +1,4 @@
-/* NetHack 3.7	dungeon.h	$NHDT-Date: 1685863327 2023/06/04 07:22:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.47 $ */
+/* NetHack 5.0	dungeon.h	$NHDT-Date: 1685863327 2023/06/04 07:22:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.47 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -169,7 +169,7 @@ struct linfo {
 /* 0x02 was FORGOTTEN, when amnesia made you forget maps */
 #define LFILE_EXISTS 0x04 /* a level file exists for this level */
         /* Note:  VISITED and LFILE_EXISTS are currently almost always
-         * set at the same time.  However they _mean_ different things.
+         * set at the same time.  However, they _mean_ different things.
          */
 };
 

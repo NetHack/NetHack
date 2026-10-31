@@ -1,4 +1,4 @@
-/* NetHack 3.7	winstat.c	$NHDT-Date: 1649269127 2022/04/06 18:18:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.37 $ */
+/* NetHack 5.0	winstat.c	$NHDT-Date: 1649269127 2022/04/06 18:18:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.37 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1714,7 +1714,7 @@ update_val(struct X_status_value *attr_rec, long new_value)
      * it's being set to blank (where that item should be reset now instead
      * of showing highlighted blank until the next expiration check).
      *
-     * 3.7:  highlight non-labelled 'name' items (conditions plus hunger
+     * 5.0:  highlight non-labelled 'name' items (conditions plus hunger
      * and encumbrance) when they come On.  For all conditions going Off,
      * or changing to not-hungry or not-encumbered, there's nothing to
      * highlight because the field becomes blank.
@@ -2348,7 +2348,7 @@ init_column(
  * indicates the end of the column.  The two numbers after that are used
  * to store widths that are calculated at run-time.
  *
- * 3.7:  changed so that all 6 columns have 8 rows, but a few entries
+ * 5.0:  changed so that all 6 columns have 8 rows, but a few entries
  * are left blank <>.  Exp-points, Score, and Time are optional depending
  * on run-time settings; Xp-level is replaced by Hit-Dice (and Exp-points
  * suppressed) when the hero is polymorphed.  Title and Dungeon-Level span

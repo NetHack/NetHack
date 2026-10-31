@@ -60,9 +60,10 @@ des.object("boulder", 09, 12);
 des.object("boulder", 03, 14);
 
 -- prevent monster generation over the (filled) holes
-des.exclusion({ type = "monster-generation", region = { 08,01, 23,01 } });
+des.exclusion({ type = "monster-generation", region = { 07,01, 23,01 } });
 -- Traps
-des.trap("hole", 08, 01);
+des.trap("hole", 07, 01);
+des.trap("rolling boulder", 08, 01);
 des.trap("hole", 09, 01);
 des.trap("hole", 10, 01);
 des.trap("hole", 11, 01);

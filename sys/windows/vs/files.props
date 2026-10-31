@@ -33,6 +33,7 @@
     <Luafiles Include = "bigrm-10.lua"/>
     <Luafiles Include = "bigrm-11.lua"/>
     <Luafiles Include = "bigrm-12.lua"/>
+    <Luafiles Include = "bigrm-13.lua"/>
     <Luafiles Include = "bigrm-2.lua"/>
     <Luafiles Include = "bigrm-3.lua"/>
     <Luafiles Include = "bigrm-4.lua"/>

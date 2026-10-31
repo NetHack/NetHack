@@ -1,5 +1,5 @@
 #	NetHack Makefile (VMS) - for utility programs.
-#	NetHack 3.7	Makefile.utl	$NHDT-Date: 1609347482 2020/12/30 16:58:02 $	$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.20 $
+#	NetHack 5.0	Makefile.utl	$NHDT-Date: 1609347482 2020/12/30 16:58:02 $	$NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.20 $
 # Copyright (c) 2011 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
 

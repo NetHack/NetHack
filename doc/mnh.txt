@@ -36,6 +36,7 @@ REQUESTS
 
 Macro     What    Initial   Note   Explanation
 Name      It Is   Value
+nH        num     0         -    avoid processing multiple times
 .BR       mac     -         -    hard line break with vertical padding inserted
 bR        num     -         i
 .CC x y   mac     -         -    aligned one char key x with short definition y
@@ -52,6 +53,7 @@ PX        num     -         i
 PY        num     -         i
 .SD x     mac     -         -    .sd with options c-center i-indent n-no indent
 SF        num     -         i
+UR        mac     -         -    URL passthrough for HTML generator
 .UX       mac     -         -    .ux with updated trademark owner
 
 

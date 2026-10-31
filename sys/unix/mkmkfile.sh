@@ -1,5 +1,5 @@
 #!/bin/sh
-# NetHack 3.7  mkmkfile.sh	$NHDT-Date: 1597332770 2020/08/13 15:32:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.15 $
+# NetHack 5.0  mkmkfile.sh	$NHDT-Date: 1597332770 2020/08/13 15:32:50 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.15 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2007.
 # NetHack may be freely redistributed.  See license for details.
 

@@ -1,4 +1,4 @@
-/* NetHack 3.7	mkroom.h	$NHDT-Date: 1725653011 2024/09/06 20:03:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.33 $ */
+/* NetHack 5.0	mkroom.h	$NHDT-Date: 1725653011 2024/09/06 20:03:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.33 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */

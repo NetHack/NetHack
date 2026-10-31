@@ -1,4 +1,4 @@
-NetHack History file for release 3.7
+NetHack History file for release 5.0
 
 Behold, mortal, the origins of NetHack...
 
@@ -274,6 +274,70 @@ some bug fixes.
 NetHack 3.6.7 was released on February 16, 2023 containing a security fix and
 some bug fixes.
 
+Development work for the major release to follow NetHack 3.6 began in 2015
+around the same time as NetHack 3.6.0 was being released. That development
+work continued in parallel to each of the NetHack 3.6 releases from 2015
+through 2023, and continued until the end of April 2026.  For the first time,
+that development was shared publicly on GitHub and SourceForge as it occurred.
+It was done under the label NetHack-3.7 work-in-progress (WIP), although the
+version number for the next release had not yet been solidified.
+
+Exposure of the development to the public brought many good things, and some
+challenges. People were able to observe and criticize changes and new features
+almost immediately, and they often did. The GitHub pull request system made
+it straightforward for people to contribute directly to development.
+Contributions resolved many, many bugs in the game and we thank all the
+contributors.
+
+In early 2026, with the game development getting stable enough to consider
+initiating an official release, the devteam reviewed the nature and number of
+changes in the game. It was clear that there was sufficient depth and
+breadth to warrant a major release and version 5.0 was decided on.
+That's a new major release over 3.x, without opening up any ambiguity
+or confusion with existing variants that there might have been had it
+been released as version 4.0.
+
+NetHack 5.0.0 was released on May 2, 2026.
+
+The source code for NetHack 5.0.0 was modified and modernized to be compliant
+with the C99 standard. The 5.0.0 release contained over 3100 fixes,changes,
+and updated features.
+
+NetHack 5.0 was the first version to replace the lex and yacc level
+and dungeon compilers of past versions, with a new Lua interpreter-based
+approach to provide those elements. Lua is also used for the quest texts
+in NetHack 5.0.0. The entire development team acknowledges the work
+done by Pasi Kallinen to make that happen.
+
+At the time of the NetHack 5.0 release, the core development team,
+active and erstwhile, included Warwick Allison, Michael Allison,
+Ken Arromdee, David Cohrs, Jessie Collet, Bart House, Kevin Hugo,
+Pasi Kallinen, Ken Lorber, Dean Luick, Pat Rankin, Derek S. Ray,
+Alex Smith, Patric Mueller, Mike Stephenson, Janet Walz, Paul Winner.
+
+Ken Lorber, Pat Rankin, Patrick Mueller and Michael Allison helped ensure
+that NetHack 5.0 would run on macOS.
+
+Ingo Paschke somehow managed to revive a NetHack 5.0 port for the Amiga,
+using a cross-compiler on a modern platform to do so. His work was shared
+so others can straightforwardly produce NetHack 5.0 for the Amiga thanks
+to his efforts.
+
+Ray Chason contributed the majority of maintenance work for the NetHack 5.0
+MS-DOS port, including porting the curses interface to it.
+Michael Allison ensured that NetHack 5.0 core changes continued to work
+with the msdos port and keep it alive.  Cross-compiling the MS-DOS port
+has helped make that possible and mostly painless.
+
+People that contributed to the Windows port of NetHack 5.0 since the
+development of NetHack 5.0 begain over eleven years ago, included
+Michael Allison, David Cohrs, Bart House, Pasi Kallinen, Alex Kompel,
+Dion Nicolaas, Derek S. Ray and Yitzhak Sapir.
+
+With sadness, the devteam would like to acknowledge and remember the past
+contributions from the late Ron Van Iwaarden, who was the sole maintainer
+of NetHack for OS/2 for several past NetHack releases. Ron will be missed.
+
 The official NetHack web site is maintained by Ken Lorber at
 https://www.nethack.org/.
 
@@ -292,45 +356,46 @@ particularly intriguing modification to help out with the game.  The
 NetHack Development Team sometimes makes note of the names of the worst
 of these miscreants in this, the list of Dungeoneers:
 
-    Adam Aronow               J. Ali Harlow             Mikko Juola
-    Alex Kompel               Janet Walz                Nathan Eady
-    Alex Smith                Janne Salmijarvi          Norm Meluch
-    Andreas Dorn              Jean-Christophe Collet    Olaf Seibert
-    Andy Church               Jeff Bailey               Pasi Kallinen
-    Andy Swanson              Jochen Erwied             Pat Rankin
-    Andy Thomson              John Kallen               Patric Mueller
-    Ari Huttunen              John Rupley               Paul Winner
-    Bart House                John S. Bien              Pierre Martineau
-    Benson I. Margulies       Johnny Lee                Ralf Brown
-    Bill Dyer                 Jon W{tte                 Ray Chason
-    Boudewijn Waijers         Jonathan Handler          Richard Addison
-    Bruce Cox                 Joshua Delahunty          Richard Beigel
-    Bruce Holloway            Karl Garrison             Richard P. Hughey
-    Bruce Mewborne            Keizo Yamamoto            Rob Menke
-    Carl Schelin              Keith Simpson             Robin Bandy
-    Chris Russo               Ken Arnold                Robin Johnson
-    David Cohrs               Ken Arromdee              Roderick Schertler
-    David Damerell            Ken Lorber                Roland McGrath
-    David Gentzel             Ken Washikita             Ron Van Iwaarden
-    David Hairston            Kevin Darcy               Ronnen Miller
-    Dean Luick                Kevin Hugo                Ross Brown
-    Del Lamb                  Kevin Sitze               Sascha Wostmann
-    Derek S. Ray              Kevin Smolkowski          Scott Bigham
-    Deron Meranda             Kevin Sweet               Scott R. Turner
-    Dion Nicolaas             Lars Huttar               Sean Hunt
-    Dylan O'Donnell           Leon Arnott               Stephen Spackman
-    Eric Backus               M. Drew Streib            Stefan Thielscher
-    Eric Hendrickson          Malcolm Ryan              Stephen White
-    Eric R. Smith             Mark Gooderum             Steve Creps
-    Eric S. Raymond           Mark Modrall              Steve Linhart
-    Erik Andersen             Marvin Bressler           Steve VanDevender
-    Fredrik Ljungdahl         Matthew Day               Teemu Suikki
-    Frederick Roeber          Merlyn LeRoy              Tim Lennan
-    Gil Neiger                Michael Allison           Timo Hakulinen
-    Greg Laskin               Michael Feir              Tom Almy
-    Greg Olson                Michael Hamel             Tom West
-    Gregg Wonderly            Michael Sokolov           Warren Cheung
-    Hao-yang Wang             Mike Engber               Warwick Allison
-    Helge Hafting             Mike Gallop               Yitzhak Sapir
-    Irina Rempt-Drijfhout     Mike Passaretti
-    Izchak Miller             Mike Stephenson
+    Adam Aronow               Irina Rempt-Drijfhout     Mike Gallop
+    Alex Kompel               Izchak Miller             Mike Passaretti
+    Alex Smith                J. Ali Harlow             Mike Stephenson
+    Andreas Dorn              Janet Walz                Mikko Juola
+    Andy Church               Janne Salmijarvi          Nathan Eady
+    Andy Swanson              Jean-Christophe Collet    Norm Meluch
+    Andy Thomson              Jeff Bailey               Olaf Seibert
+    Ari Huttunen              Jochen Erwied             Pasi Kallinen
+    Bart House                John Kallen               Pat Rankin
+    Benson I. Margulies       John Rupley               Patric Mueller
+    Bill Dyer                 John S. Bien              Paul Winner
+    Boudewijn Waijers         Johnny Lee                Pierre Martineau
+    Bruce Cox                 Jon W{tte                 Ralf Brown
+    Bruce Holloway            Jonathan Handler          Ray Chason
+    Bruce Mewborne            Joshua Delahunty          Richard Addison
+    Cameron Root              Karl Garrison             Richard Beigel
+    Carl Schelin              Keizo Yamamoto            Richard P. Hughey
+    Chris Russo               Keith Simpson             Rob Menke
+    David Cohrs               Ken Arnold                Robin Bandy
+    David Damerell            Ken Arromdee              Robin Johnson
+    David Gentzel             Ken Lorber                Roderick Schertler
+    David Hairston            Ken Washikita             Roland McGrath
+    Dean Luick                Kestrel Gregorich-Trevor  Ron Van Iwaarden
+    Del Lamb                  Kevin Darcy               Ronnen Miller
+    Derek S. Ray              Kevin Hugo                Ross Brown
+    Deron Meranda             Kevin Sitze               Sascha Wostmann
+    Dion Nicolaas             Kevin Smolkowski          Scott Bigham
+    Dylan O'Donnell           Kevin Sweet               Scott R. Turner
+    Eric Backus               Lars Huttar               Sean Hunt
+    Eric Hendrickson          Leon Arnott               Stephen Spackman
+    Eric R. Smith             M. Drew Streib            Stefan Thielscher
+    Eric S. Raymond           Malcolm Ryan              Stephen White
+    Erik Andersen             Mark Gooderum             Steve Creps
+    Fredrik Ljungdahl         Mark Modrall              Steve Linhart
+    Frederick Roeber          Marvin Bressler           Steve VanDevender
+    G. Branden Robinson       Matthew Day               Teemu Suikki
+    Gil Neiger                Merlyn LeRoy              Tim Lennan
+    Greg Laskin               Michael Allison           Timo Hakulinen
+    Greg Olson                Michael Feir              Tom Almy
+    Gregg Wonderly            Michael Hamel             Tom West
+    Hao-yang Wang             Michael Meyer             Warren Cheung
+    Helge Hafting             Michael Sokolov           Warwick Allison
+    Ingo Paschke              Mike Engber               Yitzhak Sapir

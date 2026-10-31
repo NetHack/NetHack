@@ -392,9 +392,9 @@ $TEST-Branch: theirs $
 
 TEST 8:
 <<< d1
-/* NetHack 3.7        objnam.c        $TEST-Date$ $TEST-Branch$:$TEST-Revision$ */
+/* NetHack 5.0        objnam.c        $TEST-Date$ $TEST-Branch$:$TEST-Revision$ */
 ===
-/* NetHack 3.7        objnam.c        $TEST-Date: 1426977394 2015/03/21 22:36:34 $  $TEST-Branch: master $:$TEST-Revision: 1.108 $ */
+/* NetHack 5.0        objnam.c        $TEST-Date: 1426977394 2015/03/21 22:36:34 $  $TEST-Branch: master $:$TEST-Revision: 1.108 $ */
 >>> d3
 
 =for nhgitset NHsubst NetHack merge driver

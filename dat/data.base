@@ -1,4 +1,4 @@
-# NetHack 3.7	data.base
+# NetHack 5.0	data.base
 # $NHDT-Date: 1737609388 2025/01/22 21:16:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.141 $
 #	Copyright (c) 1994, 1995, 1996 by the NetHack Development Team
 #	Copyright (c) 1994 by Boudewijn Wayers
@@ -1384,7 +1384,7 @@ dispater
 	Wealth".  It refers to the wealth of precious stone below the
 	earth.
 		[ Encyclopedia Mythica, ed. M.F. Lindemans ]
-# 3.7; monster adapted from slash'em based on an AD&D Monster Manual entry;
+# 5.0; monster adapted from slash'em based on an AD&D Monster Manual entry;
 # slash'em lacked a description so this entry has been created from scratch;
 # the puma comparison is how the AD&D monster is described (except that
 # that creature has six legs and two tentacles!) but the actual monster's
@@ -2048,7 +2048,7 @@ gem or rock
 	same as for jewels:  it is always the false ones that look the
 	most real, the most brilliant.
 		[ Salvador Dali ]
-# 3.7; monster derived from slash'em which lacked a description so this
+# 5.0; monster derived from slash'em which lacked a description so this
 # entry has been created from scratch
 genetic engineer
 	These very odd people have mastered the ability to insert gene
@@ -2418,7 +2418,7 @@ helm of caution
 	A helmet which confers the "warning" property, sensing the
 	strength of threats posed by unseen hostile creatures.
 # note: this quotation had "high of steel" but we're going to cheat--it is
-# now deliberately mistranslated as "high of crystal" to match nethack 3.7's
+# now deliberately mistranslated as "high of crystal" to match nethack 5.0's
 # change to helm of brilliance and become more useful to players.
 # PR #1109 wanted to change it to be for all helms but being covered with
 # gems and gold is not appropriate for ordinary helmets (plus it states that

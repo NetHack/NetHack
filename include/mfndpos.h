@@ -1,4 +1,4 @@
-/* NetHack 3.7	mfndpos.h	$NHDT-Date: 1596498546 2020/08/03 23:49:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.14 $ */
+/* NetHack 5.0	mfndpos.h	$NHDT-Date: 1596498546 2020/08/03 23:49:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.14 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2005. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -18,9 +18,9 @@
 #define UNLOCKDOOR  0x00800000L  /* unlocks locked doors */
 #define BUSTDOOR    0x01000000L  /* breaks any doors */
 #define ALLOW_ROCK  0x02000000L  /* pushes rocks */
-#define ALLOW_WALL  0x04000000L  /* walks thru walls */
+#define ALLOW_WALL  0x04000000L  /* walks through walls */
 #define ALLOW_DIG   0x08000000L  /* digs */
-#define ALLOW_BARS  0x10000000L  /* may pass thru iron bars */
+#define ALLOW_BARS  0x10000000L  /* may pass through iron bars */
 #define ALLOW_SANCT 0x20000000L  /* enters temples */
 #define ALLOW_SSM   0x40000000L  /* ignores scare monster */
 #ifdef NHSTDC
@@ -29,5 +29,11 @@
 #define NOGARLIC    0x80000000L  /* hates garlic */
 #endif
 /* clang-format on */
+
+struct mfndposdata {
+    int cnt;
+    coord poss[9];
+    long info[9];
+};
 
 #endif /* MFNDPOS_H */

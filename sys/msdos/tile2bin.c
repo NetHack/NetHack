@@ -1,4 +1,4 @@
-/* NetHack 3.7	tile2bin.c	$NHDT-Date: 1596498275 2020/08/03 23:44:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.11 $ */
+/* NetHack 5.0	tile2bin.c	$NHDT-Date: 1596498275 2020/08/03 23:44:35 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.11 $ */
 /*   Copyright (c) NetHack PC Development Team 1993, 1994, 1995     */
 /*   NetHack may be freely redistributed.  See license for details. */
 
@@ -185,7 +185,7 @@ main(int argc, char *argv[])
     tibheader.compiler = OTHER_COMP;
 #endif
 
-    strncpy(tibheader.ident, "NetHack 3.7 MSDOS Port binary tile file", 80);
+    strncpy(tibheader.ident, "NetHack 5.0 MSDOS Port binary tile file", 80);
 #if !defined(NOSTRFTIME)
     (void) strftime(tibheader.timestamp,
                   sizeof tibheader.timestamp, "%c", newtime);

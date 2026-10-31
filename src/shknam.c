@@ -1,4 +1,4 @@
-/* NetHack 3.7	shknam.c	$NHDT-Date: 1764109114 2025/11/25 22:18:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.86 $ */
+/* NetHack 5.0	shknam.c	$NHDT-Date: 1764109114 2025/11/25 22:18:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.86 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -128,7 +128,7 @@ static const char *const shktools[] = {
 #ifdef WIN32
     "Lexa", "Niod",
 #endif
-#ifdef MAC
+#ifdef MACOS9
     "Nhoj-lee", "Evad\'kh", "Ettaw-noj", "Tsew-mot", "Ydna-s", "Yao-hang",
     "Tonbar", "Kivenhoug", "Llardom",
 #endif

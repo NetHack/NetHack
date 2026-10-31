@@ -1,4 +1,4 @@
-/* NetHack 3.7	you.h	$NHDT-Date: 1702349061 2023/12/12 02:44:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.75 $ */
+/* NetHack 5.0	you.h	$NHDT-Date: 1702349061 2023/12/12 02:44:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.75 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -160,14 +160,23 @@ struct u_conduct {     /* number of times... */
     long sokocheat;    /* violated special 'rules' in Sokoban */
     long pets;         /* obtained a pet */
     /* genocides already listed at end of game */
+    long reserved1;
+    long reserved2;
+    long reserved3;
+    long reserved4;
 };
 
 struct u_roleplay {
-    boolean blind;  /* permanently blind */
-    boolean nudist; /* has not worn any armor, ever */
-    boolean deaf;   /* permanently deaf */
-    boolean pauper; /* no starting inventory */
-    long numbones;  /* # of bones files loaded  */
+    boolean blind;   /* permanently blind */
+    boolean nudist;  /* has not worn any armor, ever */
+    boolean deaf;    /* permanently deaf */
+    boolean pauper;  /* no starting inventory */
+    boolean reroll;  /* starting inventory/attr rerolling enabled */
+    boolean reserved1;
+    boolean reserved2;
+    boolean reserved3;
+    long numbones;   /* # of bones files loaded */
+    long numrerolls; /* # of rerolls used */
 };
 
 /*** Unified structure containing role information ***/
@@ -426,7 +435,6 @@ struct you {
     Bitfield(uinvulnerable, 1); /* you're invulnerable (praying) */
     Bitfield(uburied, 1);       /* you're buried */
     Bitfield(uedibility, 1);    /* blessed food detect; sense unsafe food */
-    Bitfield(usaving_grace, 1); /* prevents death once */
     Bitfield(uhandedness, 1); /* There is no advantage for either handedness.
                                  The distinction is only for flavor variation
                                  and for use in messages. */
@@ -496,6 +504,7 @@ struct you {
     short mcham;             /* vampire mndx if shapeshifted to bat/cloud */
     short umovement;         /* instead of youmonst.movement */
     schar uachieved[N_ACH];  /* list of achievements in the order attained */
+    struct monst *umonst;    /* for future conversion of &gy.youmonst to u.umonst */
 }; /* end of `struct you' */
 
 

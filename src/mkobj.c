@@ -1,4 +1,4 @@
-/* NetHack 3.7	mkobj.c	$NHDT-Date: 1764044196 2025/11/24 20:16:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.326 $ */
+/* NetHack 5.0	mkobj.c	$NHDT-Date: 1764044196 2025/11/24 20:16:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.326 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -35,10 +35,10 @@ struct icp {
 };
 
 static const struct icp mkobjprobs[] = { { 10, WEAPON_CLASS },
-                                         { 10, ARMOR_CLASS },
+                                         { 11, ARMOR_CLASS },
                                          { 20, FOOD_CLASS },
                                          { 8, TOOL_CLASS },
-                                         { 8, GEM_CLASS },
+                                         { 7, GEM_CLASS },
                                          { 16, POTION_CLASS },
                                          { 16, SCROLL_CLASS },
                                          { 4, SPBOOK_CLASS },
@@ -973,7 +973,7 @@ mksobj_init(struct obj **obj, boolean artif)
             /* for emphasis; glob quantity is always 1 and weight varies
                when other globs coalesce with it or this one shrinks */
             otmp->quan = 1L;
-            /* 3.7: globs in 3.6.x left owt as 0 and let weight() fix
+            /* 5.0: globs in 3.6.x left owt as 0 and let weight() fix
                that up during 'obj->owt = weight(obj)' below, but now
                we initialize glob->owt explicitly so weight() doesn't
                need to perform any fix up and returns glob->owt as-is */
@@ -1137,6 +1137,10 @@ mksobj_init(struct obj **obj, boolean artif)
     case WAND_CLASS:
         if (otmp->otyp == WAN_WISHING)
             otmp->spe = 1;
+        else if (otmp->otyp == WAN_STASIS)
+            /* just as easy to recharge as other NODIR wands, but starts with
+               fewer charges */
+            otmp->spe = rn1(4, 3);
         else
             otmp->spe = rn1(5,
                             (objects[otmp->otyp].oc_dir == NODIR) ? 11 : 4);
@@ -1931,7 +1935,7 @@ weight(struct obj *obj)
        manage glob->owt and there is nothing for weight() to do except
        return the current value as-is */
     if (obj->globby) {
-        /* 3.7: in 3.6.x this checked for owt==0 and then used
+        /* 5.0: in 3.6.x this checked for owt==0 and then used
            owt as-is when non-zero or objects[].oc_weight if zero;
            we don't do that anymore because it confused calculating
            the weight of a container when a glob inside shrank down
@@ -1996,7 +2000,7 @@ weight(struct obj *obj)
     } else if (obj->oclass == FOOD_CLASS && obj->oeaten) {
         return eaten_stat((int) obj->quan * wt, obj);
     } else if (obj->oclass == COIN_CLASS) {
-        /* 3.7: always weigh at least 1 unit; used to yield 0 for 1..49 */
+        /* 5.0: always weigh at least 1 unit; used to yield 0 for 1..49 */
         wt = (int) ((obj->quan + 50L) / 100L);
         return max(wt, 1);
     } else if (obj->otyp == HEAVY_IRON_BALL && obj->owt != 0) {
@@ -2322,8 +2326,9 @@ is_rottable(struct obj *otmp)
 {
     int otyp = otmp->otyp;
 
-    return (boolean) (objects[otyp].oc_material <= WOOD
-                      && objects[otyp].oc_material != LIQUID);
+    return (boolean) ((objects[otyp].oc_material <= WOOD
+                       && objects[otyp].oc_material != LIQUID)
+                      || objects[otyp].oc_material == DRAGON_HIDE);
 }
 
 /*

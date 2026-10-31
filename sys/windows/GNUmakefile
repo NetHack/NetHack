@@ -1,4 +1,4 @@
-# NetHack 3.7	GNUmakefile
+# NetHack 5.0	GNUmakefile
 # Copyright (c) 2022 by Feiyun Wang
 #-Copyright (c) 2022 by Michael Allison
 # NetHack may be freely redistributed.  See license for details.
@@ -104,7 +104,7 @@ USE_LUADLL = Y
 WANT_LUAC = N
 
 ifndef LUA_VERSION
-LUAVER=5.4.6
+LUAVER=5.4.8
 else
 LUAVER=$(LUA_VERSION)
 endif
@@ -172,7 +172,7 @@ $(info     GIT=1)
 $(info or modify your Makefile to set the following:)
 $(info     INTERNET_AVAILABLE=Y)
 $(info     GIT_AVAILABLE=Y)
-$(error Stopping because NetHack 3.7 requires Lua for its build.)
+$(error Stopping because NetHack 5.0 requires Lua for its build.)
 endif  # LUA_MAY_PROCEED
 
 # Now, pdcurses
@@ -206,7 +206,7 @@ endif  # ADD_CURSES == Y
 endif  # INTERNET_AVAILABLE
 
 ifneq "$(ADD_CURSES)" "Y"
-$(info NetHack 3.7 will be built without support for the curses window-port.)
+$(info NetHack 5.0 will be built without support for the curses window-port.)
 endif
 
 ifeq "$(INTERNET_AVAILABLE)" "Y"
@@ -229,7 +229,7 @@ endif
 #==============================================================================
 
 #  The version of the game this Makefile was designed for
-NETHACK_VERSION="3.7.0"
+NETHACK_VERSION="5.0.0"
 
 # A brief version for use in macros
 NHV1=$(subst .,,$(NETHACK_VERSION))
@@ -357,7 +357,7 @@ endif
 
 ifeq "$(GCC_EXTRA_WARNINGS)" "Y"
 #
-# These match the warnings enabled on the linux.370 and macOS.370 hints builds
+# These match the warnings enabled on the linux.500 and macOS.500 hints builds
 #
 CFLAGSXTRA = -Wall -Wextra -Wreturn-type -Wunused -Wswitch -Wshadow \
 	     -Wwrite-strings -pedantic -Wmissing-declarations \
@@ -393,7 +393,7 @@ CLEAN_DIR = $(GAMEDIR) $(OBJ)
 
 #=================================================================
 # LUA library
-# Source from http://www.lua.org/ftp/lua-5.4.6.tar.gz
+# Source from http://www.lua.org/ftp/lua-5.4.8.tar.gz
 #=================================================================
 
 OLUA = $(O)lua
@@ -475,7 +475,7 @@ CLEAN_FILE += $(NHLUAH)
 LUALIST = air Arc-fila Arc-filb Arc-goal Arc-loca Arc-strt \
 	asmodeus astral baalz Bar-fila Bar-filb Bar-goal \
 	Bar-loca Bar-strt bigrm-1 bigrm-10 bigrm-11 bigrm-2 \
-	bigrm-12 \
+	bigrm-12 bigrm-13 \
 	bigrm-3 bigrm-4 bigrm-5 bigrm-6 bigrm-7 bigrm-8 \
 	bigrm-9 castle Cav-fila Cav-filb Cav-goal Cav-loca \
 	Cav-strt dungeon earth fakewiz1 fakewiz2 fire \
@@ -794,6 +794,7 @@ HACK_H = $(CONFIG_H) ../include/align.h ../include/artilist.h \
 	../include/decl.h ../include/defsym.h ../include/display.h \
 	../include/dungeon.h ../include/engrave.h ../include/flag.h \
 	../include/hack.h ../include/lint.h ../include/mextra.h \
+	../include/mcastu.h \
 	../include/mkroom.h ../include/monattk.h ../include/mondata.h \
 	../include/monflag.h ../include/monst.h ../include/monsters.h \
 	../include/nhlua.h ../include/obj.h ../include/objclass.h \
@@ -1065,8 +1066,8 @@ fetchpdcurses:
 	git submodule update ../submodules/$(PDCURSES) ; fi
 #	git submodule update --remote ../submodules/$(PDCURSES) ; fi
 else  # GIT_AVAILABLE no
-CURLLUASRC=http://www.lua.org/ftp/lua-5.4.6.tar.gz
-CURLLUADST=lua-5.4.6.tar.gz
+CURLLUASRC=http://www.lua.org/ftp/lua-5.4.8.tar.gz
+CURLLUADST=lua-5.4.8.tar.gz
 
 CURLPDCSRC=https://github.com/Bill-Gray/PDCursesMod/archive/refs/tags/v4.5.1.zip
 CURLPDCDST=$(PDCURSES).zip
@@ -1231,21 +1232,21 @@ COREOBJS = $(addsuffix .o, allmain alloc apply artifact attrib ball bones botl \
 	   calendar cfgfiles cmd coloratt cppregex \
 	   dbridge decl detect dig display dlb do do_name do_wear \
 	   dog dogmove dokick dothrow drawing dungeon \
-	   eat end engrave exper explode extralev files fountain \
-	   getpos glyphs hack insight invent isaac64 light lock \
+	   earlyarg eat end engrave exper explode extralev files fountain \
+	   getpos glyphs hack iactions insight invent isaac64 light lock \
 	   mail makemon mcastu mdlib mhitm mhitu minion mklev mkmap mkmaze mkobj mkroom \
 	   mon mondata monmove monst mplayer mthrowu muse music \
 	   nhlobj nhlsel nhlua windsound o_init objects objnam options \
 	   pager pickup pline polyself potion pray priest quest questpgr \
 	   random read rect region report restore rip rnd role rumors \
-	   safeproc save sfbase sfstruct shk shknam sit selvar sounds sp_lev \
+	   save sfbase sfstruct shk shknam sit selvar sounds sp_lev \
 	   spell stairs steal steed strutil \
 	   symbols sys teleport timeout topten track trap u_init uhitm utf8map \
 	   vault version vision weapon were wield windmain windows windsys wizard \
 	   wizcmds worm worn write zap $(SOUNDLIBOBJS))
 
-CFLAGSW = $(CFLAGS) $(CFLAGSXTRA) $(SOUNDLIBINCL) $(COMMONDEF) $(DLBFLG) -DTILES -D_WINDOWS -DMSWIN_GRAPHICS -DSAFEPROCS -DNOTTYGRAPHICS $(SOUNDLIBDEFS)
-CPPFLAGSW = $(CFLAGS) $(CPPFLAGSXTRA) $(COMMONDEF) $(DLBFLG) -DTILES -D_WINDOWS -DMSWIN_GRAPHICS -DSAFEPROCS -DNOTTYGRAPHICS $(SOUNDLIBDEFS)
+CFLAGSW = $(CFLAGS) $(CFLAGSXTRA) $(SOUNDLIBINCL) $(COMMONDEF) $(DLBFLG) -DTILES -D_WINDOWS -DMSWIN_GRAPHICS -DNOTTYGRAPHICS $(SOUNDLIBDEFS)
+CPPFLAGSW = $(CFLAGS) $(CPPFLAGSXTRA) $(COMMONDEF) $(DLBFLG) -DTILES -D_WINDOWS -DMSWIN_GRAPHICS -DNOTTYGRAPHICS $(SOUNDLIBDEFS)
 
 ONHW = $(O)nethackw
 NHWONLY = $(addsuffix .o, mhaskyn mhdlg mhfont mhinput mhmain mhmap mhmenu \
@@ -1281,13 +1282,13 @@ $(GAMEDIR)/NetHackW.exe: $(NHWOBJS) $(NHWRES) $(DATEW_O) \
 $(ONHW)/%.o: $(SRC)/%.c $(NHLUAH) | $(ONHW)
 	$(cc) $(CFLAGSW) $< -o$@
 
-#       In NetHack 3.7, date.c must be recompiled after any other file is compiled,
+#       In NetHack 5.0, date.c must be recompiled after any other file is compiled,
 #       otherwise the game internal build timestamp (and potentially git hash)
 #       will not be accurate.
 #       Therefore, date must not be included in COREOBJS (and by extension
 #       NHWOBJS, NHWONLY). That allows those to be listed as explicit dependencies
 #       to ensure that date.c is always recompiled again after anything else that
-#       was just recompiled. date.h is not used in the build of NetHack 3.7.
+#       was just recompiled. date.h is not used in the build of NetHack 5.0.
 #
 $(ONHW)/date.o: $(SRC)/date.c $(NHWOBJS) | $(ONHW)
 	$(cc) $(CFLAGSW) $(GITHASH) $(GITBRANCH) $(GITPREFIX) $< -o$@
@@ -1347,8 +1348,8 @@ CLEAN_FILE += $(NHWTARGETS) $(NHWOBJS) $(NHWRES) $(BMPS) $(WAV)
 #==========================================
 # nethack
 #==========================================
-CFLAGSNH = $(CFLAGSU) $(CFLAGSXTRA) $(SOUNDLIBINCL) -DNO_TILE_C -DSAFEPROCS -D_LIB -DWIN32CON $(SOUNDLIBDEFS)
-CPPFLAGSNH = $(CFLAGSU) $(CPPFLAGSXTRA) -DNO_TILE_C -DSAFEPROCS -D_LIB -DWIN32CON $(SOUNDLIBDEFS)
+CFLAGSNH = $(CFLAGSU) $(CFLAGSXTRA) $(SOUNDLIBINCL) -DNO_TILE_C -D_LIB -DWIN32CON $(SOUNDLIBDEFS)
+CPPFLAGSNH = $(CFLAGSU) $(CPPFLAGSXTRA) -DNO_TILE_C -D_LIB -DWIN32CON $(SOUNDLIBDEFS)
 
 ONH = $(O)nethack
 
@@ -1407,13 +1408,13 @@ $(PkgDir):
 CLEAN_DIR += $(PkgDir)
 CLEAN_FILE += $(MAINZIP)
 
-#       In NetHack 3.7, date.c must be recompiled after any other file is compiled,
+#       In NetHack 5.0, date.c must be recompiled after any other file is compiled,
 #       otherwise the game internal build timestamp (and potentially git hash)
 #       will not be accurate.
 #       Therefore, date must not be included in COREOBJS (and by extension
 #       NHOBJS). That allows those to be listed as explicit dependencies of date.o
 #       to ensure that date.c is always recompiled again after anything else that
-#       was just recompiled. date.h is not used in the build of NetHack 3.7.
+#       was just recompiled. date.h is not used in the build of NetHack 5.0.
 #
 $(ONH)/date.o: $(SRC)/date.c $(NHOBJS) $(NHRES) | $(ONH)
 	$(cc) $(CFLAGSNH) $(GITHASH) $(GITBRANCH) $(GITPREFIX) $< -o$@

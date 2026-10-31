@@ -1,4 +1,4 @@
-/* NetHack 3.7	msdos.c	$NHDT-Date: 1596498269 2020/08/03 23:44:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.15 $ */
+/* NetHack 5.0	msdos.c	$NHDT-Date: 1596498269 2020/08/03 23:44:29 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.15 $ */
 /* Copyright (c) NetHack PC Development Team 1990 */
 /* NetHack may be freely redistributed.  See license for details.         */
 
@@ -449,7 +449,7 @@ filesize_nh(char *file)
  * Chdrive() changes the default drive.
  */
 void
-chdrive(char *str)
+chdrive(const char *str)
 {
 #define SELECTDISK 0x0E
     char *ptr;

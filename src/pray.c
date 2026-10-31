@@ -1,4 +1,4 @@
-/* NetHack 3.7	pray.c	$NHDT-Date: 1762680996 2025/11/09 01:36:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.244 $ */
+/* NetHack 5.0	pray.c	$NHDT-Date: 1762680996 2025/11/09 01:36:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.244 $ */
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -213,7 +213,7 @@ in_trouble(void)
         return TROUBLE_STARVING;
     if (region_danger())
         return TROUBLE_REGION;
-    if (critically_low_hp(FALSE))
+    if ((!Upolyd || Unchanging) && critically_low_hp(FALSE))
         return TROUBLE_HIT;
     if (ismnum(u.ulycn))
         return TROUBLE_LYCANTHROPE;

@@ -1,4 +1,4 @@
-/* NetHack 3.7	mhitm.c	$NHDT-Date: 1732979463 2024/11/30 07:11:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.253 $ */
+/* NetHack 5.0	mhitm.c	$NHDT-Date: 1732979463 2024/11/30 07:11:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.253 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -919,7 +919,7 @@ gulpmm(
          *  -> relmon() used to call remove_monster() for the dead
          *  monster even when it wasn't the one on the map, so we
          *  needed to put magr back after mdef was killed and removed
-         *  from their shared spot.  But now [3.7] relmon() calls
+         *  from their shared spot.  But now [5.0] relmon() calls
          *  mon_leaving_level() and that checks whether the monster at
          *  dying monster's coordinates is that dying monster and only
          *  removes it when they match.  So magr is still at mdef's
@@ -1259,7 +1259,7 @@ slept_monst(struct monst *mon)
 void
 rustm(struct monst *mdef, struct obj *obj)
 {
-    int dmgtyp = -1, chance = 1;
+    int dmgtyp = ERODE_NONE, chance = 1;
 
     if (!mdef || !obj)
         return; /* just in case */
@@ -1275,7 +1275,7 @@ rustm(struct monst *mdef, struct obj *obj)
         chance = 6;
     }
 
-    if (dmgtyp >= 0 && !rn2(chance))
+    if (dmgtyp != ERODE_NONE && !rn2(chance))
         (void) erode_obj(obj, (char *) 0, dmgtyp, EF_GREASE | EF_VERBOSE);
 }
 

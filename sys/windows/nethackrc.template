@@ -1,4 +1,4 @@
-# NetHack 3.7  defaults.nh       $NHDT-Date: 1524689357 2018/04/25 20:49:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.32 $
+# NetHack 5.0  defaults.nh       $NHDT-Date: 1524689357 2018/04/25 20:49:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.32 $
 # Copyright (c) 2006 by Michael Allison
 # NetHack may be freely redistributed.  See license for details.
 
@@ -56,6 +56,12 @@ OPTIONS=!autopickup
 
 # Set the default boulder symbol to '0'
 OPTIONS=boulder:0
+
+# Disable the prompt for a tutorial
+#OPTIONS=!tutorial
+
+# Disable game tips
+#OPTIONS=!tips
 
 # Highlight menu lines with different colors. You need to define the colors
 # with MENUCOLOR lines.
@@ -140,22 +146,22 @@ OPTIONS=hilite_pet,!toptenwin
 # point at must exist.  NetHack will not create them for you.
 #
 # The location that documentation and helps files are placed
-#HACKDIR=c:\User\USERNAME\NetHack\3.6
+#HACKDIR=c:\User\USERNAME\NetHack\5.0
 #
 # The location that level files in progress are stored (writeable)
-#LEVELDIR=c:\User\USERNAME\AppData\Local\NetHack\3.6
+#LEVELDIR=c:\User\USERNAME\AppData\Local\NetHack\5.0
 #
 # The location where saved games are kept (writeable)
-#SAVEDIR=c:\User\USERNAME\AppData\Local\NetHack\3.6
+#SAVEDIR=c:\User\USERNAME\AppData\Local\NetHack\5.0
 #
 # The location that bones files are kept (writeable)
-#BONESDIR=c:\ProgramData\NetHack\3.6
+#BONESDIR=c:\ProgramData\NetHack\5.0
 #
 # The location that score files are kept (writeable)
-#SCOREDIR=c:\ProgramData\NetHack\3.6
+#SCOREDIR=c:\ProgramData\NetHack\5.0
 #
 # The location that file synchronization locks are stored (writeable)
-#LOCKDIR=c:\ProgramData\NetHack\3.6
+#LOCKDIR=c:\ProgramData\NetHack\5.0
 #
 
 # Finnish keyboards might need these modifications uncommented. 

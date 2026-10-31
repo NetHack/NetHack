@@ -1,4 +1,4 @@
-/* NetHack 3.7	dlb.h	$NHDT-Date: 1596498534 2020/08/03 23:48:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.12 $ */
+/* NetHack 5.0	dlb.h	$NHDT-Date: 1596498534 2020/08/03 23:48:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.12 $ */
 /* Copyright (c) Kenneth Lorber, Bethesda, Maryland, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -9,7 +9,7 @@
 #ifdef DLB
 
 /* implementations */
-#if defined(MAC) && !defined(MAC_CROSS)
+#if defined(MACOS9) && !defined(MACOS9_CROSS)
 #define DLBRSRC /* use Mac resources */
 #else
 #define DLBLIB /* use a set of external files */

@@ -1,4 +1,4 @@
-/* NetHack 3.7	defsym.h $NHDT-Date: 1725653007 2024/09/06 20:03:27 $ $NHDT-Branch: NetHack-3.7 $ $NHDT-Revision: 1.25 $ */
+/* NetHack 5.0	defsym.h $NHDT-Date: 1725653007 2024/09/06 20:03:27 $ $NHDT-Branch: NetHack-3.7 $ $NHDT-Revision: 1.25 $ */
 /*      Copyright (c) 2016 by Pasi Kallinen              */
 /* NetHack may be freely redistributed.  See license for details. */
 

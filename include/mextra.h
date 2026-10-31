@@ -1,4 +1,4 @@
-/* NetHack 3.7	mextra.h	$NHDT-Date: 1720717969 2024/07/11 17:12:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.40 $ */
+/* NetHack 5.0	mextra.h	$NHDT-Date: 1720717969 2024/07/11 17:12:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.40 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -98,6 +98,7 @@ struct epri {
     schar shroom;      /* index in rooms */
     coord shrpos;      /* position of shrine */
     d_level shrlevel;  /* level (& dungeon) of shrine */
+    unsigned cheapskate_count; /* number of cheapskate donations */
     long intone_time,  /* used to limit verbosity  +*/
         enter_time,    /*+ of temple entry messages */
         hostile_time,  /* forbidding feeling */

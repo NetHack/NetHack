@@ -30,6 +30,7 @@ Debug-Mode Quick Reference:
 #wizloadlua     == load and execute a lua script
 #wizmakemap     == recreate the current dungeon level
 #wizmondiff     == [Opt] check for discrepancies in monster difficulty ratings
+#wizobjprobs    == [Opt] list actual probabilities of item generation
 #wizrumorcheck  == validate rumor indexing; also show first, second, and last
                    random engravings, epitaphs, and hallucinatory monsters
 #wizseenv       == show map locations' seen vectors

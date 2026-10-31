@@ -34,8 +34,8 @@ O     options   set options
 /     what-is   tell what a map symbol represents
 \     known     display list of what's been discovered
 |     perminv   interact with persistent inventory window instead of hero+map
-v     version   display version number
-V     history   display game history
+v     chronicle display a list of important events
+V     version   display version number
 ^A    again     redo the previous command
 ^R    redraw    redraw the screen
 ^P    prevmsg   repeat previous message (consecutive ^P's repeat earlier ones)

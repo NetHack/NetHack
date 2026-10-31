@@ -1,4 +1,4 @@
-/* NetHack 3.7	obj.h	$NHDT-Date: 1718999845 2024/06/21 19:57:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.116 $ */
+/* NetHack 5.0	obj.h	$NHDT-Date: 1718999845 2024/06/21 19:57:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.116 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -453,6 +453,7 @@ struct obj {
 #define BURIED_TOO 0x2
 
 /* object erosion types */
+#define ERODE_NONE -1
 #define ERODE_BURN 0
 #define ERODE_RUST 1
 #define ERODE_ROT 2

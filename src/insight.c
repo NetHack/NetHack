@@ -1,4 +1,4 @@
-/* NetHack 3.7	insight.c	$NHDT-Date: 1737384766 2025/01/20 06:52:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.128 $ */
+/* NetHack 5.0	insight.c	$NHDT-Date: 1777004419 2026/04/23 20:20:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.134 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -16,13 +16,14 @@
 
 staticfn void enlght_out(const char *);
 staticfn void enlght_line(const char *, const char *, const char *,
-                        const char *);
+                          const char *);
 staticfn char *enlght_combatinc(const char *, int, int, char *);
 staticfn void enlght_halfdmg(int, int);
 staticfn boolean walking_on_water(void);
 staticfn boolean cause_known(int);
 staticfn char *attrval(int, int, char *);
 staticfn char *fmt_elapsed_time(char *, int);
+staticfn char *N_times(long, char *) NONNULL NONNULLARG2;
 staticfn void background_enlightenment(int, int);
 staticfn void basics_enlightenment(int, int);
 staticfn void characteristics_enlightenment(int, int);
@@ -353,6 +354,28 @@ fmt_elapsed_time(char *outbuf, int final)
     }
     if (eseconds)
         Sprintf(eos(outbuf), " %ld second%s", eseconds, plur(eseconds));
+    return outbuf;
+}
+
+/* "once" vs "twice" vs "17 times", used in several places */
+staticfn char *
+N_times(long n, char *outbuf)
+{
+    switch (n) {
+    case 0:
+    default:
+        Sprintf(outbuf, "%ld times", n);
+        break;
+    case 1:
+        Strcpy(outbuf, "once");
+        break;
+    case 2:
+        Strcpy(outbuf, "twice");
+        break;
+    case 3:
+        Strcpy(outbuf, "thrice");
+        break;
+    }
     return outbuf;
 }
 
@@ -1951,44 +1974,16 @@ attributes_enlightenment(
     }
 #endif
 
-    /* saving-grace: show during final disclosure, hide during normal play */
-    if (final || wizard || discover) {
-        static const char *verbchoices[2][2] = {
-            { "might avoid", "have avoided" },
-            { "could have avoided", "avoided" },
-        };
-        /* u.usaving_grace will always be 0 or 1; final is 0 (game in
-           progress), 1 (game over, survived), or 2 (game over, died) */
-        const char *verb = verbchoices[!!final][u.usaving_grace];
-
-        /* 'verb' has already been set for present or past but enl_msg()
-           needs it twice, one for in progress, the other for game over */
-        enl_msg(You_, verb, verb, " a one-shot death via saving-grace", "");
-    }
-
     {
         const char *p;
 
         buf[0] = '\0';
         if (final < 2) { /* still in progress, or quit/escaped/ascended */
             p = "survived after being killed ";
-            switch (u.umortality) {
-            case 0:
+            if (!u.umortality)
                 p = !final ? (char *) 0 : "survived";
-                break;
-            case 1:
-                Strcpy(buf, "once");
-                break;
-            case 2:
-                Strcpy(buf, "twice");
-                break;
-            case 3:
-                Strcpy(buf, "thrice");
-                break;
-            default:
-                Sprintf(buf, "%d times", u.umortality);
-                break;
-            }
+            else
+                (void) N_times((long) u.umortality, buf);
         } else { /* game ended in character's death */
             p = "are dead";
             switch (u.umortality) {
@@ -2093,12 +2088,25 @@ doconduct(void)
 void
 show_conduct(int final)
 {
-    char buf[BUFSZ];
+    char buf[BUFSZ], bufN[40];
     int ngenocided;
 
     /* Create the conduct window */
     ge.en_win = create_nhwindow(NHW_MENU);
     putstr(ge.en_win, 0, "Voluntary challenges:");
+
+    /* rerolling; "You <this or that>" is about the character, rerolling
+       is about the player so phrase it differently;
+       also, always use past tense since the chance to do something with it
+       is gone by time player can issue #conduct command or see disclosure */
+    if (!u.uroleplay.reroll)
+        Strcpy(buf, " Character rerolling was not enabled.");
+    else if (!u.uroleplay.numrerolls)
+        Strcpy(buf, " Your character was not rerolled.");
+    else
+        Sprintf(buf, " Your character was rerolled %s.",
+                N_times(u.uroleplay.numrerolls, bufN));
+    enlght_out(buf);
 
     if (u.uroleplay.blind)
         you_have_been("blind from birth");
@@ -2208,25 +2216,13 @@ show_conduct(int final)
     if (sokoban_in_play()) {
         const char *presentverb = "have violated", *pastverb = "violated";
 
-        Strcpy(buf, " the special Sokoban rules ");
-        switch (u.uconduct.sokocheat) {
-        case 0L:
+        if (!u.uconduct.sokocheat) {
             presentverb = "have not violated";
             pastverb = "did not violate";
             Strcpy(buf, " any of the special Sokoban rules");
-            break;
-        case 1L:
-            Strcat(buf, "once");
-            break;
-        case 2L:
-            Strcat(buf, "twice");
-            break;
-        case 3L:
-            Strcat(buf, "thrice");
-            break;
-        default:
-            Sprintf(eos(buf), "%ld times", u.uconduct.sokocheat);
-            break;
+        } else {
+            Strcpy(buf, " the special Sokoban rules ");
+            Strcat(buf, N_times(u.uconduct.sokocheat, bufN));
         }
         enl_msg(You_, presentverb, pastverb, buf, "");
     }
@@ -2893,19 +2889,9 @@ list_vanquished(char defquery, boolean ask)
                     Sprintf(buf, "%s%s",
                             !type_is_pname(&mons[i]) ? "the " : "",
                             mons[i].pmnames[NEUTRAL]);
-                    if (nkilled > 1) {
-                        switch (nkilled) {
-                        case 2:
-                            Sprintf(eos(buf), " (twice)");
-                            break;
-                        case 3:
-                            Sprintf(eos(buf), " (thrice)");
-                            break;
-                        default:
-                            Sprintf(eos(buf), " (%d times)", nkilled);
-                            break;
-                        }
-                    }
+                    if (nkilled > 1)
+                        Sprintf(eos(buf), " (%s)",
+                                N_times((long) nkilled, buftoo));
                     was_uniq = TRUE;
                 } else {
                     if (uniq_header && was_uniq) {

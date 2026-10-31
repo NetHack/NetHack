@@ -121,3 +121,22 @@ for func, fval in pairs(tests) do
       end
    end
 end
+
+function test_getlin()
+   nh.pushkey("AbC");
+   local str = nh.getlin("What?");
+   if str ~= "AbC" then
+      error("nh.getlin fail, got \"" .. str .. "\"");
+   end
+end
+
+function test_abscoord()
+   local ax,ay = nh.abscoord(3, 8);
+   local pt = nh.abscoord({ x = 10, y = 5 });
+end
+
+test_getlin();
+test_abscoord();
+
+nh.flip_level(3);
+

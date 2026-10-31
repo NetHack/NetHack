@@ -1,6 +1,6 @@
 $ ! vmssetup.com -- place GNU Makefiles in their target directories
-$ version_number = "3.7.0"
-$ ! $NHDT-Date: 1687541093 2024/03/08 17:24:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.39 $
+$ version_number = "5.0.0"
+$ ! $NHDT-Date: 1687541093 2024/03/08 17:24:53 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.39 $
 $ ! NetHack may be freely redistributed.  See license for details.
 $ !
 $ relsrc = ""

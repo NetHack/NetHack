@@ -1,4 +1,4 @@
-/* NetHack 3.7	glyphs.c	TODO: add NHDT branch/date/revision tags */
+/* NetHack 5.0	glyphs.c	TODO: add NHDT branch/date/revision tags */
 /* Copyright (c) Michael Allison, 2021. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -299,7 +299,8 @@ glyph_find_core(
 */
 
 
-void fill_glyphid_cache(void)
+void
+fill_glyphid_cache(void)
 {
     int reslt = 0;
 
@@ -350,7 +351,8 @@ init_glyph_cache(void)
     }
 }
 
-void free_glyphid_cache(void)
+void
+free_glyphid_cache(void)
 {
     size_t idx;
 
@@ -790,6 +792,7 @@ purge_custom_entries(enum graphics_sets which_set)
         gdc->count = 0;
     }
 }
+
 void
 dump_all_glyphids(FILE *fp)
 {
@@ -815,7 +818,7 @@ wizcustom_glyphids(winid win)
             wizcustom_callback(win, glyphnum, id);
         }
     }
- }
+}
 
 staticfn int
 parse_id(
@@ -1172,7 +1175,8 @@ clear_all_glyphmap_colors(void)
     }
 }
 
-void reset_customcolors(void)
+void
+reset_customcolors(void)
 {
     clear_all_glyphmap_colors();
     apply_customizations(gc.currentgraphics, do_custom_colors);

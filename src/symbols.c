@@ -1,4 +1,4 @@
-/* NetHack 3.7	symbols.c	$NHDT-Date: 1736530208 2025/01/10 09:30:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.123 $ */
+/* NetHack 5.0	symbols.c	$NHDT-Date: 1736530208 2025/01/10 09:30:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.123 $ */
 /* Copyright (c) NetHack Development Team 2020.                   */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -638,14 +638,14 @@ parse_sym_line(char *buf, int which_set)
 #ifdef ENHANCED_SYMBOLS
             } else {
                 if (gc.chosen_symset_start) {
-                    glyphrep_to_custom_map_entries(buf, &glyph);
+                    (void) glyphrep_to_custom_map_entries(buf, &glyph);
                 }
 #endif
             }
         }
     } else if (gc.chosen_symset_start) {
         /* glyph, not symbol */
-        glyphrep_to_custom_map_entries(buf, &glyph);
+        (void) glyphrep_to_custom_map_entries(buf, &glyph);
     }
 #ifndef ENHANCED_SYMBOLS
     nhUse(glyph);

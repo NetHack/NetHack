@@ -1,4 +1,4 @@
-/* NetHack 3.7	steal.c	$NHDT-Date: 1720895742 2024/07/13 18:35:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.132 $ */
+/* NetHack 5.0	steal.c	$NHDT-Date: 1720895742 2024/07/13 18:35:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.132 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -643,7 +643,7 @@ mpickobj(struct monst *mtmp, struct obj *otmp)
     }
     /* don't want hidden light source inside the monster; assumes that
        engulfers won't have external inventories; whirly monsters cause
-       the light to be extinguished rather than letting it shine thru */
+       the light to be extinguished rather than letting it shine through */
     if (obj_sheds_light(otmp) && attacktype(mtmp->data, AT_ENGL)) {
         /* this is probably a burning object that you dropped or threw */
         if (engulfing_u(mtmp) && !Blind)

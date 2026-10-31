@@ -1,4 +1,4 @@
-/* NetHack 3.7	dog.c	$NHDT-Date: 1753856387 2025/07/29 22:19:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.190 $ */
+/* NetHack 5.0	dog.c	$NHDT-Date: 1753856387 2025/07/29 22:19:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.190 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -427,6 +427,7 @@ mon_arrive(struct monst *mtmp, int when)
     stairway *stway;
     d_level fromdlev;
 
+    mtmp->mstate |= MON_STILL_ARRIVING;
     mtmp->nmon = fmon;
     fmon = mtmp;
     if (mtmp->isshk)
@@ -475,6 +476,7 @@ mon_arrive(struct monst *mtmp, int when)
             rloc_to(mtmp, u.ux, u.uy);
         else
             mnexto(mtmp, RLOC_NOMSG);
+        mtmp->mstate &= ~MON_STILL_ARRIVING;
         return;
     } else if (when == Wiz_arrive) {
         /* resurrect() is bringing existing wizard to harass the hero */
@@ -604,6 +606,7 @@ mon_arrive(struct monst *mtmp, int when)
 
     mtmp->mx = 0; /*(already is 0)*/
     mtmp->my = xyflags;
+
     if (xlocale)
         failed_to_place = !mnearto(mtmp, xlocale, ylocale, FALSE, RLOC_NOMSG);
     else
@@ -616,6 +619,7 @@ mon_arrive(struct monst *mtmp, int when)
         else /* when==Wiz_arrive => not being called by losedogs() */
             m_into_limbo(mtmp);
     }
+    mtmp->mstate &= ~MON_STILL_ARRIVING;
 }
 
 /* heal monster for time spent elsewhere */

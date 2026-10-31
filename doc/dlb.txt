@@ -6,47 +6,47 @@ NAME
        dlb - NetHack data librarian
 
 SYNOPSIS
-       dlb { xct } [ vfIC ] arguments...  [ files...  ]
+       dlb {c|t|x}[v][C directory] [file] ...
+
+       dlb {c|t|x}[v]I list-file
+
+       dlb {c|t|x}[v][f archive-file-name] [file] ...
 
 DESCRIPTION
-       Dlb  is  a file archiving tool in the spirit (and tradition) of tar for
-       NetHack version 3.1 and higher.  It is used  to  maintain  the  archive
-       files  from which NetHack reads special level files and other read-only
-       information.  Note that like tar the command and option specifiers  are
-       specified  as  a  continuous  string  and are followed by any arguments
-       required in the same order as the option specifiers.
+       Dlb  is  a  file archiving tool in the spirit (and tradition) of tar(1)
+       for nethack(6) version 3.1 and higher.  It  is  used  to  maintain  the
+       archive  files  from which the game reads special level files and other
+       read-only information.  Note that like tar, the letters specifying  the
+       operation  and  options  are  expressed as a continuous string.  Unlike
+       tar, dlb is configured with a default set of file names to process.
 
-       This facility is optional and may be excluded during NetHack configura-
-       tion.
+   Operations
+       c causes dlb to create a new archive from files in the  current  direc-
+       tory.
 
-COMMANDS
-       The  x  command  causes dlb to extract the contents of the archive into
-       the current directory.
+       t lists the files in the archive.
 
-       The c command causes dlb to create a new archive from files in the cur-
-       rent directory.
+       x  causes  dlb  to extract the contents of the archive into the current
+       directory.
 
-       The t command lists the files in the archive.
+OPTIONS
+       C dir        Change directory to dir before trying to read any files.
 
-OPTIONS AND ARGUMENTS
-       v           verbose output
+       f archive    Read from or write to archive instead of LIBFILE  (usually
+                    the nhdat file in the playground).
 
-       f archive   specify the archive.  Default if f not specified is LIBFILE
-       (usually the nhdat file in the playground).
+       I list-file  Read  from  list-file the names of files to emplace within
+                    or extract from the archive.  The default for archive cre-
+                    ation is LIBLISTFILE.
 
-       I lfile     specify the file containing the list of files to put in  to
-       or extract from the archive if no files are listed on the command line.
-       Default for archive creation if no files are listed is LIBLISTFILE.
-
-       C dir       change directory.  Changes directory before trying to  read
-       any files (including the archive and the lfile).
+       v            Operate verbosely.
 
 EXAMPLES
        Create the default archive from the default file list:
-                   dlb c
+              dlb c
 
-       List the contents of the archive 'foo':
-                   dlb tf foo
+       List the contents of the archive foo:
+              dlb tf foo
 
 AUTHOR
        Kenneth Lorber
@@ -55,15 +55,17 @@ SEE ALSO
        nethack(6), tar(1)
 
 BUGS
-       Not  a  good  tar  emulation;  - does not mean stdin or stdout.  Should
-       include an optional compression facility.  Not all read-only files  for
-       NetHack can be read out of an archive; examining the source is the only
-       way to know which files can be.
+       o Not a good tar emulation; - does not mean stdin or stdout.
+
+       o Should include an optional compression facility.
+
+       o Not  all  read-only  files for NetHack can be read out of an archive;
+         examining the source is the only way to know which files can be.
 
 COPYRIGHT
        This file is Copyright (C) Kenneth Lorber, 2024 for  version  keni-git-
-       set:1.13.   NetHack  may  be  freely  redistributed.   See  license for
-       details.
+       set:1.13.   NetHack  may  be freely redistributed.  See license for de-
+       tails.
 
 
 

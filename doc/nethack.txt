@@ -279,11 +279,11 @@ BUGS
 
 COPYRIGHT
        This  file  is  Copyright  (C)  Robert Patrick Rankin, 2024 for version
-       NetHack-3.7:1.31.  NetHack may be freely  redistributed.   See  license
-       for details.
+       NetHack-5:1.31.  NetHack may be freely redistributed.  See license  for
+       details.
 
        Dungeons & Dragons is a Trademark of Wizards of the Coast, Inc.
 
 
 
-NETHACK                        25 December 2024                     NETHACK(6)
+NETHACK                          26 April 2026                      NETHACK(6)

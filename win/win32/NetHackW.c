@@ -1,4 +1,4 @@
-/* NetHack 3.7    NetHackW.c    $NHDT-Date: 1693359674 2023/08/30 01:41:14 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.79 $ */
+/* NetHack 5.0    NetHackW.c    $NHDT-Date: 1693359674 2023/08/30 01:41:14 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.79 $ */
 /* Copyright (C) 2001 by Alex Kompel      */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -14,10 +14,6 @@
 #include "resource.h"
 #include "mhmain.h"
 #include "mhmap.h"
-
-#if !defined(SAFEPROCS)
-#error You must #define SAFEPROCS to build NetHackW.c
-#endif
 
 /* Borland and MinGW redefine "boolean" in shlwapi.h,
    so just use the little bit we need */
@@ -98,32 +94,6 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
     UNREFERENCED_PARAMETER(nCmdShow);
-
-    /*
-     * Get a set of valid safe windowport function
-     * pointers during early startup initialization.
-     *
-     * When get_safe_procs is called with 0 as the param,
-     * non-functional, but safe function pointers are set
-     * for all windowport routines.
-     *
-     * When get_safe_procs is called with 1 as the param,
-     * raw_print, raw_print_bold, and wait_synch, and nhgetch
-     * are set to use C stdio routines via stdio_raw_print,
-     * stdio_raw_print_bold, stdio_wait_synch, and
-     * stdio_nhgetch.
-     */
-    windowprocs = *get_safe_procs(0);
-
-    /*
-     * Now we are going to override a couple
-     * of the windowprocs functions so that
-     * error messages are handled in a suitable
-     * way for the graphical version.
-     */
-    windowprocs.win_raw_print = mswin_raw_print;
-    windowprocs.win_raw_print_bold = mswin_raw_print_bold;
-    windowprocs.win_wait_synch = mswin_wait_synch;
 
     win10_init();
     early_init(0, NULL);  /* Change as needed to support CRASHREPORT */
@@ -241,6 +211,12 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
         free(savefile);
     }
     GUILaunched = 1;
+    /* emergency IO */
+    windowprocs.win_raw_print = mswin_raw_print;
+    windowprocs.win_raw_print_bold = mswin_raw_print_bold;
+    windowprocs.win_nhgetch = mswin_nhgetch;
+    windowprocs.win_wait_synch = mswin_wait_synch;
+
     /* let nethackw_main do the argument processing */
     nethackw_main(argc, argv);
     /* not reached */

@@ -1,4 +1,4 @@
-/* NetHack 3.7	topten.c	$NHDT-Date: 1606009004 2020/11/22 01:36:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.74 $ */
+/* NetHack 5.0	topten.c	$NHDT-Date: 1606009004 2020/11/22 01:36:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.74 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -16,7 +16,7 @@
 
 /*
  * Updating in place can leave junk at the end of the file in some
- * circumstances (if it shrinks and the O.S. doesn't have a straightforward
+ * circumstances (if it shrinks and the OS doesn't have a straightforward
  * way to truncate it).  The trailing junk is harmless and the code
  * which reads the scores will ignore it.
  */
@@ -385,6 +385,7 @@ writexlentry(FILE *rfile, struct toptenentry *tt, int how)
     Fprintf(rfile, "%cwish_cnt=%ld", XLOG_SEP, u.uconduct.wishes);
     Fprintf(rfile, "%carti_wish_cnt=%ld", XLOG_SEP, u.uconduct.wisharti);
     Fprintf(rfile, "%cbones=%ld", XLOG_SEP, u.uroleplay.numbones);
+    Fprintf(rfile, "%crerolls=%ld", XLOG_SEP, u.uroleplay.numrerolls);
     Fprintf(rfile, "\n");
 #undef XLOG_SEP
 }
@@ -400,6 +401,8 @@ encodexlogflags(void)
         e |= 1L << 1;
     if (!u.uroleplay.numbones)
         e |= 1L << 2;
+    if (u.uroleplay.reroll)
+        e |= 1L << 3;
 
     return e;
 }
@@ -601,6 +604,7 @@ encode_extended_conducts(char *buf)
     add_achieveX(buf, "pauper",       u.uroleplay.pauper);
     add_achieveX(buf, "bonesless",    !flags.bones);
     add_achieveX(buf, "petless",      !u.uconduct.pets);
+    add_achieveX(buf, "unrerolled",   !u.uroleplay.reroll);
 
     return buf;
 }

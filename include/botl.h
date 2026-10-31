@@ -1,11 +1,16 @@
-/* NetHack 3.7  botl.h  $NHDT-Date: 1694893330 2023/09/16 19:42:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.37 $ */
+/* NetHack 5.0  botl.h  $NHDT-Date: 1694893330 2023/09/16 19:42:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.37 $ */
 /* Copyright (c) Michael Allison, 2003                            */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifndef BOTL_H
 #define BOTL_H
 
-/* MAXCO must hold longest uncompressed status line, and must be larger
+/* Note: this comment is about the pre-VIA_WINDOWPORT two line status
+ * which is still available but has not added a bunch of conditional
+ * extra status conditions (Grab, InLava, Held, Zzz and many others)
+ * or the new fields Weapon, Armor, and Terrain.
+ *
+ * MAXCO must hold longest uncompressed status line, and must be larger
  * than COLNO
  *
  * longest practical second status line at the moment is
@@ -27,6 +32,9 @@ Astral Plane \GXXXXNNNN:123456 HP:1234(1234) Pw:1234(1234) AC:-127
 #define MAXCO (COLNO + 40)
 #endif
 
+/* limit of the player's name in the status window */
+#define BOTL_NSIZ 16
+
 struct condmap {
     const char *id;
     unsigned long bitmask;
@@ -36,13 +44,20 @@ enum statusfields {
     BL_CHARACTERISTICS = -3, /* alias for BL_STR..BL_CH */
     BL_RESET = -2,           /* Force everything to redisplay */
     BL_FLUSH = -1,           /* Finished cycling through bot fields */
+    /*
+     * Note: status_sanity_check() in wintty.c has strings for the rest
+     * of these, so if any get renumbered or more get added, be sure to
+     * keep those in sync.
+     */
     BL_TITLE = 0,
-    BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH,  /* 1..6 */
-    BL_ALIGN, BL_SCORE, BL_CAP, BL_GOLD, BL_ENE, BL_ENEMAX, /* 7..12 */
-    BL_XP, BL_AC, BL_HD, BL_TIME, BL_HUNGER, BL_HP, /* 13..18 */
-    BL_HPMAX, BL_LEVELDESC, BL_EXP, BL_CONDITION, /* 19..22 */
-    BL_VERS, /* 23 */
-    MAXBLSTATS, /* [24] */
+    BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH,  /*  1.. 6 */
+    BL_ALIGN, BL_SCORE, BL_CAP, BL_GOLD,        /*  7..10 */
+    BL_ENE, BL_ENEMAX, BL_XP, BL_AC, BL_HD,     /* 11..15 */
+    BL_TIME, BL_HUNGER, BL_HP, BL_HPMAX,        /* 16..19 */
+    BL_LEVELDESC, BL_EXP, BL_CONDITION,         /* 20..22 */
+    BL_WEAPON, BL_ARMOR, BL_TERRAIN,            /* 23..25 */
+    BL_VERS,                                    /*   26   */
+    MAXBLSTATS /* [27] */
 };
 
 enum relationships {
@@ -52,7 +67,7 @@ enum relationships {
 };
 
 enum blconditions {
-    bl_bareh,
+    bl_bareh, /* deprecated -- bl_weapon encompasses this */
     bl_blind,
     bl_busy,
     bl_conf,
@@ -64,7 +79,7 @@ enum blconditions {
     bl_grab,
     bl_hallu,
     bl_held,
-    bl_icy,
+    bl_icy, /* bl_terrain encompasses this */
     bl_inlava,
     bl_lev,
     bl_parlyz,
@@ -75,7 +90,7 @@ enum blconditions {
     bl_stone,
     bl_strngl,
     bl_stun,
-    bl_submerged,
+    bl_submerged, /* bl_terrain encompasses this */
     bl_termill,
     bl_tethered,
     bl_trapped,

@@ -1,4 +1,4 @@
-/* NetHack 3.7	permonst.h	$NHDT-Date: 1725653014 2024/09/06 20:03:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.26 $ */
+/* NetHack 5.0	permonst.h	$NHDT-Date: 1725653014 2024/09/06 20:03:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.26 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -64,8 +64,8 @@ struct permonst {
     aligntyp maligntyp;         /* basic monster alignment */
     unsigned short geno;        /* creation/geno mask value */
     struct attack mattk[NATTK]; /* attacks matrix */
-    unsigned short cwt,         /* weight of corpse */
-        cnutrit;                /* its nutritional value */
+    unsigned cwt;               /* weight of corpse */
+    unsigned short cnutrit;     /* its nutritional value */
     uchar msound;               /* noise it makes (6 bits) */
     uchar msize;                /* physical size (3 bits) */
     uchar mresists;             /* resistances */

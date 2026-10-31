@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.21 $ $NHDT-Date: 1683746783 2023/05/10 19:26:23 $
+$NHDT-Branch: to500 $:$NHDT-Revision: 1.2 $ $NHDT-Date: 1777409988 2026/04/28 20:59:48 $
 
 fixes36.7 contains a summary of changes made to 3.6.6 in order to
 produce 3.6.7 as well as any post-release fixes in binaries.
@@ -7,7 +7,7 @@ produce 3.6.7 as well as any post-release fixes in binaries.
 General Fixes and Modified Features
 -----------------------------------
 during engraving, spaces were counted instead of non-space (cherry-pick of
-	4e0a1e04 from NetHack-3.7)
+	4e0a1e04 from NetHack WIP)
 avoid potential buffer overflow in append_str()
 resolve missing dependency in NetHack.sln
 code in include/tradstdc.h was trying to suppress warn_unused result by
@@ -29,7 +29,7 @@ windows: the console.rc file had outdated information stating 3.6.3 when the
 	official 3.6.6 binary was built.
 windows: switch from using keyhandling dll's to incorporating the three
 	variations (default, ray, 340) in sys/winnt/nttty.c
-curses: cherry-picked selectsaved code from 3.7 for menu of save files
+curses: cherry-picked selectsaved code from NetHack WIP for menu of save files
 NetHackW: fix delay rendering of cursor when using farlook
 
 
@@ -63,9 +63,11 @@ makedefs can produce individual bogusmon, engrave and epitaph files
 drinkfountain() fate 24 to curse objects could end up cursing objects
 	on the floor chain instead of the intended inventory object chain
 proceed with showpaths option even if the sysconf file is missing
-avoid memory leak in mk_artifact(); cherry-pick of 3cca4f27 from 3.7 WIP
+avoid memory leak in mk_artifact(); cherry-pick of 3cca4f27 from NetHack WIP
 avoid using col in Guidebook build, since some distros no longer include
 	it, particularly some that use musl libc
 back-port some nroff macro updates for Guidebook
 prevent a crash when using 'O' to interactively set a text match highlight
 	for hunger
+avoid a reported obuf reuse in use_misc() when using a bullwhip
+

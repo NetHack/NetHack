@@ -1,4 +1,4 @@
-/* NetHack 3.7	tile2x11.h	$NHDT-Date: 1597274123 2020/08/12 23:15:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.12 $ */
+/* NetHack 5.0	tile2x11.h	$NHDT-Date: 1597274123 2020/08/12 23:15:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.12 $ */
 /*      Copyright (c) 2002 by David Cohrs              */
 /* NetHack may be freely redistributed.  See license for details. */
 

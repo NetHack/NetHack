@@ -10,15 +10,14 @@ Spellings below are the owner's, including `elixer`, `exlier`,
 and `PSALM 91`. They are intentional content (or at least content the
 owner shipped) and must not be "corrected" back to vanilla NetHack.
 
-Status values, filled in after the merge:
+Status values:
 
 - **preserved** — still present, same place, same behavior
-- **ported** — moved onto a NetHack 5.0.0 API or location
-- **needs owner decision** — kept as the owner wrote it, but ambiguous, incomplete, or in conflict with a 5.0 change in a way only the owner should settle
-- **lost** — should not appear; if it does, the upgrade failed
+- **ported** — moved onto a NetHack 5.0.0 API, filename, or pack list
+- **needs owner decision** — kept as written, but unfinished or inconsistent
+- **lost** — not used; none of the inventory items were dropped
 
-| ID | Status |
-|----|--------|
+The per-id results are in section 20. Nothing in this inventory was lost.
 
 ---
 
@@ -486,4 +485,89 @@ RighteousHack 0.1 saves are NetHack 3.7, `EDITLEVEL 131`. NetHack 5.0.0
 is `VERSION_MAJOR 5`, `VERSION_MINOR 0`, `EDITLEVEL 0`, `NH_STATUS_RELEASED`,
 and `struct objclass` grew shop-price fields (`oc_sell_minseen` and the
 related min/max fields). 0.1 save files and bones will not load. That is
-expected. Do not promise a converter.
+expected. There is no converter.
+
+## 20. Upgrade status (after the 5.0.0 merge)
+
+Linux tty build of this branch was made with:
+
+```
+sh sys/unix/setup.sh sys/unix/hints/linux.500
+make fetch-lua
+make -j4 WANT_WIN_TTY=1
+make install
+```
+
+`make fetch-lua` downloaded lua-5.4.8 and the checksum in
+`submodules/CHKSUMS` matched. The game binary is `src/nethack`. A
+character start as a lawful human Royal Historian reached Dlvl:1 and
+showed the Historian quest speech from `dat/quest.lua` (the "day of
+salvation" / "Son of man" text). `dat/nhdat` contains `His-strt.lua`,
+`Pht-strt.lua`, `Adv-goal.lua`, `Chp-strt.lua`, `his-treasure-1.lua`,
+and `quest.lua`.
+
+### Preserved
+
+These are in the merged tree with the owner's wording and behavior.
+Auto-merge kept them, or a conflict was resolved by keeping the owner's
+text on top of 5.0 code that did not change the behavior.
+
+ID-001, ID-002, ID-003 (README text; the base version in it now says
+5.0.0), ID-010 through ID-019, ID-030, ID-031, ID-040 through ID-043,
+ID-050 through ID-060, ID-071 through ID-083, ID-085's parsers in
+`src/objnam.c`, `src/mkobj.c`, `src/muse.c`, `src/shknam.c`,
+`src/sp_lev.c`, ID-090 through ID-110, ID-120 through ID-144, ID-150
+through ID-190, ID-200 through ID-211, ID-220 through ID-225, ID-230
+through ID-235, ID-240, ID-241, ID-243 through ID-247, ID-260 through
+ID-266, ID-270 through ID-277, ID-281.
+
+ID-224 stays "The Hand of Elbereth" because that is what `righteoushack-0.1`
+shipped in `src/pray.c` and `src/insight.c`.
+
+### Ported
+
+| ID | What changed |
+|----|----------------|
+| ID-004 | Version is NetHack 5.0.0, `EDITLEVEL 0`, `NH_STATUS_RELEASED`. The RighteousHack banner from ID-001 is still the one players see. |
+| ID-084 | Starting oils use the 5.0 `trobj` (`trquan_min`, `trquan_max`). Healer still starts with `ANO_HEALING` and `ANO_EXTRA_HEALING` and still `knows_object(ANO_FULL_HEALING)`. The rows still say `POTION_CLASS`, which is only a label when `trotyp` is set (`mksobj` uses the type). 5.0 removed the Monk's starting prophetic book; that row was not one of the owner's edits, so the 5.0 Monk table was kept and only the healing oil was swapped. Monk and Tourist are not playable. |
+| ID-085 | `src/invent.c` item-action menu moved to `src/iactions.c` in 5.0. The owner's "elixer" comment was reapplied there. |
+| ID-191, ID-192 | `Z` is still `meditate`. Wizard commands stay on the `pro` prefix. 5.0's new commands are `proobjprobs` and `proshownhuuid`. `anoint` is still Meta-a. Command flags from 5.0 (`CMD_M_PREFIX`, `GENERALCMD`) are kept. |
+| ID-205 | Staff-of-wonders targeting uses 5.0 `getpos_sethilite(void (*)(boolean), boolean (*)(coordxy, coordxy))`. Same distance and visibility rules. |
+| ID-242 | `his-treasure-1.lua` was not on the Unix `SPEC_LEVS` list or the Windows `LUA_FILES` list, so a DLB build never packed it. It is on both lists now. |
+| ID-014, ID-015 | File codes are `Adv` and `Chp`, and the game builds quest level names from the file code (`src/dungeon.c`). The edited maps were still named `Rog-*.lua` and `Val-*.lua`. Copies are `dat/Adv-*.lua` and `dat/Chp-*.lua` (goal item and locate-level edits included). The `Rog-*` and `Val-*` files are still in the tree. Windows `LUA_FILES` lists the `His`, `Pht`, `Adv`, and `Chp` files. |
+| ID-247 | `dat/tower2.lua` had `/**/` after two prophetic-book strings. That is not Lua, so the level would not load. Those two tokens were removed. The names are unchanged. |
+| ID-280 | Gitlinks for `submodules/lua` (`6e22fedb`), `submodules/pdcurses` (`09cf16db`), and `submodules/pdcursesmod` (`5a255460`) are the 5.0.0 commits. The Linux hints still point at `submodules/lua`, but the default tty recipe is `make fetch-lua` (lua 5.4.8 tarball). The vendored `sys/lib/lua-5.4.6` tree is unused by that recipe and was left in place. |
+
+`is_blanket_of_the_heavenly_host`, `rloc_pos_ok`, and `maybewakesteed`
+are global and declared in `include/extern.h`. 5.0 made the last two
+`static`, and both the Linux hints and `WIN32` define `NOSTATICFN`, so
+a `static` definition is not visible to `src/apply.c` / `src/artifact.c`.
+`#undef PBOOK` and `#undef ROD` were added next to the old `#undef SPELL`
+and `#undef WAND` so those renamed macros do not leak out of
+`include/objects.h`.
+
+5.0's new wand is a rod named **stasis** (appearance redwood, probability
+45), inserted after "ask and ye shall receive", which is where 5.0 put
+`WAN_STASIS`. There is no Christian name for it in the owner's notes.
+5.0's shield of drain resistance and shield of shock resistance are
+kept under those names, and ancient defense is kept too.
+
+### Needs owner decision
+
+| ID | Why |
+|----|-----|
+| ID-070 | Anointing oil of gain ability is still named "wiggy gain ability". |
+| ID-212 | Handkerchief of the Apostle Paul is the Healer quest artifact in `src/role.c`, and `include/artilist.h` still gates it to `PM_KNIGHT`. |
+| ID-213 | Champion's quest artifact is still the Orb of Fate. |
+| ID-223 | `desecrate_altar` is gone. `src/dig.c` and `src/music.c` print `placeholder for desecrate_altar`. |
+| ID-224 | Crowning still says "The Hand of Elbereth". |
+| (new) | The stasis rod has no scripture name. |
+| ID-084 | Healer's oil rows are tagged `POTION_CLASS` even though the objects are `ANOINTING_CLASS`. Creation uses `trotyp`, so the game start still works. |
+| ID-017 | Only human is playable. `src/u_init.c` still has tables for the removed roles. |
+
+### Not lost
+
+No inventory item was dropped on the floor. Clutter from section 18 is
+still in the tree, including `scratch.c`, `src/tile 2.c` through
+`src/tile 5.c`, `dat/quest_BAK.lua`, `dat/Kni-strtBAK.lua`,
+`tools/parse_objectsBAK.py`, `tools/bak.html`, and `sys/lib/lua-5.4.6`.

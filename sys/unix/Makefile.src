@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-# NetHack 3.7  Makefile.src    $NHDT-Date: 1697316523 2023/10/14 20:48:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.164 $
+# NetHack 5.0  Makefile.src    $NHDT-Date: 1697316523 2023/10/14 20:48:43 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.164 $
 # Copyright (c) 2018 by Pasi Kallinen
 # NetHack may be freely redistributed.  See license for details.
 
@@ -68,7 +68,7 @@ SYSOBJ = $(TARGETPFX)ioctl.o $(TARGETPFX)unixmain.o $(TARGETPFX)unixtty.o \
 #SYSOBJ = $(TARGETPFX)bemain.o $(TARGETPFX)unixtty.o $(TARGETPFX)ioctl.o
 
 
-# NetHack 3.7 began introducing C99 code.
+# NetHack 5.0 began introducing C99 code.
 #
 # If your compiler needs an appropriate switch to accept C99 code.
 # CSTD = -std=c99
@@ -502,7 +502,7 @@ TARGET_HACKLIB = $(TARGETPFX)hacklib.a
 MAKEDEFS = ../util/makedefs
 
 # -lm required by lua
-LUA_VERSION ?=5.4.6
+LUA_VERSION ?=5.4.8
 LUABASE = liblua-$(LUA_VERSION).a
 LUALIB = ../lib/lua/$(LUABASE)
 LUALIBS = $(LUALIB) -lm $(DLLIB)
@@ -517,9 +517,9 @@ HACK_H	= ../src/hack.h-t
 HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
 	   botl.c calendar.c cmd.c coloratt.c dbridge.c decl.c detect.c dig.c display.c \
 	   dlb.c do.c do_name.c do_wear.c dog.c dogmove.c dokick.c dothrow.c \
-	   drawing.c dungeon.c eat.c end.c engrave.c exper.c explode.c \
+	   drawing.c dungeon.c earlyarg.c eat.c end.c engrave.c exper.c explode.c \
 	   extralev.c files.c fountain.c hack.c hacklib.c \
-	   getpos.c glyphs.c insight.c invent.c isaac64.c light.c \
+	   getpos.c glyphs.c iactions.c insight.c invent.c isaac64.c light.c \
 	   lock.c mail.c makemon.c mcastu.c mdlib.c mhitm.c \
 	   mhitu.c minion.c mklev.c mkmap.c mkmaze.c mkobj.c mkroom.c mon.c \
 	   mondata.c monmove.c monst.c mplayer.c mthrowu.c muse.c music.c \
@@ -571,6 +571,7 @@ HACKINCL = align.h artifact.h artilist.h attrib.h botl.h \
 	color.h config.h config1.h context.h coord.h cstd.h decl.h \
 	defsym.h display.h dlb.h dungeon.h engrave.h extern.h flag.h \
 	fnamesiz.h func_tab.h global.h warnings.h hack.h lint.h mextra.h \
+	mcastu.h \
 	micro.h mfndpos.h mkroom.h monattk.h mondata.h monflag.h monst.h \
 	monsters.h nhmd4.h obj.h objects.h objclass.h optlist.h patchlevel.h \
 	pcconf.h permonst.h prop.h rect.h region.h savefile.h selvar.h sym.h \
@@ -597,21 +598,21 @@ HOBJ = $(TARGETPFX)allmain.o $(TARGETPFX)alloc.o \
 	$(TARGETPFX)dlb.o $(TARGETPFX)do.o $(TARGETPFX)do_name.o \
 	$(TARGETPFX)do_wear.o $(TARGETPFX)dog.o $(TARGETPFX)dogmove.o \
 	$(TARGETPFX)dokick.o $(TARGETPFX)dothrow.o $(TARGETPFX)drawing.o \
-	$(TARGETPFX)dungeon.o $(TARGETPFX)eat.o $(TARGETPFX)end.o \
-	$(TARGETPFX)engrave.o $(TARGETPFX)exper.o $(TARGETPFX)explode.o \
-	$(TARGETPFX)extralev.o $(TARGETPFX)files.o $(TARGETPFX)fountain.o \
-	$(TARGETPFX)getpos.o $(TARGETPFX)glyphs.o $(TARGETPFX)hack.o \
-	$(TARGETPFX)insight.o $(TARGETPFX)invent.o $(TARGETPFX)isaac64.o \
-	$(TARGETPFX)light.o $(TARGETPFX)lock.o $(TARGETPFX)mail.o \
-	$(TARGETPFX)makemon.o $(TARGETPFX)mcastu.o $(TARGETPFX)mdlib.o \
-	$(TARGETPFX)mhitm.o $(TARGETPFX)mhitu.o $(TARGETPFX)minion.o \
-	$(TARGETPFX)mklev.o $(TARGETPFX)mkmap.o $(TARGETPFX)mkmaze.o \
-	$(TARGETPFX)mkobj.o $(TARGETPFX)mkroom.o $(TARGETPFX)mon.o \
-	$(TARGETPFX)mondata.o $(TARGETPFX)monmove.o $(TARGETPFX)monst.o \
-	$(TARGETPFX)mplayer.o $(TARGETPFX)mthrowu.o $(TARGETPFX)muse.o \
-	$(TARGETPFX)music.o $(TARGETPFX)nhlua.o $(TARGETPFX)nhlsel.o \
-	$(TARGETPFX)nhlobj.o $(TARGETPFX)nhmd4.o \
-	$(TARGETPFX)objects.o $(TARGETPFX)o_init.o \
+	$(TARGETPFX)dungeon.o $(TARGETPFX)earlyarg.o $(TARGETPFX)eat.o \
+	$(TARGETPFX)end.o $(TARGETPFX)engrave.o $(TARGETPFX)exper.o \
+	$(TARGETPFX)explode.o $(TARGETPFX)extralev.o $(TARGETPFX)files.o \
+	$(TARGETPFX)fountain.o $(TARGETPFX)getpos.o $(TARGETPFX)glyphs.o \
+	$(TARGETPFX)hack.o $(TARGETPFX)iactions.o $(TARGETPFX)insight.o \
+	$(TARGETPFX)invent.o $(TARGETPFX)isaac64.o $(TARGETPFX)light.o \
+	$(TARGETPFX)lock.o $(TARGETPFX)mail.o $(TARGETPFX)makemon.o \
+	$(TARGETPFX)mcastu.o $(TARGETPFX)mdlib.o $(TARGETPFX)mhitm.o \
+	$(TARGETPFX)mhitu.o $(TARGETPFX)minion.o $(TARGETPFX)mklev.o \
+	$(TARGETPFX)mkmap.o $(TARGETPFX)mkmaze.o $(TARGETPFX)mkobj.o \
+	$(TARGETPFX)mkroom.o $(TARGETPFX)mon.o $(TARGETPFX)mondata.o \
+	$(TARGETPFX)monmove.o $(TARGETPFX)monst.o $(TARGETPFX)mplayer.o \
+	$(TARGETPFX)mthrowu.o $(TARGETPFX)muse.o $(TARGETPFX)music.o \
+	$(TARGETPFX)nhlua.o $(TARGETPFX)nhlsel.o $(TARGETPFX)nhlobj.o \
+	$(TARGETPFX)nhmd4.o $(TARGETPFX)objects.o $(TARGETPFX)o_init.o \
 	$(TARGETPFX)objnam.o $(TARGETPFX)options.o $(TARGETPFX)pager.o \
 	$(TARGETPFX)pickup.o $(TARGETPFX)pline.o $(TARGETPFX)polyself.o \
 	$(TARGETPFX)potion.o $(TARGETPFX)pray.o $(TARGETPFX)priest.o \
@@ -627,11 +628,12 @@ HOBJ = $(TARGETPFX)allmain.o $(TARGETPFX)alloc.o \
 	$(TARGETPFX)teleport.o $(TARGETPFX)timeout.o $(TARGETPFX)topten.o \
 	$(TARGETPFX)track.o $(TARGETPFX)trap.o $(TARGETPFX)u_init.o \
 	$(TARGETPFX)uhitm.o $(TARGETPFX)utf8map.o $(TARGETPFX)vault.o \
-	$(TARGETPFX)vision.o $(TARGETPFX)weapon.o \
-	$(TARGETPFX)were.o $(TARGETPFX)wield.o $(TARGETPFX)windows.o \
-	$(TARGETPFX)wizard.o $(TARGETPFX)wizcmds.o $(TARGETPFX)worm.o \
-	$(TARGETPFX)worn.o $(TARGETPFX)write.o $(TARGETPFX)zap.o \
-	$(REGEXOBJ) $(RANDOBJ) $(SYSOBJ) $(WINOBJ) $(HINTOBJ) $(SNDLIBOBJ) \
+	$(TARGETPFX)vision.o $(TARGETPFX)weapon.o $(TARGETPFX)were.o \
+	$(TARGETPFX)wield.o $(TARGETPFX)windows.o $(TARGETPFX)wizard.o \
+	$(TARGETPFX)wizcmds.o $(TARGETPFX)worm.o $(TARGETPFX)worn.o \
+	$(TARGETPFX)write.o $(TARGETPFX)zap.o \
+	$(REGEXOBJ) $(RANDOBJ) $(SYSOBJ) $(WINOBJ) \
+	$(HINTOBJ) $(SNDLIBOBJ) $(UUIDOBJ) \
 	$(TARGETPFX)version.o 
 
 DATE_O = $(TARGETPFX)date.o
@@ -811,7 +813,7 @@ tags: $(CSOURCES)
 clean:
 	-rm -f *.o $(HACK_H) $(CONFIG_H)
 	-rm -f monstr.c vis_tab.c ../include/vis_tab.h #obsolete generated files
-	true; $(CLEANMORE)
+	-true; $(CLEANMORE)
 	true; $(CLEAN_CC_RESPONSEFILE) $(CLEAN_CXX_RESPONSEFILE)
 
 spotless: clean
@@ -878,6 +880,7 @@ depend2:	$(WINQTMOC)
 	@rm -f Makefile.bak
 	@rm -f ../include/nhlua.h tile.c
 
+
 # DO NOT DELETE THIS LINE OR CHANGE ANYTHING BEYOND IT
 
 # config.h timestamp
@@ -895,6 +898,7 @@ $(HACK_H): $(CONFIG_H) ../include/align.h ../include/artilist.h \
 		../include/decl.h ../include/defsym.h ../include/display.h \
 		../include/dungeon.h ../include/engrave.h ../include/flag.h \
 		../include/hack.h ../include/lint.h ../include/mextra.h \
+		../include/mcastu.h \
 		../include/mkroom.h ../include/monattk.h ../include/mondata.h \
 		../include/monflag.h ../include/monst.h ../include/monsters.h \
 		../include/nhlua.h ../include/obj.h ../include/objclass.h \
@@ -1163,6 +1167,7 @@ $(TARGETPFX)drawing.o: drawing.c $(CONFIG_H) ../include/defsym.h \
 		../include/sym.h ../include/wintype.h
 $(TARGETPFX)dungeon.o: dungeon.c $(HACK_H) ../include/dgn_file.h \
 		../include/dlb.h
+$(TARGETPFX)earlyarg.o: earlyarg.c $(HACK_H)
 $(TARGETPFX)eat.o: eat.c $(HACK_H)
 $(TARGETPFX)end.o: end.c $(HACK_H) ../include/dlb.h
 $(TARGETPFX)engrave.o: engrave.c $(HACK_H)
@@ -1176,6 +1181,7 @@ $(TARGETPFX)getpos.o: getpos.c $(HACK_H)
 $(TARGETPFX)glyphs.o: glyphs.c $(HACK_H)
 $(TARGETPFX)hack.o: hack.c $(HACK_H)
 $(TARGETPFX)hacklib.o: hacklib.c $(HACK_H)
+$(TARGETPFX)iactions.o: iactions.c $(HACK_H)
 $(TARGETPFX)insight.o: insight.c $(HACK_H)
 $(TARGETPFX)invent.o: invent.c $(HACK_H)
 $(TARGETPFX)isaac64.o: isaac64.c $(CONFIG_H) ../include/isaac64.h
@@ -1183,7 +1189,7 @@ $(TARGETPFX)light.o: light.c $(HACK_H)
 $(TARGETPFX)lock.o: lock.c $(HACK_H)
 $(TARGETPFX)mail.o: mail.c $(HACK_H) ../include/mail.h
 $(TARGETPFX)makemon.o: makemon.c $(HACK_H)
-$(TARGETPFX)mcastu.o: mcastu.c $(HACK_H)
+$(TARGETPFX)mcastu.o: mcastu.c $(HACK_H) ../include/mcastu.h
 $(TARGETPFX)mdlib.o: mdlib.c $(CONFIG_H) ../include/align.h \
 		../include/artilist.h ../include/attrib.h \
 		../include/context.h ../include/defsym.h ../include/dlb.h \

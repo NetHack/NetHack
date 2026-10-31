@@ -46,10 +46,10 @@ des.object("water walking boots",place[7])
 des.object("crystal plate mail",place[8])
 
 local spbooks = {
-   "prophetic book of divine concealment",/**/
+   "prophetic book of divine concealment",
    "prophetic book of northern wind",
    "prophetic book of angelic help",
-   "prophetic book of far sight",/**/
+   "prophetic book of far sight",
    "prophetic book of pacification",
    "prophetic book of flesh renewed",
    "prophetic book of transformation"

@@ -1,4 +1,4 @@
-/* NetHack 3.7	were.c	$NHDT-Date: 1717570494 2024/06/05 06:54:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.36 $ */
+/* NetHack 5.0	were.c	$NHDT-Date: 1766588485 2025/12/24 07:01:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.41 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -84,6 +84,7 @@ were_beastie(int pm)
     case PM_WOLF:
     case PM_WARG:
     case PM_WINTER_WOLF:
+    case PM_WINTER_WOLF_CUB:
         return PM_WEREWOLF;
     default:
         break;
@@ -201,6 +202,8 @@ you_were(void)
                 an(mons[u.ulycn].pmnames[NEUTRAL] + 4));
         if (!paranoid_query(ParanoidWerechange, qbuf))
             return;
+    } else if (monster_nearby()) {
+        return;
     }
     gw.were_changes++;
     (void) polymon(u.ulycn);
@@ -216,6 +219,7 @@ you_unwere(boolean purify)
         set_ulycn(NON_PM); /* cure lycanthropy */
     }
     if (!Unchanging && is_were(gy.youmonst.data)
+        && !monster_nearby()
         && (!controllable_poly
             || !paranoid_query(ParanoidWerechange, "Remain in beast form?")))
         rehumanize();

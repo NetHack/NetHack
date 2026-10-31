@@ -1,4 +1,4 @@
-/* NetHack 3.7	explode.c	$NHDT-Date: 1736530208 2025/01/10 09:30:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.122 $ */
+/* NetHack 5.0	explode.c	$NHDT-Date: 1736530208 2025/01/10 09:30:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.122 $ */
 /*      Copyright (C) 1990 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -718,10 +718,11 @@ struct scatter_chain {
 
 /* returns number of scattered objects */
 long
-scatter(coordxy sx, coordxy sy,  /* location of objects to scatter */
-        int blastforce,  /* force behind the scattering */
-        unsigned int scflags,
-        struct obj *obj) /* only scatter this obj        */
+scatter(
+    coordxy sx, coordxy sy,  /* location of objects to scatter */
+    int blastforce,          /* force behind the scattering */
+    unsigned int scflags,
+    struct obj *obj)         /* only scatter this obj */
 {
     struct obj *otmp;
     int tmp;
@@ -864,14 +865,15 @@ scatter(coordxy sx, coordxy sy,  /* location of objects to scatter */
                     }
                 } else if (u_at(gb.bhitpos.x, gb.bhitpos.y)) {
                     if (scflags & MAY_HITYOU) {
-                        int hitvalu, hitu;
+                        int dam, hitvalu, hitu;
 
                         if (gm.multi)
                             nomul(0);
+                        dam = dmgval(stmp->obj, &gy.youmonst);
                         hitvalu = 8 + stmp->obj->spe;
                         if (bigmonst(gy.youmonst.data))
                             hitvalu++;
-                        hitu = thitu(hitvalu, dmgval(stmp->obj, &gy.youmonst),
+                        hitu = thitu(hitvalu, Maybe_Half_Phys(dam),
                                      &stmp->obj, (char *) 0);
                         if (!stmp->obj)
                             stmp->stopped = TRUE;

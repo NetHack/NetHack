@@ -1,12 +1,8 @@
-/* NetHack 3.7	optlist.h */
+/* NetHack 5.0	optlist.h */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifndef OPTLIST_H
 #define OPTLIST_H
-
-#ifdef OPTIONS_C
-static int optfn_boolean(int, int, boolean, char *, char *);
-#endif
 
 /*
  *  NOTE:  If you add (or delete) an option, please review:
@@ -15,6 +11,10 @@ static int optfn_boolean(int, int, boolean, char *, char *);
  *         It contains how-to info and outlines some required/suggested
  *         updates that should accompany your change.
  */
+
+#define BACKWARD_COMPAT
+
+extern int optfn_boolean(int, int, boolean, char *, char *);
 
 enum OptType { BoolOpt, CompOpt, OthrOpt };
 enum Y_N { No, Yes };
@@ -45,7 +45,7 @@ struct allopt_t {
     const char *alias;
     const char *descr;
     const char *prefixgw;
-    boolean initval, has_handler, dupdetected;
+    boolean initval, has_handler, dupdetected, disregarded;
 };
 
 #endif /* OPTLIST_H */
@@ -74,16 +74,16 @@ static int optfn_##a(int, int, boolean, char *, char *);
 #elif defined(NHOPT_PARSE)
 #define NHOPTB(a, sec, b, c, s, i, n, v, d, al, bp, termp, desc)             \
     { #a, OptS_##sec, 0, b, opt_##a, s, BoolOpt, n, v, d, No, termp, c,  \
-      bp, &optfn_boolean, al, desc, (const char *) 0, i, 0, 0 },
+      bp, &optfn_boolean, al, desc, (const char *) 0, i, 0, 0 , 0 },
 #define NHOPTC(a, sec, b, c, s, n, v, d, h, al, z) \
     { #a, OptS_##sec, 0, b, opt_##a, s, CompOpt, n, v, d, No, 0, c,  \
-      (boolean *) 0, &optfn_##a, al, z, (const char *) 0, Off, h, 0 },
+      (boolean *) 0, &optfn_##a, al, z, (const char *) 0, Off, h, 0, 0 },
 #define NHOPTP(a, sec, b, c, s, n, v, d, h, al, z) \
     { #a, OptS_##sec, 0, b, pfx_##a, s, CompOpt, n, v, d, Yes, 0, c, \
-      (boolean *) 0, &pfxfn_##a, al, z, #a, Off, h, 0 },
+      (boolean *) 0, &pfxfn_##a, al, z, #a, Off, h, 0, 0 },
 #define NHOPTO(m, sec, a, b, c, s, n, v, d, al, z) \
     { m, OptS_##sec, 0, b, opt_##a, s, OthrOpt, n, v, d, No, 0, c,   \
-      (boolean *) 0, &optfn_##a, al, z, (const char *) 0, On, On, 0 },
+      (boolean *) 0, &optfn_##a, al, z, (const char *) 0, On, On, 0, 0 },
 
 /* this is not reliable because TILES_IN_GLYPHMAP might be defined
  * in a multi-interface binary but not apply to the current interface */
@@ -164,11 +164,14 @@ static int optfn_##a(int, int, boolean, char *, char *);
            Off, Yes, No, No, NoAlias, (boolean *) 0, Term_False,
            (char *)0)
 #endif
+    NHOPTB(armorstatus, Advanced, 0, opt_in, set_in_game,
+                Off, Yes, No, No, NoAlias, &flags.armorstatus, Term_False,
+                "summarize currently worn armor in a status field")
     NHOPTB(ascii_map, Advanced, 0, opt_in, set_in_game,
                 ascii_map_Def, Yes, No, No, NoAlias, &iflags.wc_ascii_map,
-           Term_False, "show map as text")
-    NHOPTO("autocompletions", Advanced, o_autocomplete, BUFSZ, opt_in, set_in_game,
-                No, Yes, No, NoAlias, "edit autocompletions")
+                Term_False, "show map as text")
+    NHOPTO("autocompletions", Advanced, o_autocomplete, BUFSZ, opt_in,
+                set_in_game, No, Yes, No, NoAlias, "edit autocompletions")
     NHOPTB(autodescribe, Advanced, 0, opt_out, set_in_game,
            On, Yes, No, No, NoAlias, &iflags.autodescribe, Term_False,
            "describe terrain under cursor")
@@ -354,7 +357,7 @@ static int optfn_##a(int, int, boolean, char *, char *);
     NHOPTB(herecmd_menu, Advanced, 0, opt_in, set_in_game,
            Off, Yes, No, No, NoAlias, &iflags.herecmd_menu, Term_False,
            "show commands available in this location")
-#if defined(MAC)
+#if defined(MACOS9)
     NHOPTC(hicolor, Advanced, 15, opt_in, set_in_config,
                 No, Yes, No, No, NoAlias,
                 "same as palette, only order is reversed")
@@ -384,7 +387,10 @@ static int optfn_##a(int, int, boolean, char *, char *);
                 Yes, Yes, No, No, NoAlias,
                 "load IBMGraphics display symbols into symset")
 #endif
-#ifndef MAC
+    NHOPTB(idlecheckpoint, Advanced, 0, opt_in, set_in_game,
+           Off, Yes, No, No, NoAlias, &iflags.idlecheckpoint, Term_Off,
+           "update checkpoint file if input is idle for 10 seconds")
+#ifndef MACOS9
     NHOPTB(ignintr, Advanced, 0, opt_in, set_in_game,
            Off, Yes, No, No, NoAlias, &flags.ignintr, Term_False,
            "ignore interrupt signals")
@@ -536,7 +542,7 @@ static int optfn_##a(int, int, boolean, char *, char *);
                 No, Yes, No, No, NoAlias,
                 "the inventory order of the items in your pack")
 #ifdef CHANGE_COLOR
-#ifndef MAC     /* not old Mac OS9 */
+#ifndef MACOS9     /* not old Mac OS9 */
     NHOPTC(palette, Advanced, 15, opt_in, set_gameview,
                 No, Yes, Yes, No, "hicolor",
                 "palette (adjust an RGB color in palette (color/R-G-B)")
@@ -589,6 +595,9 @@ static int optfn_##a(int, int, boolean, char *, char *);
     NHOPTB(preload_tiles, Advanced, 0, opt_out, set_in_config, /* MSDOS only */
            On, Yes, No, No, NoAlias, &iflags.wc_preload_tiles, Term_False,
            (char *)0)
+    NHOPTB(price_quotes, General, 0, opt_in, set_in_game,
+           Off, Yes, No, No, NoAlias, &iflags.pricequotes, Term_False,
+           "display prices you have seen for unidentified objects")
     NHOPTB(pushweapon, Behavior, 0, opt_in, set_in_game,
            Off, Yes, No, No, NoAlias, &flags.pushweapon, Term_False,
            "previous weapon goes to secondary slot")
@@ -608,6 +617,9 @@ static int optfn_##a(int, int, boolean, char *, char *);
            Off, No, No, No, NoAlias, (boolean *) 0, Term_False,
            (char *)0)
 #endif
+    NHOPTB(reroll, Advanced, 0, opt_in, set_in_config,
+           Off, Yes, No, No, NoAlias, &u.uroleplay.reroll, Term_False,
+           "allow rerolling of starting inventory and items")
     NHOPTB(rest_on_space, Advanced, 0, opt_in, set_in_game, Off,
            Yes, No, No, NoAlias, &flags.rest_on_space, Term_False,
            "space bar is bound to the rest-command")
@@ -735,6 +747,9 @@ static int optfn_##a(int, int, boolean, char *, char *);
                 No, Yes, No, No, "termcolumns", "number of columns")
     NHOPTC(term_rows, Advanced, 6, opt_in, set_in_config,
                 No, Yes, No, No, NoAlias, "number of rows")
+    NHOPTB(terrainstatus, Advanced, 0, opt_in, set_in_game,
+                Off, Yes, No, No, NoAlias, &flags.terrainstatus, Term_False,
+                "show hero's location as a status field")
     NHOPTC(tile_file, Advanced, 70, opt_in, set_gameview,
                 No, Yes, No, No, NoAlias, "name of tile file")
     NHOPTC(tile_height, Advanced, 20, opt_in, set_gameview,
@@ -847,6 +862,9 @@ static int optfn_##a(int, int, boolean, char *, char *);
 #endif
     NHOPTC(warnings, Advanced, 10, opt_in, set_in_config,
                 No, Yes, No, No, NoAlias, "display characters for warnings")
+    NHOPTB(weaponstatus, Advanced, 0, opt_in, set_in_game,
+                Off, Yes, No, No, NoAlias, &flags.weaponstatus, Term_False,
+                "show currently wielded weapon in a status field")
     NHOPTC(whatis_coord, Advanced, 1, opt_in, set_in_game,
                 Yes, Yes, No, Yes, NoAlias,
                 "show coordinates when auto-describing cursor position")

@@ -1,4 +1,4 @@
-/* NetHack 3.7	winmenu.c	$NHDT-Date: 1644531504 2022/02/10 22:18:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.50 $ */
+/* NetHack 5.0	winmenu.c	$NHDT-Date: 1644531504 2022/02/10 22:18:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.50 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 

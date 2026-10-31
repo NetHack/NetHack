@@ -61,6 +61,7 @@ Set debugging flags.
 | mongen           | boolean | Do monsters generate
 | hunger           | boolean | Does hero's hunger-state increase
 | overwrite_stairs | boolean | Allow special-file commands overwrite the stairs
+| prevent_pline    | boolean | Prevent messages going out to the UI
 |===
 
 Example:
@@ -99,7 +100,7 @@ Only available if NetHack was compiled with DUMPLOG.
 | %T | current time, timestamp
 | %d | game start, YYYYMMDDhhmmss
 | %D | current time, YYYYMMDDhhmmss
-| %v | game version, eg. '3.7.0-0'
+| %v | game version, eg. '5.0.0-0'
 | %u | UID
 | %n | player name
 | %N | first character of player name
@@ -118,6 +119,15 @@ command name, if it is not bound to any key.
 Example:
 
  local k = nh.eckey("help");
+
+
+=== flip_level
+
+Flip the level horizontally or vertically.
+
+Example:
+
+ nh.flip_level(1);
 
 
 === getlin
@@ -248,6 +258,26 @@ Construct a gerund (a verb formed by appending "ing" to a noun).
 Example:
 
  local str = nh.ing_suffix("foo");
+
+
+=== int_to_objname
+
+Convert integer value to object name and class.
+Returns two strings, the object base name and the class character.
+The returned strings may be empty if an error occurred.
+
+Example:
+
+ local oname, oclass = nh.int_to_objname(45);
+
+
+=== int_to_pmname
+
+Convert integer value to monster type name.
+
+Example:
+
+ local pmname = nh.int_to_pmname(12);
 
 
 === is_genocided
@@ -789,6 +819,7 @@ The hash parameter accepts the following keys:
 | stunned        | boolean |
 | confused       | boolean |
 | waiting        | boolean | monster will wait until hero gets next to it
+| m_lev_adj      | integer | monster's level adjustment
 | tail           | boolean | generate worm without a tail?
 | group          | boolean | generate a group of monsters?
 | adjacentok     | boolean | is adjacent location ok, if given one is not suitable?
@@ -832,7 +863,7 @@ Example:
 
 === object
 
-Create an object. Returns the object as an <<Obj>> class.
+Create an object and place it somewhere on the map. Returns the object as an <<Obj>> class.
 The table parameter accepts the following:
 
 [options="header"]
@@ -856,8 +887,8 @@ The table parameter accepts the following:
 | greased     | boolean  | Is the object greased?
 | broken      | boolean  | Is the object broken?
 | achievement | boolean  | Is there an achievement attached to the object?
-| x, y        | int      | Coordinates on the level
-| coord       | table    | x,y coordinates in table format
+| x, y        | int      | Coordinates on the level; defaults to a random location.
+| coord       | table    | x,y coordinates in table format; defaults to a random location.
 | montype     | string   | Monster id or class
 | historic    | boolean  | Is statue historic?
 | male        | boolean  | Is statue male?
@@ -1136,6 +1167,16 @@ Example:
  local sel2 = selection.clone(sel);
 
 
+=== describe_size
+
+Return a text describing the size of the selection.
+
+Example:
+
+ local sel = selection.fillrect(1,1, 3,3);
+ local txt = sel:describe_size();
+
+
 === ellipse
 
 Example:
@@ -1352,11 +1393,13 @@ Handling objects via obj-class.
 
 === new
 
-Create a new object via wishing routine.
+Create a new object, either via wishing routine, or specifying object name and class.
+Unlike des.object, does not place the object anywhere.
 
 Example:
 
  local o = obj.new("rock");
+ local o = obj.new({ id = "invisibility", class = "!" });
 
 
 === isnull
@@ -1545,6 +1588,11 @@ These constants are in the `nhc` table.
 |===
 | COLNO | Number of map columns
 | ROWNO | Number of map rows
+| NUMMONS | Number of different monster types
+| LOW_PM  | First monster type id. See <<_int_to_pmname>>.
+| HIGH_PM | Last monster type id. See <<_int_to_pmname>>.
+| FIRST_OBJECT | First object type id. See <<_int_to_objname>>.
+| LAST_OBJECT | Number of object type ids. See <<_int_to_objname>>.
 | DLB   | 1 or 0, depending if NetHack is compiled with DLB
 |===
 

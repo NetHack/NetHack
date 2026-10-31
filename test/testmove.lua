@@ -3,14 +3,14 @@
 
 nh.parse_config("OPTIONS=number_pad:0");
 nh.parse_config("OPTIONS=runmode:teleport");
+nh.parse_config("OPTIONS=!timed_delay");
 
 local POS = { x = 10, y = 05 };
 local number_pad = 0;
 
 function initlev()
-   nh.debug_flags({mongen = false, hunger = false, overwrite_stairs = true });
-   des.level_flags("noflip");
    des.reset_level();
+   des.level_flags("noflip");
    des.level_init({ style = "solidfill", fg = ".", lit = true });
    des.teleport_region({ region = {POS.x,POS.y,POS.x,POS.y}, region_islev = true, dir="both" });
    des.finalize_level();
@@ -140,6 +140,7 @@ local basicmoves = {
 };
 
 
+nh.debug_flags({mongen = false, hunger = false, overwrite_stairs = true, disable_pline = true });
 
 for k, v in pairs(basicmoves) do
    initlev();
@@ -179,3 +180,4 @@ for k, v in pairs(basicmoves) do
 end
 
 initlev();
+nh.debug_flags({ disable_pline = false });

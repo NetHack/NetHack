@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.598 $ $NHDT-Date: 1745139202 2025/04/20 00:53:22 $
+.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.614 $ $NHDT-Date: 1770881338 2026/02/11 23:28:58 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\"+--
@@ -31,8 +31,21 @@
 .lt 70n
 .\}
 .
-.so tmac.nh \" extra macros which aren't in tmac.n
-.if !\n(nH .so doc/tmac.nh
+.\" Load extra macros that "tmac.n" doesn't define.
+.de So
+.ie \n(.g&(\n(.x=1)&(\n(.y>22) .soquiet \\$1
+.el                            .so      \\$1
+..
+.
+.So tmac.nh
+.if !\n(nH So doc/tmac.nh
+.
+.if !\n(nH \{\
+.tm fatal error: cannot locate "tmac.nh" macro package
+.ab
+.\}
+.
+.rm So
 .
 .\" building Guidebook.txt doesn't have CR font available; groff 1.23 issues
 .\" a warning each time any font can't be loaded; earlier versions silently
@@ -43,11 +56,11 @@
 .ds h0 NetHack Guidebook
 .ds h1 \" empty
 .ds h2 %
-.ds vr NetHack 3.7.0
+.ds vr NetHack 5.0.0
 .ds f0 \*(vr
 .ds f1 \" empty
 .\"DO NOT REMOVE NH_DATESUB .ds f2 Date(%B %-d, %Y)
-.ds f2 October 24, 2025
+.ds f2 May 2, 2026
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -131,7 +144,8 @@ will vary with your background and training:
 .pg
 \fIArcheologists\fP understand dungeons pretty well; this enables them
 to move quickly and sneak up on the local nasties.  They start equipped
-with the tools for a proper scientific expedition.
+with the tools for a proper scientific expedition, and are able to read
+ancient languages.
 .pg
 \fIBarbarians\fP are warriors out of the hinterland, hardened to battle.
 They begin their quests with naught but uncommon strength, a trusty hauberk,
@@ -1020,9 +1034,16 @@ choices but will accept an item of armor and attempt to take it off.)
 .lp \(haT
 Teleport, if you have the ability.
 .lp v
-Display version number.
+Display a list of significant events in the current game, also shown by
+\f(CR#chronicle\fP.
+.lp ""
+\(oq\f(CRv\fP\(cq used to display the game's version number.
+Use \(oq\f(CRV\fP\(cq for that now.
 .lp V
-Display the game history.
+Display version number.
+.lp ""
+\(oq\f(CRV\fP\(cq used to display a summary of the game's history.
+Still available via \f(CR#history\fP.
 .lp w
 Wield weapon.
 .sd
@@ -1233,6 +1254,9 @@ Autocompletes.
 Default key is \(oqM-A\(cq, and also \(oq\(haN\(cq if
 .op number_pad
 is on.
+.lp ""
+Preceding #annotate with the \(oqm\(cq prefix is the same as
+#overview with the prefix.
 .lp "#apply   "
 Apply (use) a tool such as a pick-axe, a key, or a lamp.
 Default key is \(oqa\(cq.
@@ -1268,6 +1292,7 @@ Talk to someone.
 Default key is \(oqM-c\(cq.
 .lp "#chronicle"
 Show a list of important game events.
+Default key is \(oqv\(cq.
 .lp "#close   "
 Close a door.
 Default key is \(oqc\(cq.
@@ -1367,8 +1392,7 @@ If mouse support is enabled and the
 option is On, clicking on the hero (or steed when mounted) will
 execute this command.
 .lp "#history "
-Show long version and game history.
-Default key is \(oqV\(cq.
+Show a summary of the game's development.
 .lp #inventory
 Show your inventory.
 Default key is \(oqi\(cq.
@@ -1740,6 +1764,18 @@ floor container menu.
 .lp ""
 Autocompletes.
 Default key is \(oqM-T\(cq.
+.lp "#toggle  "
+Toggle a boolean option on or off.
+Requires a parameter in parenthesis, the name of the option to toggle.
+The option must be settable in-game.
+.lp ""
+For example:
+.sd
+.ft CR
+BIND=':toggle(price_quotes)
+BIND=@:toggle(autopickup)
+.ft
+.ed
 .lp "#travel  "
 Travel to a specific location on the map.
 Default key is \(oq_\(cq. \" underscore
@@ -1809,7 +1845,7 @@ Default key is \(oqM-v\(cq.
 .lp #versionshort
 Show the program's version number, plus the date and time that the
 running copy was built from sources (not the version's release date).
-Default key is \(oqv\(cq.
+Default key is \(oqV\(cq.
 .lp "#vision  "
 Show vision array.
 Autocompletes.
@@ -1909,6 +1945,7 @@ Wish for something.
 Autocompletes.
 Debug mode only.
 Default key is \(oq\(haW\(cq.
+Precede this command with the \(oq\f(CRm\fP\(cq prefix to show a wish history menu.
 .lp "#wmode   "
 Show wall modes.
 Autocompletes.
@@ -2581,6 +2618,56 @@ Sometimes the bless or curse state of objects is referred to as their
 or \(lq\f(CRBUCX\fP\(rq for Blessed, Uncursed, Cursed, or unknown.
 (The term \fIbeatitude\fP is occasionally used as well.)
 .hn 2
+Artifacts
+.pg
+Some objects have been imbued with special powers and are known as
+\fBArtifacts\fP.
+They have specific types (such as long sword or orcish dagger) and distinct
+names such as \fIGiantslayer\fP or \fIGrimtooth\fP.
+Artifact weapons typically do more damage than their ordinary counterparts.
+Some do extra damage against all monsters, others only against specific
+types of monsters so aren't better than regular weapons against other types.
+Some confer defensive capabilities when wielded or have other powers that
+aren't listed here.
+.pg
+You might find them simply lying on the floor, including but not limited
+to inside shops, or be granted as a reward for \(lq#offer\(rq on an
+altar to your patron deity.
+A few might be dropped by monsters, or might be converted from an ordinary
+object of the same type via assigning the right name.
+.\" should we mention dipping for Excalibur here?
+Or you might wish for them, if you happen to be granted a wish, but such
+wishes can fail.
+.pg
+Some artifacts have a specific alignment, others don't.
+You won't obtain aligned ones that have a different alignment from yours
+via offering and might get a shock if you attempt to wish for any of those
+or find one and attempt to use it.
+.pg
+Each role has a distinct artifact that is contained in the \fIQuest\fP
+dungeon branch.
+These are commonly known as quest artifacts.
+All are aligned and most are non-weapons.
+They won't be found randomly.
+.pg
+The \(oq\f(CR\\\fP\(cq and \(oq\f(CR\`a\fP\(cq commands will
+list artifacts that you have fully identified (knowing the name and item
+type isn't sufficient).
+.hn 2
+Relics
+.pg
+There are three unique items that are named and have limited special
+powers but aren't classified as artifacts.
+Each is guarded by a particular monster and you'll need to collect all
+three for use late in the game.
+.\" The relics are listed in the same order as the Oracle's message about
+.\" them rather than in the order they need to be used for the invocation.
+They are \fIthe Bell of Opening\fP,
+\fIthe Book of the Dead\fP, and
+\fIthe Candelabrum of Invocation\fP.
+Their corresponding descriptions when not yet identified are
+silver bell, papyrus spellbook, and candelabrum.
+.hn 2
 Weapons (\(oq)\(cq)
 .pg
 Given a chance, most monsters in the Mazes of Menace will gratuitously try to
@@ -2643,6 +2730,12 @@ NetHack.
 Some of the more obscure weapons (such as the \fIaklys\fP,
 \fIlucern hammer\fP, and \fIbec-de-corbin\fP) are defined in an
 appendix to \fIUnearthed Arcana\fP, an AD&D supplement.
+.pg
+Some interfaces support the
+.op weaponstatus
+option.
+When it is enabled, an extra status condition is displayed, describing
+the currently wielded weapon.
 .pg
 The commands to use weapons are \(oqw\(cq (wield), \(oqt\(cq (throw),
 \(oqf\(cq (fire), \(oqQ\(cq (quiver),
@@ -2875,6 +2968,12 @@ The
 option can be set (prior to game start) to attempt to play the entire
 game without wearing any armor (a self-imposed challenge which is
 extremely difficult to accomplish).
+.pg
+Some interfaces support the
+.op armorstatus
+option.
+When it is enabled, an extra status condition is displayed, summarizing
+currently worn armor.
 .pg
 The commands to use armor are \(oqW\(cq (wear) and \(oqT\(cq (take off).
 The \(oqA\(cq command can be used to take off armor as well as other
@@ -3322,6 +3421,14 @@ not penalized for being spoken to by an angry god, priest(ess), or
 other religious figure; a true atheist would hear the words but
 attach no special meaning to them.
 .pg
+A pauper starts the game with no possessions, no spells, and no weapon or
+spell skills (and if playing as a knight, your pony will not have a saddle).
+Can only be initiated by starting a new game with \f(CROPTIONS=pauper\fP
+set in your run-time configurtion file or \f(CRNETHACKOPTIONS\fP environment
+variable.
+Once the game is underway, you can acquire and use items, spells, and skills
+in the usual way.
+.pg
 Most players fight with a wielded weapon (or tool intended to be
 wielded as a weapon).  Another challenge is to win the game without
 using such a wielded weapon.  You are still permitted to throw,
@@ -3478,7 +3585,8 @@ the Castle level's drawbridge or can be given to you via prayer boon.
 and \fIPauper\fP are also conducts, and they can only be
 enabled by setting the correspondingly named option in NETHACKOPTIONS
 or run-time configuration file prior to game start.
-In the case of \fIBlind\fP and \fIDeaf\fP, the option also enforces the conduct.
+In the case of \fIBlind\fP and \fIDeaf\fP, the option also enforces the
+conduct.
 They aren't really significant accomplishments unless/until you make
 substantial progress into the dungeon.
 .
@@ -3536,7 +3644,7 @@ is a section marker (the closing \(oq\f(CR]\fP\(cq can be followed
 by whitespace and then an arbitrary comment beginning with \(oq\f(CR#\fP\(cq).
 The text between the square brackets is the section name.
 Section markers are only valid after a CHOOSE directive and their names
-are case insensitive.
+are case-insensitive.
 Lines after a section marker belong to that section up until another
 section starts or a marker without a name is encountered or the file ends.
 Lines within sections are ignored unless a CHOOSE directive has selected
@@ -3645,7 +3753,7 @@ Otherwise the last section extends to the end of the options file.
 Highlight menu lines with different colors.
 See the \(lqConfiguring Menu Colors\(rq section.
 .lp MSGTYPE
-Change the way messages are shown in the top status line.
+Change the way messages are shown in the top line.
 See the \(lqConfiguring Message Types\(rq section.
 .lp ROGUESYMBOLS
 Custom symbols for the rogue level's symbol set.
@@ -3671,6 +3779,7 @@ Debug mode only:  extra items to add to initial inventory.
 Value is the name of a text file containing a list of item names,
 one per line, up to a maximum of 128 lines.
 Each line is processed by the function that handles wishing.
+Entries are added to the wish history; see the wizwish-command.
 .lp ""
 Example:
 .sd
@@ -3793,6 +3902,21 @@ If \f(CRalign\fP is not specified, there is no default value;
 player will be prompted unless role and/or race forces a choice for alignment.
 Cannot be set with the \(oq\f(CRO\fP\(cq command.
 Persistent.
+.lp armorstatus
+Display an extra status condition which summarizes currently worn armor
+(default off, not supported by all interfaces).
+.lp ""
+For the usual case where more than one piece of armor is worn, a list of
+letters is shown in the following order:
+.sd
+\f(CRG\fP - gloves;
+\f(CRC\fP - cloak;
+\f(CRA\fP - suit;
+\f(CRU\fP - shirt;
+\f(CRH\fP - helmet;
+\f(CRB\fP - boots;
+\f(CRS\fP - shield.
+.ed
 .lp autodescribe
 Automatically describe the terrain under cursor when asked to get a location
 on the map (default true).
@@ -3816,7 +3940,7 @@ and also
 .op autopickup_exception
 for ways to refine the behavior.
 .lp ""
-Note: prior to version 3.7.0, the default for
+Note: prior to version 5.0.0, the default for
 .op autopickup
 was \fIon\fP.
 .lp autoquiver
@@ -4410,6 +4534,10 @@ The positive (no \(oq!\(cq) and negative (with \(oq!\(cq) entries
 can be intermixed.
 .lp pauper
 Start the character with no possessions (default false).  Persistent.
+.lp ""
+Also start with no spells or skills, which are tied to starting equipment.
+Does not inhibit acquiring and using items, spells, and skills once play
+has started.
 .lp perm_invent
 If true, always display your current inventory in a window (default false).
 .lp ""
@@ -4528,6 +4656,15 @@ user name (on multi-user systems) or specifying a particular character
 name (on single-user systems) or it might be disabled entirely.  Requesting
 it when not allowed or not possible results in explore mode instead.
 Default is normal play.
+.lp price_quotes
+Whenever the game mentions the name of an object you haven't identified yet,
+it also mentions the range of buy and sell prices you have seen for that
+item (to help narrow down what it could be).
+The price shown is the unit price for one item (even when you are looking at
+a stack of multiple items).
+Many players may want to turn this on while identifying objects, and then
+turn it back off again for general play.
+Default is off.
 .lp pushweapon
 Using the \(oqw\(cq (wield) command when already wielding
 something pushes the old item into your alternate weapon slot (default off).
@@ -4556,6 +4693,16 @@ If \f(CRrace\fP is not specified, there is no default value;
 player will be prompted unless role forces a choice for race.
 Cannot be set with the \(oq\f(CRO\fP\(cq command.
 Persistent.
+.lp reroll
+Allows rerolling your character's starting inventory and attributes (default
+false).  Persistent.
+.lp ""
+Note that rerolling your character is not a recommended way to play if aiming
+merely to win (a lucky start has a much smaller influence on whether or not
+you win the game than your actions later in the game).  This option exists
+partly as an acknowledgement that some players will insist on doing so anyway,
+and partly because rerolling may be necessary for certain types of challenge
+games.
 .lp rest_on_space
 Make the space bar a synonym for the \(oq.\(cq (#wait) command (default off).
 Persistent.
@@ -4660,9 +4807,15 @@ or you are making screenshots or streaming video.
 Using the
 .op statuslines:3
 option is recommended so that there will be more room available for
-status information, unless you're using nethack's \fIQt\fP interface
+status information, unless you're using NetHack's \fIQt\fP interface
 or your terminal emulator window displays fewer than 25 lines.
 Persistent.
+.lp ""
+The
+.op versinfo
+option provides limited control over what information
+.op showvers
+displays.
 .lp "silent  "
 Suppress terminal beeps (default on).
 Persistent.
@@ -4764,6 +4917,9 @@ and prior versions (for example \(lqsuppress_alert:3.3.1\(rq).
 This option may be used to select one of the named symbol sets found within
 \(lqsymbols\(rq to alter the symbols displayed on the screen.
 Use \(lqsymset:default\(rq to explicitly select the default symbols.
+.lp terrainstatus
+Display an extra status condition describing the spot beneath the hero's
+feet (default off, not supported by all interfaces).
 .lp "time    "
 Show the elapsed game time in turns on bottom line (default off).
 Persistent.
@@ -4800,6 +4956,20 @@ Play a tutorial level at the start of the game.
 Setting this option on or off in the config file will skip the query.
 .lp "verbose "
 Provide more commentary during the game (default on).  Persistent.
+.lp versinfo
+Controls what the
+.op showvers
+option displays on the status lines.
+.lp weaponstatus
+Display an extra status condition which describes currently wielded weapon
+(default off, not supported by all interfaces).
+.lp ""
+Some possible displayed values are:
+.sd
+\f(CRbare-hnds\fP - no weapon and no gloves;
+\f(CRempty-hnd\fP - no weapon but gloves are worn;
+\f(CRdual-weps\fP - wielding two weapons.
+.ed
 .lp whatis_coord
 When using the \(oq/\(cq or \(oq;\(cq commands to look around on the map with
 .op autodescribe
@@ -5517,7 +5687,7 @@ An entry that maps a sound file to a user-specified message pattern.
 Each SOUND entry is broken down into the following parts:
 .PS "sound index"
 .PL MESG
-message window mapping (the only one supported in 3.7.0);
+message window mapping (the only one supported in 5.0.0);
 .PL msgtype
 optional; message type to use, see \(lqConfiguring Message Types\(rq
 .PL pattern
@@ -5553,7 +5723,9 @@ change the color or appearance of fields in the status display.
 .pg
 The format for defining status colors is:
 .SD n
-\f(CROPTION=hilite_status:\fIfield-name\fP/\fIbehavior\fP/\fIcolor\fP&\fIattributes\fP\fP
+.\" was "\f(CR...\fI...\fP\fP" but font changes don't nest so final \fP didn't
+.\" restore the pre-\f(CR font; assume that was Roman and explicitly use \fR
+\f(CROPTION=hilite_status:\fIfield-name\fP/\fIbehavior\fP/\fIcolor\fP&\fIattributes\fP\fR
 .ED
 .pg
 For example, the following line in your configuration file will cause
@@ -5977,7 +6149,7 @@ If your platform or terminal supports the display of UTF-8 character
 sequences, you can customize your game display by assigning Unicode
 codepoint values and \fIred-green-blue\fP colors to glyph
 representations. The customizations can be specified for use with a symset that
-has a UTF8 handler within the symbols file such as the enhanced1 set, or 
+has a UTF8 handler within the symbols file such as the enhanced1 set, or
 individually within your nethack.rc file.
 .pg
 The format for defining a glyph representation is:
@@ -5998,7 +6170,7 @@ U+224B and the color represented by R-G-B value 0-0-160:
 OPTIONS=glyph:G_pool/U+224B/0-0-160
 .ft
 .ED
-The list of acceptable glyphid's can be produced by 
+The list of acceptable glyphid's can be produced by
 \fBnethack \-\-dumpglyphids\fP.
 Individual NetHack glyphs can be specified using the G_ prefix,
 or you can use an S_ symbol for a glyphid and store the custom
@@ -6171,7 +6343,7 @@ Allows the following placeholders:
 .PL \f(CR%%\fP
 literal \(oq\f(CR%\fP\(cq
 .PL \f(CR%v\fP
-version (eg. \(lq\f(CR3.7.0\-0\fP\(rq)
+version (eg. \(lq\f(CR5.0.0\-0\fP\(rq)
 .PL \f(CR%u\fP
 game UID
 .PL \f(CR%t\fP
@@ -6622,6 +6794,73 @@ some bug fixes.
 NetHack 3.6.7 was released on February 16, 2023 containing a security fix and
 some bug fixes.
 .pg
+Development work for the major release to follow NetHack 3.6 began in 2015
+around the same time as NetHack 3.6.0 was being released. That development
+work continued in parallel to each of the NetHack 3.6 releases from 2015
+through 2023, and continued until the end of April 2026.  For the first time,
+that development was shared publicly on GitHub and SourceForge as it occurred.
+It was done under the label NetHack-3.7 work-in-progress (WIP), although the
+version number for the next release had not yet been solidified.
+.pg
+Exposure of the development to the public brought many good things, and some
+challenges. People were able to observe and criticize changes and new features
+almost immediately, and they often did. The GitHub pull request system made
+it straightforward for people to contribute directly to development.
+Contributions resolved many, many bugs in the game and we thank all the
+contributors.
+.pg
+In early 2026, with the game development getting stable enough to consider
+initiating an official release, the devteam reviewed the nature and number of
+changes in the game. It was clear that there was sufficient depth and
+breadth to warrant a major release and version 5.0 was decided on.
+That's a new major release over 3.x, without opening up any ambiguity
+or confusion with existing variants that there might have been had it
+been released as version 4.0.
+.pg
+NetHack 5.0.0 was released on May 2, 2026.
+.pg
+The source code for NetHack 5.0.0 was modified and modernized to be
+compliant with the C99 standard. The 5.0.0 release contained over 3100 fixes,
+changes, and updated features.
+.pg
+NetHack 5.0 was the first version to replace the lex and yacc level
+and dungeon compilers of past versions, with a new Lua interpreter-based
+approach to provide those elements. Lua is also used for the quest texts
+in NetHack 5.0.0. The entire development team acknowledges the work
+done by \fBPasi Kallinen\fP to make that happen.
+.pg
+At the time of the NetHack 5.0 release, the core development team,
+active and erstwhile, included \fBWarwick Allison\fP, \fBMichael Allison\fP,
+\fBKen Arromdee\fP, \fBDavid Cohrs\fP, \fBJessie Collet\fP, \fBBart House\fP,
+\fBKevin Hugo\fP, \fBPasi Kallinen\fP, \fBKen Lorber\fP, \fBDean Luick\fP,
+\fBPat Rankin\fP, \fBDerek S. Ray\fP, \fBAlex Smith\fP, \fBPatric Mueller\fP,
+\fBMike Stephenson\fP, \fBJanet Walz\fP, \fBPaul Winner\fP.
+.pg
+\fBKen Lorber\fP, \fBPat Rankin\fP, \fBPatrick Mueller\fP and
+\fBMichael Allison\fP helped ensure that NetHack 5.0 would run
+on macOS.
+.pg
+\fBIngo Paschke\fP somehow managed to revive a NetHack 5.0 port for the Amiga,
+using a cross-compiler on a modern platform to do so. His work was shared so
+others can straightforwardly produce NetHack 5.0 for the Amiga thanks to his
+efforts.
+.pg
+\fBRay Chason\fP contributed the majority of maintenance work for the
+NetHack 5.0 MS-DOS port, including porting the curses interface to it.
+\fBMichael Allison\fP ensured that NetHack 5.0 core changes continued to
+work with the msdos port and keep it alive.  Cross-compiling the MS-DOS
+port has helped make that possible and mostly painless.
+.pg
+People that contributed to the Windows port of NetHack 5.0 since the
+development of NetHack 5.0 begain over eleven years ago, included
+\fBMichael Allison\fP, \fBDavid Cohrs\fP, \fBBart House\fP,
+\fBPasi Kallinen\fP, \fBAlex Kompel\fP, \fBDion Nicolaas\fP,
+\fBDerek S. Ray\fP and \fBYitzhak Sapir\fP.
+.pg
+With sadness, the devteam would like to acknowledge and remember the past
+contributions from the late \fBRon Van Iwaarden\fP, who was the sole maintainer
+of NetHack for OS/2 for several past NetHack releases. Ron will be missed.
+.pg
 The official NetHack web site is maintained by \fBKen Lorber\fP
 at
 .UR https://www.nethack.org/ .
@@ -6656,48 +6895,49 @@ miscreants in this, the list of Dungeoneers:
 center;
 c2 c2 c.
 .\"TABLE_START
-Adam Aronow	J. Ali Harlow	Mikko Juola
-Alex Kompel	Janet Walz	Nathan Eady
-Alex Smith	Janne Salmijarvi	Norm Meluch
-Andreas Dorn	Jean-Christophe Collet	Olaf Seibert
-Andy Church	Jeff Bailey	Pasi Kallinen
-Andy Swanson	Jochen Erwied	Pat Rankin
-Andy Thomson	John Kallen	Patric Mueller
-Ari Huttunen	John Rupley	Paul Winner
-Bart House	John S. Bien	Pierre Martineau
-Benson I. Margulies	Johnny Lee	Ralf Brown
-Bill Dyer	Jon W{tte	Ray Chason
-Boudewijn Waijers	Jonathan Handler	Richard Addison
-Bruce Cox	Joshua Delahunty	Richard Beigel
-Bruce Holloway	Karl Garrison	Richard P. Hughey
-Bruce Mewborne	Keizo Yamamoto	Rob Menke
-Carl Schelin	Keith Simpson	Robin Bandy
-Chris Russo	Ken Arnold	Robin Johnson
-David Cohrs	Ken Arromdee	Roderick Schertler
-David Damerell	Ken Lorber	Roland McGrath
-David Gentzel	Ken Washikita	Ron Van Iwaarden
-David Hairston	Kevin Darcy	Ronnen Miller
-Dean Luick	Kevin Hugo	Ross Brown
-Del Lamb	Kevin Sitze	Sascha Wostmann
-Derek S. Ray	Kevin Smolkowski	Scott Bigham
-Deron Meranda	Kevin Sweet	Scott R. Turner
-Dion Nicolaas	Lars Huttar	Sean Hunt
-Dylan O'Donnell	Leon Arnott	Stephen Spackman
-Eric Backus	M. Drew Streib	Stefan Thielscher
-Eric Hendrickson	Malcolm Ryan	Stephen White
-Eric R. Smith	Mark Gooderum	Steve Creps
-Eric S. Raymond	Mark Modrall	Steve Linhart
-Erik Andersen	Marvin Bressler	Steve VanDevender
-Fredrik Ljungdahl	Matthew Day	Teemu Suikki
-Frederick Roeber	Merlyn LeRoy	Tim Lennan
-Gil Neiger	Michael Allison	Timo Hakulinen
-Greg Laskin	Michael Feir	Tom Almy
-Greg Olson	Michael Hamel	Tom West
-Gregg Wonderly	Michael Sokolov	Warren Cheung
-Hao-yang Wang	Mike Engber	Warwick Allison
-Helge Hafting	Mike Gallop	Yitzhak Sapir
-Irina Rempt-Drijfhout	Mike Passaretti
-Izchak Miller	Mike Stephenson
+Adam Aronow	Irina Rempt-Drijfhout	Mike Gallop
+Alex Kompel	Izchak Miller	Mike Passaretti
+Alex Smith	J. Ali Harlow	Mike Stephenson
+Andreas Dorn	Janet Walz	Mikko Juola
+Andy Church	Janne Salmijarvi	Nathan Eady
+Andy Swanson	Jean-Christophe Collet	Norm Meluch
+Andy Thomson	Jeff Bailey	Olaf Seibert
+Ari Huttunen	Jochen Erwied	Pasi Kallinen
+Bart House	John Kallen	Pat Rankin
+Benson I. Margulies	John Rupley	Patric Mueller
+Bill Dyer	John S. Bien	Paul Winner
+Boudewijn Waijers	Johnny Lee	Pierre Martineau
+Bruce Cox	Jon W{tte	Ralf Brown
+Bruce Holloway	Jonathan Handler	Ray Chason
+Bruce Mewborne	Joshua Delahunty	Richard Addison
+Cameron Root	Karl Garrison	Richard Beigel
+Carl Schelin	Keizo Yamamoto	Richard P. Hughey
+Chris Russo	Keith Simpson	Rob Menke
+David Cohrs	Ken Arnold	Robin Bandy
+David Damerell	Ken Arromdee	Robin Johnson
+David Gentzel	Ken Lorber	Roderick Schertler
+David Hairston	Ken Washikita	Roland McGrath
+Dean Luick	Kestrel Gregorich-Trevor	Ron Van Iwaarden
+Del Lamb	Kevin Darcy	Ronnen Miller
+Derek S. Ray	Kevin Hugo	Ross Brown
+Deron Meranda	Kevin Sitze	Sascha Wostmann
+Dion Nicolaas	Kevin Smolkowski	Scott Bigham
+Dylan O'Donnell	Kevin Sweet	Scott R. Turner
+Eric Backus	Lars Huttar	Sean Hunt
+Eric Hendrickson	Leon Arnott	Stephen Spackman
+Eric R. Smith	M. Drew Streib	Stefan Thielscher
+Eric S. Raymond	Malcolm Ryan	Stephen White
+Erik Andersen	Mark Gooderum	Steve Creps
+Fredrik Ljungdahl	Mark Modrall	Steve Linhart
+Frederick Roeber	Marvin Bressler	Steve VanDevender
+G. Branden Robinson	Matthew Day	Teemu Suikki
+Gil Neiger	Merlyn LeRoy	Tim Lennan
+Greg Laskin	Michael Allison	Timo Hakulinen
+Greg Olson	Michael Feir	Tom Almy
+Gregg Wonderly	Michael Hamel	Tom West
+Hao-yang Wang	Michael Meyer	Warren Cheung
+Helge Hafting	Michael Sokolov	Warwick Allison
+Ingo Paschke	Mike Engber	Yitzhak Sapir
 .\"TABLE_END  Do not delete this line.
 .TE
 .BR 1

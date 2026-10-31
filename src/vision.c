@@ -1,4 +1,4 @@
-/* NetHack 3.7	vision.c	$NHDT-Date: 1724939600 2024/08/29 13:53:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.70 $ */
+/* NetHack 5.0	vision.c	$NHDT-Date: 1777205478 2026/04/26 04:11:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.75 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Dave Cohrs, 1990. */
 /* NetHack may be freely redistributed.  See license for details.       */
 
@@ -58,7 +58,7 @@ const coordxy circle_start[] = {
     /* 4*/ 10,
     /* 5*/ 15,
     /* 6*/ 21,
-    /* 7*/ 38,
+    /* 7*/ 28,
     /* 8*/ 36,
     /* 9*/ 45,
     /*10*/ 55,
@@ -399,7 +399,7 @@ staticfn int new_angle(struct rm *, unsigned char *, int, int);
  * this is good enough.
  *
  *      + When this function is called we don't have all of the seen
- *        information (we're doing a top down scan in vision_recalc).
+ *        information (we're doing a top-down scan in vision_recalc).
  *        We would need to scan once to set all IN_SIGHT and COULD_SEE
  *        bits, then again to correctly set the seenv bits.
  *      + I'm trying to make this as cheap as possible.  The display
@@ -561,7 +561,7 @@ vision_recalc(int control)
 
         /*
          * Our own version of the update loop below.  We know we can't see
-         * anything, so we only need update positions we used to be able
+         * anything, so we only need to update positions we used to be able
          * to see.
          */
         temp_array = gv.viz_array; /* set gv.viz_array so newsym() will work */
@@ -588,7 +588,7 @@ vision_recalc(int control)
 
         if (Underwater && !Is_waterlevel(&u.uz)) {
             /*
-             * The hero is under water.  Only see surrounding locations if
+             * The hero is underwater.  Only see surrounding locations if
              * they are also underwater.  This overrides night vision but
              * does not override x-ray vision.
              */
@@ -714,7 +714,7 @@ vision_recalc(int control)
      *      + Set the IN_SIGHT bit for places that we could see and are lit.
      *      + Reset changed places.
      *
-     * There is one thing that make deciding what the hero can see
+     * There is one thing that makes deciding what the hero can see
      * difficult:
      *
      *  1.  Directional lighting.  Items that block light create problems.
@@ -761,10 +761,9 @@ vision_recalc(int control)
                      || IS_WALL(lev->typ)) && !viz_clear[row][col]) {
                     /*
                      * Make sure doors, walls, boulders or mimics don't show
-                     * up
-                     * at the end of dark hallways.  We do this by checking
+                     * up at the end of dark hallways.  We do this by checking
                      * the adjacent position.  If it is lit, then we can see
-                     * the door or wall, otherwise we can't.
+                     * the door or wall; otherwise we can't.
                      */
                     dx = u.ux - col;
                     dx = sign(dx);
@@ -823,7 +822,18 @@ vision_recalc(int control)
                 if ((old_row[col] & IN_SIGHT)
                     || ((next_row[col] & COULD_SEE)
                         ^ (old_row[col] & COULD_SEE)))
+                {
+                    /*
+                     * TEMPORARY?  Sometimes we get here with col==0 and
+                     * newsym()'s impossible() for !isok() is being
+                     * triggered, so avoid calling it for <0,y>; other bad
+                     * coordinates will produce a panic() as they should.
+                     */
+                    if (col != 0)
+                    /*
+                     */
                     newsym(col, row);
+                }
             }
 
         } /* end for col . . */
@@ -1786,7 +1796,7 @@ right_side(
          *
          * Otherwise, we know we can see the right edge of the current row.
          *
-         * This must be a strict less than so that we can always see a
+         * This must be a strict "less than" so that we can always see a
          * horizontal wall, even if it is adjacent to us.
          */
         if (right_mark < right_edge) {

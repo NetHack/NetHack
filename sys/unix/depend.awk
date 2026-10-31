@@ -1,6 +1,6 @@
 # depend.awk -- awk script used to construct makefile dependencies
 # for nethack's source files (`make depend' support for Makefile.src).
-# $NHDT-Date: 1709577497 2024/03/04 18:38:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.18 $
+# $NHDT-Date: 1709577497 2024/03/04 18:38:17 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.18 $
 #
 # usage:
 #   awk -f depend.awk ../include/*.h list-of-.c/.cpp-files
@@ -54,7 +54,7 @@ FNR == 1	{ output_dep()			#finish previous file
 		  #[3.4.0: gnomehack headers currently aren't in include]
 		  #[3.6.2: Qt4 headers aren't in include either]
 		  #[3.6.2: curses headers likewise]
-		  #[3.7.0: Qt headers have moved; process 'moc' files]
+		  #[NetHack 5.0.0: Qt headers have moved; process 'moc' files]
 		  if (incl ~ /[.]h$/) {
 		    if (incl ~ "curses[.]h")
 		      incl = ""	# skip "curses.h"; it should be <curses.h>

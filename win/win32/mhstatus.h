@@ -1,4 +1,4 @@
-/* NetHack 3.7	mhstatus.h	$NHDT-Date: 1596498361 2020/08/03 23:46:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.15 $ */
+/* NetHack 5.0	mhstatus.h	$NHDT-Date: 1596498361 2020/08/03 23:46:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.15 $ */
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 
