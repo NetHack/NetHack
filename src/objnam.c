@@ -1896,6 +1896,8 @@ meat_noun_word(const char *word)
         return FALSE;
     if (!strcmpi(word, "meat") || !strcmpi(word, "meats"))
         return TRUE;
+    if (!strcmpi(word, "essence") || !strcmpi(word, "essences"))
+        return TRUE;
 #define MEAT_NOUN(sym, w) \
     if (!strcmpi(word, w)) \
         return TRUE; \
@@ -1913,16 +1915,35 @@ meat_noun_word(const char *word)
     return FALSE;
 }
 
-/* Humanoids, humans, and elves leave no meat. Two exceptions, because
-   the game brings the monster back from that body:
-   - Riders (Death, Pestilence, Famine)
-   - Trolls (S_TROLL), which are flagged humanoid */
+/* Spirits leave an essence, not meat. Riders are included. Trolls are not. */
+boolean
+leaves_essence(struct permonst *ptr)
+{
+    if (!ptr)
+        return FALSE;
+    if (is_rider(ptr))
+        return TRUE;
+    switch (ptr->mlet) {
+    case S_GHOST:   /* ghost, shade */
+    case S_WRAITH:  /* wraith, barrow wight, Nazgul */
+    case S_VAMPIRE: /* vampire, vampire lord, Vlad */
+    case S_ZOMBIE:  /* zombies, ghoul, skeleton */
+    case S_MUMMY:
+        return TRUE;
+    default:
+        return FALSE;
+    }
+}
+
+/* Humanoids, humans, and elves leave no meat. Exceptions:
+   - Trolls still leave meat, because they revive from it.
+   - Spirits leave an essence (still a CORPSE internally). */
 boolean
 monster_leaves_meat(struct permonst *ptr)
 {
     if (!ptr)
         return FALSE;
-    if (is_rider(ptr) || ptr->mlet == S_TROLL)
+    if (ptr->mlet == S_TROLL || leaves_essence(ptr))
         return TRUE;
     if (humanoid(ptr) || is_human(ptr) || is_elf(ptr))
         return FALSE;
@@ -2009,6 +2030,23 @@ corpse_xname(
             Strcat(nambuf, mnam);
         else
             Sprintf(eos(nambuf), "%s %s", adjective, mnam);
+    } else if (ismnum(omndx) && leaves_essence(&mons[omndx]) && !omit_corpse) {
+        /* "wraith's essence", "Death's essence". Not raw or cooked. */
+        char possbuf[BUFSZ];
+        const char *word = (otmp->quan > 1L && !ignore_quan)
+                               ? "essences" : "essence";
+
+        /* s_suffix() uses a private static buffer, not an obuf. */
+        Strcpy(possbuf, s_suffix(obj_pmname(otmp)));
+        if (!adjective || !*adjective)
+            Sprintf(eos(nambuf), "%s %s", possbuf, word);
+        else
+            Sprintf(eos(nambuf), "%s%s %s", adjective, possbuf, word);
+        mungspaces(nambuf);
+        if (otmp->quan > 1L && !ignore_quan)
+            any_prefix = FALSE;
+        if (adjective && *adjective && digit(*adjective))
+            any_prefix = FALSE;
     } else {
         const char *prep = (otmp->otyp == CORPSE && otmp->ocooked)
                                ? "cooked" : "raw";
@@ -4526,6 +4564,15 @@ readobjnam_postparse1(struct _readobjnam_data *d)
         if (!strstri(d->bp, "rod ") && !strstri(d->bp, "prophetic book ")
             && !strstri(d->bp, "gauntlets ") && !strstri(d->bp, "gloves ")
             && !strstri(d->bp, "finger ")) {
+            /* "essence of wraith" as well as "wraith's essence" */
+            if ((d->p = strstri(d->bp, "essence of ")) != 0) {
+                d->mntmp = name_to_mon(d->p + sizeof "essence of " - 1,
+                                       &d->mgend);
+                if (d->mntmp >= LOW_PM) {
+                    d->typ = CORPSE;
+                    return 2; /* goto typfnd */
+                }
+            }
             if ((d->p = strstri(d->bp, "tin of ")) != 0) {
                 if (!strcmpi(d->p + 7, "spinach")) {
                     d->contents = TIN_SPINACH;
@@ -4577,7 +4624,7 @@ readobjnam_postparse1(struct _readobjnam_data *d)
                 d->bp = obp;
                 d->mntmp = NON_PM;
             }
-            /* "raw gray dragon steak" / "cooked electric eel fillet" */
+            /* "raw gray dragon steak" / "wraith's essence" */
             if (d->mntmp >= LOW_PM && meat_noun_word(d->bp)) {
                 d->typ = CORPSE;
                 return 2; /* goto typfnd */
@@ -5369,7 +5416,8 @@ readobjnam(char *bp, struct obj *no_wish)
             if (d.cooked_meat)
                 d.otmp->ocooked = 1;
             if ((!(mons[d.mntmp].geno & G_UNIQ) || wizard)
-                && !(svm.mvitals[d.mntmp].mvflags & G_NOCORPSE)) {
+                && (!(svm.mvitals[d.mntmp].mvflags & G_NOCORPSE)
+                    || leaves_essence(&mons[d.mntmp]))) {
                 if (mons[d.mntmp].msound == MS_GUARDIAN)
                     d.mntmp = genus(d.mntmp, 1);
                 set_corpsenm(d.otmp, d.mntmp);

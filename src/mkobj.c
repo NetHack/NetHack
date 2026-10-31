@@ -1421,8 +1421,12 @@ start_corpse_timeout(struct obj *body)
      *      of revive when its REVIVE_MON timer finishes.
      */
 
-    /* lizards and lichen don't rot or revive */
+    /* lizards and lichen don't rot or revive.
+       Essences never rot. Riders still revive from theirs. */
     if (body->corpsenm == PM_LIZARD || body->corpsenm == PM_LICHEN)
+        return;
+    if (leaves_essence(&mons[body->corpsenm])
+        && !is_rider(&mons[body->corpsenm]))
         return;
 
     action = ROT_CORPSE;               /* default action: rot away */
@@ -1782,7 +1786,8 @@ can_bless(struct obj *otmp)
     if (!otmp || otmp->oclass == COIN_CLASS)
         return FALSE;
     if (otmp->otyp == CORPSE && !otmp->ocooked && ismnum(otmp->corpsenm)
-        && !raw_meat_poison_exempt(&mons[otmp->corpsenm]))
+        && !raw_meat_poison_exempt(&mons[otmp->corpsenm])
+        && !leaves_essence(&mons[otmp->corpsenm]))
         return FALSE;
     return TRUE;
 }
@@ -2040,6 +2045,15 @@ weight(struct obj *obj)
                     : ((cwt + 1) / 2); /* uncursed */
 
         return wt + cwt;
+    }
+    if (obj->otyp == CORPSE && ismnum(obj->corpsenm)
+        && leaves_essence(&mons[obj->corpsenm])) {
+        /* A ghost's listed weight is a human body, for statues.
+           The essence itself is light. */
+        wt = 20 * (int) obj->quan;
+        if (obj->oeaten)
+            wt = eaten_stat(wt, obj);
+        return wt;
     }
     if (obj->otyp == CORPSE && ismnum(obj->corpsenm)) {
         long long_wt = obj->quan * (long) mons[obj->corpsenm].cwt;

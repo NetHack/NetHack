@@ -620,15 +620,8 @@ make_corpse(struct monst *mtmp, unsigned int corpseflags)
         goto default_1;
     case PM_VAMPIRE:
     case PM_VAMPIRE_LEADER:
-        /* include mtmp in the mkcorpstat() call */
-        num = undead_to_corpse(mndx);
-        /* That body is human meat. Humanoids leave none. */
-        if (!monster_leaves_meat(&mons[num]))
-            break;
-        corpstatflags |= CORPSTAT_INIT;
-        obj = mkcorpstat(CORPSE, mtmp, &mons[num], x, y, corpstatflags);
-        obj->age -= (TAINT_AGE + 1); /* this is an *OLD* corpse */
-        break;
+        /* Leave the vampire's own essence, not an old racial body. */
+        goto default_1;
     case PM_KOBOLD_MUMMY:
     case PM_DWARF_MUMMY:
     case PM_GNOME_MUMMY:
@@ -645,15 +638,8 @@ make_corpse(struct monst *mtmp, unsigned int corpseflags)
     case PM_HUMAN_ZOMBIE:
     case PM_GIANT_ZOMBIE:
     case PM_ETTIN_ZOMBIE:
-        num = undead_to_corpse(mndx);
-        /* Kobold through ettin: the old body is that race's meat.
-           Humanoids, humans, and elves leave none. */
-        if (!monster_leaves_meat(&mons[num]))
-            break;
-        corpstatflags |= CORPSTAT_INIT;
-        obj = mkcorpstat(CORPSE, mtmp, &mons[num], x, y, corpstatflags);
-        obj->age -= (TAINT_AGE + 1); /* this is an *OLD* corpse */
-        break;
+        /* Leave this undead's own essence, not an old racial body. */
+        goto default_1;
     case PM_IRON_GOLEM:
         num = d(2, 6);
         while (num--)
@@ -903,12 +889,18 @@ make_corpse(struct monst *mtmp, unsigned int corpseflags)
            already dropped above; only the meat is skipped. */
         if (!monster_leaves_meat(mdat))
             return (struct obj *) 0;
-        if (svm.mvitals[mndx].mvflags & G_NOCORPSE) {
+        /* Spirits are often flagged G_NOCORPSE. They still leave an essence. */
+        if ((svm.mvitals[mndx].mvflags & G_NOCORPSE)
+            && !leaves_essence(mdat)) {
             return (struct obj *) 0;
         } else {
             corpstatflags |= CORPSTAT_INIT;
-            /* preserve the unique traits of some creatures */
-            obj = mkcorpstat(CORPSE, KEEPTRAITS(mtmp) ? mtmp : 0,
+            /* preserve the unique traits of some creatures;
+               essences keep the dead monster so undead turning
+               can bring that same one back */
+            obj = mkcorpstat(CORPSE,
+                             (KEEPTRAITS(mtmp) || leaves_essence(mdat))
+                                 ? mtmp : (struct monst *) 0,
                              mdat, x, y, corpstatflags);
             if (burythem) {
                 boolean dealloc;
@@ -3202,7 +3194,7 @@ corpse_chance(
     if (!magr && gm.mswallower && attacktype(gm.mswallower->data, AT_ENGL))
         magr = gm.mswallower, was_swallowed = TRUE; /* for gas spore boom */
 
-    if (mdat == &mons[PM_VLAD_THE_IMPALER] || mdat->mlet == S_LICH) {
+    if (mdat->mlet == S_LICH) {
         if (cansee(mon->mx, mon->my) && !was_swallowed)
             pline_mon(mon, "%s body crumbles into dust.",
                       s_suffix(Monnam(mon)));
@@ -3255,7 +3247,8 @@ corpse_chance(
         return FALSE;
 
     if (((bigmonst(mdat) || mdat == &mons[PM_LIZARD]) && !mon->mcloned)
-        || is_golem(mdat) || is_mplayer(mdat) || is_rider(mdat) || mon->isshk)
+        || is_golem(mdat) || is_mplayer(mdat) || is_rider(mdat)
+        || leaves_essence(mdat) || mon->isshk)
         return TRUE;
     tmp = 2 + ((mdat->geno & G_FREQ) < 2) + verysmall(mdat);
     return (boolean) !rn2(tmp);

@@ -1712,6 +1712,7 @@ extern void refresh_meat_timer(struct obj *) NONNULLARG1;
 extern const char *meat_noun(struct permonst *);
 extern boolean meat_noun_word(const char *);
 extern boolean monster_leaves_meat(struct permonst *);
+extern boolean leaves_essence(struct permonst *);
 extern boolean raw_meat_poison_exempt(struct permonst *);
 extern void bless(struct obj *) NONNULLARG1;
 extern void unbless(struct obj *) NONNULLARG1;

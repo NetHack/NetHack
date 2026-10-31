@@ -53,7 +53,7 @@ staticfn int finish_cooking(void);
 staticfn struct obj *find_cook_obj(void);
 
 /* also used to see if you're allowed to eat cats and dogs */
-#define CANNIBAL_ALLOWED() (Role_if(PM_CAVE_DWELLER) || Race_if(PM_ORC))
+/* Cannibalism is not part of RighteousHack. */
 
 /* Rider corpses are treated as non-rotting so that attempting to eat one
    will be sure to reach the stage of eating where that meal is fatal;
@@ -83,7 +83,8 @@ meat_rotted(struct obj *otmp, boolean worst)
     if (!otmp || otmp->otyp != CORPSE)
         return 0L;
     mnum = otmp->corpsenm;
-    if (!ismnum(mnum) || nonrotting_corpse(mnum))
+    if (!ismnum(mnum) || nonrotting_corpse(mnum)
+        || leaves_essence(&mons[mnum]))
         return 0L;
     if (otmp->ocooked && otmp->blessed)
         return 0L;
@@ -383,6 +384,11 @@ obj_nutrition(struct obj *otmp)
                       : otmp->globby ? otmp->owt
                          : (unsigned) objects[otmp->otyp].oc_nutrition;
 
+    /* Ghosts, wraiths, and the other zero-nutrition spirits are a
+       small meal. Their listed nutrition is 0. */
+    if (!nut && otmp->otyp == CORPSE && ismnum(otmp->corpsenm)
+        && leaves_essence(&mons[otmp->corpsenm]))
+        nut = 50;
     return nut;
 }
 
@@ -809,36 +815,13 @@ eat_brains(
 }
 
 /* eating a corpse or egg of one's own species is usually naughty */
+/* Cannibalism is disabled. Eating your own kind has no Luck or
+   aggravate penalty and no message. */
 staticfn boolean
 maybe_cannibal(int pm, boolean allowmsg)
 {
-    static NEARDATA long ate_brains = 0L;
-    struct permonst *fptr = &mons[pm]; /* food type */
-
-    /* when poly'd into a mind flayer, multiple tentacle hits in one
-       turn cause multiple digestion checks to occur; avoid giving
-       multiple luck penalties for the same attack */
-    if (svm.moves == ate_brains)
-        return FALSE;
-    ate_brains = svm.moves; /* ate_anything, not just brains... */
-
-    if (!CANNIBAL_ALLOWED()
-        /* non-cannibalistic heroes shouldn't eat own species ever
-           and also shouldn't eat current species when polymorphed
-           (even if having the form of something which doesn't care
-           about cannibalism--hero's innate traits aren't altered) */
-        && (your_race(fptr)
-            || (Upolyd && same_race(gy.youmonst.data, fptr))
-            || (ismnum(u.ulycn) && were_beastie(pm) == u.ulycn))) {
-        if (allowmsg) {
-            if (Upolyd && your_race(fptr))
-                You("have a bad feeling deep inside.");
-            You("cannibal!  You will regret this!");
-        }
-        HAggravate_monster |= FROMOUTSIDE;
-        change_luck(-rn1(4, 2)); /* -5..-2 */
-        return TRUE;
-    }
+    nhUse(pm);
+    nhUse(allowmsg);
     return FALSE;
 }
 
@@ -866,19 +849,6 @@ cprefx(int pm)
     }
 
     switch (pm) {
-    case PM_LITTLE_DOG:
-    case PM_DOG:
-    case PM_LARGE_DOG:
-    case PM_KITTEN:
-    case PM_HOUSECAT:
-    case PM_LARGE_CAT:
-        /* cannibals are allowed to eat domestic animals without penalty */
-        if (!CANNIBAL_ALLOWED()) {
-            You_feel("that eating the %s was a bad idea.",
-                     mons[pm].pmnames[NEUTRAL]);
-            HAggravate_monster |= FROMOUTSIDE;
-        }
-        break;
     case PM_LIZARD:
         if (Stoned)
             fix_petrification();
@@ -887,8 +857,8 @@ cprefx(int pm)
     case PM_PESTILENCE:
     case PM_FAMINE: {
         pline("Eating that is instantly fatal.");
-        Sprintf(svk.killer.name, "unwisely ate the body of %s",
-                mons[pm].pmnames[NEUTRAL]);
+        Sprintf(svk.killer.name, "unwisely ate %s essence",
+                s_suffix(mons[pm].pmnames[NEUTRAL]));
         svk.killer.format = NO_KILLER_PREFIX;
         done(DIED);
         /* life-saving needed to reach here */
@@ -1941,19 +1911,17 @@ eatcorpse(struct obj *otmp)
     /* Fresh raw meat: 1 in 20 is fatal food poisoning, on top of taint.
        Cooked meat, lizard meat, and sea-monster fillets never roll it. */
     if (!otmp->ocooked && !glob
+        && !leaves_essence(&mons[mnum])
         && !raw_meat_poison_exempt(&mons[mnum]) && !rn2(20))
         raw_poison = TRUE;
 
     /* 5.0: globs don't become tainted, they shrink away */
     if (!glob && !stoneable && !slimeable && rotted > 5L) {
-        boolean cannibal = maybe_cannibal(mnum, FALSE);
-
         /* tp++; -- early return makes this unnecessary */
-        pline("Ulch - that %s was tainted%s!",
+        pline("Ulch - that %s was tainted!",
               (mons[mnum].mlet == S_FUNGUS) ? "fungoid vegetation"
               : vegetarian(&mons[mnum]) ? "protoplasm"
-                : "meat",
-              cannibal ? ", you cannibal" : "");
+                : "meat");
         if (Sick_resistance) {
             pline("It doesn't seem at all sickening, though...");
         } else {
@@ -2002,6 +1970,7 @@ eatcorpse(struct obj *otmp)
         = 3 + ((!glob ? mons[mnum].cwt : otmp->owt) >> 6);
 
     if (!tp && !nonrotting_corpse(mnum)
+        && !leaves_essence(&mons[mnum])
         && !(otmp->ocooked && otmp->blessed)
         && (otmp->orotten || !rn2(7))) {
         if (rottenfood(otmp)) {
@@ -2198,9 +2167,7 @@ fprefx(struct obj *otmp)
             pline("Yak - dog food!");
             more_experienced(1, 0);
             newexplevel();
-            /* not cannibalism, but we use similar criteria
-               for deciding whether to be sickened by this meal */
-            if (rn2(2) && !CANNIBAL_ALLOWED())
+            if (rn2(2))
                 make_vomiting((long) rn1(svc.context.victual.reqtime, 14),
                               FALSE);
         }
@@ -4098,6 +4065,9 @@ docook(void)
 
             if (floorobj->otyp != CORPSE || floorobj->ocooked)
                 continue;
+            if (ismnum(floorobj->corpsenm)
+                && leaves_essence(&mons[floorobj->corpsenm]))
+                continue;
             if (will_feel_cockatrice(floorobj, FALSE)) {
                 feel_cockatrice(floorobj, FALSE);
                 return ECMD_TIME;
@@ -4123,6 +4093,10 @@ docook(void)
         return ECMD_OK;
     if (otmp->otyp != CORPSE) {
         You_cant("cook that!");
+        return ECMD_OK;
+    }
+    if (ismnum(otmp->corpsenm) && leaves_essence(&mons[otmp->corpsenm])) {
+        pline("You can't cook %s.", yname(otmp));
         return ECMD_OK;
     }
     if (otmp->ocooked) {

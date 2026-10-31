@@ -1065,6 +1065,7 @@ dogfood(struct monst *mon, struct obj *obj)
         case CORPSE:
             if ((peek_at_iced_corpse_age(obj) + 50L <= svm.moves
                  && !(fx == PM_LIZARD || fx == PM_LICHEN)
+                 && !leaves_essence(fptr)
                  && mptr->mlet != S_FUNGUS)
                 || (acidic(fptr) && !resists_acid(mon))
                 || (poisonous(fptr) && !resists_poison(mon)))
@@ -1075,12 +1076,6 @@ dogfood(struct monst *mon, struct obj *obj)
                 return MANFOOD;
             else if (vegan(fptr))
                 return herbi ? CADAVER : MANFOOD;
-            /* most humanoids will avoid cannibalism unless starving;
-               arbitrary: elves won't eat other elves even then */
-            else if (humanoid(mptr) && same_race(mptr, fptr)
-                     && (!is_undead(mptr) && fptr->mlet != S_KOBOLD
-                         && fptr->mlet != S_ORC && fptr->mlet != S_OGRE))
-                return (starving && carni && !is_elf(mptr)) ? ACCFOOD : TABU;
             else
                 return carni ? CADAVER : MANFOOD;
         case GLOB_OF_GREEN_SLIME: /* other globs use the default case */

@@ -563,8 +563,19 @@ steak, sea monsters (`S_EEL`) are fillet, fungi are cap, jellies
 are jelly, puddings are pudding, and everything else is meat.
 Cooked meat is the same object with a cooked flag, so poison,
 acid, petrification, and intrinsics stay the same. Humanoids,
-humans, and elves leave no meat. Death, Pestilence, Famine, and
-trolls still do, because the game brings them back from that body.
+humans, and elves leave no meat. Trolls still leave meat, because
+they come back from it. Ghosts, shades, wraiths, barrow wights,
+Nazgul, vampires, zombies, mummies, ghouls, skeletons, and the
+Riders leave an essence named "<monster>'s essence". An essence
+never spoils, cannot be cooked, and can be blessed. A wraith's
+essence still grants a level. Eating Death's, Pestilence's, or
+Famine's essence is still fatal, and they still revive from it.
+Ghosts and the other zero-nutrition spirits give 50 nutrition.
+Vampire, zombie, and mummy essences are that undead, not an old
+human or elf body, and undead turning brings them back from it.
+Cannibalism is removed: no "You cannibal!" message, no Luck or
+aggravate penalty, no cave dweller or orc exception, and pets do
+not refuse food of their own race.
 Every role starts with a flint and tinder box. `#cook` uses it
 and does not use it up. Raw meat cannot be blessed, except lizard
 meat and sea-monster fillets. Blessed cooked meat never spoils.

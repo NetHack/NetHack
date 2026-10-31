@@ -308,8 +308,13 @@ def is_humanoid_body(mon: dict, flags: dict[str, int]) -> bool:
 def classify(mon: dict, by_name: dict[str, dict], flags: dict[str, int]) -> tuple[str, str]:
     """Return (sheet, reason). sheet is 'meat', 'humanoid', or 'other'."""
     key = mon["name"].lower()
-    if key in RIDERS:
-        return "meat", "Rider. Still leaves meat so the game can bring them back."
+    if key in RIDERS or mon["mlet"] in {
+        "S_GHOST", "S_WRAITH", "S_VAMPIRE", "S_ZOMBIE", "S_MUMMY"
+    }:
+        return (
+            "essence",
+            "Leaves an essence. Never spoils, cannot be cooked, can be blessed.",
+        )
     if mon["mlet"] == "S_TROLL":
         return (
             "meat",
@@ -327,7 +332,7 @@ def classify(mon: dict, by_name: dict[str, dict], flags: dict[str, int]) -> tupl
         return "other", "Golem. Leaves parts or a statue, not meat."
     if mon["mlet"] == "S_PUDDING":
         return "other", "Pudding or ooze. Leaves a glob, not meat."
-    if mon["mlet"] == "S_LICH" or key == "vlad the impaler":
+    if mon["mlet"] == "S_LICH":
         return "other", "Crumbles to dust. No meat."
     if "AT_BOOM" in mon["attacks"] or key == "gas spore":
         return "other", "Explodes. No meat."
@@ -543,8 +548,27 @@ def main() -> None:
     other_headers = ["Monster", "Class", "Why no meat"]
     for col, header in enumerate(other_headers, 1):
         other_ws.cell(1, col, header)
+    ess_ws = wb.create_sheet("Essences")
+    ess_headers = [
+        "Monster",
+        "Also called",
+        "Class",
+        "Name",
+        "Nutrition when eaten",
+        "Listed nutrition",
+        "Weight of essence",
+        "Spoils",
+        "Can cook",
+        "Can bless",
+        "5% raw-poison",
+        "Eat effects",
+        "Revival",
+        "Notes",
+    ]
+    for col, header in enumerate(ess_headers, 1):
+        ess_ws.cell(1, col, header)
 
-    meat_n = human_n = other_n = 1
+    meat_n = human_n = other_n = ess_n = 1
     for mon in monsters:
         sheet, reason = classify(mon, by_name, flags)
         aliases = ""
@@ -580,6 +604,44 @@ def main() -> None:
                 ]
             )
             meat_n += 1
+        elif sheet == "essence":
+            listed = mon["nutrition"]
+            eaten = listed if listed else 50
+            effects = []
+            key = mon["name"].lower()
+            if key == "wraith":
+                effects.append("gain a level")
+            if key in RIDERS:
+                effects.append("eating is instantly fatal; the Rider comes back")
+            if mon["m1"] & flags["M1_POIS"]:
+                effects.append("poisonous (the monster's own flag, not a living race)")
+            if not effects:
+                effects.append("no special effect beyond a small meal")
+            if key in RIDERS:
+                revival = "yes, revives from this essence"
+            elif mon["mlet"] in {"S_VAMPIRE", "S_ZOMBIE", "S_MUMMY"}:
+                revival = "undead turning brings this monster back from the essence"
+            else:
+                revival = "no automatic revival"
+            ess_ws.append(
+                [
+                    mon["name"],
+                    aliases,
+                    mon["mlet"],
+                    f"{mon['name']}'s essence",
+                    eaten,
+                    listed,
+                    20,
+                    "never",
+                    "no",
+                    "yes",
+                    "no",
+                    "; ".join(effects),
+                    revival,
+                    reason + " Not counted as a living race. Cannibalism is gone.",
+                ]
+            )
+            ess_n += 1
         elif sheet == "humanoid":
             human_ws.append(
                 [
@@ -600,6 +662,7 @@ def main() -> None:
     style_sheet(meat_ws, meat_headers, meat_n)
     style_sheet(human_ws, human_headers, human_n)
     style_sheet(other_ws, other_headers, other_n)
+    style_sheet(ess_ws, ess_headers, ess_n)
 
     tin = wb.create_sheet("Tins and eggs")
     tin_headers = ["Item", "Player-facing name", "Notes"]
@@ -664,12 +727,15 @@ def main() -> None:
         ("Dragon", "raw gray dragon steak, cooked gray dragon steak."),
         ("Sea monsters", EXEMPT_NOTE),
         ("Lizard", "The creature named lizard only, not newt, gecko, iguana, crocodile, or salamander."),
-        ("Humanoids", "M1_HUMANOID, or the human or elf race, leave no meat. Riders are the exception."),
-        ("Riders", "Death, Pestilence, and Famine still leave meat because revival uses that body."),
-        ("Trolls", "Trolls are flagged humanoid, but they still leave meat. Revival uses that body. Ice, rock, and water trolls, and the olog-hai if it is class S_TROLL, are included."),
+        ("Humanoids", "M1_HUMANOID, or the human or elf race, leave no meat. Spirits leave essence instead. Trolls still leave meat."),
+        ("Essences", "Named \"<monster>'s essence\" (wraith's essence, Death's essence). Wishes may also say \"essence of <monster>\". Never spoil, cannot be cooked, can be blessed. No 5% raw-poison roll."),
+        ("Riders", "Death, Pestilence, and Famine leave essence. They still revive from it. Eating it is instantly fatal, as with the old Rider corpse."),
+        ("Trolls", "Trolls still leave meat (raw troll steak), not essence. Revival uses that meat."),
         ("Medusa", "Humanoid, so she leaves no meat. Killing her is still recorded. The level does not need her body."),
         ("Quest", "Quest leaders and nemeses who are humanoid leave no meat. The quest does not need that body."),
-        ("Vampires, zombies, mummies", "They used to leave an old racial body. That body is humanoid meat, so it is not left. A wand of undead turning cannot revive them from meat that is not there."),
+        ("Vampires, zombies, mummies", "They leave their own essence, not an old human/elf/orc body. Eating it uses that undead's own flags (poisonous if the undead is). It is not cannibalism and it is not tainted. Undead turning revives them from the essence. Ghoul and skeleton are included because they are zombie-class. Vlad leaves essence instead of crumbling."),
+        ("Ghost nutrition", "Ghost, shade, wraith, barrow wight, and Nazgul are listed with 0 nutrition. Eating their essence gives 50, a small meal. A wraith's essence still grants a level."),
+        ("Cannibalism", "Removed. No Luck penalty, no aggravate, no 'You cannibal!' message, no cave dweller or orc exception, and pets do not refuse same-race food."),
         ("Bones", "Your own body is still saved with a bones file, under your name. Sleeping-gas traps no longer place human, elf, dwarf, gnome, or orc meat."),
         ("Bless", "Raw meat cannot be blessed, except the exempt seafood and lizard meat. The message is: You can't bless <food>! Cooked meat can be blessed. Blessed cooked meat never rots and never causes tainted or fatal food poisoning."),
         ("Raw poison", "Eating raw meat rolls 1 in 20 for fatal food poisoning, in addition to the old tainted-meat rules. Same cure as other food poisoning."),
@@ -686,7 +752,10 @@ def main() -> None:
     OUT.parent.mkdir(parents=True, exist_ok=True)
     wb.save(OUT)
     print(f"wrote {OUT}")
-    print(f"foods {len(foods)} meat {meat_n - 1} humanoid {human_n - 1} other {other_n - 1}")
+    print(
+        f"foods {len(foods)} meat {meat_n - 1} essence {ess_n - 1} "
+        f"humanoid {human_n - 1} other {other_n - 1}"
+    )
 
 
 if __name__ == "__main__":

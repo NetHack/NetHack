@@ -45,7 +45,7 @@
     MEAT_NOUN(S_JABBERWOCK, "steak") \
     MEAT_NOUN(S_KOP, "meat") \
     MEAT_NOUN(S_LICH, "meat") \
-    MEAT_NOUN(S_MUMMY, "meat") \
+    MEAT_NOUN(S_MUMMY, "essence") \
     MEAT_NOUN(S_NAGA, "meat") \
     MEAT_NOUN(S_OGRE, "meat") \
     MEAT_NOUN(S_PUDDING, "pudding") \
@@ -54,13 +54,13 @@
     MEAT_NOUN(S_SNAKE, "meat") \
     MEAT_NOUN(S_TROLL, "steak") \
     MEAT_NOUN(S_UMBER, "steak") \
-    MEAT_NOUN(S_VAMPIRE, "meat") \
-    MEAT_NOUN(S_WRAITH, "meat") \
+    MEAT_NOUN(S_VAMPIRE, "essence") \
+    MEAT_NOUN(S_WRAITH, "essence") \
     MEAT_NOUN(S_XORN, "meat") \
     MEAT_NOUN(S_YETI, "steak") \
-    MEAT_NOUN(S_ZOMBIE, "meat") \
+    MEAT_NOUN(S_ZOMBIE, "essence") \
     MEAT_NOUN(S_HUMAN, "meat") \
-    MEAT_NOUN(S_GHOST, "meat") \
+    MEAT_NOUN(S_GHOST, "essence") \
     MEAT_NOUN(S_GOLEM, "meat") \
     MEAT_NOUN(S_DEMON, "meat") \
     MEAT_NOUN(S_EEL, "fillet") \

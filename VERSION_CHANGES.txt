@@ -11,6 +11,16 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-10-31
+Spirits leave an essence, named like "wraith's essence" or
+"Death's essence". It never spoils, cannot be cooked, and can be
+blessed. Ghosts, shades, wraiths, barrow wights, Nazgul, vampires,
+zombies, mummies, ghouls, skeletons, and the three Riders do this.
+A wraith's essence still raises your level. Eating a Rider's
+essence is still fatal, and they still come back from it. Trolls
+still leave meat. Cannibalism is gone: no penalty for eating your
+own kind, and no cave dweller or orc exception.
+
+2026-10-31
 Monster bodies are raw meat now (a dragon leaves a raw dragon steak).
 Human-like monsters leave none, except trolls, who still do so
 they can come back. Eating raw meat can fatally poison
