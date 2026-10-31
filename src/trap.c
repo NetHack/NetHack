@@ -2311,7 +2311,15 @@ trapeffect_magic_trap(
                 u.uenpeak = u.uenmax;
             return Trap_Effect_Finished;
         } else {
+            coordxy tx = trap->tx, ty = trap->ty;
+
             domagictrap();
+            /* domagictrap() can free the trap: the fire fate melts ice
+               underfoot (dofiretrap() -> melt_ice() ->
+               trap_ice_effects() -> deltrap()), and the plunge into the
+               water can move the hero; refetch it so steedintrap() never
+               reads freed memory or another square's trap */
+            trap = u_at(tx, ty) ? t_at(tx, ty) : (struct trap *) 0;
         }
         (void) steedintrap(trap, (struct obj *) 0);
     } else {
