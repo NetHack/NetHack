@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $NHDT-Header$
+# $NHDT-Header: NetHack 5.0 nhsub 2026/10/31_22:55:58 NetHack-5.0:1.17 $
 # Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
 
@@ -530,11 +530,14 @@ sub Date {
     my(undef, $val) = @_;
     my $now;
 
-    my $hash = `git log -1 '--format=format:%H' $::current_file`;
+#XXX saved for posterity: update to last date before changing header format
+# in this case, used -f -m and here: f7943a0f6b8facc05fd3b2558aa8529cec0127e6^
+#my $rev = $::revopt . '--' if($::revopt);
+    chomp(my $hash = `git log -1 '--format=format:%H' $rev $::current_file`);
     $now = $^T;
 
 	    # cope with file not yet added to git
-    if(not defined $hash){
+    if(length $hash < 40){
 	if(-f $::current_file){
 	    $now = (stat($::current_file))[9];
 	} else {
