@@ -103,6 +103,7 @@ fix travel using up turns trying to displace pet that cannot move
 replace generic gem tile asterisk with a cut gem shape with shadow,
 	generic potion tile exclamation point with potion shape,
 	generic spellbook plus-tile with a spellbook shape
+fix impossible and use-after-free in lava_effects
 
 
 Platform- and/or Interface-Specific Fixes
