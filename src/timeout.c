@@ -98,7 +98,7 @@ static const struct propname {
     { FLYING, "flying" },
     { SWIMMING, "swimming" },
     { SLOW_DIGESTION, "slow digestion" },
-    { HALF_SPDAM, "half spell damage" },
+    { HALF_SPDAM, "half damage from false prophecies" },
     { HALF_PHDAM, "half physical damage" },
     { REGENERATION, "HP regeneration" },
     { ENERGY_REGENERATION, "energy regeneration" },

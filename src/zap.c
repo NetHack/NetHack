@@ -5383,7 +5383,8 @@ zap_over_floor(
         if (ztype < ZT_PBOOK(0))
             zapverb = "bolt"; /* wand zap */
         else if (ztype < ZT_BREATH(0))
-            zapverb = "prophecy";
+            /* the hero's own casting is a prophecy; a monster's is sorcery */
+            zapverb = yourzap ? "prophecy" : "sorcery";
     } else if (exploding_wand_typ == POT_OIL
                || exploding_wand_typ == SCR_FIRE) {
         /* breakobj() -> explode_oil() -> splatter_burning_oil()

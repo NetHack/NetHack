@@ -555,6 +555,13 @@ so the item is "rod of stillness" and the object enum is
 5.0 behavior. 5.0's shield of drain resistance and shield of shock
 resistance are kept under those names, and ancient defense is kept too.
 
+### Planned (not done)
+
+Lawful, neutral, and chaotic will eventually be replaced by two
+alignments, good and evil. That work is not done. Alignment itself
+still works, and the attributes screen no longer describes the
+player's own deity names as opposing each other.
+
 ### Needs owner decision
 
 | ID | Why |

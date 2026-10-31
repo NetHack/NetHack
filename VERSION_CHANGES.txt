@@ -5,6 +5,23 @@ Each entry is a date and a sentence or two, enough to know that
 something changed. The full customization inventory is
 RIGHTEOUSHACK_CHANGES.md.
 
+Planned (not done)
+RighteousHack will eventually replace lawful, neutral, and chaotic
+with two alignments, good and evil. Alignment still works as it
+does now until that change is made.
+
+2026-10-31
+The attributes screen no longer says your god is opposed by the
+other names in the pantheon. It only says which god you are on a
+mission for. Planned, not done: those three alignments will
+eventually become good and evil.
+
+2026-10-31
+Magic cancellation now says you are protected from false prophets,
+with a degree when the armor gives one. Half spell damage now says
+you take half damage from false prophecies. A monster's magic is
+called sorcery.
+
 2026-10-31
 The new NetHack 5.0 wand was added as the Rod of Stillness
 (Psalm 46:10). Zapping it still makes the current level block

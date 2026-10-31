@@ -197,7 +197,7 @@ castmu(
      */
     if (!foundyou && thinks_it_foundyou
         && !is_undirected_spell(spellnum)) {
-        pline_mon(mtmp, "%s casts a spell at %s!",
+        pline_mon(mtmp, "%s casts sorcery at %s!",
                  canseemon(mtmp) ? Monnam(mtmp) : "Something",
                  is_waterwall(mtmp->mux, mtmp->muy) ? "empty water"
                                                     : "thin air");
@@ -214,7 +214,7 @@ castmu(
         return M_ATTK_MISS;
     }
     if (canspotmon(mtmp) || !is_undirected_spell(spellnum)) {
-        pline_mon(mtmp, "%s casts a spell%s!",
+        pline_mon(mtmp, "%s casts sorcery%s!",
                  canspotmon(mtmp) ? Monnam(mtmp) : "Something",
                  is_undirected_spell(spellnum) ? ""
                  : (Invis && !perceives(mtmp->data)
