@@ -38,7 +38,7 @@ noteleport_level(struct monst *mon)
     if (svl.level.flags.noteleport && !is_covetous(mon->data))
         return TRUE;
 
-    /* wand of stasis prevents teleportation while the effect is active
+    /* rod of stillness prevents teleportation while the effect is active
        (even for covetous monsters) */
     if (svl.level.flags.stasis_until >= svm.moves)
         return TRUE;

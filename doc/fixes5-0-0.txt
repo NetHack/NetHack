@@ -2925,7 +2925,7 @@ the game now automatically tracks which sell prices and buy prices you have
         seen for each type of item; these are visible in the discoveries list,
         and can also be shown elsewhere using the new 'price_quotes' option
 new shields: shield of shock resistance, shield of drain resistance
-new wand: wand of stasis
+new wand: wand of stasis (RighteousHack: rod of stillness)
 early-game monsters always miss with their first use of an attack wand
 new command #toggle which can be used to toggle a boolean option
 

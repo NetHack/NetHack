@@ -2556,7 +2556,7 @@ zapnodir(struct obj *obj)
         known = !!obj->dknown;
         (void) findit();
         break;
-    case WAN_STASIS: {
+    case WAN_STILLNESS: {
         long tmp_until = svm.moves + (long) rn1(21, 10);
 
         /* no immediately obvious effect, and no message so that it isn't

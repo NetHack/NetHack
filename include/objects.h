@@ -1482,7 +1482,7 @@ ROD("reveal secret things",      "balsa",      50, 150, 1, NODIR, WOOD,       HI
 ROD("understanding",            "crystal",    15, 150, 1, NODIR, GLASS,      HI_GLASS,     WAN_ENLIGHTENMENT),
 ROD("heavenly host",             "maple",      45, 200, 1, NODIR, WOOD,       HI_WOOD,      WAN_CREATE_MONSTER),
 ROD("ask and ye shall receive",  "pine",        5, 500, 1, NODIR, WOOD,       HI_WOOD,      WAN_WISHING),
-ROD("stasis",                    "redwood",    45, 150, 1, NODIR, WOOD,       CLR_RED,      WAN_STASIS),
+ROD("stillness",                 "redwood",    45, 150, 1, NODIR, WOOD,       CLR_RED,      WAN_STILLNESS),
 ROD("nothing",                    "oak",        25, 100, 0, IMMEDIATE, WOOD,    HI_WOOD,      WAN_NOTHING),
 ROD("rebuke",                    "ebony",      75, 150, 1, IMMEDIATE, WOOD,    HI_WOOD,      WAN_STRIKING),
 ROD("divine concealment",        "marble",     45, 150, 1, IMMEDIATE, MINERAL, HI_MINERAL,   WAN_MAKE_INVISIBLE),

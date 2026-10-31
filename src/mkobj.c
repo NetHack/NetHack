@@ -1137,7 +1137,7 @@ mksobj_init(struct obj **obj, boolean artif)
     case WAND_CLASS:
         if (otmp->otyp == WAN_WISHING)
             otmp->spe = 1;
-        else if (otmp->otyp == WAN_STASIS)
+        else if (otmp->otyp == WAN_STILLNESS)
             /* just as easy to recharge as other NODIR wands, but starts with
                fewer charges */
             otmp->spe = rn1(4, 3);

@@ -546,11 +546,13 @@ a `static` definition is not visible to `src/apply.c` / `src/artifact.c`.
 and `#undef WAND` so those renamed macros do not leak out of
 `include/objects.h`.
 
-5.0's new wand is a rod named **stasis** (appearance redwood, probability
-45), inserted after "ask and ye shall receive", which is where 5.0 put
-`WAN_STASIS`. There is no Christian name for it in the owner's notes.
-5.0's shield of drain resistance and shield of shock resistance are
-kept under those names, and ancient defense is kept too.
+5.0's new wand is a rod named **stillness** (appearance redwood,
+probability 45), inserted after "ask and ye shall receive", which is
+where 5.0 put `WAN_STASIS`. The owner chose "stillness" (Psalm 46:10),
+so the item is "rod of stillness" and the object enum is
+`WAN_STILLNESS`. Charges, duration, and the no-teleport effect are the
+5.0 behavior. 5.0's shield of drain resistance and shield of shock
+resistance are kept under those names, and ancient defense is kept too.
 
 ### Needs owner decision
 
@@ -561,7 +563,7 @@ kept under those names, and ancient defense is kept too.
 | ID-213 | Champion's quest artifact is still the Orb of Fate. |
 | ID-223 | `desecrate_altar` is gone. `src/dig.c` and `src/music.c` print `placeholder for desecrate_altar`. |
 | ID-224 | Crowning still says "The Hand of Elbereth". |
-| (new) | The stasis rod has no scripture name. |
+| (new) | Resolved: the owner named the 5.0 stasis rod "stillness" (`WAN_STILLNESS`, "rod of stillness", Psalm 46:10). |
 | ID-084 | Healer's oil rows are tagged `POTION_CLASS` even though the objects are `ANOINTING_CLASS`. Creation uses `trotyp`, so the game start still works. |
 | ID-017 | Only human is playable. `src/u_init.c` still has tables for the removed roles. |
 

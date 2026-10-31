@@ -467,7 +467,7 @@ struct levelflags {
     Bitfield(stormy, 1);       /* clouds create lightning bolts at random */
 
     schar temperature;         /* +1 == hot, -1 == cold */
-    long stasis_until;         /* wand of stasis effect lasts until when? */
+    long stasis_until;         /* rod of stillness effect lasts until when? */
 };
 
 typedef struct {

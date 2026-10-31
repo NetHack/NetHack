@@ -530,7 +530,7 @@ magic_whistled(struct obj *obj)
             already_discovered = objects[obj->otyp].oc_name_known != 0;
     int omx, omy, shift = 0, appear = 0, disappear = 0, trapped = 0;
 
-    /* stasis prevents magic-whistling */
+    /* rod of stillness prevents magic-whistling */
     if (svl.level.flags.stasis_until >= svm.moves)
         return;
 
@@ -3992,7 +3992,7 @@ do_break_wand(struct obj *obj)
     case WAN_PROBING:
     case WAN_ENLIGHTENMENT:
     case WAN_SECRET_DOOR_DETECTION:
-    case WAN_STASIS:
+    case WAN_STILLNESS:
         pline(nothing_else_happens);
         discard_broken_wand();
         return ECMD_TIME;
