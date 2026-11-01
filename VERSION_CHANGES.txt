@@ -11,6 +11,12 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-01
+The Oracle's chamber has an up stair to the Cave of Gibeon. Praying
+on the Altar at Gibeon with the burnt offering there asks for one
+wish. Asking for wisdom gives the existing Belt of Truth at +2,
+a blessed anointing oil of gain level, and Wisdom 25.
+
+2026-11-01
 An adult dragon steak weighs 4500, past what stock pickup can lift
 (the carrying cap is 1000, and the heaviest single lift is just
 under 3000). It stays on the floor, where it can be cooked and

@@ -1155,6 +1155,10 @@ FOOD("C-ration",              0,  1, 10, 0, VEGGY, 300, HI_ORGANIC, C_RATION),
    flesh; negative specifies preparation method {homemade,boiled,&c})
    and by obj->corpsenm (type of monster flesh) */
 FOOD("tin",                  75,  0, 10, 1, METAL,   0, HI_METAL, TIN),
+/* Cave of Gibeon quest item. Probability 0: not randomly generated.
+   Wishes for it are refused in makewish(). */
+FOOD("burnt offering",        0,  1, 20, 0, FLESH, 100, CLR_BROWN,
+                                                        BURNT_OFFERING),
 #undef FOOD
 
 /* potions ... */

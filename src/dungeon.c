@@ -1885,6 +1885,25 @@ dungeon_branch(const char *s)
     return br;
 }
 
+/* The Cave of Gibeon is a one-level branch above the Oracle. */
+boolean
+on_gibeon_level(d_level *lev)
+{
+    if (lev->dnum < 0 || lev->dnum >= svn.n_dgns)
+        return FALSE;
+    return (boolean) !strcmp(svd.dungeons[lev->dnum].dname,
+                             "Cave of Gibeon");
+}
+
+/* The only altar on that level is the Altar at Gibeon. */
+boolean
+is_gibeon_altar(coordxy x, coordxy y)
+{
+    if (!isok(x, y) || !on_gibeon_level(&u.uz))
+        return FALSE;
+    return (boolean) IS_ALTAR(levl[x][y].typ);
+}
+
 /*
  * This returns true if the hero is on the same level as the entrance to
  * the named dungeon.

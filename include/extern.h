@@ -903,6 +903,8 @@ extern const char *ceiling(coordxy, coordxy);
 extern boolean In_quest(d_level *) NONNULLARG1;
 extern boolean In_mines(d_level *) NONNULLARG1;
 extern branch *dungeon_branch(const char *) NONNULL NONNULLARG1;
+extern boolean on_gibeon_level(d_level *) NONNULLARG1;
+extern boolean is_gibeon_altar(coordxy, coordxy);
 extern boolean at_dgn_entrance(const char *) NONNULLARG1;
 extern boolean In_hell(d_level *) NONNULLARG1;
 extern boolean In_V_tower(d_level *) NONNULLARG1;
@@ -4042,6 +4044,7 @@ extern int resist(struct monst *, char, int, int) NONNULLARG1;
 extern void wish_history_add(char *);
 extern void wish_history_flush(void);
 extern void makewish(void);
+extern int wish_from_text(char *, boolean);
 extern const char *flash_str(int, boolean) NONNULL;
 
 /* ### unixmain.c, windsys.c ### */

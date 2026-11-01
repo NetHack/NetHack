@@ -5,6 +5,9 @@
 #include "hack.h"
 
 staticfn int prayer_done(void);
+staticfn boolean gibeon_wisdom_request(const char *);
+staticfn void gibeon_grant_wisdom(void);
+staticfn int gibeon_vision(void);
 staticfn void maybe_turn_mon_iter(struct monst *);
 staticfn struct obj *worst_cursed_item(void);
 staticfn int in_trouble(void);
@@ -1898,10 +1901,116 @@ can_pray(boolean praying) /* false means no messages (e.g. enlightenment) */
     return TRUE; /* always allow prayer attempt; outcome handled in prayer_done() */
 }
 
-/*=====================================================================
- *  prayer_done()
- *  Called after the prayer animation. This is where grace is dispensed.
- *====================================================================*/
+/* Wisdom answers at the Altar at Gibeon. A leading "a" or "an" is ignored. */
+staticfn boolean
+gibeon_wisdom_request(const char *buf)
+{
+    const char *p = buf;
+
+    if (!strncmpi(p, "an ", 3))
+        p += 3;
+    else if (!strncmpi(p, "a ", 2))
+        p += 2;
+    return (boolean) (!strcmpi(p, "wisdom")
+                      || !strcmpi(p, "discerning heart")
+                      || !strcmpi(p, "wise and discerning heart")
+                      || !strcmpi(p, "wisdom and knowledge")
+                      || !strcmpi(p, "knowledge"));
+}
+
+/* Existing Belt of Truth, +2, plus blessed anointing oil of gain level,
+   and Wisdom 25. The race table still says 18; this hero's copy is raised
+   so adjattrib() does not immediately clamp the gift back down. */
+staticfn void
+gibeon_grant_wisdom(void)
+{
+    struct obj *otmp;
+
+    /* One message is limited to 255 characters, so the sentence is
+       given as two lines. The words are the full verse. */
+    pline("\"Since this is your heart's desire and you have not asked for wealth, possessions or honor, nor for the death of your enemies,");
+    pline("and since you have not asked for a long life but for wisdom and knowledge, therefore wisdom and knowledge will be given you, and I will also give you wealth, possessions and honor.\"");
+
+    otmp = mksobj(BELT, FALSE, FALSE);
+    if (otmp) {
+        otmp = oname(otmp, artiname(ART_BELT_OF_TRUTH),
+                     ONAME_GIFT | ONAME_KNOW_ARTI);
+        if (otmp) {
+            otmp->spe = 2;
+            bless(otmp);
+            otmp->bknown = 1;
+            otmp->known = 1;
+            otmp->dknown = 1;
+            if (otmp->oartifact)
+                u.ugifts++;
+            (void) hold_another_object(otmp, "Oops!  %s to the floor!",
+                                       The(aobjnam(otmp, "drop")),
+                                       (const char *) 0);
+        }
+    }
+
+    otmp = mksobj(ANO_GAIN_LEVEL, FALSE, FALSE);
+    if (otmp) {
+        bless(otmp);
+        otmp->bknown = 1;
+        otmp->dknown = 1;
+        otmp->known = 1;
+        makeknown(ANO_GAIN_LEVEL);
+        (void) hold_another_object(otmp, "Oops!  %s to the floor!",
+                                   The(aobjnam(otmp, "drop")),
+                                   (const char *) 0);
+    }
+
+    gu.urace.attrmax[A_WIS] = 25;
+    ABASE(A_WIS) = 25;
+    AMAX(A_WIS) = 25;
+    ATEMP(A_WIS) = 0;
+    disp.botl = TRUE;
+    You_feel("wise!");
+    livelog_printf(LL_DIVINEGIFT | LL_ARTIFACT,
+                   "asked for wisdom at the Altar at Gibeon");
+}
+
+/* Offering is on the altar and the vision has not happened yet.
+   Returns 1 if the vision ran. Stock wishes allow five tries. */
+staticfn int
+gibeon_vision(void)
+{
+    char buf[BUFSZ];
+    struct obj *otmp;
+    int tries;
+
+    for (otmp = svl.level.objects[u.ux][u.uy]; otmp; otmp = otmp->nexthere)
+        if (otmp->otyp == BURNT_OFFERING)
+            break;
+    if (!otmp)
+        return 0;
+
+    useupf(otmp, 1L);
+    u.uevent.gibeon_wish = 1;
+
+    pline("At Gibeon the LORD appears to you in a vision.");
+    pline("The LORD says, \"Ask for whatever you want me to give you.\"");
+
+    tries = 0;
+    for (;;) {
+        getlin("Ask for whatever you want me to give you?", buf);
+        if (iflags.term_gone)
+            return 1;
+        (void) mungspaces(buf);
+        if (buf[0] == '\033')
+            buf[0] = '\0';
+        if (gibeon_wisdom_request(buf)) {
+            gibeon_grant_wisdom();
+            return 1;
+        }
+        /* Fifth failure grants a random object, the same as a normal wish. */
+        if (wish_from_text(buf, tries >= 4))
+            return 1;
+        tries++;
+    }
+}
+
 staticfn int
 prayer_done(void)
 {
@@ -1909,6 +2018,12 @@ prayer_done(void)
     boolean on_altar = on_altar();
 
     u.uinvulnerable = FALSE; /* will be re-applied only if miracle grants it */
+
+    /* The vision is available during the ordinary prayer wait, and it
+       does not also grant a miracle or bless water. */
+    if (!u.uevent.gibeon_wish && is_gibeon_altar(u.ux, u.uy)
+        && gibeon_vision())
+        return 1;
     
     /* ------------------------------------------------------------------
      *  1. Altar use: always attempt to bless water (anointing oil

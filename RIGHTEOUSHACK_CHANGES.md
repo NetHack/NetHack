@@ -626,6 +626,40 @@ every monster; regenerate it with `tools/gen_food_xlsx.py` when
 those tables change. `EDITLEVEL` is 1, so saves from before the
 first food change will not load.
 
+### Cave of Gibeon (2026-11-01)
+
+The Oracle's chamber has an up stair into a one-level branch, the
+Cave of Gibeon. Sokoban still joins one level below the Oracle; this
+stair is placed on the Oracle level itself. A dark orthogonal tunnel
+leads into a lit cave. The cave does not generate random monsters.
+In the middle is the Altar at Gibeon, a lawful altar. Looking at it
+says "There is the Altar at Gibeon here." King Solomon stands on the
+platform and remains there. `#chat` with him says: "When the Lord
+came to me in this place, I could have asked for gold or the lives
+of my enemies. Instead I asked for a heart to judge His people
+rightly." A chest on the platform holds one burnt offering. That food is not randomly
+generated and cannot be wished for.
+
+Praying while standing on the altar, with the burnt offering on it,
+consumes the offering even during the normal prayer wait. The LORD
+appears and asks what you want. Asking for wisdom, a discerning
+heart, a wise and discerning heart, wisdom and knowledge, or
+knowledge (a leading "a" or "an" is ignored) is answered with the
+words from 2 Chronicles 1. The gift is the existing Belt of Truth at
++2 enchantment, a blessed anointing oil of gain level, and Wisdom 25.
+Any other answer is an ordinary wish. The vision happens once. Later
+prayers at the altar are ordinary prayers.
+
+The Belt of Truth is the artifact that was already defined on the
+humble sash. Its base item and properties are unchanged. The +2 is
+the enchantment of this gift. While worn, that enchantment is +2
+Intelligence. The human race table still lists a Wisdom ceiling of
+18. This gift raises the ceiling for the hero who receives it, so
+the 25 is not immediately pulled back down to 18.
+
+Humans are the only race in the race table. No other race can be
+selected.
+
 ### Planned (not done)
 
 Lawful, neutral, and chaotic will eventually be replaced by two

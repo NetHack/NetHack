@@ -719,6 +719,13 @@ domonnoise(struct monst *mtmp)
     if (!canspotmon(mtmp))
         map_invisible(mtmp->mx, mtmp->my);
 
+    if (has_mgivenname(mtmp)
+        && !strcmp(MGIVENNAME(mtmp), "King Solomon")) {
+        SetVoice(mtmp, 0, 80, 0);
+        verbalize("When the Lord came to me in this place, I could have asked for gold or the lives of my enemies. Instead I asked for a heart to judge His people rightly.");
+        return ECMD_TIME;
+    }
+
     switch (msound) {
     case MS_ORACLE:
         return doconsult(mtmp); /* check this */

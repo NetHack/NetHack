@@ -24,6 +24,14 @@ dungeon = {
             direction = "up"
          },
          {
+            -- base 0 chained to the oracle is the Oracle level itself.
+            -- base 1 is the next level down, which is where Sokoban joins.
+            name = "Cave of Gibeon",
+            chainlevel = "oracle",
+            base = 0,
+            direction = "up"
+         },
+         {
             name = "The Quest",
             chainlevel = "oracle",
             base = 6,
@@ -345,6 +353,16 @@ dungeon = {
       alignment = "neutral",
       levels = {
          { name = "his-treasure-1", base = 1 }
+      }
+   },
+   {
+      name = "Cave of Gibeon",
+      bonetag = "C",
+      base = 1,
+      alignment = "lawful",
+      flags = { "mazelike" },
+      levels = {
+         { name = "gibeon", bonetag = "C", base = 1 }
       }
    },
    
