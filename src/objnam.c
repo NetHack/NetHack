@@ -60,6 +60,7 @@ staticfn int readobjnam_postparse1(struct _readobjnam_data *);
 staticfn int readobjnam_postparse2(struct _readobjnam_data *);
 staticfn int readobjnam_postparse3(struct _readobjnam_data *);
 staticfn void ensure_uncursed(struct _readobjnam_data *);
+staticfn boolean name_ends_with_word(const char *, const char *);
 
 struct Jitem {
     int item;
@@ -1870,12 +1871,17 @@ not_fully_identified(struct obj *otmp)
         return (boolean) is_damageable(otmp);
 }
 
-/* Player-facing noun for a monster's meat. From include/meatnoun.h. */
+/* Player-facing noun for a monster's meat. From include/meatnoun.h.
+   A small ape is meat. Cyclops is a giant who leaves a steak. */
 const char *
 meat_noun(struct permonst *ptr)
 {
     if (!ptr)
         return "meat";
+    if (ptr == &mons[PM_MONKEY])
+        return "meat";
+    if (ptr == &mons[PM_CYCLOPS])
+        return "steak";
     switch (ptr->mlet) {
 #define MEAT_NOUN(sym, word) \
     case sym: \
@@ -1915,13 +1921,17 @@ meat_noun_word(const char *word)
     return FALSE;
 }
 
-/* Spirits leave an essence, not meat. Riders are included. Trolls are not. */
+/* Spirits, undead of the listed classes, demons, and a few named
+   humanoids leave an essence, not meat. Trolls do not.
+   Every S_DEMON leaves an essence. Eating is fatal only for
+   is_demon() (M2_DEMON) and, separately, the Riders. */
 boolean
 leaves_essence(struct permonst *ptr)
 {
     if (!ptr)
         return FALSE;
-    if (is_rider(ptr))
+    /* M2_DEMON, including lords who are not sitting in the main '&' block. */
+    if (is_rider(ptr) || is_demon(ptr))
         return TRUE;
     switch (ptr->mlet) {
     case S_GHOST:   /* ghost, shade */
@@ -1929,30 +1939,50 @@ leaves_essence(struct permonst *ptr)
     case S_VAMPIRE: /* vampire, vampire lord, Vlad */
     case S_ZOMBIE:  /* zombies, ghoul, skeleton */
     case S_MUMMY:
+    case S_LICH:
+    case S_NYMPH:
+    case S_DEMON:   /* also sandestin, djinni, mail daemon; not M2_DEMON */
         return TRUE;
     default:
-        return FALSE;
+        break;
     }
+    /* Humanoids the owner asked for by name. Other orc-class stay foodless. */
+    if (ptr == &mons[PM_MIND_FLAYER] || ptr == &mons[PM_MASTER_MIND_FLAYER]
+        || ptr == &mons[PM_GOBLIN]
+        || ptr == &mons[PM_QUANTUM_MECHANIC]
+        || ptr == &mons[PM_GENETIC_ENGINEER]
+        || ptr == &mons[PM_MEDUSA]
+        || ptr == &mons[PM_WIZARD_OF_YENDOR]
+        || ptr == &mons[PM_CROESUS])
+        return TRUE;
+#ifdef CHARON
+    if (ptr == &mons[PM_CHARON])
+        return TRUE;
+#endif
+    return FALSE;
 }
 
 /* Humanoids, humans, and elves leave no meat. Exceptions:
    - Trolls still leave meat, because they revive from it.
-   - Spirits leave an essence (still a CORPSE internally). */
+   - The ape class (S_YETI), both forms of lycanthrope, and Cyclops.
+   - Essences (still a CORPSE internally). */
 boolean
 monster_leaves_meat(struct permonst *ptr)
 {
     if (!ptr)
         return FALSE;
-    if (ptr->mlet == S_TROLL || leaves_essence(ptr))
+    if (ptr->mlet == S_TROLL || ptr->mlet == S_YETI || leaves_essence(ptr))
+        return TRUE;
+    if (is_were(ptr) || ptr == &mons[PM_CYCLOPS])
         return TRUE;
     if (humanoid(ptr) || is_human(ptr) || is_elf(ptr))
         return FALSE;
     return TRUE;
 }
 
-/* Lizard meat, and every sea monster in class S_EEL (jellyfish, piranha,
-   shark, giant eel, electric eel, kraken), never takes the 5% raw-meat
-   poisoning roll. The same set may be blessed while still raw. */
+/* Lizard meat, every S_EEL fillet, and every jelly never take the 5%
+   raw-meat poisoning roll. The same set may be blessed while still raw.
+   They also never rot (see nonrotting_corpse). */
 boolean
 raw_meat_poison_exempt(struct permonst *ptr)
 {
@@ -1960,9 +1990,27 @@ raw_meat_poison_exempt(struct permonst *ptr)
         return FALSE;
     if (ptr == &mons[PM_LIZARD])
         return TRUE;
-    if (ptr->mlet == S_EEL)
+    if (ptr->mlet == S_EEL || ptr->mlet == S_JELLY)
         return TRUE;
     return FALSE;
+}
+
+/* True when the monster's name already ends with the meat noun
+   ("blue jelly" + "jelly"), so the noun is not said twice. */
+staticfn boolean
+name_ends_with_word(const char *name, const char *word)
+{
+    int nlen, wlen;
+
+    if (!name || !word || !*word)
+        return FALSE;
+    nlen = (int) strlen(name);
+    wlen = (int) strlen(word);
+    if (wlen > nlen)
+        return FALSE;
+    if (strcmpi(name + (nlen - wlen), word))
+        return FALSE;
+    return (boolean) (nlen == wlen || name[nlen - wlen - 1] == ' ');
 }
 
 /* format a corpse name (xname() omits monster type; doname() calls us);
@@ -2052,12 +2100,21 @@ corpse_xname(
                                ? "cooked" : "raw";
         const char *noun = (ismnum(omndx) ? meat_noun(&mons[omndx]) : "meat");
         char nounbuf[32];
+        char namebuf[BUFSZ];
+        boolean noun_in_name;
 
+        Strcpy(namebuf, mnam);
+        /* "blue jelly" already ends in "jelly". Don't say the noun twice.
+           "yellow mold" does not end in "cap", so the fungus noun stays. */
+        noun_in_name = (!possessive && name_ends_with_word(namebuf, noun));
         Strcpy(nounbuf, noun);
         if (otmp->quan > 1L && !ignore_quan && !omit_corpse) {
-            char *pn = makeplural(nounbuf);
+            char *pn = makeplural(noun_in_name ? namebuf : nounbuf);
 
-            Strcpy(nounbuf, pn);
+            if (noun_in_name)
+                Strcpy(namebuf, pn);
+            else
+                Strcpy(nounbuf, pn);
             releaseobuf(pn);
             any_prefix = FALSE; /* avoid "a newt steaks" */
         }
@@ -2069,8 +2126,14 @@ corpse_xname(
                 Sprintf(eos(nambuf), "%s %s", mnam, adjective);
             else
                 Sprintf(eos(nambuf), "%s %s", adjective, mnam);
+        } else if (noun_in_name) {
+            /* "raw blue jelly", "raw black pudding" */
+            if (!adjective || !*adjective)
+                Sprintf(eos(nambuf), "%s %s", prep, namebuf);
+            else
+                Sprintf(eos(nambuf), "%s%s %s", adjective, prep, namebuf);
         } else if (possessive) {
-            /* "Death's cursed partly eaten raw meat" */
+            /* "the Cyclops's cursed partly eaten raw steak" */
             if (!adjective || !*adjective)
                 Sprintf(eos(nambuf), "%s %s %s", mnam, prep, nounbuf);
             else
@@ -2078,10 +2141,11 @@ corpse_xname(
                         nounbuf);
         } else if (!adjective || !*adjective) {
             /* "raw gray dragon steak" */
-            Sprintf(eos(nambuf), "%s %s %s", prep, mnam, nounbuf);
+            Sprintf(eos(nambuf), "%s %s %s", prep, namebuf, nounbuf);
         } else {
             /* "cursed partly eaten raw gray dragon steak" */
-            Sprintf(eos(nambuf), "%s%s %s %s", adjective, prep, mnam, nounbuf);
+            Sprintf(eos(nambuf), "%s%s %s %s", adjective, prep, namebuf,
+                    nounbuf);
         }
         mungspaces(nambuf);
         if (adjective && *adjective && digit(*adjective))

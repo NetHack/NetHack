@@ -1421,9 +1421,11 @@ start_corpse_timeout(struct obj *body)
      *      of revive when its REVIVE_MON timer finishes.
      */
 
-    /* lizards and lichen don't rot or revive.
+    /* lizards, lichen, jellies, and sea fillets don't rot or revive.
        Essences never rot. Riders still revive from theirs. */
-    if (body->corpsenm == PM_LIZARD || body->corpsenm == PM_LICHEN)
+    if (body->corpsenm == PM_LIZARD || body->corpsenm == PM_LICHEN
+        || mons[body->corpsenm].mlet == S_JELLY
+        || mons[body->corpsenm].mlet == S_EEL)
         return;
     if (leaves_essence(&mons[body->corpsenm])
         && !is_rider(&mons[body->corpsenm]))
@@ -1775,11 +1777,11 @@ maybe_adjust_light(struct obj *obj, int old_range)
  *      these routines to make the actual curse/bless state change.
  */
 
-/* Raw meat cannot be blessed, except lizard meat and sea-monster
-   fillets (the same set that skips the 5% raw poisoning roll).
-   Cooked meat can be blessed. Silent here; the player-facing
-   "You can't bless ..." message is printed by the attempt
-   (holy water, wishing). */
+/* Raw meat cannot be blessed, except lizard meat, sea-monster
+   fillets, and jellies (the same set that skips the 5% raw
+   poisoning roll and never rots). Cooked meat and essences can
+   be blessed. Silent here; the player-facing "You can't bless ..."
+   message is printed by the attempt (holy water, wishing). */
 boolean
 can_bless(struct obj *otmp)
 {

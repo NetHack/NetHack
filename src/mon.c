@@ -889,9 +889,10 @@ make_corpse(struct monst *mtmp, unsigned int corpseflags)
            already dropped above; only the meat is skipped. */
         if (!monster_leaves_meat(mdat))
             return (struct obj *) 0;
-        /* Spirits are often flagged G_NOCORPSE. They still leave an essence. */
+        /* Spirits are often flagged G_NOCORPSE. They still leave an essence.
+           Animal-form lycanthropes are G_NOCORPSE too; they still leave meat. */
         if ((svm.mvitals[mndx].mvflags & G_NOCORPSE)
-            && !leaves_essence(mdat)) {
+            && !leaves_essence(mdat) && !is_were(mdat)) {
             return (struct obj *) 0;
         } else {
             corpstatflags |= CORPSTAT_INIT;
@@ -3194,12 +3195,8 @@ corpse_chance(
     if (!magr && gm.mswallower && attacktype(gm.mswallower->data, AT_ENGL))
         magr = gm.mswallower, was_swallowed = TRUE; /* for gas spore boom */
 
-    if (mdat->mlet == S_LICH) {
-        if (cansee(mon->mx, mon->my) && !was_swallowed)
-            pline_mon(mon, "%s body crumbles into dust.",
-                      s_suffix(Monnam(mon)));
-        return FALSE;
-    }
+    /* Liches used to crumble into dust. They leave an essence now,
+       so this no longer returns before the drop check. */
 
     /* Gas spores always explode upon death */
     for (i = 0; i < NATTK; i++) {
@@ -3248,7 +3245,7 @@ corpse_chance(
 
     if (((bigmonst(mdat) || mdat == &mons[PM_LIZARD]) && !mon->mcloned)
         || is_golem(mdat) || is_mplayer(mdat) || is_rider(mdat)
-        || leaves_essence(mdat) || mon->isshk)
+        || leaves_essence(mdat) || is_were(mdat) || mon->isshk)
         return TRUE;
     tmp = 2 + ((mdat->geno & G_FREQ) < 2) + verysmall(mdat);
     return (boolean) !rn2(tmp);

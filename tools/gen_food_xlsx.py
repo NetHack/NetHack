@@ -62,12 +62,37 @@ GOLEM_NO_MEAT = {
     "paper golem",
 }
 RIDERS = {"death", "pestilence", "famine"}
-# Same set as raw_meat_poison_exempt() in src/objnam.c.
+# Same set as raw_meat_poison_exempt() / nonrotting jellies and fillets.
 EXEMPT_NOTE = (
-    "Never the 5% raw-poison roll, and may be blessed while raw: "
-    "the lizard, and every S_EEL sea monster "
-    "(jellyfish, piranha, shark, giant eel, electric eel, kraken)."
+    "Never rot, never the 5% raw-poison roll, and may be blessed while raw: "
+    "the lizard, every S_EEL fillet "
+    "(jellyfish, piranha, shark, giant eel, electric eel, kraken), "
+    "and every jelly (blue jelly, spotted jelly, ochre jelly). "
+    "They can still be cooked."
 )
+
+ESSENCE_MLETS = {
+    "S_GHOST",
+    "S_WRAITH",
+    "S_VAMPIRE",
+    "S_ZOMBIE",
+    "S_MUMMY",
+    "S_LICH",
+    "S_NYMPH",
+    "S_DEMON",
+}
+# Humanoids named by the owner. Other orc-class monsters are not here.
+ESSENCE_NAMES = {
+    "mind flayer",
+    "master mind flayer",
+    "goblin",
+    "quantum mechanic",
+    "genetic engineer",
+    "medusa",
+    "wizard of yendor",
+    "croesus",
+    "charon",
+}
 
 HEADER_FILL = PatternFill("solid", fgColor="1F4E79")
 HEADER_FONT = Font(color="FFFFFF", bold=True)
@@ -102,7 +127,7 @@ def eval_expr(expr: str, table: dict[str, int]) -> int:
     total = 0
     expr = re.sub(r"/\*.*?\*/", "", expr, flags=re.S)
     for part in expr.replace("\n", " ").split("|"):
-        part = part.strip()
+        part = part.strip().strip("()")
         if not part:
             continue
         part = part.rstrip("L")
@@ -216,9 +241,34 @@ def monster_blocks(text: str) -> list[str]:
     return blocks
 
 
+def strip_if0(text: str) -> str:
+    """Drop `#if 0` regions so unused monsters stay out of the workbook."""
+    out = []
+    skip_stack: list[bool] = []
+    for line in text.splitlines(keepends=True):
+        stripped = line.lstrip()
+        if stripped.startswith("#if"):
+            parent = skip_stack[-1] if skip_stack else False
+            this = parent or stripped.startswith("#if 0") or stripped.startswith("#if\t0")
+            skip_stack.append(this)
+            if this:
+                continue
+        elif stripped.startswith("#endif"):
+            skipping = skip_stack.pop() if skip_stack else False
+            if skipping:
+                continue
+        elif skip_stack and skip_stack[-1]:
+            continue
+        out.append(line)
+    return "".join(out)
+
+
 def parse_monsters(text: str, flags: dict[str, int]) -> list[dict]:
+    text = strip_if0(text)
     mons = []
     for block in monster_blocks(text):
+        # Comments can contain commas (erinys). Strip them before splitting.
+        block = re.sub(r"/\*.*?\*/", " ", block, flags=re.S)
         args = split_top_args(block)
         if len(args) < 11:
             continue
@@ -305,21 +355,74 @@ def is_humanoid_body(mon: dict, flags: dict[str, int]) -> bool:
     )
 
 
-def classify(mon: dict, by_name: dict[str, dict], flags: dict[str, int]) -> tuple[str, str]:
-    """Return (sheet, reason). sheet is 'meat', 'humanoid', or 'other'."""
+def leaves_essence(mon: dict, flags: dict[str, int]) -> bool:
     key = mon["name"].lower()
-    if key in RIDERS or mon["mlet"] in {
-        "S_GHOST", "S_WRAITH", "S_VAMPIRE", "S_ZOMBIE", "S_MUMMY"
-    }:
-        return (
-            "essence",
-            "Leaves an essence. Never spoils, cannot be cooked, can be blessed.",
-        )
+    if key in RIDERS or key in ESSENCE_NAMES:
+        return True
+    if mon["m2"] & flags["M2_DEMON"]:
+        return True
+    return mon["mlet"] in ESSENCE_MLETS
+
+
+def is_stable_remains(mon: dict) -> bool:
+    return (
+        mon["mlet"] in {"S_JELLY", "S_EEL"}
+        or mon["name"].lower() == "lizard"
+    )
+
+
+def demon_flagged(mon: dict, flags: dict[str, int]) -> bool:
+    return bool(mon["m2"] & flags["M2_DEMON"])
+
+
+def classify(mon: dict, by_name: dict[str, dict], flags: dict[str, int]) -> tuple[str, str]:
+    """Return (sheet, reason)."""
+    key = mon["name"].lower()
+    if leaves_essence(mon, flags):
+        if demon_flagged(mon, flags):
+            why = (
+                "Demon (M2_DEMON). Leaves an essence. "
+                "Eating it is instantly fatal."
+            )
+        elif key in RIDERS:
+            why = (
+                "Rider. S_DEMON but not M2_DEMON. Leaves an essence. "
+                "Eating it is fatal, and the Rider comes back."
+            )
+        elif mon["mlet"] == "S_DEMON":
+            why = (
+                "S_DEMON but not M2_DEMON. Leaves an essence. "
+                "Eating it is not fatal."
+            )
+        else:
+            why = "Leaves an essence. Never spoils, cannot be cooked, can be blessed."
+        return "essence", why
+    if is_stable_remains(mon):
+        if mon["mlet"] == "S_JELLY":
+            why = "Jelly. Stable food: never rots, no 5% roll, blessable while raw."
+        elif mon["name"].lower() == "lizard":
+            why = "The lizard only. Stable while raw. Newt and the other lizards are not."
+        else:
+            why = "Sea fillet. Stable while raw: never rots, no 5% roll, blessable."
+        return "stable", why
     if mon["mlet"] == "S_TROLL":
         return (
             "meat",
             "Troll. Flagged humanoid, but still leaves meat so it can revive.",
         )
+    if mon["mlet"] == "S_YETI":
+        return (
+            "meat",
+            "Ape class. Flagged humanoid, but leaves meat.",
+        )
+    if mon["m2"] & flags["M2_WERE"]:
+        form = "human form" if mon["mlet"] == "S_HUMAN" else "animal form"
+        return (
+            "meat",
+            f"Lycanthrope, {form}. Eating it causes lycanthropy.",
+        )
+    if key == "cyclops":
+        return "meat", "Giant. Leaves a steak."
     body = mon
     undead_note = ""
     if key in UNDEAD_BODY:
@@ -332,8 +435,6 @@ def classify(mon: dict, by_name: dict[str, dict], flags: dict[str, int]) -> tupl
         return "other", "Golem. Leaves parts or a statue, not meat."
     if mon["mlet"] == "S_PUDDING":
         return "other", "Pudding or ooze. Leaves a glob, not meat."
-    if mon["mlet"] == "S_LICH":
-        return "other", "Crumbles to dust. No meat."
     if "AT_BOOM" in mon["attacks"] or key == "gas spore":
         return "other", "Explodes. No meat."
     if mon["geno"] & flags["G_NOCORPSE"]:
@@ -343,23 +444,44 @@ def classify(mon: dict, by_name: dict[str, dict], flags: dict[str, int]) -> tupl
     return "meat", "Leaves meat when killed (some small monsters only sometimes)."
 
 
-def meat_names(mon: dict, nouns: dict[str, str]) -> tuple[str, str]:
-    noun = nouns.get(mon["mlet"], "meat")
-    pname = False  # filled by caller via flags; placeholder
-    raw = f"raw {mon['name']} {noun}"
-    cooked = f"cooked {mon['name']} {noun}"
-    return raw, cooked, noun  # type: ignore[return-value]
+def meat_noun_for(mon: dict, nouns: dict[str, str]) -> str:
+    key = mon["name"].lower()
+    if key == "monkey":
+        return "meat"
+    if key == "cyclops":
+        return "steak"
+    return nouns.get(mon["mlet"], "meat")
 
 
-def possessive_names(mon: dict, nouns: dict[str, str], flags: dict[str, int]) -> tuple[str, str, str]:
-    noun = nouns.get(mon["mlet"], "meat")
-    if mon["m2"] & flags.get("M2_PNAME", 0):
-        raw = f"{mon['name']}'s raw {noun}"
-        cooked = f"{mon['name']}'s cooked {noun}"
+def ends_with_word(name: str, word: str) -> bool:
+    low = name.lower()
+    w = word.lower()
+    return low == w or low.endswith(" " + w)
+
+
+def possessive(name: str) -> str:
+    if name.lower() == "it":
+        return name + "s"
+    if name.endswith("s") or name.endswith("S"):
+        return name + "'"
+    return name + "'s"
+
+
+def formatted_meat(mon: dict, nouns: dict[str, str], flags: dict[str, int], cooked: bool) -> str:
+    noun = meat_noun_for(mon, nouns)
+    prep = "cooked" if cooked else "raw"
+    name = mon["name"]
+    pname = bool(mon["m2"] & flags.get("M2_PNAME", 0))
+    uniq = bool(mon["geno"] & flags.get("G_UNIQ", 0)) and not pname
+    if ends_with_word(name, noun):
+        body = f"{prep} {name}"
+    elif pname or uniq:
+        body = f"{possessive(name)} {prep} {noun}"
     else:
-        raw = f"raw {mon['name']} {noun}"
-        cooked = f"cooked {mon['name']} {noun}"
-    return raw, cooked, noun
+        body = f"{prep} {name} {noun}"
+    if uniq:
+        body = "the " + body
+    return body
 
 
 def dangers(mon: dict, flags: dict[str, int]) -> str:
@@ -401,6 +523,42 @@ def intrinsics(mon: dict, flags: dict[str, int]) -> str:
     if extra:
         labels.append(extra)
     return ", ".join(labels)
+
+
+def essence_effects(mon: dict, flags: dict[str, int]) -> str:
+    """What eating the essence does, matching cprefx/cpostfx and corpse intrinsics."""
+    key = mon["name"].lower()
+    if demon_flagged(mon, flags):
+        return (
+            "instantly fatal (ate a demon's essence). "
+            "Poison and acid on the monster are not applied."
+        )
+    bits: list[str] = []
+    special = {
+        "quantum mechanic": "speed may toggle",
+        "genetic engineer": "polymorph",
+        "sandestin": "polymorph",
+        "medusa": "petrifies if eaten",
+    }
+    if key in RIDERS:
+        bits.append("instantly fatal; the Rider comes back")
+    extra = special.get(key)
+    if extra:
+        bits.append(extra)
+    gained = intrinsics(mon, flags)
+    if gained:
+        bits.append(gained)
+    if mon["m1"] & flags["M1_POIS"]:
+        bits.append("poisonous (the monster's own flag)")
+    if mon["m1"] & flags["M1_ACID"]:
+        bits.append("acidic")
+    if not bits:
+        bits.append("nutrition only; stock had no special meal effect")
+    if key in {"lich", "demilich", "master lich", "arch-lich"}:
+        bits.append("stock crumbled to dust and left nothing to eat")
+    if key in {"djinni", "sandestin", "mail daemon", "charon"}:
+        bits.append("stock left no corpse")
+    return "; ".join(bits)
 
 
 def stable_flag(name: str) -> str:
@@ -561,29 +719,67 @@ def main() -> None:
         "Can cook",
         "Can bless",
         "5% raw-poison",
+        "Eating fatal",
+        "Demon-flagged",
         "Eat effects",
         "Revival",
         "Notes",
     ]
     for col, header in enumerate(ess_headers, 1):
         ess_ws.cell(1, col, header)
+    stable_ws = wb.create_sheet("Stable remains", 1)
+    stable_headers = [
+        "Monster",
+        "Class",
+        "Raw name",
+        "Cooked name",
+        "Nutrition",
+        "Weight",
+        "Rots",
+        "5% raw-poison",
+        "Blessable while raw",
+        "Intrinsics and effects",
+        "Dangers",
+        "Notes",
+    ]
+    for col, header in enumerate(stable_headers, 1):
+        stable_ws.cell(1, col, header)
 
-    meat_n = human_n = other_n = ess_n = 1
+    meat_n = human_n = other_n = ess_n = stable_n = 1
     for mon in monsters:
         sheet, reason = classify(mon, by_name, flags)
         aliases = ""
         if mon["male"] != mon["name"] or mon["female"] != mon["name"]:
             aliases = f"{mon['male']} / {mon['female']}"
+        if sheet == "stable":
+            raw = formatted_meat(mon, nouns, flags, False)
+            cooked = formatted_meat(mon, nouns, flags, True)
+            stable_ws.append(
+                [
+                    mon["name"],
+                    mon["mlet"],
+                    raw,
+                    cooked,
+                    mon["nutrition"],
+                    mon["weight"],
+                    "never",
+                    "no",
+                    "yes",
+                    intrinsics(mon, flags),
+                    dangers(mon, flags),
+                    reason + " Can still be cooked. Cooking does not make it spoil.",
+                ]
+            )
+            stable_n += 1
+            continue
         if sheet == "meat":
-            raw, cooked, _noun = possessive_names(mon, nouns, flags)
-            exempt = "yes" if (
-                mon["mlet"] == "S_EEL" or mon["name"].lower() == "lizard"
-            ) else "no"
+            raw = formatted_meat(mon, nouns, flags, False)
+            cooked = formatted_meat(mon, nouns, flags, True)
+            exempt = "no"
             size_val = flags.get(mon["size"], 0)
             always = (
                 size_val >= flags.get("MZ_LARGE", 3)
-                or mon["name"].lower() == "lizard"
-                or mon["name"].lower() in RIDERS
+                or bool(mon["m2"] & flags["M2_WERE"])
             )
             drop = "always" if always else "sometimes"
             meat_ws.append(
@@ -607,20 +803,18 @@ def main() -> None:
         elif sheet == "essence":
             listed = mon["nutrition"]
             eaten = listed if listed else 50
-            effects = []
             key = mon["name"].lower()
-            if key == "wraith":
-                effects.append("gain a level")
-            if key in RIDERS:
-                effects.append("eating is instantly fatal; the Rider comes back")
-            if mon["m1"] & flags["M1_POIS"]:
-                effects.append("poisonous (the monster's own flag, not a living race)")
-            if not effects:
-                effects.append("no special effect beyond a small meal")
+            flagged = demon_flagged(mon, flags)
+            fatal = flagged or key in RIDERS
+            effects = essence_effects(mon, flags)
             if key in RIDERS:
                 revival = "yes, revives from this essence"
             elif mon["mlet"] in {"S_VAMPIRE", "S_ZOMBIE", "S_MUMMY"}:
                 revival = "undead turning brings this monster back from the essence"
+            elif key == "wizard of yendor":
+                revival = "comes back on his own; not from this essence"
+            elif mon["mlet"] == "S_LICH":
+                revival = "no corpse revival in stock; turning can raise this essence"
             else:
                 revival = "no automatic revival"
             ess_ws.append(
@@ -628,7 +822,7 @@ def main() -> None:
                     mon["name"],
                     aliases,
                     mon["mlet"],
-                    f"{mon['name']}'s essence",
+                    f"{possessive(mon['name'])} essence",
                     eaten,
                     listed,
                     20,
@@ -636,7 +830,9 @@ def main() -> None:
                     "no",
                     "yes",
                     "no",
-                    "; ".join(effects),
+                    "yes" if fatal else "no",
+                    "yes" if flagged else "no",
+                    effects,
                     revival,
                     reason + " Not counted as a living race. Cannibalism is gone.",
                 ]
@@ -663,6 +859,7 @@ def main() -> None:
     style_sheet(human_ws, human_headers, human_n)
     style_sheet(other_ws, other_headers, other_n)
     style_sheet(ess_ws, ess_headers, ess_n)
+    style_sheet(stable_ws, stable_headers, stable_n)
 
     tin = wb.create_sheet("Tins and eggs")
     tin_headers = ["Item", "Player-facing name", "Notes"]
@@ -726,18 +923,27 @@ def main() -> None:
         ("Noun table", "include/meatnoun.h, one noun per monster class. Default is meat."),
         ("Dragon", "raw gray dragon steak, cooked gray dragon steak."),
         ("Sea monsters", EXEMPT_NOTE),
-        ("Lizard", "The creature named lizard only, not newt, gecko, iguana, crocodile, or salamander."),
-        ("Humanoids", "M1_HUMANOID, or the human or elf race, leave no meat. Spirits leave essence instead. Trolls still leave meat."),
+        ("Lizard", "The creature named lizard only, not newt, gecko, iguana, crocodile, or salamander. Lizard meat never rots."),
+        ("Jellies", "Blue jelly, spotted jelly, and ochre jelly never rot, skip the 5% roll, and can be blessed raw. The noun is not repeated: raw blue jelly."),
+        ("Humanoids", "M1_HUMANOID, or the human or elf race, leave no meat, except the named essences, the ape class, lycanthropes, Cyclops, and trolls."),
+        ("Apes", "Monkey, ape, owlbear, yeti, carnivorous ape, and sasquatch leave meat. Monkey is meat. The large ones are steak."),
+        ("Lycanthropes", "Wererat, werejackal, and werewolf leave meat in animal form and in human form. Eating either form causes lycanthropy. A wish for the shared name still produces the human form."),
+        ("Cyclops", "Leaves the Cyclops's raw steak. Other giants leave nothing."),
+        ("Orcs", "Only the goblin leaves an essence. Hobgoblin, orc, hill orc, Mordor orc, Uruk-hai, orc shaman, and orc-captain still leave nothing. Orc zombies and orc mummies already leave an essence."),
         ("Essences", "Named \"<monster>'s essence\" (wraith's essence, Death's essence). Wishes may also say \"essence of <monster>\". Never spoil, cannot be cooked, can be blessed. No 5% raw-poison roll."),
+        ("Demons", "Every M2_DEMON leaves an essence, and eating it is instantly fatal. The death reason is \"ate a demon's essence\". S_DEMON monsters that are not M2_DEMON (sandestin, djinni, mail daemon) leave an essence and are not fatal. The Riders are S_DEMON, not M2_DEMON, and keep their own fatal meal, and they still come back. Imps, manes, lemures, quasits, and tengu are not demons."),
         ("Riders", "Death, Pestilence, and Famine leave essence. They still revive from it. Eating it is instantly fatal, as with the old Rider corpse."),
         ("Trolls", "Trolls still leave meat (raw troll steak), not essence. Revival uses that meat."),
-        ("Medusa", "Humanoid, so she leaves no meat. Killing her is still recorded. The level does not need her body."),
-        ("Quest", "Quest leaders and nemeses who are humanoid leave no meat. The quest does not need that body."),
+        ("Medusa", "Leaves Medusa's essence. Eating it still petrifies. Killing her is still recorded. The level does not need her body."),
+        ("Wizard of Yendor", "Leaves an essence. He still comes back, and still drops what he was carrying. The essence is not what brings him back."),
+        ("Croesus", "Leaves an essence. His gold and other carried items still drop."),
+        ("Charon", "Would leave an essence. This build does not compile Charon (CHARON is not defined)."),
+        ("Quest", "Quest leaders who are ordinary humanoids still leave nothing. Demon nemeses leave a fatal essence. Cyclops leaves a steak."),
         ("Vampires, zombies, mummies", "They leave their own essence, not an old human/elf/orc body. Eating it uses that undead's own flags (poisonous if the undead is). It is not cannibalism and it is not tainted. Undead turning revives them from the essence. Ghoul and skeleton are included because they are zombie-class. Vlad leaves essence instead of crumbling."),
         ("Ghost nutrition", "Ghost, shade, wraith, barrow wight, and Nazgul are listed with 0 nutrition. Eating their essence gives 50, a small meal. A wraith's essence still grants a level."),
         ("Cannibalism", "Removed. No Luck penalty, no aggravate, no 'You cannibal!' message, no cave dweller or orc exception, and pets do not refuse same-race food."),
         ("Bones", "Your own body is still saved with a bones file, under your name. Sleeping-gas traps no longer place human, elf, dwarf, gnome, or orc meat."),
-        ("Bless", "Raw meat cannot be blessed, except the exempt seafood and lizard meat. The message is: You can't bless <food>! Cooked meat can be blessed. Blessed cooked meat never rots and never causes tainted or fatal food poisoning."),
+        ("Bless", "Raw meat cannot be blessed, except lizard meat, sea fillets, jellies, and essences. The message is: You can't bless <food>! Cooked meat can be blessed. Blessed cooked meat never rots and never causes tainted or fatal food poisoning."),
         ("Raw poison", "Eating raw meat rolls 1 in 20 for fatal food poisoning, in addition to the old tainted-meat rules. Same cure as other food poisoning."),
         ("Cook", "#cook needs a flint and tinder box. Every role starts with one. The box is not used up. Cooking takes a few turns. Cooked meat rots about ten times slower."),
         ("Tins and eggs", "Still work. Their names do not say corpse. See the Tins and eggs sheet."),
@@ -754,8 +960,16 @@ def main() -> None:
     print(f"wrote {OUT}")
     print(
         f"foods {len(foods)} meat {meat_n - 1} essence {ess_n - 1} "
-        f"humanoid {human_n - 1} other {other_n - 1}"
+        f"stable {stable_n - 1} humanoid {human_n - 1} other {other_n - 1}"
     )
+    demons = [m["name"] for m in monsters if demon_flagged(m, flags)]
+    nonfatal = [
+        m["name"]
+        for m in monsters
+        if m["mlet"] == "S_DEMON" and not demon_flagged(m, flags)
+    ]
+    print("M2_DEMON:", ", ".join(demons))
+    print("S_DEMON not M2_DEMON:", ", ".join(nonfatal))
 
 
 if __name__ == "__main__":

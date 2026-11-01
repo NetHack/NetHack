@@ -10,6 +10,13 @@ RighteousHack will eventually replace lawful, neutral, and chaotic
 with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
+2026-11-01
+Demons leave an essence, and eating any demon's essence is fatal.
+Mind flayers, liches, nymphs, the goblin, and a few named people
+leave an essence too. Apes, were-creatures, and Cyclops leave meat.
+Jellies, lizard meat, and fish fillets do not spoil. A jelly's
+name is no longer said twice.
+
 2026-10-31
 Spirits leave an essence, named like "wraith's essence" or
 "Death's essence". It never spoils, cannot be cooked, and can be

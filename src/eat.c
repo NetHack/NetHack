@@ -63,7 +63,9 @@ staticfn struct obj *find_cook_obj(void);
 #define nonrotting_corpse(mnum) \
     ((mnum) == PM_LIZARD || (mnum) == PM_LICHEN \
      || is_rider(&mons[mnum])                   \
-     || (mnum) == PM_ACID_BLOB)
+     || (mnum) == PM_ACID_BLOB                  \
+     || mons[mnum].mlet == S_JELLY              \
+     || mons[mnum].mlet == S_EEL)
 
 /* non-rotting non-corpses; unlike lizard corpses, these items will behave
    as if rotten if they are cursed (fortune cookies handled elsewhere) */
@@ -829,6 +831,20 @@ staticfn void
 cprefx(int pm)
 {
     (void) maybe_cannibal(pm, TRUE);
+    /* Any demon essence kills at once. Riders are not M2_DEMON;
+       they keep their own fatal path, which also brings them back. */
+    if (is_demon(&mons[pm])) {
+        pline("Eating a demon's essence is instantly fatal.");
+        Strcpy(svk.killer.name, "ate a demon's essence");
+        svk.killer.format = NO_KILLER_PREFIX;
+        done(DIED);
+        /* life-saving needed to reach here; do not finish the meal */
+        exercise(A_WIS, FALSE);
+        if (svc.context.victual.piece)
+            svc.context.victual.eating = 0;
+        return;
+    }
+
     if (flesh_petrifies(&mons[pm])) {
         if (!Stone_resistance
             && !(poly_when_stoned(gy.youmonst.data)
@@ -837,8 +853,12 @@ cprefx(int pm)
             if (svc.context.tin.tin)
                 use_up_tin(svc.context.tin.tin);
 
-            Sprintf(svk.killer.name, "tasting %s meat",
-                    mons[pm].pmnames[NEUTRAL]);
+            if (leaves_essence(&mons[pm]))
+                Sprintf(svk.killer.name, "tasting %s essence",
+                        s_suffix(mons[pm].pmnames[NEUTRAL]));
+            else
+                Sprintf(svk.killer.name, "tasting %s meat",
+                        mons[pm].pmnames[NEUTRAL]);
             svk.killer.format = KILLED_BY;
             You("turn to stone.");
             done(STONING);
@@ -1162,16 +1182,23 @@ cpostfx(int pm)
     if (ge.eatmbuf)
         (void) eatmdone();
 
+    /* Life-saving after a demon essence should not grant its intrinsics. */
+    if (is_demon(&mons[pm]))
+        return;
+
     switch (pm) {
     case PM_WRAITH:
         pluslvl(FALSE);
         break;
+    case PM_WERERAT:
     case PM_HUMAN_WERERAT:
         catch_lycanthropy = PM_WERERAT;
         break;
+    case PM_WEREJACKAL:
     case PM_HUMAN_WEREJACKAL:
         catch_lycanthropy = PM_WEREJACKAL;
         break;
+    case PM_WEREWOLF:
     case PM_HUMAN_WEREWOLF:
         catch_lycanthropy = PM_WEREWOLF;
         break;
@@ -1268,7 +1295,7 @@ cpostfx(int pm)
         break;
     case PM_CHAMELEON:
     case PM_DOPPELGANGER:
-    case PM_SANDESTIN: /* moot--they don't leave corpses */
+    case PM_SANDESTIN: /* essence; not a demon, so this is not fatal */
     case PM_GENETIC_ENGINEER:
         if (Unchanging) {
             You_feel("momentarily different."); /* same as poly trap */
@@ -1891,6 +1918,8 @@ eatcorpse(struct obj *otmp)
     assert(ismnum(mnum));
     stoneable = (flesh_petrifies(&mons[mnum]) && !Stone_resistance
                  && !poly_when_stoned(gy.youmonst.data));
+    /* Demon essence kills in cprefx. Skip poison and acid so that
+       death is the demon meal, not a poisonous-meat side effect. */
 
     /* KMH, conduct */
     if (!vegan(&mons[mnum]))
@@ -1909,7 +1938,7 @@ eatcorpse(struct obj *otmp)
     }
     rotted = meat_rotted(otmp, FALSE);
     /* Fresh raw meat: 1 in 20 is fatal food poisoning, on top of taint.
-       Cooked meat, lizard meat, and sea-monster fillets never roll it. */
+       Cooked meat, essences, lizard meat, fillets, and jellies never roll it. */
     if (!otmp->ocooked && !glob
         && !leaves_essence(&mons[mnum])
         && !raw_meat_poison_exempt(&mons[mnum]) && !rn2(20))
@@ -1943,12 +1972,13 @@ eatcorpse(struct obj *otmp)
         else
             useupf(otmp, 1L);
         return 2;
-    } else if (acidic(&mons[mnum]) && !Acid_resistance) {
+    } else if (!is_demon(&mons[mnum]) && acidic(&mons[mnum])
+               && !Acid_resistance) {
         tp++;
         You("have a very bad case of stomach acid.");   /* not body_part() */
         losehp(rnd(15), !glob ? "acidic meat" : "acidic glob",
                KILLED_BY_AN); /* acid damage */
-    } else if (poisonous(&mons[mnum]) && rn2(5)) {
+    } else if (!is_demon(&mons[mnum]) && poisonous(&mons[mnum]) && rn2(5)) {
         tp++;
         pline("Ecch - that must have been poisonous!");
         if (!Poison_resistance) {
@@ -1959,7 +1989,8 @@ eatcorpse(struct obj *otmp)
             You("seem unaffected by the poison.");
 
     /* now any corpse left too long will make you mildly ill */
-    } else if ((rotted > 5L || (rotted > 3L && rn2(5))) && !Sick_resistance) {
+    } else if (!is_demon(&mons[mnum])
+               && (rotted > 5L || (rotted > 3L && rn2(5))) && !Sick_resistance) {
         tp++;
         You_feel("%ssick.", (Sick) ? "very " : "");
         losehp(rnd(8), !glob ? "spoiled meat" : "rotted glob", KILLED_BY_AN);
@@ -2003,6 +2034,8 @@ eatcorpse(struct obj *otmp)
         You("peck the eyeball with delight.");
     } else if (tp) {
         ; /* we've already delivered a message; don't add "it tastes okay" */
+    } else if (is_demon(&mons[mnum])) {
+        ; /* cprefx says this meal is fatal */
     } else {
         /* yummy is always False for omnivores, palatable always True */
         boolean yummy = (vegan(&mons[mnum])
