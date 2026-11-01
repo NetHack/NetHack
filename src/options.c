@@ -152,9 +152,9 @@ static const struct paranoia_opts {
     { PARANOID_QUIT, "quit", 1, "explore", 2,
       "yes vs y to quit or to enter explore mode" },
     { PARANOID_DIE, "die", 1, "death", 2,
-      "yes vs y to die (explore mode or debug mode)" },
+      "yes vs y to die (explore mode or prophet mode)" },
     { PARANOID_BONES, "bones", 1, 0, 0,
-      "yes vs y to save bones data when dying in debug mode" },
+      "yes vs y to save bones data when dying in prophet mode" },
     { PARANOID_HIT, "attack", 1, "hit", 1,
       "yes vs y to attack a peaceful monster" },
     { PARANOID_BREAKWAND, "wand-break", 2, "break-wand", 2,
@@ -3488,7 +3488,8 @@ optfn_playmode(
         } else if (!strncmpi(op, "explore", 6)
                    || !strncmpi(op, "discovery", 6)) {
             wizard = FALSE, discover = TRUE;
-        } else if (!strncmpi(op, "debug", 5) || !strncmpi(op, "Elisha", 6)) {
+        } else if (!strncmpi(op, "debug", 5) || !strncmpi(op, "prophet", 7)
+                   || !strncmpi(op, "Elisha", 6)) {
             wizard = TRUE, discover = FALSE;
         } else {
             config_error_add("Invalid value for \"%s\":%s",
@@ -3498,7 +3499,7 @@ optfn_playmode(
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        Strcpy(opts, wizard ? "debug" : discover ? "explore" : "normal");
+        Strcpy(opts, wizard ? "prophet" : discover ? "explore" : "normal");
         return optn_ok;
     }
     return optn_ok;

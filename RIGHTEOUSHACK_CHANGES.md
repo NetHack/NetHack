@@ -702,6 +702,14 @@ King Solomon's #chat, before the Gibeon vision, always speaks
 the hint about asking for a heart to judge rightly, then
 Mark 8:36. After the vision, either line may be spoken.
 
+### Prophet mode (2026-11-01)
+
+The mode started with -D is prophet mode. Help, the guidebook, the
+options screen, and the messages that used to say wizard mode or
+debug mode say prophet mode. `OPTIONS=playmode:prophet` selects it.
+`playmode:debug` still selects it. The Wizard of Yendor and the
+Wizard role are unchanged. The sysconf list is still named WIZARDS.
+
 ### Prophet, Capernaum, and PETRA (2026-11-01)
 
 The Oracle is the Prophet. Paying for a minor consultation hears one
@@ -709,7 +717,7 @@ of the placeholder proverbs. Paying the full price for a major
 consultation hears "The treasure you seek has always been yours."
 A short payment hears "That is not enough." That short line is a
 stand-in; Jon did not write one. The overview feature line is
-exactly "Prophet of the Lord." Wizard mode tags that level
+exactly "Prophet of the Lord." Prophet mode tags that level
 [prophet]. The #levelport menu shows prophet. The xlogfile
 achievement is consulted_the_prophet. The big room's overview and
 achievements call it the Valley of Dry Bones. The maps of those
@@ -721,7 +729,7 @@ open to the old tune. Apply the Key to Babylon's Palace at the
 drawbridge, or at a door of the palace. A lock pick does not open
 those doors. Interior chests can still be picked.
 
-Capernaum replaces every Minetown variant. Wizard mode tags that
+Capernaum replaces every Minetown variant. Prophet mode tags that
 level [capernaum], and the #levelport menu shows capernaum. The
 xlogfile achievement is entered_capernaum. The old file name
 minetn-1 used to trigger the orc-town gang; Capernaum does not.

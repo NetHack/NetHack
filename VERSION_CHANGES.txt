@@ -11,6 +11,12 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-01
+The old wizard mode is called prophet mode. Help, the guidebook,
+and the messages that name the mode say prophet mode. The
+playmode option accepts prophet. The old value debug still works.
+The Wizard of Yendor and the Wizard role are unchanged.
+
+2026-11-01
 The dungeon overview tags the Prophet's level [prophet] and
 Capernaum [capernaum]. The feature line is "Prophet of the Lord."
 The #levelport menu uses those same names. The xlogfile records

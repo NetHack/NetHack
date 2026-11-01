@@ -709,8 +709,8 @@ the floor and go straight to checking inventory,
 or (for \(lq#loot\(rq to remove a saddle),
 skip containers and go straight to adjacent monsters.
 .lp ""
-In debug mode (aka \(lqwizard mode\(rq), the \(oqm\(cq prefix may also be
-used with the \(lq#teleport\(rq and \(lq#wizlevelport\(rq commands.
+In prophet mode, the \(oqm\(cq prefix may also be
+used with the \(lq#teleport\(rq and \(lq#prolevelport\(rq commands.
 .lp F[yuhjklbn]
 Prefix:  fight a monster (even if you only guess one is there).
 .lp "g[yuhjklbn]"
@@ -924,9 +924,9 @@ Show overview.
 .lp ""
 Shortcut for \(lq#overview\(rq:  list interesting dungeon levels visited.
 .lp ""
-(Prior to 3.6.0, \(oq\(haO\(cq was a debug mode command which listed
+(Prior to 3.6.0, \(oq\(haO\(cq was a prophet mode command which listed
 the placement of all special levels.
-Use \(lq#wizwhere\(rq to run that command.)
+Use \(lq#prowhere\(rq to run that command.)
 .lp p
 Pay your shopping bill.
 .lp P
@@ -1298,7 +1298,7 @@ Close a door.
 Default key is \(oqc\(cq.
 .lp "#conduct "
 List voluntary challenges you have maintained.
-.\" [only in wizard mode:]
+.\" [only in prophet mode:]
 .\" Also lists various achievements representing progress toward ultimate
 .\" ascension if any have been attained.
 Autocompletes.
@@ -1307,7 +1307,7 @@ Default key is \(oqM-C\(cq.
 See the section below entitled \(lqConduct\(rq for details.
 .lp #debugfuzzer
 Start the fuzz tester.
-Debug mode only.
+Prophet mode only.
 .lp "#dip     "
 Dip an object into something.
 Autocompletes.
@@ -1359,7 +1359,7 @@ Autocompletes.
 Default key is \(oqM-f\(cq.
 .lp #genocided
 List any monster types which have been genocided.
-In explore mode and debug mode it also shows types which have become
+In explore mode and prophet mode it also shows types which have become
 extinct.
 .lp ""
 The display order is the same as is used by #vanquished.
@@ -1429,11 +1429,11 @@ The \(oq\f(CRm\fP\(cq prefix operates the same as for \(lq#known\(rq.
 .lp #levelchange
 Change your experience level.
 Autocompletes.
-Debug mode only.
+Prophet mode only.
 .lp #lightsources
 Show mobile light sources.
 Autocompletes.
-Debug mode only.
+Prophet mode only.
 .lp "#look    "
 Look at what is here, under you.
 Default key is \(oq:\(cq.
@@ -1503,7 +1503,7 @@ Default keys are \(oq\(haO\(cq, and \(oqM-O\(cq.
 Test the panic routine.
 Terminates the current game.
 Autocompletes.
-Debug mode only.
+Prophet mode only.
 .lp ""
 Asks for confirmation; default is \f(CRn\fP (no); continue playing.
 To really panic, respond with \f(CRy\fP.
@@ -1528,7 +1528,7 @@ The \(oqm\(cq prefix forces use of a menu.
 .lp #polyself
 Polymorph self.
 Autocompletes.
-Debug mode only.
+Prophet mode only.
 .lp "#pray    "
 Pray to the gods for help.
 Autocompletes.
@@ -1696,7 +1696,7 @@ Default key is \(oqM-s\(cq.
 .lp "#stats   "
 Show memory usage statistics.
 Autocompletes.
-Debug mode only.
+Prophet mode only.
 .lp "#suspend "
 Suspend the game, switching from NetHack to the terminal it was started
 from without performing save-and-exit.
@@ -1728,7 +1728,7 @@ when deciding whether to show them or the floor underneath them.
 .lp ""
 In explore mode, you can choose to view the full map rather than just
 its explored portion.
-In debug mode there are additional choices.
+In prophet mode there are additional choices.
 .lp ""
 Autocompletes.
 Default key is \(oq<del>\(cq or \(oq<delete>\(cq (see \fIDel\fP above).
@@ -1748,7 +1748,7 @@ Default key is \(oqt\(cq.
 .lp "#timeout "
 Look at the timeout queue.
 Autocompletes.
-Debug mode only.
+Prophet mode only.
 .lp "#tip     "
 Tip over a container (bag or box) to pour out its contents.
 When there are containers on the floor, the game will prompt to pick one
@@ -1849,7 +1849,7 @@ Default key is \(oqV\(cq.
 .lp "#vision  "
 Show vision array.
 Autocompletes.
-Debug mode only.
+Prophet mode only.
 .lp "#wait    "
 Rest one move while doing nothing.
 Default key is \(oq.\(cq, and also \(oq\ \(cq if
@@ -1871,55 +1871,55 @@ Default key is \(oqw\(cq.
 Wipe off your face.
 Autocompletes.
 Default key is \(oqM-w\(cq.
-.lp "#wizborn "
+.lp "#proborn "
 Show monster birth, death, genocide, and extinct statistics.
-Debug mode only.
-.lp "#wizbury "
+Prophet mode only.
+.lp "#probury "
 Bury objects under and around you.
 Autocompletes.
-Debug mode only.
-.lp #wizcast
+Prophet mode only.
+.lp #procast
 Cast any spell.
-Debug mode only.
-.lp #wizdetect
+Prophet mode only.
+.lp #prodetect
 Reveal hidden things (secret doors or traps or unseen monsters)
 within a modest radius.
 No time elapses.
 Autocompletes.
-Debug mode only.
+Prophet mode only.
 Default key is \(oq\(haE\(cq.
-.lp #wizgenesis
+.lp #progenesis
 Create a monster.
 May be prefixed by a count to create more than one.
 Autocompletes.
-Debug mode only.
+Prophet mode only.
 Default key is \(oq\(haG\(cq.
-.lp #wizidentify
+.lp #proidentify
 Identify all items in inventory.
 Autocompletes.
-Debug mode only.
+Prophet mode only.
 Default key is \(oq\(haI\(cq.
-.lp #wizintrinsic
+.lp #prointrinsic
 Set one or more intrinsic attributes.
 Autocompletes.
-Debug mode only.
-.lp "#wizkill "
+Prophet mode only.
+.lp "#prokill "
 Remove monsters from play by just pointing at them.
 By default the hero gets credit or blame for killing the targets.
 Precede this command with the \(oq\f(CRm\fP\(cq prefix to override that.
 Autocompletes.
-Debug mode only.
-.lp #wizlevelport
+Prophet mode only.
+.lp #prolevelport
 Teleport to another level.
 Autocompletes.
-Debug mode only.
+Prophet mode only.
 Default key is \(oq\(haV\(cq.
-.lp "#wizmap  "
+.lp "#promap  "
 Map the level.
 Autocompletes.
-Debug mode only.
+Prophet mode only.
 Default key is \(oq\(haF\(cq.
-.lp #wizrumorcheck
+.lp #prorumorcheck
 Verify rumor boundaries by displaying first and last true rumors and
 first and last false rumors.
 .lp ""
@@ -1927,29 +1927,29 @@ Also displays first, second, and last random engravings, epitaphs,
 and hallucinatory monsters.
 .lp ""
 Autocompletes.
-Debug mode only.
-.lp #wizseenv
+Prophet mode only.
+.lp #proseenv
 Show map locations' seen vectors.
 Autocompletes.
-Debug mode only.
-.lp #wizsmell
+Prophet mode only.
+.lp #prosmell
 Smell monster.
 Autocompletes.
-Debug mode only.
-.lp #wizwhere
+Prophet mode only.
+.lp #prowhere
 Show locations of special levels.
 Autocompletes.
-Debug mode only.
-.lp "#wizwish "
+Prophet mode only.
+.lp "#prowish "
 Wish for something.
 Autocompletes.
-Debug mode only.
+Prophet mode only.
 Default key is \(oq\(haW\(cq.
 Precede this command with the \(oq\f(CRm\fP\(cq prefix to show a wish history menu.
 .lp "#wmode   "
 Show wall modes.
 Autocompletes.
-Debug mode only.
+Prophet mode only.
 .lp "#zap     "
 Zap a wand.
 Default key is \(oqz\(cq.
@@ -3790,7 +3790,7 @@ Example:
 \f(CRSYMBOLS=S_golem:7\fP
 .ed
 .lp WIZKIT
-Debug mode only:  extra items to add to initial inventory.
+Prophet mode only:  extra items to add to initial inventory.
 Value is the name of a text file containing a list of item names,
 one per line, up to a maximum of 128 lines.
 Each line is processed by the function that handles wishing.
@@ -4376,15 +4376,15 @@ Default \(oq}\(cq.
 ." .lp menu_tab_sep
 ." Format menu entries using TAB to separate columns (default off).
 ." Only applicable to some menus, and only useful to some interfaces.
-." Debug mode only.
+." Prophet mode only.
 .lp mon_movement
 Show a message when hero notices a monster movement (default is off).
 .lp monpolycontrol
 Prompt for new form whenever any monster changes shape (default off).
-Debug mode only.
+Prophet mode only.
 .lp montelecontrol
 Prompt for destination whenever any monster gets teleported (default off).
-Debug mode only.
+Prophet mode only.
 .lp mouse_support
 Allow use of the mouse for input and travel.
 Valid settings are:
@@ -4492,7 +4492,7 @@ require \(lqyes\(rq rather than \(oqy\(cq to confirm dying (not
 useful in normal play; applies to explore mode);
 .PL bones
 require \(lqyes\(rq rather than \(oqy\(cq to confirm saving
-bones data when dying in debug mode;
+bones data when dying in prophet mode;
 .PL attack
 require \(lqyes\(rq rather than \(oqy\(cq to confirm attacking
 a peaceful monster;
@@ -4663,10 +4663,11 @@ the objects\(rq since the pile size will always be at least that big;
 default value is 5.
 Persistent.
 .lp playmode
-Values are \(lqnormal\(rq, \(lqexplore\(rq, or \(lqdebug\(rq.
-Allows selection of explore mode (also known as discovery mode) or debug
-mode (also known as wizard mode) instead of normal play.
-Debug mode might only be allowed for someone logged in under a particular
+Values are \(lqnormal\(rq, \(lqexplore\(rq, or \(lqprophet\(rq.
+The old value \(lqdebug\(rq is still accepted.
+Allows selection of explore mode (also known as discovery mode) or prophet
+mode instead of normal play.
+Prophet mode might only be allowed for someone logged in under a particular
 user name (on multi-user systems) or specifying a particular character
 name (on single-user systems) or it might be disabled entirely.  Requesting
 it when not allowed or not possible results in explore mode instead.
@@ -4792,7 +4793,7 @@ Prevents you from waiting or searching when next to a hostile monster
 (default on). Persistent.
 .lp sanity_check
 Evaluate monsters, objects, and map prior to each turn (default off).
-Debug mode only.
+Prophet mode only.
 .lp "scores  "
 Control what parts of the score list you are shown at the end (for example
 \(lqscores:5 top scores/4 around my score/own scores\(rq).
@@ -4965,7 +4966,7 @@ Does not affect traveling via the \(oq\f(CR_\fP\(cq (\(lq#travel\(rq) command.
 Persistent.
 ." .lp travel_debug
 ." Display intended path during each step of travel (default off).
-." Debug mode only.
+." Prophet mode only.
 .lp tutorial
 Play a tutorial level at the start of the game.
 Setting this option on or off in the config file will skip the query.
@@ -5048,7 +5049,7 @@ that would
 be the \fIrightmost\fP option in the list.
 .lp wizweight
 Augment object descriptions with their objects' weight (default off).
-Debug mode only.
+Prophet mode only.
 .lp zerocomp
 When writing out a save file, perform zero-comp compression of the
 contents. Not all ports support zero-comp compression. It has no effect
@@ -6289,9 +6290,9 @@ system).
 .\"               as filling and justifying are concerned
 .lp
 WIZARDS\ =\ A space-separated list of user names who are allowed to
-play in debug mode (commonly referred to as wizard mode).
+play in prophet mode.
 A value of a single
-asterisk (*) allows anyone to start a game in debug mode.
+asterisk (*) allows anyone to start a game in prophet mode.
 .lp
 SHELLERS\ =\ A list of users who are allowed to use the shell
 escape command (!).  The syntax is the same as WIZARDS.
@@ -6445,10 +6446,10 @@ The other benefits of explore mode are left for
 the trepid reader to discover.
 .pg
 .hn 2
-Debug mode
+Prophet mode
 .pg
-Debug mode, also known as wizard mode, is undocumented aside from this
-brief description and the various \(lqdebug mode only\(rq commands listed
+Prophet mode is undocumented aside from this
+brief description and the various \(lqprophet mode only\(rq commands listed
 among the command descriptions.
 It is intended for tracking down problems within the
 program rather than to provide god-like powers to your character, and
@@ -6457,14 +6458,16 @@ themselves.
 It is initiated by starting the game with the
 .op \-D
 command-line switch or with the
-.op playmode:debug
+.op playmode:prophet
 option.
+.op playmode:debug
+is still accepted.
 .pg
 For some systems, the player must be logged in
-under a particular user name to be allowed to use debug mode; for others,
+under a particular user name to be allowed to use prophet mode; for others,
 the hero must be given a particular character name (but may be any role;
-there's no connection between \(lqwizard mode\(rq and the Wizard role).
-Attempting to start a game in debug mode when not allowed
+there's no connection between \(lqprophet mode\(rq and the Wizard role).
+Attempting to start a game in prophet mode when not allowed
 or not available will result in falling back to explore mode instead.
 .
 .hn

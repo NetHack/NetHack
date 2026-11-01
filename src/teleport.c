@@ -960,7 +960,7 @@ dotelecmd(void)
             { 'n', "normal ^T on demand; no spell, obey restrictions" },
             { 's', "via spellcast; no intrinsic teleport" },
             { 't', "try ^T without having it; no spell" },
-            { 'w', "debug mode; ignore restrictions" }, /* trad wizard mode */
+            { 'w', "prophet mode; ignore restrictions" }, /* trad wizard mode */
         };
         menu_item *picks = (menu_item *) 0;
         anything any;

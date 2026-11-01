@@ -157,4 +157,4 @@ l     loot      loot a box on the floor
 N     name      name an item or type of object
 u     untrap    untrap something (usually a trapped object)
 
-Additional commands are available in debug mode (also known as wizard mode).
+Additional commands are available in prophet mode.

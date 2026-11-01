@@ -857,7 +857,7 @@ dorecover(NHFILE *nhfp)
     clear_nhwindow(WIN_MESSAGE);
     You("return to level %d in %s%s.", depth(&u.uz),
         svd.dungeons[u.uz.dnum].dname,
-        flags.debug ? " while in debug mode"
+        flags.debug ? " while in prophet mode"
                     : flags.explore ? " while in explore mode" : "");
     curs(WIN_MAP, 1, 1);
     dotcnt = 0;

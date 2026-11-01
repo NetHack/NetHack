@@ -138,7 +138,7 @@ selectsaved    tty (Qt and Windows GUI do this unconditionally)
 splash_screen  curses, Qt, Windows GUI
 tiled_map      show map as tiles, forces ascii_map Off; Qt, X11
 
-Boolean options available when running in debug mode (aka wizard mode):
+Boolean options available when running in prophet mode:
 menu_tab_sep   menu formatting--do not touch
 monpolycontrol have player choose shape-changing monsters' new shapes
 montelecontrol let player choose destination for teleported monsters
@@ -235,8 +235,8 @@ paranoid_confirmation  space separated list    [paranoid_confirm:pray swim]
               Confirm -- when requiring "yes", also require "no" to reject;
                       also requires yes rather than y for pray, trap, Autoall
               quit    -- yes vs y to confirm quitting or to enter explore mode
-              die     -- yes vs y to confirm dying (for explore or debug mode)
-              bones   -- yes vs y to confirm saving bones data in debug mode
+              die     -- yes vs y to confirm dying (for explore or prophet mode)
+              bones   -- yes vs y to confirm saving bones data in prophet mode
               attack  -- yes vs y to confirm attacking a peaceful monster
               wand-break  -- yes vs y to confirm breaking a wand
               eating  -- yes vs y to confirm whether to continue eating
@@ -369,7 +369,7 @@ pettype    your preferred type of pet (cat, dog, horse, random,    [random]
            want to avoid a starting pet).  Most roles allow dog or cat
            but not horse.  For roles which force a particular type,
            pettype is ignored unless it specifies 'none'.
-playmode   normal play or non-scoring explore mode or debug mode   [normal]
+playmode   normal play or non-scoring explore mode or prophet mode   [normal]
 race       Your starting race (e.g., race:Human, race:Elf).        [random]
            Most roles restrict race choice to a subset.
 role       Your starting role (e.g., role:Barbarian, role:Valk).   [random]

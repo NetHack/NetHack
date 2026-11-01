@@ -10,9 +10,10 @@
 # This file can also be used to set local system defaults for run-time
 # options, using the same syntax as an individual user's ./nethackrc file.
 
-# Which users can use debug mode (aka wizard mode; accessed via '-D' command
-# line flag or OPTIONS=playmode:debug in the runtime options config file).
-# A value of * allows anyone to enter debugging mode.
+# Which users can use prophet mode (accessed via '-D' command
+# line flag or OPTIONS=playmode:prophet in the runtime options config file;
+# playmode:debug is still accepted).
+# A value of * allows anyone to enter prophet mode.
 WIZARDS=root games
 
 # Which users can use explore mode (aka discover mode; accessed via '-X'
