@@ -11,9 +11,9 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-01
-The Philistine Champion uses the ogre lord's attacks, speed, and
-other combat numbers. He is always hostile and wields a
-two-handed sword. The name is still Philistine Champion.
+The Philistine Champion has 90 hit points, bronze plate mail,
+and a helmet. He wields a +2 two-handed sword. His speed is
+still the ogre lord's, and he uses no sorcery.
 
 2026-11-01
 The Philistine Champion waits in his own dark room on Mines' End,

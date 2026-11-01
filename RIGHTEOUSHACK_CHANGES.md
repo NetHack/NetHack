@@ -758,11 +758,13 @@ to that room leaves the arrival corridor and winds under the
 puzzle, around the outer edge, and back to a closed door. It does
 not cross the letter floor or the safe row, so the scroll can be
 taken before the puzzle. The passage is not visible from the
-stair. He is hostile and male. His combat entry is the ogre lord's:
-monster level 7, speed 12, base armor class 3, magic resistance 30,
-size large (weight 1700), difficulty 9, and one 2d6 weapon attack.
-The map symbol is O. He wields an uncursed two-handed sword, so a
-hit on a human-sized hero uses that sword. Killing him always leaves a scholar's
+stair. He is hostile and male. Monster level 7, speed 12, magic
+resistance 30, size large. Hit points are a fixed 90, about three
+times an ogre lord. Bare armor class is 3. He wears uncursed bronze
+plate mail and a helmet, so his armor class in the fight is -4.
+One weapon attack, listed as 2d6 with empty hands. He wields a +2
+two-handed sword: 1d12+2 against a human-sized hero, plus strength.
+No sorcery. Killing him always leaves a scholar's
 scroll. The scroll is not generated anywhere else and cannot be
 wished for. Reading it shows this text and does not use it up:
 "In my research I have found the ancient Greek name for the rock
