@@ -129,6 +129,12 @@ self_lookat(char *outbuf)
                 uball ? ansimpleoname(uball) : "nothing?");
     if (u.utrap) /* bear trap, pit, web, in-floor, in-lava, tethered */
         Sprintf(eos(outbuf), ", %s", trap_predicament(trapbuf, 0, FALSE));
+    {
+        char letter = petra_map_letter(u.ux, u.uy);
+
+        if (letter)
+            Sprintf(eos(outbuf), ", on the letter %c", letter);
+    }
     return outbuf;
 }
 
@@ -554,6 +560,48 @@ look_at_monster(
     } /* monbuf is non-null */
 }
 
+/* Capernaum's sea runs to the edge of the map. The town pool is the
+   same moat terrain but does not touch that edge. */
+static boolean
+sea_of_galilee(coordxy x, coordxy y)
+{
+    static char seen[COLNO][ROWNO];
+    coordxy qx[COLNO * ROWNO], qy[COLNO * ROWNO];
+    int qh = 0, qt = 0, d;
+    const schar dxs[4] = { 1, -1, 0, 0 };
+    const schar dys[4] = { 0, 0, 1, -1 };
+    s_level *slev = Is_special(&u.uz);
+
+    if (!slev || strcmp(slev->proto, "capernaum") != 0)
+        return FALSE;
+    if (!isok(x, y) || levl[x][y].typ != MOAT)
+        return FALSE;
+    (void) memset(seen, 0, sizeof seen);
+    qx[0] = x;
+    qy[0] = y;
+    qt = 1;
+    seen[x][y] = 1;
+    while (qh < qt) {
+        coordxy cx = qx[qh], cy = qy[qh];
+
+        qh++;
+        /* The map is 76 columns, placed with its left edge at x = 1. */
+        if (cx <= 1 || cx >= 76 || cy <= 0 || cy >= ROWNO - 1)
+            return TRUE;
+        for (d = 0; d < 4; d++) {
+            coordxy nx = cx + dxs[d], ny = cy + dys[d];
+
+            if (!isok(nx, ny) || seen[nx][ny] || levl[nx][ny].typ != MOAT)
+                continue;
+            seen[nx][ny] = 1;
+            qx[qt] = nx;
+            qy[qt] = ny;
+            qt++;
+        }
+    }
+    return FALSE;
+}
+
 /* describe a pool location's contents; might return a static buffer so
    caller should use it or copy it before calling waterbody_name() again
    [5.0: moved here from mkmaze.c] */
@@ -590,6 +638,10 @@ waterbody_name(coordxy x, coordxy y)
             return "shallow sea";
         } else if (Is_juiblex_level(&u.uz)) {
             return "swamp";
+        } else if (sea_of_galilee(x, y)) {
+            /* Callers already say "the %s", so this reads
+               "the Sea of Galilee". */
+            return "Sea of Galilee";
         } else if (Role_if(PM_SAMURAI) && Is_qstart(&u.uz)) {
             /* samurai quest home level has two isolated moat spots;
                they sound silly if farlook describes them as such */
@@ -738,7 +790,13 @@ lookat(coordxy x, coordxy y, char *buf, char *monbuf)
     } else if (glyph_is_cmap(glyph)) {
         int amsk;
         aligntyp algn;
+        char letter = petra_map_letter(x, y);
         short symidx = glyph_to_cmap(glyph);
+
+        if (letter && (levl[x][y].seenv || cansee(x, y))) {
+            Sprintf(buf, "the letter %c", letter);
+            return (struct permonst *) 0;
+        }
 
         switch (symidx) {
         case S_altar:
@@ -1216,6 +1274,9 @@ add_cmap_descr(
                     /* thawing ice ("solid ice", "thin ice", &c) */
                     || ((p = strchr(x_str, ' ')) != 0 && !strcmpi(p, " ice"))
                     );
+        /* "the Sea of Galilee", not "a Sea of Galilee". */
+        if (!strcmp(x_str, "Sea of Galilee"))
+            article = 2;
     }
 
     if (!found) {

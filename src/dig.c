@@ -505,6 +505,8 @@ dig(void)
             if (!(lev->doormask & D_TRAPPED))
                 lev->doormask = D_BROKEN;
         } else if (closed_door(dpx, dpy)) {
+            if (peters_door_blocks(dpx, dpy))
+                return 0;
             Sprintf(digbuf, "You break through the door with your %s.",
                     simpleonames(uwep));
             digtxt = digbuf;
@@ -1667,6 +1669,11 @@ zap_dig(void)
                 break;
             }
         } else if (closed_door(zx, zy) || room->typ == SDOOR) {
+            if (peters_closet_door(zx, zy)) {
+                if (cansee(zx, zy))
+                    pline("This door will not yield.");
+                break;
+            }
             if (*in_rooms(zx, zy, SHOPBASE)) {
                 add_damage(zx, zy, SHOP_DOOR_COST);
                 shopdoor = TRUE;

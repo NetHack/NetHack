@@ -2146,8 +2146,8 @@ const allMonsters = {
         symbol: "T",
         color: "HI_LORD"
     },
-    "oracle": {
-        id: "Oracle",
+    "prophet": {
+        id: "Prophet",
         class1: "human",
         class2: "elf",
         symbol: "@",

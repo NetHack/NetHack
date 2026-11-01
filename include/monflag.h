@@ -52,7 +52,7 @@ enum ms_sounds {
     MS_NEMESIS  = 37,   /* your nemesis */
     MS_GUARDIAN = 38,   /* your leader's guards */
     MS_SELL     = 39,   /* demand payment, complain about shoplifters */
-    MS_ORACLE   = 40,   /* do a consultation */
+    MS_ORACLE   = 40,   /* give a word from the Lord */
     MS_PRIEST   = 41,   /* ask for contribution; do cleansing */
     MS_SPELL    = 42,   /* spellcaster not matching any of the above */
     MS_BOAST    = 43,   /* giants */

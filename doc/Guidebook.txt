@@ -768,8 +768,8 @@
           checking  inventory,  or  (for  "#loot" to remove a saddle), skip
           containers and go straight to adjacent monsters.
 
-          In debug mode (aka "wizard mode"), the `m'  prefix  may  also  be
-          used with the "#teleport" and "#wizlevelport" commands.
+          In prophet mode, the `m'  prefix  may  also  be
+          used with the "#teleport" and "#prolevelport" commands.
 
      F[yuhjklbn]
           Prefix:  fight a monster (even if you only guess one is there).
@@ -994,8 +994,8 @@
 
 
 
-          (Prior to 3.6.0, `^O' was a debug mode command which  listed  the
-          placement  of  all  special  levels.  Use "#wizwhere" to run that
+          (Prior to 3.6.0, `^O' was a prophet mode command which  listed  the
+          placement  of  all  special  levels.  Use "#prowhere" to run that
           command.)
 
      p    Pay your shopping bill.
@@ -1403,7 +1403,7 @@
           See the section below entitled "Conduct" for details.
 
      #debugfuzzer
-          Start the fuzz tester.  Debug mode only.
+          Start the fuzz tester.  Prophet mode only.
 
      #dip
           Dip an object into something.  Autocompletes.  Default key is `M-
@@ -1465,7 +1465,7 @@
 
      #genocided
           List any monster types which have  been  genocided.   In  explore
-          mode  and  debug  mode  it  also  shows  types  which have become
+          mode  and  prophet mode  it  also  shows  types  which have become
           extinct.
 
           The display order is the same as is used by #vanquished.  The `m'
@@ -1544,10 +1544,10 @@
           The `m' prefix operates the same as for "#known".
 
      #levelchange
-          Change your experience level.  Autocompletes.  Debug mode only.
+          Change your experience level.  Autocompletes.  Prophet mode only.
 
      #lightsources
-          Show mobile light sources.  Autocompletes.  Debug mode only.
+          Show mobile light sources.  Autocompletes.  Prophet mode only.
 
      #look
           Look at what is here, under you.  Default key is `:'.
@@ -1624,7 +1624,7 @@
 
      #panic
           Test the panic routine.  Terminates the current  game.   Autocom-
-          pletes.  Debug mode only.
+          pletes.  Prophet mode only.
 
           Asks  for  confirmation; default is n (no); continue playing.  To
           really panic, respond with y.  You can set the paranoid_confirma-
@@ -1657,7 +1657,7 @@
           `m' prefix forces use of a menu.
 
      #polyself
-          Polymorph self.  Autocompletes.  Debug mode only.
+          Polymorph self.  Autocompletes.  Prophet mode only.
 
      #pray
           Pray to the gods for help.  Autocompletes.  Default key is `M-p'.
@@ -1836,7 +1836,7 @@
           Sit down.  Autocompletes.  Default key is `M-s'.
 
      #stats
-          Show memory usage statistics.  Autocompletes.  Debug mode only.
+          Show memory usage statistics.  Autocompletes.  Prophet mode only.
 
      #suspend
           Suspend  the  game, switching from NetHack to the terminal it was
@@ -1880,7 +1880,7 @@
           them.
 
           In explore mode, you can choose to view the full map rather  than
-          just  its  explored  portion.  In debug mode there are additional
+          just  its  explored  portion.  In prophet mode there are additional
           choices.
 
           Autocompletes.  Default key is `<del>'  or  `<delete>'  (see  Del
@@ -1895,7 +1895,7 @@
           Throw something.  Default key is `t'.
 
      #timeout
-          Look at the timeout queue.  Autocompletes.  Debug mode only.
+          Look at the timeout queue.  Autocompletes.  Prophet mode only.
 
      #tip
           Tip over a container (bag or box) to pour out its contents.  When
@@ -2011,7 +2011,7 @@
           release date).  Default key is `V'.
 
      #vision
-          Show vision array.  Autocompletes.  Debug mode only.
+          Show vision array.  Autocompletes.  Prophet mode only.
 
      #wait
           Rest  one move while doing nothing.  Default key is `.', and also
@@ -2033,9 +2033,9 @@
      #wipe
           Wipe off your face.  Autocompletes.  Default key is `M-w'.
 
-     #wizborn
+     #proborn
           Show  monster  birth,  death,  genocide,  and extinct statistics.
-          Debug mode only.
+          Prophet mode only.
 
 
 
@@ -2050,59 +2050,59 @@
 
 
 
-     #wizbury
-          Bury objects under and around you.   Autocompletes.   Debug  mode
+     #probury
+          Bury objects under and around you.   Autocompletes.   Prophet mode
           only.
 
-     #wizcast
-          Cast any spell.  Debug mode only.
+     #procast
+          Cast any spell.  Prophet mode only.
 
-     #wizdetect
+     #prodetect
           Reveal  hidden  things (secret doors or traps or unseen monsters)
           within a modest radius.  No time elapses.  Autocompletes.   Debug
           mode only.  Default key is `^E'.
 
-     #wizgenesis
+     #progenesis
           Create a monster.  May be prefixed by a count to create more than
-          one.  Autocompletes.  Debug mode only.  Default key is `^G'.
+          one.  Autocompletes.  Prophet mode only.  Default key is `^G'.
 
-     #wizidentify
-          Identify all items  in  inventory.   Autocompletes.   Debug  mode
+     #proidentify
+          Identify all items  in  inventory.   Autocompletes.   Prophet mode
           only.  Default key is `^I'.
 
-     #wizintrinsic
-          Set one or more intrinsic attributes.  Autocompletes.  Debug mode
+     #prointrinsic
+          Set one or more intrinsic attributes.  Autocompletes.  Prophet mode
           only.
 
-     #wizkill
+     #prokill
           Remove monsters from play by just pointing at them.   By  default
           the  hero  gets credit or blame for killing the targets.  Precede
           this command with the `m'  prefix  to  override  that.   Autocom-
-          pletes.  Debug mode only.
+          pletes.  Prophet mode only.
 
-     #wizlevelport
-          Teleport  to  another  level.   Autocompletes.   Debug mode only.
+     #prolevelport
+          Teleport  to  another  level.   Autocompletes.   Prophet mode only.
           Default key is `^V'.
 
-     #wizmap
-          Map the level.  Autocompletes.  Debug mode only.  Default key  is
+     #promap
+          Map the level.  Autocompletes.  Prophet mode only.  Default key  is
           `^F'.
 
-     #wizrumorcheck
+     #prorumorcheck
           Verify  rumor boundaries by displaying first and last true rumors
           and first and last false rumors.
 
           Also displays first, second, and  last  random  engravings,  epi-
           taphs, and hallucinatory monsters.
 
-          Autocompletes.  Debug mode only.
+          Autocompletes.  Prophet mode only.
 
-     #wizseenv
-          Show  map  locations'  seen  vectors.  Autocompletes.  Debug mode
+     #proseenv
+          Show  map  locations'  seen  vectors.  Autocompletes.  Prophet mode
           only.
 
-     #wizsmell
-          Smell monster.  Autocompletes.  Debug mode only.
+     #prosmell
+          Smell monster.  Autocompletes.  Prophet mode only.
 
 
 
@@ -2116,17 +2116,17 @@
 
 
 
-     #wizwhere
-          Show locations of special  levels.   Autocompletes.   Debug  mode
+     #prowhere
+          Show locations of special  levels.   Autocompletes.   Prophet mode
           only.
 
-     #wizwish
-          Wish  for  something.   Autocompletes.  Debug mode only.  Default
+     #prowish
+          Wish  for  something.   Autocompletes.  Prophet mode only.  Default
           key is `^W'.  Precede this command with the `m' prefix to show  a
           wish history menu.
 
      #wmode
-          Show wall modes.  Autocompletes.  Debug mode only.
+          Show wall modes.  Autocompletes.  Prophet mode only.
 
      #zap
           Zap a wand.  Default key is `z'.
@@ -2683,7 +2683,7 @@
           The  extended  command  "#chat"  can  be used to interact with an
      adjacent monster.  There is no actual  dialog  (in  other  words,  you
      don't  get to choose what you'll say), but chatting with some monsters
-     such as a shopkeeper or  the  Oracle  of  Delphi  can  produce  useful
+     such as a shopkeeper or the Prophet of the Lord can produce useful
      results.
 
      6.1.  Fighting
@@ -3863,8 +3863,8 @@
          Shop         -  Entered a shop.
          Temple       -  Entered a temple.
          Mines        -  Entered the Salt Mines of Galilee.
-         Town         -  Entered Mine Town.
-         Oracle       -  Consulted the Oracle of Delphi.
+         Town         -  Entered Capernaum.
+         Prophet      -  Received a word from the Lord.
          Novel        -  Read a passage from a Discworld Novel.
          Sokoban      -  Entered Sokoban.
          Big Room     -  Entered the Big Room.
@@ -4144,7 +4144,7 @@
             SYMBOLS=S_golem:7
 
      WIZKIT
-       Debug mode only:  extra items to add to initial inventory.  Value is
+       Prophet mode only:  extra items to add to initial inventory.  Value is
        the name of a text file containing a list of  item  names,  one  per
        line,  up  to a maximum of 128 lines.  Each line is processed by the
        function that handles wishing.  Entries are added to the  wish  his-
@@ -4812,11 +4812,11 @@
 
      monpolycontrol
        Prompt  for  new  form  whenever  any monster changes shape (default
-       off).  Debug mode only.
+       off).  Prophet mode only.
 
      montelecontrol
        Prompt for destination whenever any monster gets teleported (default
-       off).  Debug mode only.
+       off).  Prophet mode only.
 
      mouse_support
        Allow use of the mouse for input and travel.  Valid settings are:
@@ -4933,7 +4933,7 @@
        die         - require "yes" rather than `y' to  confirm  dying  (not
                      useful in normal play; applies to explore mode);
        bones       - require  "yes" rather than `y' to confirm saving bones
-                     data when dying in debug mode;
+                     data when dying in prophet mode;
        attack      - require "yes" rather than `y' to confirm  attacking  a
                      peaceful monster;
        wand-break  - require  "yes"  rather  than `y' to confirm breaking a
@@ -5104,9 +5104,10 @@
 
 
      playmode
-       Values  are  "normal",  "explore",  or "debug".  Allows selection of
-       explore mode (also known as discovery  mode)  or  debug  mode  (also
-       known as wizard mode) instead of normal play.  Debug mode might only
+       Values  are  "normal",  "explore",  or "prophet".  The old value
+       "debug" is still accepted.  Allows selection of
+       explore mode (also known as discovery mode) or prophet mode
+       instead of normal play.  Prophet mode might only
        be allowed for someone logged in under a particular  user  name  (on
        multi-user  systems)  or  specifying a particular character name (on
        single-user systems) or it might be disabled  entirely.   Requesting
@@ -5245,7 +5246,7 @@
 
      sanity_check
        Evaluate  monsters,  objects,  and  map  prior to each turn (default
-       off).  Debug mode only.
+       off).  Prophet mode only.
 
      scores
        Control what parts of the score list you are shown at the  end  (for
@@ -5535,7 +5536,7 @@
 
      wizweight
        Augment  object  descriptions  with  their  objects' weight (default
-       off).  Debug mode only.
+       off).  Prophet mode only.
 
      zerocomp
        When writing out a save file, perform zero-comp compression  of  the
@@ -6965,7 +6966,7 @@
      default (which may not be appropriate for your system).
 
        WIZARDS = A  space-separated  list  of user names who are allowed to
-       play in debug mode (commonly referred to as wizard mode).   A  value
+       play in prophet mode.   A  value
        of  a  single  asterisk  (*)  allows anyone to start a game in debug
        mode.
 
@@ -7122,21 +7123,21 @@
      switching  during  play  does not.  The other benefits of explore mode
      are left for the trepid reader to discover.
 
-     11.1.  Debug mode
+     11.1.  Prophet mode
 
-          Debug mode, also known as wizard mode, is undocumented aside from
-     this  brief  description  and  the  various "debug mode only" commands
+          Prophet mode is undocumented aside from
+     this  brief  description  and  the  various "prophet mode only" commands
      listed among the command descriptions.  It is  intended  for  tracking
      down  problems within the program rather than to provide god-like pow-
      ers to your character, and players who attempt debugging are  expected
      to  figure  out how to use it themselves.  It is initiated by starting
-     the game with the -D command-line switch or  with  the  playmode:debug
-     option.
+     the game with the -D command-line switch or  with  the  playmode:prophet
+     option.  playmode:debug is still accepted.
 
           For some systems, the player must be logged in under a particular
-     user name to be allowed to use debug mode; for others, the  hero  must
+     user name to be allowed to use prophet mode; for others, the  hero  must
      be  given a particular character name (but may be any role; there's no
-     connection between "wizard mode" and the Wizard role).  Attempting  to
+     connection between "prophet mode" and the Wizard role).  Attempting  to
 
 
      NetHack 5.0.0                                              May 2, 2026
@@ -7149,7 +7150,7 @@
 
 
 
-     start  a  game  in  debug  mode when not allowed or not available will
+     start  a  game  in  prophet mode when not allowed or not available will
      result in falling back to explore mode instead.
 
      12.  Credits

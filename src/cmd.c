@@ -955,7 +955,7 @@ enter_explore_mode(void)
     if (discover) {
         You("are already in explore mode.");
     } else {
-        const char *oldmode = !wizard ? "normal game" : "debug mode";
+        const char *oldmode = !wizard ? "normal game" : "prophet mode";
 
         if (!authorize_explore_mode()) {
             if (!wizard) {
@@ -3007,7 +3007,7 @@ dokeylist(void)
     if (wizard && keylist_putcmds(datawin, TRUE,
                                   WIZMODECMD, INTERNALCMD, keys_used)) {
         putstr(datawin, 0, "");
-        putstr(datawin, 0, "Debug mode commands:");
+        putstr(datawin, 0, "Prophet mode commands:");
         (void) keylist_putcmds(datawin, FALSE,
                                WIZMODECMD, INTERNALCMD, keys_used);
     }

@@ -305,7 +305,7 @@ Pluralize the given string.
 
 Example:
 
- local str = nh.makeplural("zorkmid");
+ local str = nh.makeplural("shekel");
 
 
 === makesingular
@@ -314,7 +314,7 @@ Make the given string singular.
 
 Example:
 
- local str = nh.makesingular("zorkmids");
+ local str = nh.makesingular("shekels");
 
 
 === menu

@@ -19,21 +19,21 @@ dungeon = {
          },
          {
             name = "Sokoban",
-            chainlevel = "oracle",
+            chainlevel = "prophet",
             base = 1,
             direction = "up"
          },
          {
-            -- base 0 chained to the oracle is the Oracle level itself.
+            -- base 0 chained to the prophet is the Prophet level itself.
             -- base 1 is the next level down, which is where Sokoban joins.
             name = "Cave of Gibeon",
-            chainlevel = "oracle",
+            chainlevel = "prophet",
             base = 0,
             direction = "up"
          },
          {
             name = "The Quest",
-            chainlevel = "oracle",
+            chainlevel = "prophet",
             base = 6,
             range = 2,
             branchtype = "portal"
@@ -72,7 +72,7 @@ dungeon = {
             flags = "roguelike",
          },
          {
-            name = "oracle",
+            name = "prophet",
             bonetag = "O",
             base = 5,
             range = 5,
@@ -190,11 +190,11 @@ dungeon = {
       lvlfill = "minefill",
       levels = {
          {
-            name = "minetn",
+            name = "capernaum",
             bonetag = "T",
             base = 3,
             range = 2,
-            nlevels = 7,
+            nlevels = 3,
             flags = "town"
          },
          {

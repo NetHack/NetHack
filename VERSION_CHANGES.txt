@@ -11,6 +11,132 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-01
+A letter on the Mines' End path stays a letter, in any order
+and from any direction, including after you leave the level or
+save. Only a letter that is not on that path becomes lava.
+
+2026-11-01
+Mines' End and Capernaum each use one of three approved maps.
+The champion's chest holds 4 real gems, 350 gold pieces, and
+one prophetic book. Peter's closet door will not yield except
+when he opens it. On Capernaum, water that reaches the edge of
+the map is the Sea of Galilee. The town pool keeps its old name.
+
+2026-11-01
+A false letter at Mines' End burns for 20 hit points, or 10
+if you resist fire. You stay on the lava and can step off.
+
+2026-11-01
+A false letter at Mines' End becomes lava and burns for 20
+hit points. You stay on it and can step off. A true-path
+letter is never turned to lava.
+
+2026-11-01
+A gift of 1000 shekels or more, within the ten that give
+experience, has Isaiah quote Luke 6:38 from the King James
+Bible. The verse is two messages, split at the sentence.
+
+2026-11-01
+A gift of 1 to 999 shekels still adds favor. Isaiah quotes
+Proverbs 11:25 from the King James Bible, and you are told the
+gift did some good.
+
+2026-11-01
+A gift of 0 shekels has no penalty. Isaiah quotes 2 Corinthians
+9:7 from the King James Bible.
+
+2026-11-01
+Both words from the Lord are free. Saying no to each offers a
+donation to God's church. A small gift adds favor. A large gift
+adds experience, at most ten times, and never more than one level.
+
+2026-11-01
+The Prophet's cheap answer is a minor word from the Lord, and
+the costly one is a major word from the Lord. The first of
+either is the achievement "received a word from the Lord."
+
+2026-11-01
+The money you are told about is counted in shekels. One is a
+shekel, and more than one are shekels. The coins in your pack
+are still gold pieces.
+
+2026-11-01
+The bottom of the Salt Mines is shown as Mines' End, tagged
+[minesend]. The name PETRA is not shown before the scholar's
+scroll. The key in the rock says the drawbridge of Babylon
+comes down.
+
+2026-11-01
+Peter's call at Capernaum says "You sir!" to a male hero and
+"You ma'am!" to a female hero. The key in the Rock with a
+keyhole says the drawbridge of Babylon comes thundering down.
+If the bridge is already down, the rock is silent.
+
+2026-11-01
+Isaiah, prophet of the Lord is the Prophet's name. Peter cannot
+be harmed, and a pet will not attack him or the other plot
+people. The first visit to Capernaum opens a text window, and
+the first talk with Peter gives the quest and Peter's scroll.
+PETRA letters are drawn on the map. A wrong step, including a
+decoy or a diagonal, turns that square to lava for 20 damage.
+The puzzle room is lit, with one entrance door, a loadstone in
+each false closet, and the hint engraved in a corner. The
+Philistine Champion stays in his room. The overview tags
+Babylon's Palace [babylon]. The Key to Babylon's Palace lowers
+the drawbridge from the Rock with a keyhole outside the moat.
+The scholar's scroll spells out Pi, Epsilon, Tau, Rho, Alpha.
+Old saves do not load.
+
+2026-11-01
+The Philistine Champion has 90 hit points, bronze plate mail,
+and a helmet. He wields a +2 two-handed sword. His speed is
+still the ogre lord's, and he uses no sorcery.
+
+2026-11-01
+The Philistine Champion waits in his own dark room on Mines' End,
+far from the stairs. A winding corridor reaches that room without
+crossing the letter floor, so the scholar's scroll can be taken
+before the puzzle. He is still the only monster there.
+
+2026-11-01
+Mines' End is guarded by the Philistine Champion, the only monster
+there. He is a difficulty-10 warrior with a long sword, scale mail,
+a helmet, and a small shield, and he does not use sorcery. Killing
+him leaves a scholar's scroll. Reading it shows the Greek name
+PETRA and does not use the scroll up. It cannot be wished for.
+
+2026-11-01
+The Shield of Faith in the Babylon's Palace tower chest is
+blessed and +2. The oil that shares that chest is unchanged.
+
+2026-11-01
+The mode started with -D is called prophet mode. Help, the guidebook,
+and the messages that name the mode say prophet mode. The
+playmode option accepts prophet. The old value debug still works.
+The Wizard of Yendor and the Wizard role are unchanged.
+
+2026-11-01
+The dungeon overview tags the Prophet's level [prophet] and
+Capernaum [capernaum]. The feature line is "Prophet of the Lord."
+The #levelport menu uses those same names. The xlogfile records
+consulted_the_prophet and entered_capernaum. The cats in
+Capernaum are housecats, so the town loads.
+
+2026-11-01
+The Oracle is the Prophet. A minor word is one of the placeholder
+proverbs. The major word is "The treasure you seek has always
+been yours." The big room is the Valley of Dry Bones. The castle
+is Babylon's Palace and its prize is the Shield of Faith. The
+bridge opens with the Key to Babylon's Palace, not a tune.
+
+2026-11-01
+Minetown is Capernaum, a lit fishing town. Peter the Fisherman
+stands in front of a closet. Mines' End is the PETRA letter
+puzzle. Bring Peter's net back to him. He keeps it, speaks his
+thank-you, and gives you both keys. The closet holds a +2
+Breastplate of Righteousness.
+
+2026-11-01
 Favor is the word you see for luck. The gray stone from the mines
 is a Favor Stone. It works the same way. The Gnomish Mines are
 the Salt Mines of Galilee.

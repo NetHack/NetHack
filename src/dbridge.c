@@ -837,7 +837,7 @@ close_drawbridge(coordxy x, coordxy y)
  * Open the drawbridge located at x,y
  */
 void
-open_drawbridge(coordxy x, coordxy y)
+open_drawbridge(coordxy x, coordxy y, boolean quiet)
 {
     struct rm *lev1, *lev2;
     struct trap *t;
@@ -849,12 +849,15 @@ open_drawbridge(coordxy x, coordxy y)
     x2 = x;
     y2 = y;
     get_wall_for_db(&x2, &y2);
-    if (cansee(x, y) || cansee(x2, y2)) {
-        You_see("a drawbridge %s down!",
-                (distu(x2, y2) < distu(x, y)) ? "going" : "coming");
-    } else { /* "5 gears turn" for castle drawbridge tune */
-        Soundeffect(se_gears_turning_chains_rattling, 100);
-        You_hear("gears turning and chains rattling.");
+    /* The palace key speaks for itself. Other openings keep the old line. */
+    if (!quiet) {
+        if (cansee(x, y) || cansee(x2, y2)) {
+            You_see("a drawbridge %s down!",
+                    (distu(x2, y2) < distu(x, y)) ? "going" : "coming");
+        } else { /* "5 gears turn" for castle drawbridge tune */
+            Soundeffect(se_gears_turning_chains_rattling, 100);
+            You_hear("gears turning and chains rattling.");
+        }
     }
     lev1->typ = DRAWBRIDGE_DOWN;
     lev2 = &levl[x2][y2];

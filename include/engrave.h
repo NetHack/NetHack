@@ -30,6 +30,8 @@ struct engr {
 #define ENGR_BLOOD 5
 #define HEADSTONE 6
 #define N_ENGRAVE 6
+/* Drawn on the map as the letter itself. Not part of the random range. */
+#define LETTER 7
     Bitfield(guardobjects, 1); /* if engr_txt is "Elbereth", it is effective
                                 * against monsters when an object is present
                                 * even when hero isn't (so behaves similarly

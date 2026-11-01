@@ -508,6 +508,10 @@ explode(
                     pline("%s is caught in the %s!", Monnam(mtmp), str);
                 }
 
+                if (peter_unhurt(mtmp)) {
+                    if (cansee(xx, yy))
+                        pline("%s is unharmed.", Monnam(mtmp));
+                } else {
                 itemdmg = destroy_items(mtmp, (int) adtyp, dam);
                 if (adtyp == AD_FIRE) {
                     (void) burnarmor(mtmp);
@@ -583,6 +587,7 @@ explode(
                     /* all affected monsters, even if mdef is set */
                     setmangry(mtmp, TRUE);
                 }
+                } /* Peter takes none of this */
             }
         }
     }

@@ -3852,7 +3852,7 @@ stolen_value(
                 Sprintf(eos(buf), " for %s",
                         (obj->quan > 1L) ? "them" : "it");
 
-            You("%s!", buf); /* "You owe <shk> N zorkmids for it!" */
+            You("%s!", buf); /* "You owe <shk> N shekels for it!" */
         }
     } else {
         ESHK(shkp)->robbed += value;
@@ -4067,8 +4067,8 @@ sellobj(
         if (c == 'y') {
             shk_names_obj(shkp, obj,
                           ((gs.sell_how != SELL_NORMAL)
-                           ? "traded %s for %ld zorkmid%s in %scredit."
-                    : "relinquish %s and acquire %ld zorkmid%s in %scredit."),
+                           ? "traded %s for %ld shekel%s in %scredit."
+                    : "relinquish %s and acquire %ld shekel%s in %scredit."),
                           tmpcr, (eshkp->credit > 0L) ? "additional " : "");
             eshkp->credit += tmpcr;
             if (container)

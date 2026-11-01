@@ -942,6 +942,14 @@ CONTAINER("bag of tricks",  "bag", 0, 1, 1, 20,  15, 100, CLOTH, HI_CLOTH,
 /* lock opening tools */
 TOOL("skeleton key",       "key", 0, 0, 0, 0, 80,  3, 10, IRON, HI_METAL,
                                                                 SKELETON_KEY),
+/* Quest keys and Peter's net. Probability 0. Not randomly generated.
+   Wishes for them are refused. The Gates key name is a placeholder. */
+TOOL("Key to Babylon's Palace", "key", 1, 0, 0, 0, 0, 3, 0, IRON, HI_METAL,
+                                                                KEY_TO_BABYLON),
+TOOL("Key to the Gates of Hell", "key", 1, 0, 0, 0, 0, 3, 0, IRON, HI_METAL,
+                                                                KEY_TO_GATES),
+TOOL("Peter's net", NoDes, 1, 0, 0, 0, 0, 20, 0, CLOTH, CLR_WHITE,
+                                                                PETER_NET),
 TOOL("lock pick",           NoDes, 1, 0, 0, 0, 60,  4, 20, IRON, HI_METAL,
                                                                 LOCK_PICK),
 TOOL("credit card",         NoDes, 1, 0, 0, 0, 15,  1, 10, PLASTIC, CLR_WHITE,
@@ -1335,6 +1343,19 @@ XTRA_SCROLL_LABEL("STRC PRST SKRZ KRK", SC20), /* Czech and Slovak
 SCROLL("mail",          "stamped",  0,   0,   0, SCR_MAIL),
 #endif
 SCROLL("blank paper", "unlabeled",  0,  28,  60, SCR_BLANK_PAPER),
+/* PETRA prize. Name is always known. Not randomly generated.
+   Wishes refused. Reading shows the scholar's note and does not use it up.
+   Unique so the identified name is "scholar's scroll", not "verse of ...". */
+OBJECT(OBJ("scholar's scroll", NoDes),
+       BITS(1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, P_NONE, PAPER),
+       0, SCROLL_CLASS, 0, 0, 5, 0, 0, 0, 0, 0, 6,
+       HI_PAPER, SCR_SCHOLARS_SCROLL),
+/* Peter's quest hint. Not random. Reading it does not use it up.
+   Placed here so the scroll class stays in order. */
+OBJECT(OBJ("Peter's scroll", NoDes),
+       BITS(1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, P_NONE, PAPER),
+       0, SCROLL_CLASS, 0, 0, 5, 0, 0, 0, 0, 0, 6,
+       HI_PAPER, SCR_PETERS_SCROLL),
 #undef SCROLL
 
 /* prophetic books ... */
@@ -1691,6 +1712,11 @@ OBJECT(OBJ("boulder", NoDes),
 OBJECT(OBJ("statue", NoDes),
        BITS(1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, P_NONE, MINERAL), 0,
        ROCK_CLASS, 900, 0, 2500, 0, 20, 20, 0, 0, 2500, CLR_WHITE, STATUE),
+/* Fixed courtyard marker. Not carried, kicked, or wished for. */
+OBJECT(OBJ("Rock with a keyhole", NoDes),
+       BITS(1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, P_NONE, MINERAL),
+       0, ROCK_CLASS, 0, 0, 6000, 0, 0, 0, 0, 0, 0,
+       HI_MINERAL, ROCK_WITH_KEYHOLE),
 
 OBJECT(OBJ("heavy iron ball", NoDes),
        BITS(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, WHACK, P_NONE, IRON), 0,

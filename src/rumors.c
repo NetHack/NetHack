@@ -50,6 +50,10 @@ staticfn void init_oracles(dlb *);
 staticfn void others_check(const char *ftype, const char *, winid *);
 staticfn void couldnt_open_file(const char *);
 staticfn void init_CapMons(void);
+staticfn long isaiah_donation(struct monst *);
+staticfn void isaiah_grant_xp(int, int);
+staticfn void isaiah_favor(void);
+staticfn void isaiah_luke(void);
 
 /* used by CapitalMon(); set up by init_CapMons(), released by free_CapMons();
    there's no need for these to be put into 'struct instance_globals g' */
@@ -554,7 +558,7 @@ outrumor(
     switch (mechanism) {
     case BY_ORACLE:
         /* Oracle delivers the rumor */
-        pline("True to her word, the Oracle %ssays: ",
+        pline("True to his word, Isaiah, prophet of the Lord %ssays: ",
               (!rn2(4) ? "offhandedly "
                        : (!rn2(3) ? "casually "
                                   : (rn2(2) ? "nonchalantly " : ""))));
@@ -574,23 +578,29 @@ outrumor(
 }
 
 /* PLACEHOLDER Prophet proverbs (Jon 2026-10-31), exact KJV.
-   These replace fortune-cookie text. Jon may replace the list.
-   Proverbs 1:5 keeps the KJV colon at the end. */
+   These replace fortune-cookie text and are the Prophet's minor word.
+   Jon may replace the list. Proverbs 1:5 keeps the KJV colon. */
+static const char *const prophet_proverbs[] = {
+    "The fear of the LORD is the beginning of knowledge: but fools despise wisdom and instruction.",
+    "Trust in the LORD with all thine heart; and lean not unto thine own understanding.",
+    "In all thy ways acknowledge him, and he shall direct thy paths.",
+    "A wise man will hear, and will increase learning; and a man of understanding shall attain unto wise counsels:",
+};
+
+const char *
+rnd_prophet_proverb(void)
+{
+    return prophet_proverbs[rn2(SIZE(prophet_proverbs))];
+}
+
 void
 out_proverb(void)
 {
-    static const char *const proverbs[] = {
-        "The fear of the LORD is the beginning of knowledge: but fools despise wisdom and instruction.",
-        "Trust in the LORD with all thine heart; and lean not unto thine own understanding.",
-        "In all thy ways acknowledge him, and he shall direct thy paths.",
-        "A wise man will hear, and will increase learning; and a man of understanding shall attain unto wise counsels:",
-    };
-
     if (Blind) {
         pline("A proverb is there, but you cannot read it!");
         return;
     }
-    pline1(proverbs[rn2(SIZE(proverbs))]);
+    pline1(rnd_prophet_proverb());
 }
 
 staticfn void
@@ -691,8 +701,8 @@ outoracle(boolean special, boolean delphi)
         if (delphi)
             putstr(tmpwin, 0,
                    special
-                     ? "The Oracle scornfully takes all your gold and says:"
-                     : "The Oracle meditates for a moment and then intones:");
+                     ? "Isaiah, prophet of the Lord scornfully takes all your gold and says:"
+                     : "Isaiah, prophet of the Lord meditates for a moment and then intones:");
         else
             putstr(tmpwin, 0, "The message reads:");
         putstr(tmpwin, 0, "");
@@ -712,76 +722,183 @@ outoracle(boolean special, boolean delphi)
     }
 }
 
+/* Amount entry matches the priest's bribe(), except a bad entry
+   does nothing and a gift of 0 has no penalty. More than the gold
+   carried gives all of it. */
+staticfn long
+isaiah_donation(struct monst *oracl)
+{
+    char buf[BUFSZ];
+    long offer = 0L;
+    long umoney = money_cnt(gi.invent);
+
+    getlin("How much will you give?", buf);
+    if (sscanf(buf, "%ld", &offer) != 1 || offer < 0L)
+        return 0L;
+    /* 2 Corinthians 9:7 KJV, checked against Bible Gateway. */
+    if (offer == 0L || umoney <= 0L) {
+        SetVoice(oracl, 0, 80, 0);
+        verbalize("Every man according as he purposeth in his heart, "
+                  "so let him give; not grudgingly, or of necessity: "
+                  "for God loveth a cheerful giver.");
+        return 0L;
+    }
+    if (offer >= umoney) {
+        offer = umoney;
+        You("give %s all your gold.", mon_nam(oracl));
+    } else {
+        You("give %s %ld %s.", mon_nam(oracl), offer, currency(offer));
+    }
+    (void) money2mon(oracl, offer);
+    disp.botl = TRUE;
+    return offer;
+}
+
+/* numer/denom of the XP span from this level to the next.
+   At most one level is gained; leftover XP stays inside the new level.
+   At the level cap the points are added and the level stays. */
+staticfn void
+isaiah_grant_xp(int numer, int denom)
+{
+    long base, span, gain, before, after, ceiling;
+
+    before = u.uexp;
+    base = (u.ulevel <= 1) ? 0L : newuexp((int) u.ulevel - 1);
+    span = newuexp((int) u.ulevel) - base;
+    if (span < 1L)
+        span = 1L;
+    gain = (span * (long) numer) / (long) denom;
+    if (gain < 1L)
+        gain = 1L;
+    after = before + gain;
+    if (after < before)
+        after = LONG_MAX;
+    if (u.ulevel < MAXULEV) {
+        ceiling = newuexp((int) u.ulevel + 1) - 1L;
+        if (before < ceiling && after > ceiling)
+            after = ceiling;
+    }
+    gain = after - before;
+    if (gain > 0L) {
+        more_experienced((int) gain, 0);
+        You_feel("more experienced.");
+        newexplevel();
+    }
+}
+
+staticfn void
+isaiah_favor(void)
+{
+    You("feel the Lord's favor.");
+    adjalign(1);
+}
+
+/* Luke 6:38 KJV, checked against Bible Gateway. Two messages, split
+   at the sentence, the way the soul reveal splits a long speech.
+   The words are unchanged. */
+staticfn void
+isaiah_luke(void)
+{
+    verbalize("Give, and it shall be given unto you; good measure, "
+              "pressed down, and shaken together, and running over, "
+              "shall men give into your bosom.");
+    verbalize("For with the same measure that ye mete withal "
+              "it shall be measured to you again.");
+}
+
 int
 doconsult(struct monst *oracl)
 {
-    long umoney;
-    int u_pay, minor_cost = 50, major_cost = 500 + 50 * u.ulevel;
+    /* Stock major-word experience, kept though the word is free.
+       minor_cost 50 is the old first-time minor bonus only. */
+    int minor_cost = 50, major_cost = 500 + 50 * (int) u.ulevel;
     int add_xpts;
+    long offer;
     char qbuf[QBUFSZ];
 
     gm.multi = 0;
-    umoney = money_cnt(gi.invent);
 
     if (!oracl) {
-        There("is no one here to consult.");
+        There("is no one here to give a word from the Lord.");
         return ECMD_OK;
     } else if (!oracl->mpeaceful) {
-        pline("%s is in no mood for consultations.", Monnam(oracl));
-        return ECMD_OK;
-    } else if (!umoney) {
-        You("have no gold.");
+        pline("%s is in no mood to give a word from the Lord.", Monnam(oracl));
         return ECMD_OK;
     }
 
-    Sprintf(qbuf, "\"Wilt thou settle for a minor consultation?\" (%d %s)",
-            minor_cost, currency((long) minor_cost));
+    Strcpy(qbuf, "\"Wilt thou settle for a minor word from the Lord?\"");
     switch (ynq(qbuf)) {
     default:
     case 'q':
         return ECMD_OK;
     case 'y':
-        if (umoney < (long) minor_cost) {
-            You("don't even have enough gold for that!");
-            return ECMD_OK;
+        if (!u.uevent.major_oracle && !u.uevent.minor_oracle)
+            record_achievement(ACH_ORCL);
+        SetVoice(oracl, 0, 80, 0);
+        verbalize1(rnd_prophet_proverb());
+        if (!u.uevent.minor_oracle) {
+            add_xpts = minor_cost / (u.uevent.major_oracle ? 25 : 10);
+            /* 5 pts if very 1st, or 2 pts if major already done */
+            more_experienced(add_xpts, minor_cost / 50);
+            newexplevel();
         }
-        u_pay = minor_cost;
-        break;
-    case 'n':
-        if (umoney <= (long) minor_cost /* don't even ask */
-            || (svo.oracle_cnt == 1 || go.oracle_flg < 0))
-            return ECMD_OK;
-        Sprintf(qbuf, "\"Then dost thou desire a major one?\" (%d %s)",
-                major_cost, currency((long) major_cost));
-        if (y_n(qbuf) != 'y')
-            return ECMD_OK;
-        u_pay = (umoney < (long) major_cost) ? (int) umoney : major_cost;
-        break;
-    }
-    money2mon(oracl, (long) u_pay);
-    disp.botl = TRUE;
-    if (!u.uevent.major_oracle && !u.uevent.minor_oracle)
-        record_achievement(ACH_ORCL);
-    add_xpts = 0; /* first oracle of each type gives experience points */
-    if (u_pay == minor_cost) {
-        outrumor(1, BY_ORACLE);
-        if (!u.uevent.minor_oracle)
-            add_xpts = u_pay / (u.uevent.major_oracle ? 25 : 10);
-        /* 5 pts if very 1st, or 2 pts if major already done */
         u.uevent.minor_oracle = TRUE;
-    } else {
-        boolean cheapskate = u_pay < major_cost;
-
-        outoracle(cheapskate, TRUE);
-        if (!cheapskate && !u.uevent.major_oracle)
-            add_xpts = u_pay / (u.uevent.minor_oracle ? 25 : 10);
-        /* ~100 pts if very 1st, ~40 pts if minor already done */
-        u.uevent.major_oracle = TRUE;
-        exercise(A_WIS, !cheapskate);
+        return ECMD_TIME;
+    case 'n':
+        break;
     }
-    if (add_xpts) {
-        more_experienced(add_xpts, u_pay / 50);
-        newexplevel();
+
+    Strcpy(qbuf, "\"Then dost thou desire a major word from the Lord?\"");
+    if (y_n(qbuf) == 'y') {
+        if (!u.uevent.major_oracle && !u.uevent.minor_oracle)
+            record_achievement(ACH_ORCL);
+        SetVoice(oracl, 0, 80, 0);
+        verbalize("The treasure you seek has always been yours.");
+        if (!u.uevent.major_oracle) {
+            add_xpts = major_cost / (u.uevent.minor_oracle ? 25 : 10);
+            /* ~100 pts if very 1st, ~40 pts if minor already done */
+            more_experienced(add_xpts, major_cost / 50);
+            newexplevel();
+        }
+        u.uevent.major_oracle = TRUE;
+        exercise(A_WIS, TRUE);
+        return ECMD_TIME;
+    }
+
+    /* PLACEHOLDER prompts and thank-yous, for Jon to review. */
+    if (y_n("\"Would you like to make a donation to God's church?\"") != 'y')
+        return ECMD_OK;
+    offer = isaiah_donation(oracl);
+    if (offer <= 0L)
+        return ECMD_OK;
+
+    SetVoice(oracl, 0, 80, 0);
+    if (offer < 1000L) {
+        /* Proverbs 11:25 KJV, checked against Bible Gateway. */
+        verbalize("The liberal soul shall be made fat: "
+                  "and he that watereth shall be watered also himself.");
+        /* PLACEHOLDER: tells the player the small gift did some good. */
+        You("feel the Lord's favor upon your gift.");
+        adjalign(1);
+    } else if (u.uevent.church_gifts >= 10) {
+        /* PLACEHOLDER: after ten XP gifts, a large gift is favor only. */
+        verbalize("The Lord bless thee. The church can receive no greater increase for now.");
+        isaiah_favor();
+    } else if (offer < 5000L) {
+        isaiah_luke();
+        verbalize("Thy gift lifts thee a little.");
+        isaiah_grant_xp(1, 4);
+        u.uevent.church_gifts++;
+    } else if (offer < 10000L) {
+        isaiah_luke();
+        verbalize("Thy gift lifts thee further.");
+        isaiah_grant_xp(1, 2);
+        u.uevent.church_gifts++;
+    } else {
+        isaiah_luke();
+        verbalize("Thy gift lifts thee a full step.");
+        isaiah_grant_xp(1, 1);
+        u.uevent.church_gifts++;
     }
     return ECMD_TIME;
 }

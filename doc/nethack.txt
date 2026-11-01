@@ -109,11 +109,11 @@ DESCRIPTION
        tor.
 
        The -X option will start the game in a  special  non-scoring  discovery
-       mode  (also  known  as  explore mode).  -D will start the game in debug
-       mode (also known as wizard mode) after changing the character  name  to
-       "wizard",  if  the  player is allowed.  Otherwise it will switch to -X.
-       Control of who is allowed to use debug mode is done via the  "WIZARDS="
-       line in nethack's sysconf file.
+       mode  (also  known  as  explore mode).  -D will start the game in
+       prophet mode after changing the character name to "Elisha", if the
+       player is allowed.  Otherwise it will switch to -X.  playmode:debug
+       is still accepted.  Control of who is allowed to use prophet mode is
+       done via the "WIZARDS=" line in nethack's sysconf file.
 
        The  -d  or  --directory option, which must be the first argument if it
        appears, supplies a directory which is to serve as the playground.   It

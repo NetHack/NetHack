@@ -110,7 +110,7 @@ tshirt_text(struct obj *tshirt, char *buf)
         "Yendor Military Soldiers Do It In Large Groups",
         "I survived Yendor Military Boot Camp",
         "Ludios Accounting School Intra-Mural Lacrosse Team",
-        "Oracle(TM) Fountains 10th Annual Wet T-Shirt Contest",
+        "Capernaum Fountains 10th Annual Wet T-Shirt Contest",
         "Hey, black dragon!  Disintegrate THIS!",
         "I'm With Stupid -->",
         "Don't blame me, I voted for Izchak!",
@@ -143,8 +143,8 @@ tshirt_text(struct obj *tshirt, char *buf)
         "Lichen Park",
         "LOST IN THOUGHT - please send search party",
         "Meat is Mordor",
-        "Minetown Better Business Bureau",
-        "Minetown Watch",
+        "Capernaum Better Business Bureau",
+        "Capernaum Watch",
         /* Discworld riff; unfortunately long */
         ("Ms. Palm's House of Negotiable Affection--A Very Reputable"
             " House Of Disrepute"),
@@ -520,7 +520,7 @@ doread(void)
             You("feel the embossed words:");
         else if (flags.verbose)
             You("read:");
-        pline("\"1 Zorkmid.  857 GUE.  In Frobs We Trust.\"");
+        pline("\"1 Shekel.  857 GUE.  In Frobs We Trust.\"");
         if (!u.uconduct.literate++)
             livelog_printf(LL_CONDUCT,
                            "became literate by reading a coin's engravings");
@@ -553,6 +553,24 @@ doread(void)
             livelog_printf(LL_CONDUCT,
                            "became literate by reading a candy bar wrapper");
 
+        return ECMD_TIME;
+    } else if (otyp == SCR_SCHOLARS_SCROLL) {
+        static const char scholars_text[] =
+            "In my research I have found the ancient Greek name for the rock "
+            "upon which the church was built. It is written with the Greek "
+            "letters Pi, Epsilon, Tau, Rho, Alpha, which in our letters is "
+            "PETRA.";
+
+        if (!u.uconduct.literate++)
+            livelog_printf(LL_CONDUCT,
+                           "became literate by reading a scroll");
+        pline("%s", scholars_text);
+        return ECMD_TIME;
+    } else if (otyp == SCR_PETERS_SCROLL) {
+        if (!u.uconduct.literate++)
+            livelog_printf(LL_CONDUCT,
+                           "became literate by reading a scroll");
+        pline("The Master gave me a new name, and on it He said He would build. Remember my name, and the floor will hold you.");
         return ECMD_TIME;
     } else if (scroll->oclass != SCROLL_CLASS
                && scroll->oclass != SPBOOK_CLASS) {

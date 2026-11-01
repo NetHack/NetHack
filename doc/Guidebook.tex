@@ -732,8 +732,8 @@ or (for ``\texttt{\#loot}'' to remove a saddle),
 skip containers and go straight to adjacent monsters.
 \\
 %.lp ""
-In debug mode (aka ``wizard mode''), the `\texttt{m}' prefix may also be
-used with the ``\texttt{\#teleport}'' and ``\texttt{\#wizlevelport}'' commands.
+In prophet mode, the `\texttt{m}' prefix may also be
+used with the ``\texttt{\#teleport}'' and ``\texttt{\#prolevelport}'' commands.
 %.lp
 \item[F{[yuhjklbn]}]
 Prefix:  fight a monster (even if you only guess one is there).
@@ -949,9 +949,9 @@ Show overview.\\
 Shortcut for ``\texttt{\#overview}'':
 list interesting dungeon levels visited.\\
 %.lp ""
-(Prior to 3.6.0, `\texttt{\textasciicircum O}' was a debug mode command which listed
+(Prior to 3.6.0, `\texttt{\textasciicircum O}' was a prophet mode command which listed
 the placement of all special levels.
-Use ``\texttt{\#wizwhere}'' to run that command.)
+Use ``\texttt{\#prowhere}'' to run that command.)
 %.lp
 \item[p]
 Pay your shopping bill.
@@ -1349,7 +1349,7 @@ See the section below entitled ``Conduct'' for details.
 %.lp
 \item[\#debugfuzzer]
 Start the fuzz tester.
-Debug mode only.
+Prophet mode only.
 %.lp
 \item[\#dip]
 Dip an object into something. Autocompletes. Default key is `\texttt{M-d}'.\\
@@ -1403,7 +1403,7 @@ Force a lock. Autocompletes. Default key is `\texttt{M-f}'.
 %.lp
 \item[\#genocided]
 List any monster types which have been genocided.
-In explore mode and debug mode it also shows types which have become
+In explore mode and prophet mode it also shows types which have become
 extinct.
 \\
 %.lp ""
@@ -1480,12 +1480,12 @@ The `\texttt{m}' prefix operates the same as for \texttt{\#known}.
 \item[\#levelchange]
 Change your experience level.
 Autocompletes.
-Debug mode only.
+Prophet mode only.
 %.lp
 \item[\#lightsources]
 Show mobile light sources.
 Autocompletes.
-Debug mode only.
+Prophet mode only.
 %.lp
 \item[\#look]
 Look at what is here, under you. Default key is `\texttt{:}'.
@@ -1560,7 +1560,7 @@ Default keys are `\texttt{\textasciicircum O}', and `\texttt{M-O}'.
 Test the panic routine.
 Terminates the current game.
 Autocompletes.
-Debug mode only.\\
+Prophet mode only.\\
 %.lp ""
 Asks for confirmation; default is `\texttt{n}' (no); continue playing.
 To really panic, respond with `\texttt{y}'.
@@ -1586,7 +1586,7 @@ The `\texttt{m}' prefix forces use of a menu.
 \item[\#polyself]
 Polymorph self.
 Autocompletes.
-Debug mode only.
+Prophet mode only.
 %.lp
 \item[\#pray]
 Pray to the gods for help. Autocompletes. Default key is `\texttt{M-p}'.\\
@@ -1766,7 +1766,7 @@ Sit down. Autocompletes. Default key is `\texttt{M-s}'.
 \item[\#stats]
 Show memory usage statistics.
 Autocompletes.
-Debug mode only.
+Prophet mode only.
 %.lp
 \item[\#suspend]
 Suspend the game, switching from NetHack to the terminal it was started
@@ -1801,7 +1801,7 @@ when deciding whether to show them or the floor underneath them.\\
 %.lp ""
 In explore mode, you can choose to view the full map rather than just
 its explored portion.
-In debug mode there are additional choices.\\
+In prophet mode there are additional choices.\\
 %.lp ""
 Autocompletes.
 Default key is `\texttt{<del>}' or `\texttt{<delete>}' (see \textit{Del} above).
@@ -1823,7 +1823,7 @@ Throw something. Default key is `\texttt{t}'.
 \item[\#timeout]
 Look at the timeout queue.
 Autocompletes.
-Debug mode only.
+Prophet mode only.
 %.lp
 \item[\#tip]
 Tip over a container (bag or box) to pour out its contents.
@@ -1933,7 +1933,7 @@ Default key is `\texttt{V}'.
 \item[\#vision]
 Show vision array.
 Autocompletes.
-Debug mode only.
+Prophet mode only.
 %.lp
 \item[\#wait]
 Rest one move while doing nothing.
@@ -1955,65 +1955,65 @@ Wield a weapon. Default key is `\texttt{w}'.
 \item[\#wipe]
 Wipe off your face. Autocompletes. Default key is `\texttt{M-w}'.
 %.lp
-\item[\#wizborn]
+\item[\#proborn]
 Show monster birth, death, genocide, and extinct statistics.
-Debug mode only.
+Prophet mode only.
 %.lp
-\item[\#wizbury]
+\item[\#probury]
 Bury objects under and around you.
 Autocompletes.
-Debug mode only.
+Prophet mode only.
 %.lp
-\item[\#wizcast]
+\item[\#procast]
 Cast any spell.
-Debug mode only.
+Prophet mode only.
 %.lp
-\item[\#wizdetect]
+\item[\#prodetect]
 Reveal hidden things (secret doors or traps or unseen monsters)
 within a modest radius.
 No time elapses.
 Autocompletes.
-Debug mode only.
+Prophet mode only.
 Default key is `\texttt{\textasciicircum E}'.
 %.lp
-\item[\#wizgenesis]
+\item[\#progenesis]
 Create a monster.
 May be prefixed by a count to create more than one.
 Autocompletes.
-Debug mode only.
+Prophet mode only.
 Default key is `\texttt{\textasciicircum G}'.
 %.lp
-\item[\#wizidentify]
+\item[\#proidentify]
 Identify all items in inventory.
 Autocompletes.
-Debug mode only.
+Prophet mode only.
 Default key is `\texttt{\textasciicircum I}'.
 %.lp
-\item[\#wizintrinsic]
+\item[\#prointrinsic]
 Set one or more intrinsic attributes.
 Autocompletes.
-Debug mode only.
+Prophet mode only.
 %.lp
-\item[\#wizkill]
+\item[\#prokill]
 Remove monsters from play by just pointing at them.
 By default the hero gets credit or blame for killing the targets.
 Precede this command with the `\texttt{m}' prefix to override that.
 Autocompletes.
-Debug mode only.
+Prophet mode only.
 %.lp
-\item[\#wizlevelport]
+\item[\#prolevelport]
 Teleport to another level.
 Autocompletes.
-Debug mode only.
+Prophet mode only.
 Default key is `\texttt{\textasciicircum V}'.
 %.lp
-\item[\#wizmap]
+\item[\#promap]
 Map the level.
 Autocompletes.
-Debug mode only.
+Prophet mode only.
 Default key is `\texttt{\textasciicircum F}'.
 %.lp
-\item[\#wizrumorcheck]
+\item[\#prorumorcheck]
 Verify rumor boundaries by displaying first and last true rumors and
 first and last false rumors.\\
 %.lp ""
@@ -2021,34 +2021,34 @@ Also displays first, second, and last random engravings, epitaphs,
 and hallucinatory monsters.\\
 %.lp ""
 Autocompletes.
-Debug mode only.
+Prophet mode only.
 %.lp
-\item[\#wizseenv]
+\item[\#proseenv]
 Show map locations' seen vectors.
 Autocompletes.
-Debug mode only.
+Prophet mode only.
 %.lp
-\item[\#wizsmell]
+\item[\#prosmell]
 Smell monster.
 Autocompletes.
-Debug mode only.
+Prophet mode only.
 %.lp
-\item[\#wizwhere]
+\item[\#prowhere]
 Show locations of special levels.
 Autocompletes.
-Debug mode only.
+Prophet mode only.
 %.lp
-\item[\#wizwish]
+\item[\#prowish]
 Wish for something.
 Autocompletes.
-Debug mode only.
+Prophet mode only.
 Default key is `\texttt{\textasciicircum W}'.
 Precede this command with the `\texttt{m}' prefix to show a wish history menu.
 %.lp
 \item[\#wmode]
 Show wall modes.
 Autocompletes.
-Debug mode only.
+Prophet mode only.
 %.lp
 \item[\#zap]
 Zap a wand. Default key is `\texttt{z}'.
@@ -2596,7 +2596,7 @@ which is just a space will remove any prior name.
 The extended command ``\texttt{\#chat}'' can be used to interact with an adjacent
 monster.  There is no actual dialog (in other words, you don't get to
 choose what you'll say), but chatting with some monsters such as a
-shopkeeper or the Oracle of Delphi can produce useful results.
+shopkeeper or the Prophet of the Lord can produce useful results.
 
 %.hn 2
 \subsection*{Fighting}
@@ -3802,9 +3802,9 @@ Entered a temple.
 \item[Mines]
 Entered the Gnomish Mines.
 \item[Town]
-Entered Mine Town.
-\item[Oracle]
-Consulted the Oracle of Delphi.
+Entered Capernaum.
+\item[Prophet]
+Received a word from the Lord.
 \item[Novel]
 Read a passage from a Discworld Novel.
 \item[Sokoban]
@@ -4123,7 +4123,7 @@ Example:
 
 %.lp
 \item[WIZKIT]
-Debug mode only:  extra items to add to initial inventory.
+Prophet mode only:  extra items to add to initial inventory.
 Value is the name of a text file containing a list of item names,
 one per line, up to a maximum of 128 lines.
 Each line is processed by the function that handles wishing.
@@ -4768,18 +4768,18 @@ Default `\texttt{\textbraceright}'.
 % \item[menu\textunderscore tab\textunderscore sep]
 % Format menu entries using TAB to separate columns (default off).
 % Only applicable to some menus, and only useful to some interfaces.
-% Debug mode only.
+% Prophet mode only.
 %.lp
 \item[mon\textunderscore movement]
 Show a message when hero notices a monster movement (default is off).
 %.lp
 \item[monpolycontrol]
 Prompt for new form whenever any monster changes shape (default off).
-Debug mode only.
+Prophet mode only.
 %.lp
 \item[montelecontrol]
 Prompt for destination whenever any monster gets teleported (default off).
-Debug mode only.
+Prophet mode only.
 %.lp
 \item[mouse\textunderscore support]
 Allow use of the mouse for input and travel.
@@ -4907,7 +4907,7 @@ require ``\texttt{yes}'' rather than `\texttt{y}' to confirm dying (not
 useful in normal play; applies to explore mode);
 \item[bones]
 require ``\texttt{yes}'' rather than `\texttt{y}' to confirm saving
-bones data when dying in debug mode
+bones data when dying in prophet mode
 \item[attack]
 require ``\texttt{yes}'' rather than `\texttt{y}' to confirm attacking
 a peaceful monster;
@@ -5088,10 +5088,10 @@ the objects'' since the pile size will always be at least that big;
 default value is 5.  Persistent.
 %.lp
 \item[playmode]
-Values are \textit{normal}, \textit{explore}, or \textit{debug}.
-Allows selection of explore mode (also known as discovery mode) or debug
-mode (also known as wizard mode) instead of normal play.
-Debug mode might only be allowed for someone logged in under a particular
+Values are \textit{normal}, \textit{explore}, or \textit{prophet}.
+The old value \textit{debug} is still accepted.
+Allows selection of explore mode (also known as discovery mode) or prophet mode instead of normal play.
+Prophet mode might only be allowed for someone logged in under a particular
 user name (on multi-user systems) or specifying a particular character
 name (on single-user systems) or it might be disabled entirely.  Requesting
 it when not allowed or not possible results in explore mode instead.
@@ -5224,7 +5224,7 @@ Prevents you from waiting or searching when next to a hostile monster
 %.lp
 \item[sanity\textunderscore check]
 Evaluate monsters, objects, and map prior to each turn (default off).
-Debug mode only.
+Prophet mode only.
 %.lp
 \item[scores]
 Control what parts of the score list you are shown at the end (for example,
@@ -5421,7 +5421,7 @@ command.  Persistent.
 % %.lp
 % \item[ib{travel\textunderscore debug}]
 % Display intended path during each step of travel (default off).
-% Debug mode only.
+% Prophet mode only.
 %.lp
 \item[tutorial]
 Play a tutorial level at the start of the game.
@@ -5521,7 +5521,7 @@ configuration file, that would be the \textit{rightmost} option in the list.
 %.lp
 \item[wizweight]
 Augment object descriptions with their objects' weight (default off).
-Debug mode only.
+Prophet mode only.
 %.lp
 \item[zerocomp]
 When writing out a save file, perform zero-comp compression of the
@@ -6914,9 +6914,9 @@ system).
 %.lp
 \item[WIZARDS]
 A space-separated list of user name who are allowed to
-play in debug mode (commonly referred to as wizard mode).
+play in prophet mode.
 A value of a single
-asterisk (*) allows anyone to start a game in debug mode.
+asterisk (*) allows anyone to start a game in prophet mode.
 %.lp
 \item[SHELLERS]
 A list of users who are allowed to use the shell escape command (`\texttt{!}').
@@ -7082,11 +7082,11 @@ the trepid reader to discover.
 
 %.pg
 %.hn 2
-\subsection*{Debug mode}
+\subsection*{Prophet mode}
 
 %.pg
-Debug mode, also known as wizard mode, is undocumented aside from this
-brief description and the various ``debug mode only'' commands listed
+Prophet mode is undocumented aside from this
+brief description and the various ``prophet mode only'' commands listed
 among the command descriptions.
 It is intended for tracking down problems within the
 program rather than to provide god-like powers to your character, and
@@ -7095,15 +7095,17 @@ themselves.
 It is initiated by starting the game with the
 \texttt{-D}
 command-line switch or with the
-\textit{playmode:debug}
+\textit{playmode:prophet}
 option.
+\textit{playmode:debug}
+is still accepted.
 
 %.pg
 For some systems, the player must be logged in
-under a particular user name to be allowed to use debug mode; for others,
+under a particular user name to be allowed to use prophet mode; for others,
 the hero must be given a particular character name (but may be any role;
-there's no connection between ``wizard mode'' and the \textit{Wizard} role).
-Attempting to start a game in debug mode when not allowed
+there's no connection between ``prophet mode'' and the \textit{Wizard} role).
+Attempting to start a game in prophet mode when not allowed
 or not available will result in falling back to explore mode instead.
 
 %.hn

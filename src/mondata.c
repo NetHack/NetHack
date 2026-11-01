@@ -641,6 +641,9 @@ breakarm(struct permonst *ptr)
 {
     if (sliparm(ptr))
         return FALSE;
+    /* Large, but the plate mail on PETRA is made for him. */
+    if (ptr == &mons[PM_PHILISTINE_CHAMPION])
+        return FALSE;
 
     return (boolean) (bigmonst(ptr)
                       || (ptr->msize > MZ_SMALL && !humanoid(ptr))

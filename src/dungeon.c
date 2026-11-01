@@ -719,7 +719,7 @@ static struct level_map {
                   { "juiblex", &juiblex_level },
                   { "knox", &knox_level },
                   { "medusa", &medusa_level },
-                  { "oracle", &oracle_level },
+                  { "prophet", &oracle_level },
                   { "orcus", &orcus_level },
                   { "rogue", &rogue_level },
                   { "sanctum", &sanctum_level },
@@ -1885,7 +1885,7 @@ dungeon_branch(const char *s)
     return br;
 }
 
-/* The Cave of Gibeon is a one-level branch above the Oracle. */
+/* The Cave of Gibeon is a one-level branch above the Prophet. */
 boolean
 on_gibeon_level(d_level *lev)
 {
@@ -2121,7 +2121,7 @@ lev_by_name(const char *nam)
     } else {
         /* no matching annotation, check whether they used a name we know */
 
-        /* allow strings like "the oracle level" to find "oracle" */
+        /* allow strings like "the prophet level" to find "prophet" */
         if (!strncmpi(nam, "the ", 4))
             nam += 4;
         if ((p = strstri(nam, " level")) != 0 && p == eos((char *) nam) - 6) {
@@ -2135,9 +2135,17 @@ lev_by_name(const char *nam)
                 nam = " to Vlad's tower"; /* branch to... */
             else
                 nam = "valley";
-        } else if (!strcmpi(nam, "delphi")) {
-            /* Oracle says "welcome to Delphi" so recognize that name too */
-            nam = "oracle";
+        } else if (!strcmpi(nam, "delphi") || !strcmpi(nam, "oracle")) {
+            nam = "prophet";
+        } else if (!strcmpi(nam, "minetown") || !strcmpi(nam, "minetn")
+                   || !strcmpi(nam, "minetn-1")) {
+            nam = "capernaum";
+        } else if (!strcmpi(nam, "babylon") || !strcmpi(nam, "castle")) {
+            nam = "castle";
+        } else if (!strcmpi(nam, "petra") || !strcmpi(nam, "minesend")
+                   || !strcmpi(nam, "minend-1") || !strcmpi(nam, "minend-2")
+                   || !strcmpi(nam, "minend-3")) {
+            nam = "minend";
         }
 
         if ((slev = find_level(nam)) != 0)
@@ -2295,6 +2303,20 @@ print_branch(
     }
 }
 
+/* Tag shown in the overview and the levelport menu.
+   The puzzle level stays "Mines' End"; its real name is the scroll. */
+static const char *
+visible_level_tag(const char *proto)
+{
+    if (!proto)
+        return "";
+    if (!strcmp(proto, "castle"))
+        return "babylon";
+    if (!strcmp(proto, "minend"))
+        return "minesend";
+    return proto;
+}
+
 /* Print available dungeon information. */
 schar
 print_dungeon(boolean bymenu, schar *rlev, xint16 *rdgn)
@@ -2356,7 +2378,8 @@ print_dungeon(boolean bymenu, schar *rlev, xint16 *rdgn)
 
             Sprintf(buf, "%c %s: %d",
                     chr_u_on_lvl(&slev->dlevel),
-                    slev->proto, depth(&slev->dlevel));
+                    visible_level_tag(slev->proto),
+                    depth(&slev->dlevel));
             if (Is_stronghold(&slev->dlevel))
                 Sprintf(eos(buf), " (tune %s)", svt.tune);
             if (bymenu)
@@ -3576,7 +3599,8 @@ print_mapseen(
         s_level *slev;
 
         if ((slev = Is_special(&mptr->lev)) != 0)
-            Sprintf(eos(buf), " [%s]", slev->proto);
+            Sprintf(eos(buf), " [%s]",
+                    visible_level_tag(slev->proto));
     }
     /* [perhaps print custom annotation on its own line when it's long] */
     if (mptr->custom)
@@ -3648,12 +3672,12 @@ print_mapseen(
     /* we assume that these are mutually exclusive */
     *buf = '\0';
     if (mptr->flags.oracle) {
-        Sprintf(buf, "%sOracle of Delphi.", PREFIX);
+        Sprintf(buf, "%sProphet of the Lord.", PREFIX);
     } else if (In_sokoban(&mptr->lev)) {
         Sprintf(buf, "%s%s.", PREFIX,
                 mptr->flags.sokosolved ? "Solved" : "Unsolved");
     } else if (mptr->flags.bigroom) {
-        Sprintf(buf, "%sA very big room.", PREFIX);
+        Sprintf(buf, "%sValley of Dry Bones.", PREFIX);
     } else if (mptr->flags.roguelevel) {
         Sprintf(buf, "%sA primitive area.", PREFIX);
     } else if (on_level(&mptr->lev, &qstart_level)) {
@@ -3669,8 +3693,10 @@ print_mapseen(
            indicates that the fort's entrance has been seen (or mapped) */
         Sprintf(buf, "%sFort Ludios.", PREFIX);
     } else if (mptr->flags.castle) {
-        Snprintf(buf, sizeof buf, "%sThe castle%s.", PREFIX,
+        Snprintf(buf, sizeof buf, "%sBabylon's Palace%s.", PREFIX,
                 tunesuffix(mptr, tmpbuf, sizeof tmpbuf));
+    } else if (on_level(&mptr->lev, &mineend_level)) {
+        Sprintf(buf, "%sMines' End.", PREFIX);
     } else if (mptr->flags.valley) {
         Sprintf(buf, "%sValley of the Dead.", PREFIX);
     } else if (mptr->flags.vibrating_square) {

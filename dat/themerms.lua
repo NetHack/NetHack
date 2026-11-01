@@ -289,7 +289,7 @@ themerooms = {
    },
 
    {
-      name = "Fake Delphi",
+      name = "False chamber",
       contents = function()
          des.room({ type = "ordinary", w = 11,h = 9, filled = 1,
                   contents = function()

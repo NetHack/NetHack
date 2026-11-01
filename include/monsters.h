@@ -2743,14 +2743,15 @@
         M2_NOPOLY | M2_HUMAN | M2_PEACEFUL | M2_STRONG | M2_COLLECT,
         M3_INFRAVISIBLE | M3_CLOSE,
         14, HI_DOMESTIC, PRISONER),
-    /* the Oracle of Delphi doesn't move */
-    MON(NAM("Oracle"), S_HUMAN,
+    /* Isaiah does not move. The name is what the player sees. */
+    MON(NAM("Isaiah, prophet of the Lord"), S_HUMAN,
         LVL(12, 0, 0, 50, 0), (G_NOGEN | G_UNIQ),
         A(ATTK(AT_NONE, AD_MAGM, 0, 4),
           NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(WT_HUMAN, 400, MS_ORACLE, MZ_HUMAN), 0, 0,
         M1_HUMANOID | M1_OMNIVORE,
-        M2_NOPOLY | M2_HUMAN | M2_PEACEFUL | M2_FEMALE, M3_INFRAVISIBLE,
+        M2_NOPOLY | M2_HUMAN | M2_PEACEFUL | M2_PNAME | M2_MALE,
+        M3_INFRAVISIBLE,
         13, HI_ZAP, ORACLE),
     /* aligned priests always have the epri extension attached;
        individual instantiations should always have either ispriest
@@ -3930,6 +3931,18 @@
                                        | M2_STRONG | M2_COLLECT | M2_MAGIC,
         M3_INFRAVISIBLE,
         8, HI_DOMESTIC, APPRENTICE),
+    /* PETRA's only monster. Combat numbers match the ogre lord.
+       Always hostile. The name is Philistine Champion. */
+    MON(NAM("Philistine Champion"), S_OGRE,
+        LVL(7, 12, 3, 30, -5), (G_NOGEN | G_UNIQ),
+        A(ATTK(AT_WEAP, AD_PHYS, 2, 6),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(1700, 700, MS_GRUNT, MZ_LARGE), 0, 0,
+        M1_HUMANOID | M1_CARNIVORE,
+        M2_HOSTILE | M2_STRONG | M2_LORD | M2_MALE | M2_GREEDY | M2_JEWELS
+            | M2_COLLECT,
+        M3_INFRAVISIBLE | M3_INFRAVISION,
+        9, CLR_RED, PHILISTINE_CHAMPION),
 
     /*
      * mons_init() in monst.c adds a terminator here, mons[NUMMONS].

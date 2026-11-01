@@ -1,159 +1,159 @@
--- NetHack mines minend-2.lua	$NHDT-Date: 1652196029 2022/05/10 15:20:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.4 $
---	Copyright (c) 1989-95 by Jean-Christophe Collet
---	Copyright (c) 1991-95 by M. Stephenson
--- NetHack may be freely redistributed.  See license for details.
---
--- Mine end level variant 2
--- "Gnome King's Wine Cellar"
-
-des.level_init({ style = "solidfill", fg = " " });
-
-des.level_flags("mazelevel");
-
-des.map([[
----------------------------------------------------------------------------
-|...................................................|                     |
-|.|---------S--.--|...|--------------------------|..|                     |
-|.||---|   |.||-| |...|..........................|..|                     |
-|.||...| |-|.|.|---...|.............................|                ..   |
-|.||...|-|.....|....|-|..........................|..|.               ..   |
-|.||.....|-S|..|....|............................|..|..                   |
-|.||--|..|..|..|-|..|----------------------------|..|-.                   |
-|.|   |..|..|....|..................................|...                  |
-|.|   |..|..|----|..-----------------------------|..|....                 |
-|.|---|..|--|.......|----------------------------|..|.....                |
-|...........|----.--|......................|     |..|.......              |
-|-----------|...|.| |------------------|.|.|-----|..|.....|..             |
-|-----------|.{.|.|--------------------|.|..........|.....|....           |
-|...............|.S......................|-------------..-----...         |
-|.--------------|.|--------------------|.|.........................       |
-|.................|                    |.....................|........    |
----------------------------------------------------------------------------
-]]);
-
-if percent(50) then
-   des.terrain({55,14},"-")
-   des.terrain({56,14},"-")
-   des.terrain({61,15},"|")
-   des.terrain({52,5}, "S")
-   des.door("locked", 52,5)
-end
-if percent(50) then
-   des.terrain({18,1}, "|")
-   des.terrain(selection.area(7,12, 8,13), ".")
-end
-if percent(50) then
-   des.terrain({49,4}, "|")
-   des.terrain({21,5}, ".")
-end
-if percent(50) then
-   if percent(50) then
-      des.terrain({22,1}, "|")
-   else
-      des.terrain({50,7}, "-")
-      des.terrain({51,7}, "-")
-   end
-end
-
--- uncontrolled arrival (via trap door, level teleport) will be in the central
--- portion of level to prevent ending up stuck in the treasure area, whether
--- arriving from above or below (despite this being bottom of Mines branch,
--- hero might arrive from below by invoking Wiz role's Eye of the Aethiopica)
-des.teleport_region({ region={23,03,48,16}, region_islev=1 })
-
--- Dungeon Description
-des.feature("fountain", {14,13})
-des.region(selection.area(23,03,48,06),"lit")
-des.region(selection.area(21,06,22,06),"lit")
-des.region(selection.area(14,04,14,04),"unlit")
-des.region(selection.area(10,05,14,08),"unlit")
-des.region(selection.area(10,09,11,09),"unlit")
-des.region(selection.area(15,08,16,08),"unlit")
--- Secret doors
-des.door("locked",12,02)
-des.door("locked",11,06)
--- Stairs
-des.stair("up", 36,04)
--- Non diggable walls
-des.non_diggable(selection.area(00,00,52,17))
-des.non_diggable(selection.area(53,00,74,00))
-des.non_diggable(selection.area(53,17,74,17))
-des.non_diggable(selection.area(74,01,74,16))
-des.non_diggable(selection.area(53,07,55,07))
-des.non_diggable(selection.area(53,14,61,14))
--- The Gnome King's wine cellar.
--- the Trespassers sign is a long-running joke
-des.engraving({12,03}, "engrave",
-	      "You are now entering the Gnome King's wine cellar.")
-des.engraving({12,04}, "engrave", "Trespassers will be persecuted!")
-des.object("elixer of booze", 10, 07)
-des.object("elixer of booze", 10, 07)
-des.object("!", 10, 07)
-des.object("elixer of booze", 10, 08)
-des.object("elixer of booze", 10, 08)
-des.object("!", 10, 08)
-des.object("elixer of booze", 10, 09)
-des.object("elixer of booze", 10, 09)
-des.object("anointing oil of object detection", 10, 09)
--- Objects
--- The Treasure chamber...
-des.object("diamond", 69, 04)
-des.object("*", 69, 04)
-des.object("diamond", 69, 04)
-des.object("*", 69, 04)
-des.object("emerald", 70, 04)
-des.object("*", 70, 04)
-des.object("emerald", 70, 04)
-des.object("*", 70, 04)
-des.object("emerald", 69, 05)
-des.object("*", 69, 05)
-des.object("ruby", 69, 05)
-des.object("*", 69, 05)
-des.object("ruby", 70, 05)
-des.object("amethyst", 70, 05)
-des.object("*", 70, 05)
-des.object("amethyst", 70, 05)
-des.object({ id="luckstone", x=70, y=05,
-	     buc="not-cursed", achievement=1 });
--- Scattered gems...
-des.object("*")
-des.object("*")
-des.object("*")
-des.object("*")
-des.object("*")
-des.object("*")
-des.object("*")
-des.object("(")
-des.object("(")
-des.object()
-des.object()
-des.object()
--- Random traps
-des.trap()
-des.trap()
-des.trap()
-des.trap()
-des.trap()
-des.trap()
--- Random monsters.
-des.monster("gnome king")
-des.monster("gnome lord")
-des.monster("gnome lord")
-des.monster("gnome lord")
-des.monster("gnomish wizard")
-des.monster("gnomish wizard")
-des.monster("gnome")
-des.monster("gnome")
-des.monster("gnome")
-des.monster("gnome")
-des.monster("gnome")
-des.monster("gnome")
-des.monster("gnome")
-des.monster("gnome")
-des.monster("gnome")
-des.monster("hobbit")
-des.monster("hobbit")
-des.monster("dwarf")
-des.monster("dwarf")
-des.monster("dwarf")
-des.monster("h")
+-- Mines' End layout 2: PETRA north, champion south.
+-- Approved geometry, 76x21, placed at map origin (1,0).
+-- Only the PETRA room is lit. The rest of the level is dark.
+-- Champion chest: 4 random real gems (no glass), 350 gold,
+-- one random prophetic book. Unlocked and untrapped.
+-- Chest square on this map: (53,15).
+des.level_init({ style = "solidfill", fg = " " })
+des.level_flags("mazelevel", "nomongen", "noteleport", "hardfloor", "noflip")
+des.map({ x = 1, y = 0, map = [[
+                       ---      -----------        -------                  
+       --------------- |.---    |...|.|...|    -----.--..--------           
+    ----.............---...|    |...|.|...|    |.--...........-.-- ---      
+   --.........--...........---  ---+-+-+---    |.................---.-----  
+  --...-...---.-...-.........|  |-.......-|    |.---.....................|  
+  |..------|.-...........-..--  |.........|    |.| ---.-....----..-.....--  
+  |..|     |.....----....--..|  |.........|   --.|   ------.|  -------..|   
+ --.--     --.......-.....|-.|  |.........|   |..|       --.|---  ---...|   
+ |..--      |.............----  |.........|   |..--     --..-..-- |....--   
+ |...|--    --..--.........----------+-----   --..|     |.......| --....|   
+ |...-.----  |.----...................|       --..|     ---------  ---..--  
+ ---......|  ---  |.....--..-----------     ---..--                  --..|  
+ --...-...|   -----.....|...|               |...--                  ----.-- 
+ |........-- --......-----.--    ---------- |..--                  --.....| 
+ |.........|--...-.....-...---- --...-.-..|--.--    -----------    |......--
+ |........-|..................| |.........--..|     |.........|    |.-.....|
+ --.......|--..--.......--.-..---.............|     |.........|-----..-...--
+  --.....--.-.--|.......|----..|........-.....|     |.........+.....-....-- 
+   --..........|---....--   --.-.......---....|     |.........|--..----..|  
+    ---------.--  ------     |.....----|...----     |.........| --......--  
+            ---              -------   -----        -----------  --------   
+]]})
+des.non_diggable()
+des.replace_terrain({ selection = selection.floodfill(38, 7), fromterrain = ".", toterrain = ".", lit = 1 })
+des.replace_terrain({ selection = selection.floodfill(39, 2), fromterrain = ".", toterrain = ".", lit = 1 })
+des.replace_terrain({ selection = selection.floodfill(35, 2), fromterrain = ".", toterrain = ".", lit = 1 })
+des.replace_terrain({ selection = selection.floodfill(37, 2), fromterrain = ".", toterrain = ".", lit = 1 })
+des.stair("up", 20, 5)
+des.petra_letter({ x=34, y=4, text="P", step=0 })
+des.petra_letter({ x=35, y=4, text="R", step=0 })
+des.petra_letter({ x=36, y=4, text="T", step=0 })
+des.petra_letter({ x=37, y=4, text="L", step=0 })
+des.petra_letter({ x=38, y=4, text="N", step=0 })
+des.petra_letter({ x=39, y=4, text="A", step=5 })
+des.petra_letter({ x=40, y=4, text="K", step=0 })
+des.petra_letter({ x=34, y=5, text="L", step=0 })
+des.petra_letter({ x=35, y=5, text="O", step=0 })
+des.petra_letter({ x=36, y=5, text="R", step=0 })
+des.petra_letter({ x=37, y=5, text="E", step=0 })
+des.petra_letter({ x=38, y=5, text="E", step=0 })
+des.petra_letter({ x=39, y=5, text="R", step=4 })
+des.petra_letter({ x=40, y=5, text="G", step=0 })
+des.petra_letter({ x=34, y=6, text="P", step=0 })
+des.petra_letter({ x=35, y=6, text="P", step=0 })
+des.petra_letter({ x=36, y=6, text="R", step=0 })
+des.petra_letter({ x=37, y=6, text="L", step=0 })
+des.petra_letter({ x=38, y=6, text="E", step=2 })
+des.petra_letter({ x=39, y=6, text="T", step=3 })
+des.petra_letter({ x=40, y=6, text="P", step=0 })
+des.petra_letter({ x=34, y=7, text="M", step=0 })
+des.petra_letter({ x=35, y=7, text="I", step=0 })
+des.petra_letter({ x=36, y=7, text="U", step=0 })
+des.petra_letter({ x=37, y=7, text="U", step=0 })
+des.petra_letter({ x=38, y=7, text="P", step=1 })
+des.petra_letter({ x=39, y=7, text="G", step=0 })
+des.petra_letter({ x=40, y=7, text="S", step=0 })
+des.engraving({ x=33, y=8, type="burn", degrade=false, text="Upon this rock I will build my church. Walk upon the rock in the tongue of the Greeks." })
+des.door("closed", 35, 3)
+des.door("closed", 37, 3)
+des.door("closed", 39, 3)
+des.door("closed", 37, 9)
+des.door("closed", 62, 17)
+des.object({ id="loadstone", x=35, y=2 })
+des.object({ id="loadstone", x=37, y=2 })
+des.object({ id="Peter's net", x=39, y=2 })
+des.object({ id="Favor Stone", x=39, y=1, buc="not-cursed", achievement=1 })
+des.monster({ id = "Philistine Champion", peaceful = 0, asleep = false, x = 57, y = 17,
+    inventory = function()
+        des.object({ id = "two-handed sword", spe = 2, buc = "uncursed" })
+        des.object({ id = "bronze plate mail", buc = "uncursed" })
+        des.object({ id = "helmet", buc = "uncursed" })
+    end })
+des.object({ id = "chest", locked = 0, trapped = 0, x = 53, y = 15,
+    contents = function()
+        local gems = {
+            "dilithium crystal",
+            "diamond",
+            "ruby",
+            "jacinth",
+            "sapphire",
+            "black opal",
+            "emerald",
+            "turquoise",
+            "citrine",
+            "aquamarine",
+            "amber",
+            "topaz",
+            "jet",
+            "opal",
+            "chrysoberyl",
+            "garnet",
+            "amethyst",
+            "jasper",
+            "fluorite",
+            "obsidian",
+            "agate",
+            "jade",
+        }
+        local i
+        for i = 1, 4 do
+            local k = math.random(i, #gems)
+            gems[i], gems[k] = gems[k], gems[i]
+            des.object({ id = gems[i], buc = "uncursed", quantity = 1 })
+        end
+        des.object({ id = "gold piece", quantity = 350 })
+        local books = {
+            "move mountains",
+            "hidden arrows",
+            "fiery tempest",
+            "northern wind",
+            "tranquility",
+            "finger of judgement",
+            "light",
+            "reveal foes",
+            "healing",
+            "door shall be open",
+            "rebuke",
+            "bewilder",
+            "cure blindness",
+            "noisome pestilence",
+            "staggering wine",
+            "seal entrance",
+            "heavenly host",
+            "reveal sustenance",
+            "righteous fear",
+            "far sight",
+            "cure sickness",
+            "pacification",
+            "quickening",
+            "piercing sight",
+            "ascension",
+            "abundant healing",
+            "divine ability",
+            "divine concealment",
+            "render unto Caesar",
+            "remove curse",
+            "path revealed",
+            "discernment",
+            "resist evil",
+            "transformation",
+            "banishment",
+            "angelic help",
+            "cancellation",
+            "protection",
+            "leaping like a deer",
+            "flesh renewed",
+            "lightning flash",
+        }
+        des.object({ id = books[math.random(#books)], buc = "uncursed" })
+    end })

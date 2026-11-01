@@ -16,9 +16,9 @@ nethack -u character-name [-X or -D]
   '-X' play in non-scoring explore mode also known as discovery mode;
        -X must be uppercase; character starts with a wand of wishing and
        player may opt to be life-saved and keep going if character dies;
-  '-D' run in debug mode also known as wizard mode; -D must be uppercase;
+  '-D' run in prophet mode; -D must be uppercase;
        if player is not allowed then nethack will switch to -X; if player
-       is allowed, character name will be changed to "wizard".
+       is allowed, character name will be changed to "Elisha".
 
   A character name may have a suffix specifying any or all of role, race,
   gender, and alignment such as -u Conan-Bar-Hum-Mal-Neu or -u Tim-Wiz.

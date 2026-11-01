@@ -628,9 +628,9 @@ first food change will not load.
 
 ### Cave of Gibeon (2026-11-01)
 
-The Oracle's chamber has an up stair into a one-level branch, the
-Cave of Gibeon. Sokoban still joins one level below the Oracle; this
-stair is placed on the Oracle level itself. A dark orthogonal tunnel
+The Prophet's chamber has an up stair into a one-level branch, the
+Cave of Gibeon. Sokoban still joins one level below the Prophet; this
+stair is placed on the Prophet's level itself. A dark orthogonal tunnel
 leads into a lit cave. The cave does not generate random monsters.
 In the middle is the Altar at Gibeon, a lawful altar. Looking at it
 says "There is the Altar at Gibeon here." King Solomon stands on the
@@ -701,6 +701,182 @@ Moloch's Sanctum are unchanged. Class-quest altars are unchanged.
 King Solomon's #chat, before the Gibeon vision, always speaks
 the hint about asking for a heart to judge rightly, then
 Mark 8:36. After the vision, either line may be spoken.
+
+### Prophet mode (2026-11-01)
+
+The mode started with -D is prophet mode. Help, the guidebook, the
+options screen, and the messages that name the mode say prophet mode. `OPTIONS=playmode:prophet` selects it.
+`playmode:debug` still selects it. The Wizard of Yendor and the
+Wizard role are unchanged. The sysconf list is still named WIZARDS.
+
+### A word from the Lord (2026-11-01)
+
+#chat with Isaiah asks, with no price:
+"Wilt thou settle for a minor word from the Lord?" [ynq] (q)
+Answering no asks:
+"Then dost thou desire a major word from the Lord?" [yn] (n)
+Both are free. The first of either is still the achievement
+"received a word from the Lord." Each word's first-time
+experience is the old amount: a few points for the minor word,
+and the old major price divided by 10 (or by 25 if the minor
+word came first). Hearing either again does not repeat that.
+If he is angry: "Isaiah, prophet of the Lord is in no mood to
+give a word from the Lord."
+
+Saying no to both asks:
+"Would you like to make a donation to God's church?" [yn] (n)
+Yes asks "How much will you give?" More than you are carrying
+gives all the gold you have. A gift of 0 takes nothing and has
+no penalty. Isaiah quotes 2 Corinthians 9:7, King James, word
+for word: "Every man according as he purposeth in his heart, so
+let him give; not grudgingly, or of necessity: for God loveth a
+cheerful giver."
+PLACEHOLDER thank-yous, for Jon:
+- 1 to 999 shekels: Isaiah quotes Proverbs 11:25, King James, word for word: "The liberal soul shall be made fat: and he that watereth shall be watered also himself." Then the placeholder "You feel the Lord's favor upon your gift." Favor +1. Any number of times.
+- 1000 to 4999: Isaiah quotes Luke 6:38, King James, in two messages, then "Thy gift lifts thee a little." A quarter of this level's experience.
+- 5000 to 9999: the same verse, then "Thy gift lifts thee further." Half a level.
+- 10000 or more: the same verse, then "Thy gift lifts thee a full step." One level.
+The verse, split at the sentence and otherwise unchanged: "Give, and it shall be given unto you; good measure, pressed down, and shaken together, and running over, shall men give into your bosom." Then: "For with the same measure that ye mete withal it shall be measured to you again."
+Those three are capped at ten gifts in a game. After that, a gift
+of 1000 or more still takes the gold and says "The Lord bless
+thee. The church can receive no greater increase for now." Favor
++1, and no experience. That last line is a placeholder. A gift
+never raises you more than one level, including at the level cap.
+
+### Shekels (2026-11-01)
+
+Prices, shop speech, the inventory gold line, and death and score
+lines say "shekel" for one and "shekels" for more. The coins
+themselves are still called gold pieces. A donation to God's
+church is counted in shekels.
+A wish for shekels or for zorkmids both yield gold pieces. The
+game does not say zorkmid.
+
+### Prophet, Capernaum, and PETRA (2026-11-01)
+
+The Oracle is Isaiah, prophet of the Lord. That is his monster
+name, and the text windows name him that way. The minor word
+hears one of the placeholder proverbs. The major word hears
+"The treasure you seek has always been yours." Neither costs gold.
+The overview feature line is exactly "Prophet of the Lord."
+Prophet mode tags that level [prophet]. The #levelport menu shows
+prophet. The xlogfile achievement is consulted_the_prophet. The
+big room's overview and achievements call it the Valley of Dry
+Bones. The maps of those big rooms are unchanged.
+
+Babylon's Palace is the old castle. The chest that held the rod of
+wishing now holds a blessed +2 Shield of Faith. The drawbridge does not
+open to the old tune, and the key is not applied at the bridge
+itself. A Rock with a keyhole stands in the small courtyard
+outside the moat, west of the closed bridge. Standing on it or
+next to it and applying the Key to Babylon's Palace lowers the
+drawbridge. PLACEHOLDER for Jon: "The key turns with a sound like
+a stone rolled away. Far off, chains groan, and the drawbridge
+of Babylon comes down." If it is already down: "The rock is
+silent. The way is already open." Palace doors still open with
+the key. A lock
+pick does not open those doors. Interior chests can still be
+picked. Prophet mode tags the level [babylon]. The #levelport
+menu shows babylon. The level file is still castle.
+
+Capernaum replaces every Minetown variant. Prophet mode tags that
+level [capernaum], and the #levelport menu shows capernaum. The
+xlogfile achievement is entered_capernaum. The old file name
+minetn-1 used to trigger the orc-town gang; Capernaum does not.
+The cats placed there are housecats; the id "cat" does not exist
+and stopped the level from loading.
+Each game picks one of three approved town maps. The sea is on
+the west, the south, or the east. The whole town is lit. There
+is no random monster generation. The shops are a delicatessen, a
+general store, a hardware store, Izchak's lighting store, a used
+armor dealership, an antique weapons outlet, a second-hand
+bookstore, a liquor emporium, and a jewelers. Two of the maps
+also have a health food store, so those maps have 10 shops and
+the south-sea map has 9. A candle shop in this town names its
+shopkeeper Izchak. There is a lawful temple, two fountains, a
+small pool, and peaceful people, dogs, and cats. Peter the
+Fisherman stands against his closet door and has room to step
+aside. Water that connects to the edge of the map is called the
+Sea of Galilee. The town pool, and water on every other level,
+keeps its ordinary name.
+The first arrival opens a text window, the same kind as a quest
+introduction. A male hero hears "As you approach Capernaum, a man
+calls out \"Hello! You sir! My name is Peter the Fisherman, and
+I am in need of your aid!\"" A female hero hears the same line
+with "You ma'am!" in place of "You sir!" The first `#chat` is the quest: "I lost my fishing net
+deep in the Salt Mines of Galilee, and I need you to retrieve it.
+Please take this scroll for a hint of the trials you may find
+along the way." He puts Peter's scroll in your pack. It cannot be
+wished for. Reading it shows "The Master gave me a new name, and
+on it He said He would build. Remember my name, and the floor will
+hold you." It can be read any number of times and is not used up.
+Later chats before the net is returned repeat that same hint.
+Peter cannot be killed or hurt by a weapon, a missile, a spell, a
+rod, a trap, or a pet. He does not turn hostile, and he cannot be
+pushed off his post. A pet will not attack Peter, King Solomon,
+Isaiah, the angel at Jacob's Ladder, or a Babel builder.
+
+Mines' End is three approved full-level maps, one chosen at
+random. The overview calls that level
+Mines' End and tags it [minesend]. The #levelport menu says
+minesend. Achievements, the livelog, and arrival text do not say
+PETRA. The scholar's scroll is the clue that does. Only the
+puzzle room is lit. The rest of the level is dark. The letters
+are a 7 by 4 grid drawn on the floor as those capitals.
+Farlook and look-here call a tile "the letter P" (or whichever
+letter it is). They are not engravings. The hint is an engraving
+in the southwest corner of the safe row, so it shows the engraving
+symbol: "Upon this rock I will build my church. Walk upon the rock
+in the tongue of the Greeks." A false letter, such as a decoy,
+becomes ordinary lava under you and deals 20 damage, or 10
+if you have fire resistance. You stay on the square.
+The lava does not sink you or kill you by itself, and the next
+move can step off. Death happens only when the 20 takes you to
+0 hit points or below, and the reason is "a false step." A
+letter on this layout's true path, P through A, is never turned
+to lava. Order and direction do not matter, and that stays true
+after you leave the level or save, because the path step is not
+replaced by the turn count when the level is loaded.
+The path is stored on each letter, so a later
+layout does not need a coordinate table. There is one door
+onto the letter floor, directly north of the A. The other two
+doors are closets, and each holds a loadstone. Behind the real
+door are Peter's net and a Favor Stone. The level does not
+generate random monsters, does not allow teleport, and cannot be
+dug. Those three limits stay, so the puzzle cannot be skipped.
+The Philistine Champion is the only monster, on every layout. He
+waits in his own room, at the square marked for him, and does not
+leave that room. He can still fight anyone who comes in. The only
+door of that room is the one drawn on the map. The route from the
+stair does not cross the letter floor. In his room, away from
+the door, an unlocked untrapped chest holds 4 real gems (no
+worthless glass; each is a single stone), 350 gold pieces, and
+one random prophetic book. He
+is hostile and male. Monster level 7, speed 12, magic resistance
+30, size large. Hit points are a fixed 90, about three times an
+ogre lord. Bare armor class is 3. He wears uncursed bronze plate
+mail and a helmet, so his armor class in the fight is -4. One
+weapon attack, listed as 2d6 with empty hands. He wields a +2
+two-handed sword: 1d12+2 against a human-sized hero, plus
+strength. No sorcery. Killing him always leaves a scholar's
+scroll. The scroll is not generated anywhere else and cannot be
+wished for. Reading it shows this text and does not use it up:
+"In my research I have found the ancient Greek name for the rock
+upon which the church was built. It is written with the Greek
+letters Pi, Epsilon, Tau, Rho, Alpha, which in our letters is
+PETRA."
+
+Give Peter the net. He says "Thank you, friend... 'Follow me, and I
+will make you fishers of men.' I have cast this net for many souls
+since then." He keeps the net. He then gives the Key to Babylon's
+Palace and the Key to the Gates of Hell (placeholder name) and says
+Matthew 16:18. He steps aside and the door opens. That is the
+only way in. Kicking, lock picks, keys, credit cards, knock,
+force, digging, phasing, and teleporting all fail, with "This
+door will not yield." The closet floor and its walls cannot be
+dug or phased through. The undiggable
+closet holds a blessed +2 Breastplate of Righteousness. The net and
+both keys cannot be wished for.
 
 ### Planned (not done)
 

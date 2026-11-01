@@ -352,7 +352,7 @@ demon_talk(struct monst *mtmp)
        also, avoid random hallucinatory currency() units */
     livelog_printf(LL_UMONST, "bribed %s with %ld %s for safe passage",
                    x_monnam(mtmp, ARTICLE_A, (char *) 0, EXACT_NAME, FALSE),
-                   offer, (offer == 1L) ? "zorkmid" : "zorkmids");
+                   offer, (offer == 1L) ? "shekel" : "shekels");
     mongone(mtmp);
     return 1;
 }

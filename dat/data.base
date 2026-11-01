@@ -1042,9 +1042,9 @@ c*ckatrice
 *coin
 ~creeping coins
 *coins
-zorkmid*
+shekel*
 	The coin bears the likeness of Belwit the Flat, along with the
-	inscriptions, "One Zorkmid," and "699 GUE [ Great Underground
+	inscriptions, "One Shekel," and "699 GUE [ Great Underground
 	Empire ]."  On the other side, the coin depicts Egreth Castle,
 	and says "In Frobs We Trust" in several languages.
 		[ Zork Zero, by Infocom ]
@@ -1157,7 +1157,7 @@ kroisos
 creosote
 	Croesus (in Greek: Kroisos), the wealthy last king of Lydia;
 	his empire was destroyed when he attacked Cyrus in 549 BC,
-	after the Oracle of Delphi (q.v.) had told him: "if you attack
+	after a prophet had told him: "if you attack
 	the Persians, you will destroy a mighty empire".  Herodotus
 	relates of his legendary conversation with Solon of Athens,
 	who impressed upon him that being rich does not imply being
@@ -4043,18 +4043,10 @@ olog-hai
 	Twilight they could endure the Sun....  They spoke little,
 	and the only tongue they knew was the Black Speech of Barad-dur.
 		[ The Return of the King, by J.R.R. Tolkien ]
-oracle
-delphi
-p*thia
-	Delphi under towering Parnassus, where Apollo's oracle was,
-	plays an important part in mythology.  Castalia was its
-	sacred spring; Cephissus its river.  It was held to be the
-	center of the world, so many pilgrims came to it, from
-	foreign countries as well as Greece.  No other shrine rivaled
-	it.  The answers to the questions asked by the anxious
-	seekers for Truth were delivered by a priestess who went into
-	a trance before she spoke.
-		[ Mythology, by Edith Hamilton ]
+prophet
+	A prophet speaks a word from the Lord.  The one who waits
+	in the dungeon will give you one if you pay in gold.
+		[]
 orange
 pear
 	What was the fruit like?  Unfortunately, no one can describe
@@ -4471,14 +4463,14 @@ python
 	A monstrous serpent in Greek mythology, and the child of Gaia,
 	the goddess earth.  It was produced from the slime and mud
 	that was left on the earth by the great flood of Deucalion.
-	It lived in a cave and guarded the oracle of Delphi on mount
+	It lived in a cave and guarded a shrine on Mount
 	Parnassus.
 
 	No man dared to approach the beast and the people asked Apollo
 	for help.  He came down from Mount Olympus with his silver bow
 	and golden arrows.  With using only one arrow he killed the
-	serpent and claimed the oracle for himself. ... The old name of
-	Delphi, Pytho, refers to the serpent.
+	serpent and claimed the shrine for himself. ... The old name of
+	that shrine, Pytho, refers to the serpent.
 		[ Encyclopedia Mythica, ed. M.F. Lindemans ]
 quadruped
 	The woodlands and other regions are inhabited by multitudes
@@ -6036,17 +6028,17 @@ wood golem
 	  [ The Sorcerer's Apprentice, by Johann Wolfgang von Goethe,
 	      translation by Edwin Zeydel ]
 woodchuck
-	The Usenet Oracle requires an answer to this question!
+	The woodchuck requires an answer to this question!
 
 	> How much wood could a woodchuck chuck if a woodchuck could
 	> chuck wood?
 
-	"Oh, heck!  I'll handle *this* one!"  The Oracle spun the terminal
+	"Oh, heck!  I'll handle *this* one!"  The clerk spun the terminal
 	back toward himself, unlocked the ZOT-guard lock, and slid the
 	glass guard away from the ZOT key.  "Ummmm....could you turn around
 	for a minute?  ZOTs are too graphic for the uninitiated.  Even *I*
 	get a little squeamish sometimes..."  The neophyte turned around,
-	and heard the Oracle slam his finger on a computer key, followed
+	and heard the clerk slam his finger on a computer key, followed
 	by a loud ZZZZOTTTTT and the smell of ozone.
 		[ Excerpted from Internet Oracularity 576.6 ]
 *worm

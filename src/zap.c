@@ -531,15 +531,21 @@ bhitm(struct monst *mtmp, struct obj *otmp)
             shieldeff_mon(mtmp);
         } else if (!resist(mtmp, otmp->oclass, dmg, NOTELL)
                    && !DEADMONSTER(mtmp)) {
-            mtmp->mhp -= dmg;
-            mtmp->mhpmax -= dmg;
-            /* die if already level 0, regardless of hit points */
-            if (DEADMONSTER(mtmp) || mtmp->mhpmax <= 0 || mtmp->m_lev < 1) {
-                killed(mtmp);
-            } else {
-                mtmp->m_lev--;
+            if (peter_unhurt(mtmp)) {
                 if (canseemon(mtmp))
-                    pline("%s suddenly seems weaker!", Monnam(mtmp));
+                    pline("%s is unharmed.", Monnam(mtmp));
+            } else {
+                mtmp->mhp -= dmg;
+                mtmp->mhpmax -= dmg;
+                /* die if already level 0, regardless of hit points */
+                if (DEADMONSTER(mtmp) || mtmp->mhpmax <= 0
+                    || mtmp->m_lev < 1) {
+                    killed(mtmp);
+                } else {
+                    mtmp->m_lev--;
+                    if (canseemon(mtmp))
+                        pline("%s suddenly seems weaker!", Monnam(mtmp));
+                }
             }
         }
         break;
@@ -3271,7 +3277,7 @@ zap_updown(struct obj *obj) /* wand or spell, nonnull */
         }
         /* up or down, but at closed portcullis only */
         if (is_db_wall(x, y) && find_drawbridge(&xx, &yy)) {
-            open_drawbridge(xx, yy);
+            open_drawbridge(xx, yy, FALSE);
             disclose = TRUE;
         } else if (u.dz > 0 && stway && stway->sx == x && stway->sy == y
                    /* can't use the stairs down to quest level 2 until
@@ -3694,7 +3700,7 @@ zap_map(
                 if (is_db_wall(x, y)) {
                     if (cansee(dbx, dby) || cansee(x, y))
                         learn_it = TRUE;
-                    open_drawbridge(dbx, dby);
+                    open_drawbridge(dbx, dby, FALSE);
                 }
                 break;
             case WAN_LOCKING:
@@ -4392,6 +4398,8 @@ zhitm(
         tmp /= 2;
     if (tmp < 0)
         tmp = 0; /* don't allow negative damage */
+    if (peter_unhurt(mon))
+        return 0;
     debugpline3("zapped monster hp = %d (= %d - %d)", mon->mhp - tmp,
                 mon->mhp, tmp);
     mon->mhp -= tmp;
@@ -5465,6 +5473,13 @@ zap_over_floor(
             break;
         }
         if (new_doormask >= 0) { /* door gets broken */
+            if (peters_closet_door(x, y)) {
+                if (see_it)
+                    pline("This door will not yield.");
+                new_doormask = -1;
+            }
+        }
+        if (new_doormask >= 0) { /* door gets broken */
             if (*in_rooms(x, y, SHOPBASE)) {
                 if (type >= 0) {
                     add_damage(x, y, SHOP_DOOR_COST);
@@ -6148,6 +6163,11 @@ resist(struct monst *mtmp, char oclass, int damage, int tell)
     }
 
     if (damage) {
+        if (peter_unhurt(mtmp)) {
+            if (canseemon(mtmp))
+                pline("%s is unharmed.", Monnam(mtmp));
+            return resisted;
+        }
         mtmp->mhp -= damage;
         if (DEADMONSTER(mtmp)) {
             if (gm.m_using)
@@ -6380,6 +6400,12 @@ wish_from_text(char *buf, boolean last_try)
     if (otmp && otmp != &nothing && otmp != &hands_obj
         && (otmp->otyp == BURNT_OFFERING
             || otmp->otyp == FORTUNE_COOKIE
+            || otmp->otyp == PETER_NET
+            || otmp->otyp == KEY_TO_BABYLON
+            || otmp->otyp == KEY_TO_GATES
+            || otmp->otyp == SCR_SCHOLARS_SCROLL
+            || otmp->otyp == SCR_PETERS_SCROLL
+            || otmp->otyp == ROCK_WITH_KEYHOLE
             || (otmp->otyp == CRYSTAL_BALL && !otmp->oartifact))) {
         pline("You cannot wish for that.");
         obfree(otmp, (struct obj *) 0);

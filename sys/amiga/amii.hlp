@@ -19,7 +19,7 @@ Command line options recognized are
 
         -n                      No News at game startup.
         -X                      Play in discovery mode.
-        -D                      Play in debug mode.
+        -D                      Play in prophet mode.
         -L                      Interlaced screen.
         -l                      Never Interlaced screen.
         -u                      Play as player given as

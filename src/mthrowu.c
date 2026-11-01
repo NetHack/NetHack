@@ -44,7 +44,7 @@ static const char *const hallublasts[] = {
     "sadness", "salt", "sand", "scrolls", "sludge", "smileys", "snowflakes",
     "sparkles", "specularity", "spores", "stars", "steam", "tetrahedrons",
     "text", "the past", "tornadoes", "toxic waste", "ultraviolet light",
-    "viruses", "water", "waveforms", "wind", "X-rays", "zorkmids"
+    "viruses", "water", "waveforms", "wind", "X-rays", "shekels"
 };
 
 /* Return a random hallucinatory blast. */
@@ -450,7 +450,12 @@ ohitmon(
 
         /* might already be dead (if petrified) */
         if (!harmless && !DEADMONSTER(mtmp)) {
-            mtmp->mhp -= damage;
+            if (peter_unhurt(mtmp)) {
+                if (vis)
+                    pline("%s is unharmed.", Monnam(mtmp));
+                damage = 0;
+            } else
+                mtmp->mhp -= damage;
             if (DEADMONSTER(mtmp)) {
                 if (vis || (verbose && !gm.mtarget))
                     pline("%s is %s!", Monnam(mtmp),

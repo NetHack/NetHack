@@ -363,6 +363,9 @@ read_engr_at(coordxy x, coordxy y)
                 You_see("a message scrawled in blood here.");
             }
             break;
+        case LETTER:
+            /* The map shows the letter. This is not an engraving. */
+            break;
         default:
             impossible("%s is written in a very strange way.", Something);
             sensed = 1;
@@ -1611,10 +1614,14 @@ rest_engravings(NHFILE *nhfp)
             ep->engr_txt[actual_text]++;
         while (ep->engr_txt[remembered_text][0] == ' ')
             ep->engr_txt[remembered_text]++;
-        /* mark as finished for bones levels -- no problem for
-         * normal levels as the player must have finished engraving
-         * to be able to move again */
-        ep->engr_time = svm.moves;
+        /* A letter tile keeps its path step in engr_time
+           (0 is a decoy, 1..5 is the true path). Replacing that
+           with the turn count makes a true-path letter burn. */
+        if (ep->engr_type != LETTER)
+            /* mark as finished for bones levels -- no problem for
+             * normal levels as the player must have finished engraving
+             * to be able to move again */
+            ep->engr_time = svm.moves;
     }
 }
 

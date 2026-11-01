@@ -435,6 +435,8 @@ teleok(coordxy x, coordxy y, boolean trapok)
         if (!trapok)
             return FALSE;
     }
+    if (peters_closet_floor(x, y))
+        return FALSE;
     if (!goodpos(x, y, &gy.youmonst, 0))
         return FALSE;
     if (!tele_jump_ok(u.ux, u.uy, x, y))
@@ -960,7 +962,7 @@ dotelecmd(void)
             { 'n', "normal ^T on demand; no spell, obey restrictions" },
             { 's', "via spellcast; no intrinsic teleport" },
             { 't', "try ^T without having it; no spell" },
-            { 'w', "debug mode; ignore restrictions" }, /* trad wizard mode */
+            { 'w', "prophet mode; ignore restrictions" }, /* trad wizard mode */
         };
         menu_item *picks = (menu_item *) 0;
         anything any;
@@ -1808,6 +1810,11 @@ rloc(
     if (mtmp == u.usteed) {
         tele();
         return TRUE;
+    }
+    /* Peter stays on his post. A deliberate step aside still uses rloc_to. */
+    if (is_peter(mtmp)) {
+        (void) peter_unhurt(mtmp);
+        return FALSE;
     }
 
     if (mtmp->iswiz && mtmp->mx) { /* Wizard, not just arriving */

@@ -1540,7 +1540,6 @@ static const char *const currencies[] = {
     "sporebuck",             /* Spore */
     "Triganic Pu",           /* The Hitchhiker's Guide to the Galaxy */
     "woolong",               /* Cowboy Bebop */
-    "zorkmid",               /* Zork, NetHack */
 };
 
 const char *
@@ -1548,7 +1547,7 @@ currency(long amount)
 {
     const char *res;
 
-    res = Hallucination ? ROLL_FROM(currencies) : "zorkmid";
+    res = Hallucination ? ROLL_FROM(currencies) : "shekel";
     if (amount != 1L)
         res = makeplural(res);
     return res;
@@ -4186,6 +4185,13 @@ look_here(
 
     otmp = svl.level.objects[u.ux][u.uy];
     dfeature = dfeature_at(u.ux, u.uy, fbuf2);
+    {
+        char letter = petra_map_letter(u.ux, u.uy);
+
+        /* `:` should name the PETRA letter underfoot. */
+        if (letter)
+            pline("There is the letter %c here.", letter);
+    }
     if (dfeature && !strcmp(dfeature, "pool of water") && Underwater)
         dfeature = 0;
 

@@ -37,8 +37,8 @@ struct u_have {
 };
 
 struct u_event {
-    Bitfield(minor_oracle, 1); /* received at least 1 cheap oracle */
-    Bitfield(major_oracle, 1); /*  "  expensive oracle */
+    Bitfield(minor_oracle, 1); /* heard the minor word from the Lord */
+    Bitfield(major_oracle, 1); /* heard the major word from the Lord */
     Bitfield(read_tribute, 1); /* read a passage from a novel */
     Bitfield(qcalled, 1);      /* called by Quest leader to do task */
     Bitfield(qexpelled, 1);    /* expelled from the Quest dungeon */
@@ -55,7 +55,12 @@ struct u_event {
 
     Bitfield(amulet_wish, 1);       /* has gained a wish from the Amulet */
     Bitfield(gibeon_wish, 1);       /* Cave of Gibeon vision has been given */
-    /* 6 free bits */
+    Bitfield(petra_step, 3);        /* unused; path letters are always safe */
+    Bitfield(peter_rewarded, 1);    /* Peter kept the net and gave the keys */
+    Bitfield(babylon_hint, 1);      /* prayer has named the palace key */
+    Bitfield(peter_quest, 1);       /* Peter has given the quest scroll */
+    Bitfield(church_gifts, 4);      /* XP donations to God's church, 0..10 */
+    /* 4 free bits remain in this 32-bit word */
 };
 
 /*
@@ -90,10 +95,10 @@ enum achivements {
     /* 1 through 14 were present in 3.6.x; the rest are newer; first,
        some easier ones so less skilled players can have achievements */
     ACH_MINE = 15, /* entered Gnomish Mines */
-    ACH_TOWN = 16, /* reached Minetown */
+    ACH_TOWN = 16, /* reached Capernaum */
     ACH_SHOP = 17, /* entered a shop */
     ACH_TMPL = 18, /* entered a temple */
-    ACH_ORCL = 19, /* consulted the Oracle */
+    ACH_ORCL = 19, /* received a word from the Lord */
     ACH_NOVL = 20, /* read at least one passage from a Discworld novel */
     ACH_SOKO = 21, /* entered Sokoban */
     ACH_BGRM = 22, /* entered Bigroom (not guaranteed to be in every dgn) */

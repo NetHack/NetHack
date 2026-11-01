@@ -187,6 +187,10 @@ mdisplacem(
     /* sanity checks; could matter if we unexpectedly get a long worm */
     if (!magr || !mdef || magr == mdef)
         return M_ATTK_MISS;
+    /* The champion is not pushed out of his room. */
+    if (mdef->data == &mons[PM_PHILISTINE_CHAMPION]
+        && levl[magr->mx][magr->my].typ != ROOM)
+        return M_ATTK_MISS;
     pa = magr->data, pd = mdef->data;
     tx = mdef->mx, ty = mdef->my; /* destination */
     fx = magr->mx, fy = magr->my; /* current location */
@@ -1067,6 +1071,13 @@ mdamagem(
     if (mhm.done)
         return mhm.hitflags;
 
+    if (is_peter(mdef)) {
+        (void) peter_unhurt(mdef);
+        if (gv.vis)
+            pline("%s is unharmed.", Monnam(mdef));
+        return M_ATTK_HIT;
+    }
+
     if (!mhm.damage)
         return mhm.hitflags;
 
@@ -1163,7 +1174,8 @@ mon_poly(struct monst *magr, struct monst *mdef, int dmg)
                 pline("%s shudders!", Before);
 
             dmg += (mdef->mhpmax + 1) / 2;
-            mdef->mhp -= dmg;
+            if (!peter_unhurt(mdef))
+                mdef->mhp -= dmg;
             dmg = 0;
             if (DEADMONSTER(mdef)) {
                 if (magr == &gy.youmonst)

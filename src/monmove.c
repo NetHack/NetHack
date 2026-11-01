@@ -720,6 +720,10 @@ dochug(struct monst *mtmp)
             mtmp->mhp = 200;
         }
     }
+    if (is_peter(mtmp)) {
+        mtmp->mstrategy |= STRAT_WAITFORU;
+        (void) peter_unhurt(mtmp);
+    }
 
     /* update quest status flags */
     quest_stat_check(mtmp);
@@ -1529,7 +1533,8 @@ postmov(
         /* open a door, or crash through it, if 'mtmp' can */
         if (IS_DOOR(levl[mtmp->mx][mtmp->my].typ)
             && !passes_walls(ptr) /* doesn't need to open doors */
-            && !can_tunnel) {     /* taken care of below */
+            && !can_tunnel /* taken care of below */
+            && !peters_closet_door(mtmp->mx, mtmp->my)) {
             struct rm *here = &levl[mtmp->mx][mtmp->my];
             boolean btrapped = (here->doormask & D_TRAPPED) != 0;
 
@@ -2047,6 +2052,12 @@ m_move(struct monst *mtmp, int after)
         }
 
         if (!m_in_out_region(mtmp, nix, niy))
+            return MMOVE_DONE;
+
+        /* The Philistine Champion fights anyone who comes in, and
+           does not step off the floor of his room. */
+        if (ptr == &mons[PM_PHILISTINE_CHAMPION]
+            && levl[nix][niy].typ != ROOM)
             return MMOVE_DONE;
 
         if ((mfp.info[chi] & ALLOW_ROCK) && m_can_break_boulder(mtmp)) {

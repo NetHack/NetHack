@@ -1028,6 +1028,10 @@ newmonhp(struct monst *mon, int mndx)
          * above the 1..49 that indicate "normal" monster levels */
         mon->mhpmax = mon->mhp = 2 * (ptr->mlevel - 6);
         mon->m_lev = mon->mhp / 4; /* approximation */
+    } else if (mndx == PM_PHILISTINE_CHAMPION) {
+        /* An ogre lord is about 7d8. This boss is a fixed 90.
+           basehp stays 0 so the all-ones boost below does not add 1. */
+        mon->mhpmax = mon->mhp = 90;
     } else if (ptr->mlet == S_DRAGON && mndx >= PM_GRAY_DRAGON) {
         /* adult dragons; N*(4+rnd(4)) before endgame, N*8 once there */
         basehp = (int) mon->m_lev; /* not really applicable; isolates cast */

@@ -517,6 +517,10 @@ really_kick_object(coordxy x, coordxy y)
     if (!gk.kickedobj || gk.kickedobj->otyp == BOULDER
         || gk.kickedobj == uball || gk.kickedobj == uchain)
         return 0;
+    if (gk.kickedobj->otyp == ROCK_WITH_KEYHOLE) {
+        pline("The rock does not move.");
+        return 1;
+    }
 
     if ((trap = t_at(x, y)) != 0) {
         if ((is_pit(trap->ttyp) && !Passes_walls) || trap->ttyp == WEB) {
@@ -916,6 +920,9 @@ kick_door(coordxy x, coordxy y, int avrg_attrib)
         kick_dumb(x, y);
         return; /* uses a turn */
     }
+
+    if (peters_door_blocks(x, y))
+        return;
 
     /* not enough leverage to kick open doors while levitating */
     if (Levitation) {

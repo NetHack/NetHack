@@ -119,7 +119,7 @@ static int optfn_##a(int, int, boolean, char *, char *);
                 "windowing system to use (should be specified first)")
     NHOPTC(playmode, Advanced, 8, opt_in, set_gameview,
                 No, Yes, No, No, NoAlias,
-                "normal play, non-scoring explore mode, or debug mode")
+                "normal play, non-scoring explore mode, or prophet mode")
     NHOPTC(name, Advanced, PL_NSIZ, opt_in, set_gameview,
                 No, Yes, No, No, NoAlias,
                 "your character's name (e.g., name:Merlin-W)")
