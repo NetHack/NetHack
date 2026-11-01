@@ -53,6 +53,7 @@ staticfn void init_CapMons(void);
 staticfn long isaiah_donation(struct monst *);
 staticfn void isaiah_grant_xp(int, int);
 staticfn void isaiah_favor(void);
+staticfn void isaiah_luke(void);
 
 /* used by CapitalMon(); set up by init_CapMons(), released by free_CapMons();
    there's no need for these to be put into 'struct instance_globals g' */
@@ -792,6 +793,19 @@ isaiah_favor(void)
     adjalign(1);
 }
 
+/* Luke 6:38 KJV, checked against Bible Gateway. Two messages, split
+   at the sentence, the way the soul reveal splits a long speech.
+   The words are unchanged. */
+staticfn void
+isaiah_luke(void)
+{
+    verbalize("Give, and it shall be given unto you; good measure, "
+              "pressed down, and shaken together, and running over, "
+              "shall men give into your bosom.");
+    verbalize("For with the same measure that ye mete withal "
+              "it shall be measured to you again.");
+}
+
 int
 doconsult(struct monst *oracl)
 {
@@ -871,14 +885,17 @@ doconsult(struct monst *oracl)
         verbalize("The Lord bless thee. The church can receive no greater increase for now.");
         isaiah_favor();
     } else if (offer < 5000L) {
+        isaiah_luke();
         verbalize("Thy gift lifts thee a little.");
         isaiah_grant_xp(1, 4);
         u.uevent.church_gifts++;
     } else if (offer < 10000L) {
+        isaiah_luke();
         verbalize("Thy gift lifts thee further.");
         isaiah_grant_xp(1, 2);
         u.uevent.church_gifts++;
     } else {
+        isaiah_luke();
         verbalize("Thy gift lifts thee a full step.");
         isaiah_grant_xp(1, 1);
         u.uevent.church_gifts++;

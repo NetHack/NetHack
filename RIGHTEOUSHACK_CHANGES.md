@@ -734,9 +734,10 @@ let him give; not grudgingly, or of necessity: for God loveth a
 cheerful giver."
 PLACEHOLDER thank-yous, for Jon:
 - 1 to 999 shekels: Isaiah quotes Proverbs 11:25, King James, word for word: "The liberal soul shall be made fat: and he that watereth shall be watered also himself." Then the placeholder "You feel the Lord's favor upon your gift." Favor +1. Any number of times.
-- 1000 to 4999: "Thy gift lifts thee a little." A quarter of this level's experience.
-- 5000 to 9999: "Thy gift lifts thee further." Half a level.
-- 10000 or more: "Thy gift lifts thee a full step." One level.
+- 1000 to 4999: Isaiah quotes Luke 6:38, King James, in two messages, then "Thy gift lifts thee a little." A quarter of this level's experience.
+- 5000 to 9999: the same verse, then "Thy gift lifts thee further." Half a level.
+- 10000 or more: the same verse, then "Thy gift lifts thee a full step." One level.
+The verse, split at the sentence and otherwise unchanged: "Give, and it shall be given unto you; good measure, pressed down, and shaken together, and running over, shall men give into your bosom." Then: "For with the same measure that ye mete withal it shall be measured to you again."
 Those three are capped at ten gifts in a game. After that, a gift
 of 1000 or more still takes the gold and says "The Lord bless
 thee. The church can receive no greater increase for now." Favor
