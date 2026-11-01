@@ -11,6 +11,18 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-01
+At the end of Sokoban, eight confused builders stand in the
+prize room. They speak of pride and of knowledge grown too
+great. Three of them also speak a line of Biblical Hebrew,
+Akkadian, or Sumerian, each marked for verification. A ladder
+there climbs to Jacob's dream. No monsters are generated on
+that level. The angel says "You seek what was taken from you,
+though you know it not." and gives a blessed +2 Gospel of
+Peace, then steps aside. The chest holds a diamond named
+PLACEHOLDER main-quest artifact. The floor is engraved with
+Genesis 28:12.
+
+2026-11-01
 The quest object is your own soul, in a chest on the Sanctum
 altar. It is named for you, such as "Elisha's soul". Opening
 that chest is the reveal and God's question. Either answer, the

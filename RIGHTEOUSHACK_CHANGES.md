@@ -1001,6 +1001,44 @@ It restores you." Hit points return to full and hunger is cured.
 Dipping says "The living water does no harm." There is no snake,
 no demon, and no curse.
 
+### Babel and Jacob's Ladder (2026-11-01)
+
+Sokoban still climbs from the entrance (soko4) to the prize
+(soko1). That prize room is the end. It no longer fills with a
+zoo, and the level does not generate random monsters. The two
+mimics on the map are still placed. Eight peaceful confused
+humans wait there. A branch stair in that room climbs to
+Jacob's Ladder, one lit room, with no generation.
+
+Every builder says "We built to reach heaven, and forgot what
+we had already lost." Then one of these:
+
+- "The higher we climbed, the less we remembered why."
+- "We called the work our own, and the work called us proud."
+- "Man's knowledge grew great, and his heart grew small."
+- "We were making a name, and losing the Name that made us."
+- "Every new course of stone was another reason not to kneel."
+- "We could measure the height. We could not measure ourselves."
+
+None of them says "AI".
+
+Three also speak before the English line. These are for
+verification, not a certified translation:
+
+- Hebrew builder: הבה נבנה לנו עיר ומגדל
+  (meant as unpointed Genesis 11:4, "come, let us build ourselves a city and a tower")
+- Akkadian builder: šarrum dannum
+  (meant as "mighty king")
+- Sumerian builder: e2 an-še3
+  (meant as "house toward heaven")
+
+The angel says "You seek what was taken from you, though you know it not."
+The first time, a blessed +2 Gospel of Peace is given, and the
+angel steps two squares toward the chest. The chest holds a
+diamond named "PLACEHOLDER main-quest artifact". It does
+nothing. The engraving is Genesis 28:12 KJV. The plan names
+Jacob's dream and does not quote that verse.
+
 ### The soul in Moloch's Sanctum (2026-11-01)
 
 The Amulet of Yendor is not given to the high priest. A chest on

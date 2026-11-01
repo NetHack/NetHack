@@ -4,7 +4,7 @@
 --
 des.level_init({ style = "solidfill", fg = " " });
 
-des.level_flags("mazelevel", "noteleport", "premapped", "sokoban", "solidify");
+des.level_flags("mazelevel", "noteleport", "premapped", "sokoban", "solidify", "nomongen");
 
 des.map([[
   ------------------------
@@ -99,7 +99,17 @@ des.door("locked",23,12)
 des.door("closed",17,10)
 des.door("closed",17,12)
 des.door("closed",17,14)
-des.region({ region={18,09, 22,15}, lit = 1, type = "zoo", filled = 1, irregular = 1 });
+des.region({ region={18,09, 22,15}, lit = 1, type = "zoo", filled = 0, irregular = 1 });
+des.levregion({ type = "branch", region = {20,11,20,11} })
+local builders = {
+   {19,11,"Akkadian builder"}, {21,11,"Sumerian builder"}, {19,13,"Hebrew builder"},
+   {21,13,"builder"}, {20,13,"builder"}, {19,12,"builder"},
+   {21,12,"builder"}, {20,14,"builder"},
+}
+for _, b in ipairs(builders) do
+   des.monster({ id = "human", x = b[1], y = b[2], peaceful = 1,
+                 confused = true, waiting = 1, name = b[3] })
+end
 
 local pt = selection.rndcoord(place);
 if percent(25) then

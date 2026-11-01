@@ -2149,6 +2149,9 @@ lev_by_name(const char *nam)
         } else if (!strcmpi(nam, "sodom") || !strcmpi(nam, "tyre")
                    || !strcmpi(nam, "sodom and tyre")) {
             nam = "medusa-1";
+        } else if (!strcmpi(nam, "babel") || !strcmpi(nam, "jacob")
+                   || !strcmpi(nam, "ladder")) {
+            nam = "jacob";
         } else if (!strcmpi(nam, "vibrating") || !strcmpi(nam, "gates")) {
             d_level inv;
 

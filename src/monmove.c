@@ -732,6 +732,14 @@ dochug(struct monst *mtmp)
        is entered, is left awake so it can attack inside. */
     if (is_sodom_dweller(mtmp) && mtmp->mpeaceful)
         mtmp->mstrategy |= STRAT_WAITFORU;
+    if (has_mgivenname(mtmp)
+        && (strstri(MGIVENNAME(mtmp), "builder")
+            || !strcmp(MGIVENNAME(mtmp), "Angel of the Ladder"))) {
+        mtmp->mstrategy |= STRAT_WAITFORU;
+        mtmp->mpeaceful = 1;
+        if (strstri(MGIVENNAME(mtmp), "builder"))
+            mtmp->mconf = 1;
+    }
     if (has_mgivenname(mtmp) && !strcmp(MGIVENNAME(mtmp), "your reflection")
         && distmin(mtmp->mx, mtmp->my, u.ux, u.uy) <= 5) {
         if (mtmp->m_lev < 30)

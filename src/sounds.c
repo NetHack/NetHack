@@ -720,6 +720,64 @@ domonnoise(struct monst *mtmp)
         map_invisible(mtmp->mx, mtmp->my);
 
     if (has_mgivenname(mtmp)
+        && !strcmp(MGIVENNAME(mtmp), "Angel of the Ladder")) {
+        struct obj *boots;
+        coordxy ax, ay;
+
+        SetVoice(mtmp, 0, 80, 0);
+        verbalize("You seek what was taken from you, though you know it not.");
+        if (!mtmp->mspare1) {
+            boots = mksobj(SANDALS, FALSE, FALSE);
+            if (boots) {
+                boots = oname(boots, artiname(ART_SHOES_GOSPEL_OF_PEACE),
+                              ONAME_GIFT | ONAME_KNOW_ARTI);
+                if (boots) {
+                    boots->spe = 2;
+                    bless(boots);
+                    boots->bknown = boots->known = boots->dknown = 1;
+                    if (boots->oartifact)
+                        u.ugifts++;
+                    (void) hold_another_object(boots,
+                                               "Oops!  %s to the floor!",
+                                               The(aobjnam(boots, "slip")),
+                                               (const char *) 0);
+                }
+            }
+            mtmp->mspare1 = 1;
+            ax = mtmp->mx + 2;
+            ay = mtmp->my;
+            if (isok(ax, ay) && !m_at(ax, ay)
+                && (levl[ax][ay].typ == ROOM || levl[ax][ay].typ == CORR))
+                rloc_to(mtmp, ax, ay);
+        }
+        return ECMD_TIME;
+    }
+
+    if (has_mgivenname(mtmp) && strstri(MGIVENNAME(mtmp), "builder")) {
+        static const char *const extra[] = {
+            "The higher we climbed, the less we remembered why.",
+            "We called the work our own, and the work called us proud.",
+            "Man's knowledge grew great, and his heart grew small.",
+            "We were making a name, and losing the Name that made us.",
+            "Every new course of stone was another reason not to kneel.",
+            "We could measure the height. We could not measure ourselves.",
+        };
+        const char *nm = MGIVENNAME(mtmp);
+
+        SetVoice(mtmp, 0, 80, 0);
+        /* Ancient lines are for verification. They are not certified. */
+        if (!strcmp(nm, "Hebrew builder"))
+            verbalize("הבה נבנה לנו עיר ומגדל");
+        else if (!strcmp(nm, "Akkadian builder"))
+            verbalize("šarrum dannum");
+        else if (!strcmp(nm, "Sumerian builder"))
+            verbalize("e2 an-še3");
+        verbalize("We built to reach heaven, and forgot what we had already lost.");
+        verbalize1(extra[mtmp->m_id % (sizeof extra / sizeof extra[0])]);
+        return ECMD_TIME;
+    }
+
+    if (has_mgivenname(mtmp)
         && !strcmp(MGIVENNAME(mtmp), "King Solomon")) {
         SetVoice(mtmp, 0, 80, 0);
         /* The hint about what to ask must be heard before the prayer.
