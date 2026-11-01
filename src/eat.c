@@ -64,8 +64,7 @@ staticfn struct obj *find_cook_obj(void);
     ((mnum) == PM_LIZARD || (mnum) == PM_LICHEN \
      || is_rider(&mons[mnum])                   \
      || (mnum) == PM_ACID_BLOB                  \
-     || mons[mnum].mlet == S_JELLY              \
-     || mons[mnum].mlet == S_EEL)
+     || mons[mnum].mlet == S_JELLY)
 
 /* non-rotting non-corpses; unlike lizard corpses, these items will behave
    as if rotten if they are cursed (fortune cookies handled elsewhere) */

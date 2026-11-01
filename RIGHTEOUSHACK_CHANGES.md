@@ -604,9 +604,14 @@ Cannibalism is removed: no "You cannibal!" message, no Luck or
 aggravate penalty, no cave dweller or orc exception, and pets do
 not refuse food of their own race.
 
-Jellies, lizard meat, and every sea fillet never rot, skip the
-5% raw-poison roll, and can be blessed while raw. They can still
-be cooked. Other raw meat cannot be blessed. Every role starts
+Jellies and lizard meat never rot, skip the 5% raw-poison roll,
+and can be blessed while raw. They can still be cooked. Sea
+fillets (jellyfish, piranha, shark, giant eel, electric eel,
+kraken) also skip that roll, and they rot on the normal raw-meat
+schedule. A raw fillet cannot be blessed. Cooked fillet rots
+about ten times slower, and blessed cooked fillet never rots.
+Jellyfish is a fillet, not a jelly. Other raw meat cannot be
+blessed. Every role starts
 with a flint and tinder box. `#cook` uses it and does not use it
 up. Blessed cooked meat never spoils.
 The workbook `docs/RighteousHack_Food.xlsx` lists every food and

@@ -11,6 +11,12 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-01
+Fish fillets still skip the raw-poisoning chance, and they spoil
+like other raw meat. A raw fillet cannot be blessed. Cooking slows
+that spoil, and blessed cooked fillet does not spoil. Lizard meat
+and jellies still do not spoil.
+
+2026-11-01
 Liches crumble into dust and leave nothing to eat. Cyclops meat
 is named "raw Cyclops steak" and "cooked Cyclops steak".
 

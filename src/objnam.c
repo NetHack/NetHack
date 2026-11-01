@@ -1980,8 +1980,9 @@ monster_leaves_meat(struct permonst *ptr)
 }
 
 /* Lizard meat, every S_EEL fillet, and every jelly never take the 5%
-   raw-meat poisoning roll. The same set may be blessed while still raw.
-   They also never rot (see nonrotting_corpse). */
+   raw-meat poisoning roll. Only lizard meat and jellies are stable:
+   they never rot and may be blessed while raw. A fillet rots on the
+   normal raw-meat schedule and cannot be blessed until it is cooked. */
 boolean
 raw_meat_poison_exempt(struct permonst *ptr)
 {

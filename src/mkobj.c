@@ -1421,11 +1421,11 @@ start_corpse_timeout(struct obj *body)
      *      of revive when its REVIVE_MON timer finishes.
      */
 
-    /* lizards, lichen, jellies, and sea fillets don't rot or revive.
-       Essences never rot. Riders still revive from theirs. */
+    /* lizards, lichen, and jellies don't rot or revive.
+       Sea fillets rot like other meat. Essences never rot.
+       Riders still revive from theirs. */
     if (body->corpsenm == PM_LIZARD || body->corpsenm == PM_LICHEN
-        || mons[body->corpsenm].mlet == S_JELLY
-        || mons[body->corpsenm].mlet == S_EEL)
+        || mons[body->corpsenm].mlet == S_JELLY)
         return;
     if (leaves_essence(&mons[body->corpsenm])
         && !is_rider(&mons[body->corpsenm]))
@@ -1777,20 +1777,26 @@ maybe_adjust_light(struct obj *obj, int old_range)
  *      these routines to make the actual curse/bless state change.
  */
 
-/* Raw meat cannot be blessed, except lizard meat, sea-monster
-   fillets, and jellies (the same set that skips the 5% raw
-   poisoning roll and never rots). Cooked meat and essences can
-   be blessed. Silent here; the player-facing "You can't bless ..."
-   message is printed by the attempt (holy water, wishing). */
+/* Raw meat cannot be blessed, except lizard meat and jellies
+   (they never rot). Sea fillets skip the 5% raw-poison roll and
+   still cannot be blessed until cooked. Cooked meat and essences
+   can be blessed. Silent here; the player-facing
+   "You can't bless ..." message is printed by the attempt
+   (holy water, wishing). */
 boolean
 can_bless(struct obj *otmp)
 {
+    struct permonst *ptr;
+
     if (!otmp || otmp->oclass == COIN_CLASS)
         return FALSE;
-    if (otmp->otyp == CORPSE && !otmp->ocooked && ismnum(otmp->corpsenm)
-        && !raw_meat_poison_exempt(&mons[otmp->corpsenm])
-        && !leaves_essence(&mons[otmp->corpsenm]))
-        return FALSE;
+    if (otmp->otyp == CORPSE && !otmp->ocooked && ismnum(otmp->corpsenm)) {
+        ptr = &mons[otmp->corpsenm];
+        /* Lizard meat and jellies are the stable raw remains. */
+        if (ptr != &mons[PM_LIZARD] && ptr->mlet != S_JELLY
+            && !leaves_essence(ptr))
+            return FALSE;
+    }
     return TRUE;
 }
 

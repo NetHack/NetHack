@@ -62,13 +62,15 @@ GOLEM_NO_MEAT = {
     "paper golem",
 }
 RIDERS = {"death", "pestilence", "famine"}
-# Same set as raw_meat_poison_exempt() / nonrotting jellies and fillets.
+# 5% exemption is lizard, S_EEL, and S_JELLY. Only lizard and S_JELLY
+# are stable (never rot, blessable raw). Fillets rot unless cooked.
 EXEMPT_NOTE = (
-    "Never rot, never the 5% raw-poison roll, and may be blessed while raw: "
-    "the lizard, every S_EEL fillet "
-    "(jellyfish, piranha, shark, giant eel, electric eel, kraken), "
-    "and every jelly (blue jelly, spotted jelly, ochre jelly). "
-    "They can still be cooked."
+    "Skip the 5% raw-poison roll: the lizard, every jelly, and every "
+    "S_EEL fillet (jellyfish, piranha, shark, giant eel, electric eel, "
+    "kraken). Lizard meat and jellies never rot and may be blessed raw. "
+    "A fillet rots on the normal raw-meat schedule, cannot be blessed "
+    "while raw, and once cooked rots about ten times slower. "
+    "Blessed cooked fillet never rots."
 )
 
 ESSENCE_MLETS = {
@@ -364,10 +366,7 @@ def leaves_essence(mon: dict, flags: dict[str, int]) -> bool:
 
 
 def is_stable_remains(mon: dict) -> bool:
-    return (
-        mon["mlet"] in {"S_JELLY", "S_EEL"}
-        or mon["name"].lower() == "lizard"
-    )
+    return mon["mlet"] == "S_JELLY" or mon["name"].lower() == "lizard"
 
 
 def demon_flagged(mon: dict, flags: dict[str, int]) -> bool:
@@ -424,6 +423,13 @@ def classify(mon: dict, by_name: dict[str, dict], flags: dict[str, int]) -> tupl
         return "meat", "Giant. Named raw Cyclops steak. No \"the\" and no possessive."
     if mon["mlet"] == "S_LICH":
         return "other", "Crumbles into dust. Leaves nothing."
+    if mon["mlet"] == "S_EEL":
+        return (
+            "meat",
+            "Sea fillet. Skips the 5% raw-poison roll. "
+            "Rots like other raw meat and cannot be blessed while raw. "
+            "Cooked rots about ten times slower; blessed cooked never rots.",
+        )
     body = mon
     undead_note = ""
     if key in UNDEAD_BODY:
@@ -776,7 +782,8 @@ def main() -> None:
         if sheet == "meat":
             raw = formatted_meat(mon, nouns, flags, False)
             cooked = formatted_meat(mon, nouns, flags, True)
-            exempt = "no"
+            poison_exempt = "yes" if mon["mlet"] == "S_EEL" else "no"
+            bless_raw = "no"
             size_val = flags.get(mon["size"], 0)
             always = (
                 size_val >= flags.get("MZ_LARGE", 3)
@@ -792,8 +799,8 @@ def main() -> None:
                     cooked,
                     mon["nutrition"],
                     mon["weight"],
-                    exempt,
-                    exempt,
+                    poison_exempt,
+                    bless_raw,
                     intrinsics(mon, flags),
                     dangers(mon, flags),
                     drop,
@@ -925,7 +932,7 @@ def main() -> None:
         ("Dragon", "raw gray dragon steak, cooked gray dragon steak."),
         ("Sea monsters", EXEMPT_NOTE),
         ("Lizard", "The creature named lizard only, not newt, gecko, iguana, crocodile, or salamander. Lizard meat never rots."),
-        ("Jellies", "Blue jelly, spotted jelly, and ochre jelly never rot, skip the 5% roll, and can be blessed raw. The noun is not repeated: raw blue jelly."),
+        ("Jellies", "Blue jelly, spotted jelly, and ochre jelly never rot, skip the 5% roll, and can be blessed raw. Jellyfish is a sea fillet, not a jelly. The noun is not repeated: raw blue jelly."),
         ("Humanoids", "M1_HUMANOID, or the human or elf race, leave no meat, except the named essences, the ape class, lycanthropes, Cyclops, and trolls."),
         ("Apes", "Monkey, ape, owlbear, yeti, carnivorous ape, and sasquatch leave meat. Monkey is meat. The large ones are steak."),
         ("Lycanthropes", "Wererat, werejackal, and werewolf leave meat in animal form and in human form. Eating either form causes lycanthropy. A wish for the shared name still produces the human form."),
@@ -945,7 +952,7 @@ def main() -> None:
         ("Ghost nutrition", "Ghost, shade, wraith, barrow wight, and Nazgul are listed with 0 nutrition. Eating their essence gives 50, a small meal. A wraith's essence still grants a level."),
         ("Cannibalism", "Removed. No Luck penalty, no aggravate, no 'You cannibal!' message, no cave dweller or orc exception, and pets do not refuse same-race food."),
         ("Bones", "Your own body is still saved with a bones file, under your name. Sleeping-gas traps no longer place human, elf, dwarf, gnome, or orc meat."),
-        ("Bless", "Raw meat cannot be blessed, except lizard meat, sea fillets, jellies, and essences. The message is: You can't bless <food>! Cooked meat can be blessed. Blessed cooked meat never rots and never causes tainted or fatal food poisoning."),
+        ("Bless", "Raw meat cannot be blessed, except lizard meat, jellies, and essences. A raw fillet gets: You can't bless <food>! Cooked meat, including cooked fillets, can be blessed. Blessed cooked meat never rots and never causes tainted or fatal food poisoning."),
         ("Raw poison", "Eating raw meat rolls 1 in 20 for fatal food poisoning, in addition to the old tainted-meat rules. Same cure as other food poisoning."),
         ("Cook", "#cook needs a flint and tinder box. Every role starts with one. The box is not used up. Cooking takes a few turns. Cooked meat rots about ten times slower."),
         ("Tins and eggs", "Still work. Their names do not say corpse. See the Tins and eggs sheet."),

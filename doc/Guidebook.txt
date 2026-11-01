@@ -3296,7 +3296,9 @@
      spoils, cannot be cooked, and can be blessed.  Eating a wraith's
      essence can raise your experience.  Eating a Rider's essence is
      fatal, and the Rider returns.  Eating any demon's essence is
-     fatal.  Jellies, lizard meat, and fish fillets do not spoil.
+     fatal.  Jellies and lizard meat do not spoil.  A fish fillet
+     can be eaten raw without the usual chance of food poisoning,
+     and it still spoils unless cooked.
      Trolls, apes, and were-creatures still leave meat.  Eating your
      own kind is not punished.
 
