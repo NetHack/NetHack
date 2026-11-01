@@ -3669,7 +3669,9 @@ static const struct alt_spellings {
     /* normally we wouldn't have to worry about unnecessary <space>, but
        " stone" will get stripped off, preventing a wishymatch; that actually
        lets "flint stone" be a match, so we also accept bogus "flintstone" */
+    { "favor stone", LUCKSTONE },
     { "luck stone", LUCKSTONE },
+    { "luckstone", LUCKSTONE },
     { "load stone", LOADSTONE },
     { "touch stone", TOUCHSTONE },
     { "flintstone", FLINT },

@@ -1163,7 +1163,7 @@ fixup_level_locations(void)
      */
     quest_dnum = dname_to_dnum("The Quest");
     sokoban_dnum = dname_to_dnum("Sokoban");
-    mines_dnum = dname_to_dnum("The Gnomish Mines");
+    mines_dnum = dname_to_dnum("Salt Mines of Galilee");
     tower_dnum = dname_to_dnum("Vlad's Tower");
     tutorial_dnum = dname_to_dnum("The Tutorial");
 
@@ -2013,23 +2013,14 @@ assign_rnd_level(d_level *dest, d_level *src, int range)
         dest->dlevel = 1;
 }
 
-/* return an alignment mask */
+/* return an alignment mask.
+   Every generated altar follows God. Random Moloch, neutral, and
+   chaotic altars are not produced. Explicit altars in special levels
+   still use the alignment written in that level. */
 unsigned int
-induced_align(int pct)
+induced_align(int pct UNUSED)
 {
-    s_level *lev = Is_special(&u.uz);
-    aligntyp al;
-
-    if (lev && lev->flags.align)
-        if (rn2(100) < pct)
-            return lev->flags.align;
-
-    if (svd.dungeons[u.uz.dnum].flags.align)
-        if (rn2(100) < pct)
-            return svd.dungeons[u.uz.dnum].flags.align;
-
-    al = rn2(3) - 1;
-    return Align2amask(al);
+    return Align2amask(A_LAWFUL);
 }
 
 boolean

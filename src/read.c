@@ -361,15 +361,15 @@ doread(void)
     otyp = scroll->otyp;
     scroll->pickup_prev = 0; /* no longer 'just picked up' */
 
-    /* outrumor has its own blindness check */
+    /* Cookies are removed. A leftover one yields a Prophet proverb. */
     if (otyp == FORTUNE_COOKIE) {
         if (flags.verbose)
             You("break up the cookie and throw away the pieces.");
-        outrumor(bcsign(scroll), BY_COOKIE);
+        out_proverb();
         if (!Blind)
             if (!u.uconduct.literate++)
                 livelog_printf(LL_CONDUCT,
-                               "became literate by reading a fortune cookie");
+                               "became literate by reading a proverb");
         useup(scroll);
         return ECMD_TIME;
     } else if (otyp == T_SHIRT || otyp == ALCHEMY_SMOCK
@@ -2171,7 +2171,7 @@ seffect_mail(struct obj **sobjp)
            note to the puzzled: the game Larn actually sends you junk
            mail if you win! */
         pline("This seems to be %s.",
-              odd ? "a chain letter threatening your luck"
+              odd ? "a chain letter threatening your favor"
               : "junk mail addressed to the finder of the Eye of Larn");
         break;
     default:

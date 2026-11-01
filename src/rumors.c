@@ -573,6 +573,26 @@ outrumor(
     pline1(line);
 }
 
+/* PLACEHOLDER Prophet proverbs (Jon 2026-10-31), exact KJV.
+   These replace fortune-cookie text. Jon may replace the list.
+   Proverbs 1:5 keeps the KJV colon at the end. */
+void
+out_proverb(void)
+{
+    static const char *const proverbs[] = {
+        "The fear of the LORD is the beginning of knowledge: but fools despise wisdom and instruction.",
+        "Trust in the LORD with all thine heart; and lean not unto thine own understanding.",
+        "In all thy ways acknowledge him, and he shall direct thy paths.",
+        "A wise man will hear, and will increase learning; and a man of understanding shall attain unto wise counsels:",
+    };
+
+    if (Blind) {
+        pline("A proverb is there, but you cannot read it!");
+        return;
+    }
+    pline1(proverbs[rn2(SIZE(proverbs))]);
+}
+
 staticfn void
 init_oracles(dlb *fp)
 {

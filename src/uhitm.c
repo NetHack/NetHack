@@ -1144,7 +1144,7 @@ hmon_hitmon_misc_obj(
         break;
     case MIRROR:
         if (breaktest(obj)) {
-            You("break %s.  That's bad luck!", ysimple_name(obj));
+            You("break %s.  That's a loss of favor!", ysimple_name(obj));
             change_luck(-2);
             useup(obj);
             obj = (struct obj *) 0;
@@ -3892,7 +3892,7 @@ mhitm_ad_deth(
         case 0:
             if (Antimagic)
                 shieldeff(u.ux, u.uy);
-            pline("Lucky for you, it didn't work!");
+            pline("By favor, it didn't work!");
             mhm->damage = 0;
             return;
         }

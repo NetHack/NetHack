@@ -85,7 +85,7 @@ function mk_dgl_extrainfo()
             elseif dname == "Sokoban" then
                 dstr = "S" .. u.dlevel;
                 sortval = sortval + 225 + u.depth;
-            elseif dname == "The Gnomish Mines" then
+            elseif dname == "Salt Mines of Galilee" then
                 dstr = "M" .. u.dlevel;
                 sortval = sortval + 215 + u.dlevel;
             else

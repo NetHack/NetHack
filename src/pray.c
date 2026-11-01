@@ -638,18 +638,10 @@ gcrownu(void)
     godvoice(u.ualign.type, (char *) 0);
 
     class_gift = STRANGE_OBJECT;
-    /* 3.3.[01] had this in the A_NEUTRAL case,
-       preventing chaotic wizards from receiving a prophetic book */
-    if (Role_if(PM_WIZARD)
-        && !u_wield_art(ART_VORPAL_BLADE)
-        && !u_wield_art(ART_STORMBRINGER)
-        && !carrying(SPE_FINGER_OF_DEATH)) {
-        class_gift = SPE_FINGER_OF_DEATH;
-    } else if (Role_if(PM_MONK) && (!uwep || !uwep->oartifact)
-               && !carrying(SPE_RESTORE_ABILITY)) {
-        /* monks rarely wield a weapon */
-        class_gift = SPE_RESTORE_ABILITY;
-    }
+    /* PLACEHOLDER (Jon 2026-10-31): the anointing gift is not designed
+       yet. The old spellbook and Excalibur gifts are not given.
+       Resistances, a blessed wielded weapon, and one extra skill
+       slot still apply. */
 
     obj = ok_wep(uwep) ? uwep : 0;
     already_exists = in_hand = FALSE; /* lint suppression */
@@ -657,9 +649,9 @@ gcrownu(void)
     case A_LAWFUL:
         u.uevent.uhand_of_elbereth = 1;
         SetVoice((struct monst *) 0, 0, 80, voice_deity);
-        verbalize("I crown thee...  The Hand of Elbereth!");
+        verbalize("I anoint thee...  The Servant of the Lord!");
         livelog_printf(LL_DIVINEGIFT,
-                       "was crowned \"The Hand of Elbereth\" by %s",
+                       "was anointed \"the Servant of the Lord\" by %s",
                        u_gname());
         break;
     case A_NEUTRAL:
@@ -715,27 +707,8 @@ gcrownu(void)
 
     switch (u.ualign.type) {
     case A_LAWFUL:
-        if (class_gift != STRANGE_OBJECT) {
-            ; /* already got bonus above */
-        } else if (obj && obj->otyp == LONG_SWORD && !obj->oartifact) {
-            char lbuf[BUFSZ];
-
-            Strcpy(lbuf, simpleonames(obj)); /* before transformation */
-            if (!Blind)
-                Your("sword shines brightly for a moment.");
-            obj = oname(obj, artiname(ART_EXCALIBUR),
-                        ONAME_GIFT | ONAME_KNOW_ARTI);
-            if (is_art(obj, ART_EXCALIBUR)) {
-                u.ugifts++;
-                livelog_printf(LL_DIVINEGIFT | LL_ARTIFACT,
-                               "had %s wielded %s transformed into %s",
-                               uhis(), lbuf, artiname(ART_EXCALIBUR));
-            }
-        }
-        /* acquire Excalibur's skill regardless of weapon or gift */
+        /* PLACEHOLDER: no artifact gift. Long sword skill is still opened. */
         unrestrict_weapon_skill(P_LONG_SWORD);
-        if (is_art(obj, ART_EXCALIBUR))
-            discover_artifact(ART_EXCALIBUR);
         break;
     case A_NEUTRAL:
         if (class_gift != STRANGE_OBJECT) {
@@ -803,8 +776,8 @@ gcrownu(void)
         /* acquire skill in this weapon */
         unrestrict_weapon_skill(weapon_type(obj));
     } else if (class_gift == STRANGE_OBJECT) {
-        /* opportunity knocked, but there was nobody home... */
-        You_feel("unworthy.");
+        /* PLACEHOLDER: no anointing gift is defined yet, so having
+           nothing in hand is not called unworthiness. */
     }
     update_inventory();
 
@@ -1649,7 +1622,8 @@ offer_corpse(struct obj *otmp, boolean highaltar, aligntyp altaralign)
 
     ptr = &mons[otmp->corpsenm];
 
-    /* the Lord abhors human sacrifice */
+    /* Same-race sacrifice does not summon a demon and does not
+       convert the altar. The Lord abhors human sacrifice. */
     if (your_race(ptr)) {
         pline( "You cannot offer this! The Lord abhors human sacrifice.");
         pline( "You shall not give any of your children to offer them to Molech, and so profane the name of your God: I am the LORD. Leviticus 18:21");
@@ -1770,11 +1744,11 @@ offer_corpse(struct obj *otmp, boolean highaltar, aligntyp altaralign)
             if (Blind)
                 You("think %s brushed your %s.", something,
                     body_part(FOOT));
-            else
-                You(Hallucination
-                ? "see crabgrass at your %s.  A funny thing in a dungeon."
-                        : "glimpse a four-leaf clover at your %s.",
+            else if (Hallucination)
+                You("see crabgrass at your %s.  A funny thing in a dungeon.",
                     makeplural(body_part(FOOT)));
+            else
+                You("feel favor rest upon you.");
         }
     }
 }

@@ -106,9 +106,8 @@ static const struct trobj Monk[] = {
     { FOOD_RATION, 0, FOOD_CLASS, 3, 3, 0 },
     { APPLE, 0, FOOD_CLASS, 5, 5, UNDEF_BLESS },
     { ORANGE, 0, FOOD_CLASS, 5, 5, UNDEF_BLESS },
-    /* Yes, we know fortune cookies aren't really from China.  They were
-       invented by George Jung in Los Angeles, California, USA in 1916. */
-    { FORTUNE_COOKIE, 0, FOOD_CLASS, 3, 3, UNDEF_BLESS },
+    /* Fortune cookies are removed. */
+    { FOOD_RATION, 0, FOOD_CLASS, 3, 3, 0 },
     { 0, 0, 0, 0, 0, 0 }
 };
 static const struct trobj Priest[] = {

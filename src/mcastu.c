@@ -403,7 +403,7 @@ mcast_death_touch(struct monst *mtmp)
             shieldeff(u.ux, u.uy);
             monstseesu(M_SEEN_MAGR);
         }
-        pline("Lucky for you, it didn't work!");
+        pline("By favor, it didn't work!");
     }
 }
 

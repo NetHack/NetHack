@@ -964,7 +964,10 @@ TOOL("expensive camera",    NoDes, 1, 0, 0, 1, 15, 12,200, PLASTIC, CLR_BLACK,
                                                             EXPENSIVE_CAMERA),
 TOOL("mirror",   "looking glass", 0, 0, 0, 0, 45, 13, 10, GLASS, HI_SILVER,
                                                                 MIRROR),
-TOOL("crystal ball", "glass orb", 0, 0, 1, 1, 15,150, 60, GLASS, HI_GLASS,
+/* Probability 0: crystal balls are removed. The Champion quest
+   artifact (Orb of Fate) still uses this base. Wishes for a plain
+   crystal ball are refused. */
+TOOL("crystal ball", "glass orb", 0, 0, 1, 1,  0,150, 60, GLASS, HI_GLASS,
                                                                 CRYSTAL_BALL),
 TOOL("torn piece of cloth", "torn piece of cloth", 0, 0, 1, 1, 15,150, 60, CLOTH, HI_CLOTH,
                                                                 PIECE_OF_CLOTH),
@@ -1140,7 +1143,9 @@ FOOD("lump of royal jelly",   0,  1,  2, 0, VEGGY, 200, CLR_YELLOW,
 FOOD("cream pie",            25,  1, 10, 0, VEGGY, 100, CLR_WHITE, CREAM_PIE),
 FOOD("candy bar",            13,  1,  2, 0, VEGGY, 100, CLR_BRIGHT_BLUE,
                                                                 CANDY_BAR),
-FOOD("fortune cookie",       55,  1,  1, 0, VEGGY,  40, CLR_YELLOW,
+/* Probability 0: fortune cookies are removed. A few placeholder
+   Prophet proverbs take their place. Wishes for a cookie are refused. */
+FOOD("fortune cookie",        0,  1,  1, 0, VEGGY,  40, CLR_YELLOW,
                                                               FORTUNE_COOKIE),
 FOOD("pancake",              25,  2,  2, 0, VEGGY, 200, CLR_YELLOW, PANCAKE),
 FOOD("lembas wafer",         20,  2,  5, 0, VEGGY, 800, CLR_WHITE,
@@ -1660,7 +1665,8 @@ MARKER(LAST_GLASS_GEM, WORTHLESS_VIOLET_GLASS)
  * that is currently everything between luckstones and flint
  * (inclusive).
  */
-ROCK("luckstone", "gray",  0,  10,  10, 60, 3, 3, 1, 10, 7, MINERAL, CLR_GRAY,
+/* Favor Stone: same object as the old luckstone. Mechanics unchanged. */
+ROCK("Favor Stone", "gray", 0,  10,  10, 60, 3, 3, 1, 10, 7, MINERAL, CLR_GRAY,
                                                                     LUCKSTONE),
 ROCK("loadstone", "gray",  0,  10, 500,  1, 3, 3, 1, 10, 6, MINERAL, CLR_GRAY,
                                                                     LOADSTONE),

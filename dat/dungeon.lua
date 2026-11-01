@@ -13,7 +13,7 @@ dungeon = {
       themerooms = "themerms.lua",
       branches = {
          {
-            name = "The Gnomish Mines",
+            name = "Salt Mines of Galilee",
             base = 2,
             range = 3
          },
@@ -181,7 +181,7 @@ dungeon = {
       }
    },
    {
-      name = "The Gnomish Mines",
+      name = "Salt Mines of Galilee",
       bonetag = "M",
       base = 8,
       range = 2,

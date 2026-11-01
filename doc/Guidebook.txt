@@ -2385,7 +2385,7 @@
           Secret doors are hidden and appear  to  be  ordinary  wall  (from
      inside  a  room) or solid rock (from outside).  You can find them with
      the `s' (search) command but it might take  multiple  tries  (possibly
-     many  tries  if  your  luck is poor).  Once found they are in all ways
+     many  tries  if your favor is poor).  Once found they are in all ways
      equivalent to normal doors.  Mapping  magic  does  not  reveal  secret
      doors.
 
@@ -2396,7 +2396,7 @@
      for a few turns trying to climb out (see below).  A trap usually won't
      appear on your map until you trigger it by moving  onto  it,  you  see
      someone else trigger it, or you discover it with the `s' (search) com-
-     mand (multiple attempts are often needed; if your luck is  poor,  many
+     mand (multiple attempts are often needed; if your favor is poor,  many
      attempts  might  be needed).  Wands of secret door detection and spell
      of detect unseen also reveal traps within a modest radius but only  if
      the trap is also within line-of-sight (whether you can see at the time
@@ -2462,7 +2462,7 @@
      possible  to  drop  everything in order to be able to squeeze into the
      same location as a boulder (and then presumably move past it),  or  to
      destroy  a boulder with magic or tools, or to create new boulders with
-     a scroll of earth.  However, doing such things will  lower  your  luck
+     a scroll of earth.  However, doing such things will lower your favor
      without  any  specific message given about that.  See the Conduct sec-
      tion for information  about  getting  feedback  for  your  actions  in
      Sokoban.
@@ -2474,7 +2474,7 @@
      next  level.   There are some exceptions though.  For instance, fairly
      early in the dungeon you will find a level with two  down  staircases,
      one  continuing  into the dungeon and the other branching into an area
-     known as the Gnomish Mines.  Those mines eventually hit a dead end, so
+     known as the Salt Mines of Galilee.  Those mines eventually hit a dead end, so
      after  exploring  them  (if you choose to do so), you'll need to climb
      back up to the main dungeon.
 
@@ -3456,7 +3456,7 @@
           A spell (even when learned) can also backfire when you  cast  it.
      If you attempt to cast a spell well above your experience level, or if
      you have little skill with the appropriate spell type, or cast it at a
-     time  when  your luck is particularly bad, you can end up wasting both
+     time  when your favor is particularly bad, you can end up wasting both
      the energy and the time required in casting.
 
           Casting a spell calls forth magical  energies  and  focuses  them
@@ -3720,8 +3720,8 @@
           Vegetarians do not eat animals; however, they are less  selective
      about  eating animal byproducts than vegans.  In addition to the vegan
      items listed above, they may eat any kind of pudding (`P') other  than
-     the  black puddings, eggs and food made from eggs (fortune cookies and
-     pancakes), food made with milk (cream pies and candy bars), and  lumps
+     the  black puddings, eggs and food made from eggs (pancakes), food made
+     with milk (cream pies and candy bars), and lumps
      of royal jelly.  Monks are expected to observe a vegetarian diet.
 
           Eating any kind of meat violates the vegetarian, vegan, and food-
@@ -3787,7 +3787,7 @@
      gain experience by other means.
 
           An  illiterate  character  does not read or write.  This includes
-     reading a scroll, spellbook, fortune cookie message, or t-shirt; writ-
+     reading a scroll, spellbook, proverb, or t-shirt; writ-
      ing  a  scroll; or making an engraving of anything other than a single
      "X" (the traditional signature of an illiterate person).   Reading  an
      engraving,  or  any item that is absolutely necessary to win the game,
@@ -3804,11 +3804,11 @@
      when in that branch of the dungeon.  Some  rules  can't  be  bypassed,
      such  as  being unable to push a boulder diagonally.  Other rules can,
      such as not smashing boulders with magic or tools, but doing so causes
-     you  to receive a luck penalty.  No message about that is given at the
+     you  to receive a favor penalty.  No message about that is given at the
      time, but it is tracked as a conduct.  The #conduct command and end of
      game  disclosure  will  report  whether you have abided by the special
      rules of Sokoban, and if not, how many times you violated  them,  pro-
-     viding you with a way to discover which actions incur bad luck so that
+     viding you with a way to discover which actions cost favor so that
      you can be better informed about whether or  not  to  avoid  repeating
      those actions in the future.  (Note:  the Sokoban conduct will only be
      displayed if you have entered the Sokoban branch of the dungeon during
@@ -3862,7 +3862,7 @@
          Rank         -  Attained rank title Rank.
          Shop         -  Entered a shop.
          Temple       -  Entered a temple.
-         Mines        -  Entered the Gnomish Mines.
+         Mines        -  Entered the Salt Mines of Galilee.
          Town         -  Entered Mine Town.
          Oracle       -  Consulted the Oracle of Delphi.
          Novel        -  Read a passage from a Discworld Novel.
@@ -3870,7 +3870,7 @@
          Big Room     -  Entered the Big Room.
          Soko-Prize   -  Explored  to  the  top  of Sokoban and found a
                          special item there.
-         Mines' End   -  Explored to the bottom of  the  Gnomish  Mines
+         Mines' End   -  Explored to the bottom of the Salt Mines of Galilee
                          and found a special item there.
          Medusa       -  Defeated Medusa.
          Tune         -  Discovered  the  tune that can be used to open

@@ -104,7 +104,7 @@ throne_sit_effect(void)
             break;
         case 6:
             if (u.uluck + rn2(5) < 0) {
-                You_feel("your luck is changing.");
+                You_feel("your favor is changing.");
                 change_luck(1);
             } else
                 makewish();

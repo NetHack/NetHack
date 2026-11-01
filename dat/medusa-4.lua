@@ -78,7 +78,7 @@ des.levregion({ region = {27,00,79,20}, type="branch" });
 --
 des.non_diggable(selection.area(01,01,22,14));
 --
-des.object("crystal ball", 07,08)
+-- Crystal balls are removed from the game.
 --
 -- same spot as Medusa plus downstairs
 des.object({ id="statue", coord=medloc, buc="uncursed",

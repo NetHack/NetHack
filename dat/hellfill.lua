@@ -213,8 +213,8 @@ B.....B
 B.....B
 B.....B
 BBBBBBB]], contents = function()
-   des.region({ region={2,2, 2,2}, type="temple", filled=1, irregular=1 });
-   des.altar({ x=3, y=3, align="noalign", type=percent(75) and "altar" or "shrine" });
+   -- Random unaligned Moloch temples and priests are not generated.
+   des.region({ region={2,2, 2,2}, type="ordinary", filled=1, irregular=1 });
       end  });
    end,
    function ()

@@ -48,8 +48,8 @@ des.levregion({ type="stair-down", region={57,03,75,19}, region_islev=1,
 des.feature("fountain",16,09)
 des.feature("fountain",25,09)
 
--- the altar's defiled; useful for BUC but never coaligned
-des.altar({ x=20,y=13,align="noalign", type="shrine" })
+-- The altar follows God. It is not a shrine of Moloch.
+des.altar({ x=20,y=13,align="law", type="altar" })
 
 -- set up the shop doors; could be broken down
 des.door("random",5,8)
