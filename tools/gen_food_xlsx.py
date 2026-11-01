@@ -64,6 +64,18 @@ GOLEM_NO_MEAT = {
     "paper golem",
 }
 RIDERS = {"death", "pestilence", "famine"}
+# weight_cap() never exceeds MAX_CARR_CAP (1000). carry_count()
+# lifts one item from an empty pack when its weight is under
+# 3 * weight_cap. At the cap, that is 3000.
+MAX_CARRY_CAP = 1000
+MAX_LIFTABLE = 3 * MAX_CARRY_CAP
+
+
+def can_carry(weight: int) -> str:
+    """Stock pickup: yes when an unburdened hero at the cap can lift it."""
+    return "yes" if weight < MAX_LIFTABLE else "no"
+
+
 # 5% exemption is lizard, S_EEL, and S_JELLY. Only lizard and S_JELLY
 # are stable (never rot, blessable raw). Fillets rot unless cooked.
 EXEMPT_NOTE = (
@@ -728,6 +740,7 @@ def main() -> None:
         "Cooked name",
         "Nutrition",
         "Weight",
+        "Can carry",
         "5% raw-poison exempt",
         "Blessable while raw",
         "Intrinsics and effects",
@@ -782,6 +795,7 @@ def main() -> None:
         "Cooked name",
         "Nutrition",
         "Weight",
+        "Can carry",
         "Rots",
         "5% raw-poison",
         "Blessable while raw",
@@ -809,6 +823,7 @@ def main() -> None:
                     cooked,
                     mon["nutrition"],
                     mon["weight"],
+                    can_carry(mon["weight"]),
                     "never",
                     "no",
                     "yes",
@@ -839,6 +854,7 @@ def main() -> None:
                     cooked,
                     mon["nutrition"],
                     mon["weight"],
+                    can_carry(mon["weight"]),
                     poison_exempt,
                     bless_raw,
                     intrinsics(mon, flags),
@@ -996,6 +1012,14 @@ def main() -> None:
         ("Raw poison", "Eating raw meat rolls 1 in 20 for fatal food poisoning, in addition to the old tainted-meat rules. Same cure as other food poisoning."),
         ("Cook", "#cook needs a flint and tinder box. Every role starts with one. The box is not used up. Cooking takes a few turns. Cooked meat rots about ten times slower."),
         ("Tins and eggs", "Still work. Their names do not say corpse. See the Tins and eggs sheet."),
+        (
+            "Can carry",
+            "Stock carrying capacity never exceeds 1000. With an empty pack, "
+            "the heaviest single thing that can be lifted is just under 3000. "
+            "Adult dragon steaks weigh 4500, so they stay on the floor. "
+            "Cook and eat them there. Baby dragon steaks weigh 1500 and can "
+            "be carried. No special pickup rule was added.",
+        ),
         ("Regenerate", "python3 tools/gen_food_xlsx.py"),
     ]
     for row in note_rows:

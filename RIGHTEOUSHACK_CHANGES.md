@@ -615,6 +615,12 @@ Jellyfish is a fillet, not a jelly. Other raw meat cannot be
 blessed. Every role starts
 with a flint and tinder box. `#cook` uses it and does not use it
 up. Blessed cooked meat never spoils.
+An adult dragon steak weighs 4500. Stock carrying capacity never
+goes above 1000, and with an empty pack the heaviest single thing
+that can be lifted is just under 3000, so the steak cannot be
+picked up. Cook it and eat it where it lies. A baby dragon steak
+weighs 1500 and can be carried. Nothing special was added to the
+pickup code.
 The workbook `docs/RighteousHack_Food.xlsx` lists every food and
 every monster; regenerate it with `tools/gen_food_xlsx.py` when
 those tables change. `EDITLEVEL` is 1, so saves from before the
