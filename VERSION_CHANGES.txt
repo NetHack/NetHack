@@ -11,6 +11,11 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-01
+A pet will not step onto a Mines' End letter, on the path or
+a decoy. If it is already on one, it steps off. On Capernaum,
+a pet will not attack any monster. Other levels are unchanged.
+
+2026-11-01
 The Wilderness Trial is chained to the prophet level, the same
 name the overview shows.
 

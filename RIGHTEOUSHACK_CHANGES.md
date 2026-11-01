@@ -818,6 +818,14 @@ Peter cannot be killed or hurt by a weapon, a missile, a spell, a
 rod, a trap, or a pet. He does not turn hostile, and he cannot be
 pushed off his post. A pet will not attack Peter, King Solomon,
 Isaiah, the angel at Jacob's Ladder, or a Babel builder.
+A pet will not step onto a Mines' End letter, whether that
+letter is on the path or a decoy, so it cannot wander the
+grid. If a pet is already standing on one, it steps off.
+On Capernaum, a pet will not attack any monster: a shopkeeper,
+townsfolk, the temple priest, a dog or a cat, Peter, or a
+hostile. It can still move, follow, and eat. Off Capernaum,
+pets keep their old behavior, apart from the plot people
+named above.
 
 Mines' End is three approved full-level maps, one chosen at
 random. The overview calls that level
