@@ -163,6 +163,9 @@ picklock(void)
         return ((gx.xlock.usedtime = 0));
     }
 
+    if (gx.xlock.door && peters_door_blocks(u.ux + u.dx, u.uy + u.dy))
+        return (gx.xlock.usedtime = 0);
+
     You("succeed in %s.", lock_action());
     if (gx.xlock.door) {
         if (gx.xlock.door->doormask & D_TRAPPED) {
@@ -691,6 +694,9 @@ pick_lock(
                 return PICKLOCK_LEARNED_SOMETHING;
             }
 
+            if (peters_door_blocks(cc.x, cc.y))
+                return PICKLOCK_LEARNED_SOMETHING;
+
             Sprintf(qbuf, "%s it%s%s?",
                     (door->doormask & D_LOCKED) ? "Unlock" : "Lock",
                     autounlock ? " with " : "",
@@ -926,6 +932,12 @@ doopen_indir(coordxy x, coordxy y)
                   Blind ? "Feels" : "Seems");
         else
             You("%s no door there.", Blind ? "feel" : "see");
+        return res;
+    }
+
+    if (peters_closet_door(cc.x, cc.y)
+        && (door->doormask & (D_LOCKED | D_CLOSED))) {
+        pline("This door will not yield.");
         return res;
     }
 
@@ -1207,6 +1219,9 @@ doorlock(struct obj *otmp, coordxy x, coordxy y)
             return FALSE;
         }
     }
+
+    if (peters_door_blocks(x, y))
+        return FALSE;
 
     switch (otmp->otyp) {
     case WAN_LOCKING:

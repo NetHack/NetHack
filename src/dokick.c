@@ -921,6 +921,9 @@ kick_door(coordxy x, coordxy y, int avrg_attrib)
         return; /* uses a turn */
     }
 
+    if (peters_door_blocks(x, y))
+        return;
+
     /* not enough leverage to kick open doors while levitating */
     if (Levitation) {
         kick_ouch(x, y, "");

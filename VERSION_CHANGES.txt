@@ -11,6 +11,13 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-01
+Mines' End and Capernaum each use one of three approved maps.
+The champion's chest holds 4 real gems, 350 gold pieces, and
+one prophetic book. Peter's closet door will not yield except
+when he opens it. On Capernaum, water that reaches the edge of
+the map is the Sea of Galilee. The town pool keeps its old name.
+
+2026-11-01
 A false letter at Mines' End burns for 20 hit points, or 10
 if you resist fire. You stay on the lava and can step off.
 

@@ -456,6 +456,11 @@ do_earthquake(int force)
                 FALLTHROUGH;
                 /*FALLTHRU*/
             case DOOR: /* make the door collapse */
+                if (peters_closet_door(x, y)) {
+                    if (cansee(x, y))
+                        pline("This door will not yield.");
+                    break;
+                }
                 /* if already doorless, treat like room or corridor */
                 if (levl[x][y].doormask == D_NODOOR) {
                     do_pit(x, y, tu_pit);

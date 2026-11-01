@@ -5473,6 +5473,13 @@ zap_over_floor(
             break;
         }
         if (new_doormask >= 0) { /* door gets broken */
+            if (peters_closet_door(x, y)) {
+                if (see_it)
+                    pline("This door will not yield.");
+                new_doormask = -1;
+            }
+        }
+        if (new_doormask >= 0) { /* door gets broken */
             if (*in_rooms(x, y, SHOPBASE)) {
                 if (type >= 0) {
                     add_damage(x, y, SHOP_DOOR_COST);

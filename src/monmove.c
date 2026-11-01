@@ -1533,7 +1533,8 @@ postmov(
         /* open a door, or crash through it, if 'mtmp' can */
         if (IS_DOOR(levl[mtmp->mx][mtmp->my].typ)
             && !passes_walls(ptr) /* doesn't need to open doors */
-            && !can_tunnel) {     /* taken care of below */
+            && !can_tunnel /* taken care of below */
+            && !peters_closet_door(mtmp->mx, mtmp->my)) {
             struct rm *here = &levl[mtmp->mx][mtmp->my];
             boolean btrapped = (here->doormask & D_TRAPPED) != 0;
 

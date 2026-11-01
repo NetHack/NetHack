@@ -786,10 +786,20 @@ xlogfile achievement is entered_capernaum. The old file name
 minetn-1 used to trigger the orc-town gang; Capernaum does not.
 The cats placed there are housecats; the id "cat" does not exist
 and stopped the level from loading.
-It is lit, with a food
-shop, a general store, a tool shop, a lawful temple, a pool, a
-fountain, and peaceful people, dogs, and cats. No random monsters
-are generated there. Peter the Fisherman stands south of his door.
+Each game picks one of three approved town maps. The sea is on
+the west, the south, or the east. The whole town is lit. There
+is no random monster generation. The shops are a delicatessen, a
+general store, a hardware store, Izchak's lighting store, a used
+armor dealership, an antique weapons outlet, a second-hand
+bookstore, a liquor emporium, and a jewelers. Two of the maps
+also have a health food store, so those maps have 10 shops and
+the south-sea map has 9. A candle shop in this town names its
+shopkeeper Izchak. There is a lawful temple, two fountains, a
+small pool, and peaceful people, dogs, and cats. Peter the
+Fisherman stands against his closet door and has room to step
+aside. Water that connects to the edge of the map is called the
+Sea of Galilee. The town pool, and water on every other level,
+keeps its ordinary name.
 The first arrival opens a text window, the same kind as a quest
 introduction. A male hero hears "As you approach Capernaum, a man
 calls out \"Hello! You sir! My name is Peter the Fisherman, and
@@ -807,12 +817,13 @@ rod, a trap, or a pet. He does not turn hostile, and he cannot be
 pushed off his post. A pet will not attack Peter, King Solomon,
 Isaiah, the angel at Jacob's Ladder, or a Babel builder.
 
-Mines' End is three puzzle layouts. The overview calls that level
+Mines' End is three approved full-level maps, one chosen at
+random. The overview calls that level
 Mines' End and tags it [minesend]. The #levelport menu says
 minesend. Achievements, the livelog, and arrival text do not say
-PETRA. The scholar's scroll is the clue that does. The puzzle
-room, through the safe row, is lit. The rest of the level is dark. The letters P, E,
-T, R, A and the decoys are drawn on the map as those capitals.
+PETRA. The scholar's scroll is the clue that does. Only the
+puzzle room is lit. The rest of the level is dark. The letters
+are a 7 by 4 grid drawn on the floor as those capitals.
 Farlook and look-here call a tile "the letter P" (or whichever
 letter it is). They are not engravings. The hint is an engraving
 in the southwest corner of the safe row, so it shows the engraving
@@ -835,12 +846,13 @@ door are Peter's net and a Favor Stone. The level does not
 generate random monsters, does not allow teleport, and cannot be
 dug. Those three limits stay, so the puzzle cannot be skipped.
 The Philistine Champion is the only monster, on every layout. He
-waits in a dark room far from the up stair and does not leave that
-room. He can still fight anyone who comes in. The passage to that
-room leaves the arrival corridor and winds under the puzzle,
-around the outer edge, and back to a closed door. It does not
-cross the letter floor or the safe row, so the scroll can be taken
-before the puzzle. The passage is not visible from the stair. He
+waits in his own room, at the square marked for him, and does not
+leave that room. He can still fight anyone who comes in. The only
+door of that room is the one drawn on the map. The route from the
+stair does not cross the letter floor. In his room, away from
+the door, an unlocked untrapped chest holds 4 real gems (no
+worthless glass; each is a single stone), 350 gold pieces, and
+one random prophetic book. He
 is hostile and male. Monster level 7, speed 12, magic resistance
 30, size large. Hit points are a fixed 90, about three times an
 ogre lord. Bare armor class is 3. He wears uncursed bronze plate
@@ -859,7 +871,11 @@ Give Peter the net. He says "Thank you, friend... 'Follow me, and I
 will make you fishers of men.' I have cast this net for many souls
 since then." He keeps the net. He then gives the Key to Babylon's
 Palace and the Key to the Gates of Hell (placeholder name) and says
-Matthew 16:18. He steps aside and the door opens. The undiggable
+Matthew 16:18. He steps aside and the door opens. That is the
+only way in. Kicking, lock picks, keys, credit cards, knock,
+force, digging, phasing, and teleporting all fail, with "This
+door will not yield." The closet floor and its walls cannot be
+dug or phased through. The undiggable
 closet holds a blessed +2 Breastplate of Righteousness. The net and
 both keys cannot be wished for.
 

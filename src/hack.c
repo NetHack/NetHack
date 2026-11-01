@@ -795,6 +795,11 @@ still_chewing(coordxy x, coordxy y)
         lev->typ = DOOR;
 
     } else if (IS_DOOR(lev->typ)) {
+        if (peters_closet_door(x, y)) {
+            pline("This door will not yield.");
+            nomul(0);
+            return 1;
+        }
         if (*in_rooms(x, y, SHOPBASE)) {
             add_damage(x, y, SHOP_DOOR_COST);
             dmgtxt = "break";
@@ -1077,6 +1082,15 @@ test_move(
         if (closed_door(x, y)) {
             if (Blind && mode == DO_MOVE)
                 feel_location(x, y);
+            /* Phasing, oozing, and chewing do not enter Peter's closet. */
+            if (peters_closet_door(x, y)
+                && (Passes_walls || can_ooze(&gy.youmonst)
+                    || (tunnels(gy.youmonst.data)
+                        && !needspick(gy.youmonst.data)))) {
+                if (mode == DO_MOVE)
+                    pline("This door will not yield.");
+                return FALSE;
+            }
             if (Passes_walls) {
                 ; /* do nothing */
             } else if (can_ooze(&gy.youmonst)) {
@@ -3476,6 +3490,121 @@ petra_check(void)
         return;
     }
     petra_fail(u.ux, u.uy);
+}
+
+/* How many ROOM/CORR squares connect to (sx,sy) without crossing a door.
+   Stops at 7: a Peter's closet is 6 or smaller, and a shop is 8 or larger.
+   If doorx is non-null, the first door touching the area is recorded. */
+static int
+floor_span(coordxy sx, coordxy sy, coordxy *doorx, coordxy *doory)
+{
+    static char seen[COLNO][ROWNO];
+    coordxy qx[64], qy[64];
+    int qh = 0, qt = 0, n = 0, d;
+    const schar dxs[4] = { 1, -1, 0, 0 };
+    const schar dys[4] = { 0, 0, 1, -1 };
+
+    if (doorx)
+        *doorx = *doory = 0;
+    if (!isok(sx, sy))
+        return 0;
+    if (levl[sx][sy].typ != ROOM && levl[sx][sy].typ != CORR)
+        return 0;
+    (void) memset(seen, 0, sizeof seen);
+    qx[0] = sx;
+    qy[0] = sy;
+    qt = 1;
+    seen[sx][sy] = 1;
+    while (qh < qt) {
+        coordxy x = qx[qh], y = qy[qh];
+
+        qh++;
+        n++;
+        if (n > 6)
+            return n;
+        for (d = 0; d < 4; d++) {
+            coordxy nx = x + dxs[d], ny = y + dys[d];
+
+            if (!isok(nx, ny) || seen[nx][ny])
+                continue;
+            if (levl[nx][ny].typ == ROOM || levl[nx][ny].typ == CORR) {
+                if (qt >= 64)
+                    return 7; /* larger than a closet */
+                qx[qt] = nx;
+                qy[qt] = ny;
+                qt++;
+                seen[nx][ny] = 1;
+            } else if (doorx && !*doorx && IS_DOOR(levl[nx][ny].typ)) {
+                *doorx = nx;
+                *doory = ny;
+            }
+        }
+    }
+    return n;
+}
+
+static boolean
+on_capernaum(void)
+{
+    s_level *slev = Is_special(&u.uz);
+
+    return (boolean) (slev && !strcmp(slev->proto, "capernaum"));
+}
+
+/* Peter's closet is the only door on Capernaum with a room of at
+   most 6 squares on one side and a larger room on the other.
+   Shops on the approved maps are 8 squares or more. */
+boolean
+peters_closet_door(coordxy x, coordxy y)
+{
+    int d, small = 0, large = 0;
+    const schar dxs[4] = { 1, -1, 0, 0 };
+    const schar dys[4] = { 0, 0, 1, -1 };
+
+    if (!on_capernaum() || !isok(x, y) || !IS_DOOR(levl[x][y].typ))
+        return FALSE;
+    for (d = 0; d < 4; d++) {
+        coordxy nx = x + dxs[d], ny = y + dys[d];
+        int sz;
+
+        if (!isok(nx, ny))
+            continue;
+        if (levl[nx][ny].typ != ROOM && levl[nx][ny].typ != CORR)
+            continue;
+        sz = floor_span(nx, ny, (coordxy *) 0, (coordxy *) 0);
+        if (sz > 0 && sz <= 6)
+            small++;
+        else if (sz > 6)
+            large++;
+    }
+    return (boolean) (small > 0 && large > 0);
+}
+
+/* Floor inside the closet, and only while the door is still shut.
+   Once the quest opens it, the room can be entered. */
+boolean
+peters_closet_floor(coordxy x, coordxy y)
+{
+    coordxy dx = 0, dy = 0;
+    int sz;
+
+    if (!on_capernaum())
+        return FALSE;
+    sz = floor_span(x, y, &dx, &dy);
+    if (sz <= 0 || sz > 6 || !dx)
+        return FALSE;
+    if (!peters_closet_door(dx, dy))
+        return FALSE;
+    return (boolean) ((levl[dx][dy].doormask & (D_LOCKED | D_CLOSED)) != 0);
+}
+
+boolean
+peters_door_blocks(coordxy x, coordxy y)
+{
+    if (!peters_closet_door(x, y))
+        return FALSE;
+    pline("This door will not yield.");
+    return TRUE;
 }
 
 void
