@@ -11,10 +11,9 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-01
-The Mines' End boss is named Philistine Champion. His attacks,
-speed, armor class, and size match the minotaur. He is shown as
-a large humanoid and does not moo. Those minotaur numbers are
-far too strong for an experience level 7 or 8 character.
+The Philistine Champion uses the ogre lord's attacks, speed, and
+other combat numbers. He is always hostile and wields a
+two-handed sword. The name is still Philistine Champion.
 
 2026-11-01
 The Philistine Champion waits in his own dark room on Mines' End,

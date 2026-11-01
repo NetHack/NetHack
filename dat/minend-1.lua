@@ -33,10 +33,7 @@ des.stair("up", 7, 9)
 -- back in. It does not touch the letter floor or the safe row.
 des.monster({ id = "Philistine Champion", peaceful = 0, asleep = false, x = 38, y = 9,
               inventory = function()
-                 des.object({ id = "long sword", spe = 1, buc = "uncursed" })
-                 des.object({ id = "scale mail", buc = "uncursed" })
-                 des.object({ id = "helmet", buc = "uncursed" })
-                 des.object({ id = "small shield", buc = "uncursed" })
+                 des.object({ id = "two-handed sword", buc = "uncursed" })
               end })
 des.engraving({ x=3, y=3, type="burn", text="P", degrade=false })
 des.engraving({ x=4, y=3, type="burn", text="R", degrade=false })

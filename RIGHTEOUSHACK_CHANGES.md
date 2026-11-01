@@ -758,14 +758,11 @@ to that room leaves the arrival corridor and winds under the
 puzzle, around the outer edge, and back to a closed door. It does
 not cross the letter floor or the safe row, so the scroll can be
 taken before the puzzle. The passage is not visible from the
-stair. He is hostile and male. His combat entry is the minotaur's:
-monster level 15, speed 15, base armor class 6, magic resistance 0,
-size large (weight 1500), difficulty 17, two 3d10 claw attacks and
-one 2d8 butt attack. The map symbol is H. He does not moo, and the
-game never calls him a minotaur. He still carries a +1 long sword,
-scale mail, a helmet, and a small shield; worn, that armor makes
-his armor class better than 6. These numbers are far too strong
-for an experience level 7 or 8 character. Killing him always leaves a scholar's
+stair. He is hostile and male. His combat entry is the ogre lord's:
+monster level 7, speed 12, base armor class 3, magic resistance 30,
+size large (weight 1700), difficulty 9, and one 2d6 weapon attack.
+The map symbol is O. He wields an uncursed two-handed sword, so a
+hit on a human-sized hero uses that sword. Killing him always leaves a scholar's
 scroll. The scroll is not generated anywhere else and cannot be
 wished for. Reading it shows this text and does not use it up:
 "In my research I have found the ancient Greek name for the rock

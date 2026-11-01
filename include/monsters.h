@@ -3930,17 +3930,18 @@
                                        | M2_STRONG | M2_COLLECT | M2_MAGIC,
         M3_INFRAVISIBLE,
         8, HI_DOMESTIC, APPRENTICE),
-    /* PETRA's only monster. Combat numbers match the minotaur.
-       He does not moo, and nothing calls him a minotaur. */
-    MON(NAM("Philistine Champion"), S_GIANT,
-        LVL(15, 15, 6, 0, 0), (G_NOGEN | G_UNIQ),
-        A(ATTK(AT_CLAW, AD_PHYS, 3, 10), ATTK(AT_CLAW, AD_PHYS, 3, 10),
-          ATTK(AT_BUTT, AD_PHYS, 2, 8), NO_ATTK, NO_ATTK, NO_ATTK),
-        SIZ(1500, 700, MS_HUMANOID, MZ_LARGE), 0, 0,
-        M1_ANIMAL | M1_HUMANOID | M1_CARNIVORE,
-        M2_HOSTILE | M2_STRONG | M2_NASTY | M2_MALE,
+    /* PETRA's only monster. Combat numbers match the ogre lord.
+       Always hostile. The name is Philistine Champion. */
+    MON(NAM("Philistine Champion"), S_OGRE,
+        LVL(7, 12, 3, 30, -5), (G_NOGEN | G_UNIQ),
+        A(ATTK(AT_WEAP, AD_PHYS, 2, 6),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(1700, 700, MS_GRUNT, MZ_LARGE), 0, 0,
+        M1_HUMANOID | M1_CARNIVORE,
+        M2_HOSTILE | M2_STRONG | M2_LORD | M2_MALE | M2_GREEDY | M2_JEWELS
+            | M2_COLLECT,
         M3_INFRAVISIBLE | M3_INFRAVISION,
-        17, CLR_BROWN, PHILISTINE_CHAMPION),
+        9, CLR_RED, PHILISTINE_CHAMPION),
 
     /*
      * mons_init() in monst.c adds a terminator here, mons[NUMMONS].
