@@ -2149,6 +2149,16 @@ lev_by_name(const char *nam)
         } else if (!strcmpi(nam, "sodom") || !strcmpi(nam, "tyre")
                    || !strcmpi(nam, "sodom and tyre")) {
             nam = "medusa-1";
+        } else if (!strcmpi(nam, "vibrating") || !strcmpi(nam, "gates")) {
+            d_level inv;
+
+            inv.dnum = sanctum_level.dnum;
+            inv.dlevel = (sanctum_level.dlevel > 1)
+                             ? sanctum_level.dlevel - 1 : 1;
+            if (wizard
+                || (svl.level_info[ledger_no(&inv)].flags & VISITED)
+                       == VISITED)
+                return depth(&inv);
         }
 
         if ((slev = find_level(nam)) != 0)

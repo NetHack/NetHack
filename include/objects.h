@@ -965,6 +965,10 @@ TOOL("oil lamp",          "lamp", 0, 0, 0, 0, 45, 20, 10, COPPER, CLR_YELLOW,
                                                                 OIL_LAMP),
 TOOL("magic lamp",        "lamp", 0, 0, 1, 0, 15, 20, 50, COPPER, CLR_YELLOW,
                                                                 MAGIC_LAMP),
+/* Quest completion reward. Probability 0. Not a random lamp.
+   Wishes for it are refused. Applying it points at the vibrating square. */
+TOOL("Lamp of God's Word", "lamp", 1, 0, 0, 0, 0, 20, 0, GOLD, HI_GOLD,
+                                                                LAMP_OF_GODS_WORD),
 TOOL("thurible",          "thurible", 0, 0, 0, 0, 45, 20, 10, GOLD, CLR_YELLOW,
                                                                 THURIBLE),
 /* other tools */

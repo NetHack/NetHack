@@ -747,7 +747,8 @@ snuff_light_source(coordxy x, coordxy y)
                  */
                 if (artifact_light(obj))
                     continue;
-                end_burn(obj, obj->otyp != MAGIC_LAMP);
+                end_burn(obj, obj->otyp != MAGIC_LAMP
+                                 && obj->otyp != LAMP_OF_GODS_WORD);
                 /*
                  * The current ls element has just been removed (and
                  * ls->next is now invalid).  Return assuming that there

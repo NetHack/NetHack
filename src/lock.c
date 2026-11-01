@@ -377,6 +377,33 @@ autokey(boolean opening) /* True: key, pick, or card; False: key or pick */
 
 DISABLE_WARNING_FORMAT_NONLITERAL
 
+/* Peter's second key opens the Gates of Hell. It is used while standing
+   on them, not aimed at a door. Matthew 16:18, then Psalm 107:16. */
+int
+use_gates_key(void)
+{
+    if (!invocation_pos(u.ux, u.uy)) {
+        pline("The key is not for any lock here.");
+        return ECMD_TIME;
+    }
+    if (!u.uevent.gates_revealed || !On_stairs(u.ux, u.uy)) {
+        pline("There are no gates here yet.");
+        return ECMD_TIME;
+    }
+    if (u.uevent.invoked) {
+        pline("The gates are already open.");
+        return ECMD_TIME;
+    }
+    /* Matthew 16:18 KJV */
+    pline("And I say also unto thee, That thou art Peter, and upon this rock I will build my church; and the gates of hell shall not prevail against it.");
+    /* Psalm 107:16 KJV */
+    pline("For he hath broken the gates of brass, and cut the bars of iron in sunder.");
+    pline("The Gates of Hell burst open.");
+    u.uevent.invoked = 1;
+    record_achievement(ACH_INVK);
+    return ECMD_TIME;
+}
+
 /* for doapply(); if player gives a direction or resumes an interrupted
    previous attempt then it usually costs hero a move even if nothing
    ultimately happens; when told "can't do that" before being asked for
@@ -477,6 +504,11 @@ pick_lock(
     }
     ch = 0; /* lint suppression */
 
+    /* The gates key is not aimed. Do this before asking for a direction. */
+    if (picktyp == KEY_TO_GATES)
+        return (use_gates_key() == ECMD_TIME) ? PICKLOCK_LEARNED_SOMETHING
+                                              : PICKLOCK_DID_NOTHING;
+
     if (rx != 0) { /* autounlock; caller has provided coordinates */
         cc.x = rx;
         cc.y = ry;
@@ -485,10 +517,6 @@ pick_lock(
         return PICKLOCK_DID_NOTHING;
     }
 
-    if (picktyp == KEY_TO_GATES) {
-        pline("The key is not for any lock here.");
-        return PICKLOCK_LEARNED_SOMETHING;
-    }
     if (picktyp == KEY_TO_BABYLON && !Is_stronghold(&u.uz)) {
         pline("The key does not turn.");
         return PICKLOCK_LEARNED_SOMETHING;

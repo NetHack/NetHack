@@ -1463,6 +1463,7 @@ extern void reset_pick(void);
 extern void maybe_reset_pick(struct obj *);
 extern struct obj *autokey(boolean);
 extern int pick_lock(struct obj *, coordxy, coordxy, struct obj *);
+extern int use_gates_key(void);
 extern boolean u_have_forceable_weapon(void);
 extern int doforce(void);
 extern boolean boxlock(struct obj *, struct obj *) NONNULLARG12;
@@ -1628,6 +1629,7 @@ extern void dodoor(coordxy, coordxy, struct mkroom *) NONNULLARG3;
 extern void mktrap(int, unsigned, struct mkroom *, coord *) NO_NNARGS;
 extern void mkstairs(coordxy, coordxy, char, struct mkroom *, boolean);
 extern void mkinvokearea(void);
+extern void reveal_gates(void);
 extern void mineralize(int, int, int, int, boolean);
 
 /* ### mkmap.c ### */

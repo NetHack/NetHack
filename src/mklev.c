@@ -2410,6 +2410,134 @@ mkgrave(struct mkroom *croom)
  * possible that "the Book reads the hero" rather than vice versa if
  * attempted while blind (in order to make blind-from-birth conduct viable).]
  */
+/* Move a monster off the new gate wall onto an open square inside it.
+   If the inside is packed, the monster is removed rather than left in
+   the wall. */
+static void
+shove_off_gate_wall(struct monst *mtmp)
+{
+    int dx, dy;
+    coordxy x, y;
+
+    for (dx = -3; dx <= 3; dx++) {
+        for (dy = -3; dy <= 3; dy++) {
+            x = u.ux + dx;
+            y = u.uy + dy;
+            if (!isok(x, y) || (x == u.ux && y == u.uy))
+                continue;
+            if (levl[x][y].typ == ROOM && !m_at(x, y)) {
+                rloc_to(mtmp, x, y);
+                return;
+            }
+        }
+    }
+    mongone(mtmp);
+}
+
+/* Prayer on the vibrating square. Ephesians 6:13, then a 9x9 walled
+   square with the Gates of Hell (down stairs) in the middle. The key
+   opens them later. The old invocation moat is not used. */
+void
+reveal_gates(void)
+{
+    int dx, dy;
+    coordxy x, y;
+    struct trap *ttmp;
+    struct monst *mtmp, *nmtmp;
+    struct obj *otmp, *nobj;
+
+    /* Ephesians 6:13 KJV */
+    pline("Wherefore take unto you the whole armour of God, that ye may be able to withstand in the evil day, and having done all, to stand.");
+    pline("The floor blasts open around you. A wall seals you off from the maze.");
+
+    if (u.utrap) {
+        if (u.utraptype == TT_BURIEDBALL)
+            buried_ball_to_punishment();
+        reset_utrap(FALSE);
+    }
+
+    for (dx = -4; dx <= 4; dx++) {
+        for (dy = -4; dy <= 4; dy++) {
+            int adx = abs(dx), ady = abs(dy);
+            schar typ;
+
+            x = u.ux + dx;
+            y = u.uy + dy;
+            if (!isok(x, y))
+                continue;
+            if ((ttmp = t_at(x, y)) != 0)
+                deltrap(ttmp);
+            if (adx < 4 && ady < 4) {
+                typ = ROOM;
+            } else if (dx == -4 && dy == -4) {
+                typ = TLCORNER;
+            } else if (dx == 4 && dy == -4) {
+                typ = TRCORNER;
+            } else if (dx == -4 && dy == 4) {
+                typ = BLCORNER;
+            } else if (dx == 4 && dy == 4) {
+                typ = BRCORNER;
+            } else if (dy == -4 || dy == 4) {
+                typ = HWALL;
+            } else {
+                typ = VWALL;
+            }
+            levl[x][y].typ = typ;
+            levl[x][y].flags = 0;
+            levl[x][y].horizontal = 0;
+            levl[x][y].lit = 1;
+            levl[x][y].waslit = 1;
+            levl[x][y].seenv = 0;
+            if (IS_STWALL(typ)) {
+                levl[x][y].wall_info |= (W_NONDIGGABLE | W_NONPASSWALL);
+                block_point(x, y);
+            } else {
+                unblock_point(x, y);
+            }
+        }
+    }
+
+    for (mtmp = fmon; mtmp; mtmp = nmtmp) {
+        int adx, ady;
+
+        nmtmp = mtmp->nmon;
+        if (DEADMONSTER(mtmp))
+            continue;
+        adx = abs(mtmp->mx - u.ux);
+        ady = abs(mtmp->my - u.uy);
+        if (max(adx, ady) == 4)
+            shove_off_gate_wall(mtmp);
+    }
+
+    for (otmp = fobj; otmp; otmp = nobj) {
+        int adx, ady;
+
+        nobj = otmp->nobj;
+        if (otmp->where != OBJ_FLOOR)
+            continue;
+        adx = abs(otmp->ox - u.ux);
+        ady = abs(otmp->oy - u.uy);
+        if (max(adx, ady) != 4)
+            continue;
+        obj_extract_self(otmp);
+        place_object(otmp, u.ux, u.uy);
+    }
+
+    mkstairs(u.ux, u.uy, 0, (struct mkroom *) 0, TRUE);
+    for (dx = -4; dx <= 4; dx++)
+        for (dy = -4; dy <= 4; dy++)
+            if (isok(u.ux + dx, u.uy + dy))
+                newsym(u.ux + dx, u.uy + dy);
+    gv.vision_full_recalc = 1;
+
+    if (!stairway_at(u.ux, u.uy)) {
+        pline("The gates do not appear.");
+        return;
+    }
+    pline("The Gates of Hell stand before you.");
+    u.uevent.gates_revealed = 1;
+}
+
 void
 mkinvokearea(void)
 {

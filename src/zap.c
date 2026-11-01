@@ -6457,6 +6457,10 @@ wish_from_text(char *buf, boolean last_try)
             || otmp->otyp == SCR_SCHOLARS_SCROLL
             || otmp->otyp == SCR_PETERS_SCROLL
             || otmp->otyp == ROCK_WITH_KEYHOLE
+            || otmp->otyp == LAMP_OF_GODS_WORD
+            || otmp->otyp == BELL_OF_OPENING
+            || otmp->otyp == CANDELABRUM_OF_INVOCATION
+            || otmp->otyp == SPE_BOOK_OF_THE_DEAD
             || (otmp->otyp == CRYSTAL_BALL && !otmp->oartifact))) {
         pline("You cannot wish for that.");
         obfree(otmp, (struct obj *) 0);

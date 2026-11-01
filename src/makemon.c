@@ -1353,8 +1353,9 @@ makemon(
                          monst_to_any(mtmp));
     mitem = STRANGE_OBJECT; /* extra inventory item for this monster */
 
+    /* Vlad no longer carries the Candelabrum. That relic is gone. */
     if (mndx == PM_VLAD_THE_IMPALER)
-        mitem = CANDELABRUM_OF_INVOCATION;
+        mitem = STRANGE_OBJECT;
     mtmp->cham = NON_PM; /* default is "not a shapechanger" */
     if (!Protection_from_shape_changers
         && (mcham = pm_to_cham(mndx)) != NON_PM) {
@@ -1379,7 +1380,8 @@ makemon(
     } else if (mndx == PM_CROESUS) {
         mitem = TWO_HANDED_SWORD;
     } else if (ptr->msound == MS_NEMESIS) {
-        mitem = BELL_OF_OPENING;
+        /* The Bell of Opening is gone. Class quest artifacts are unchanged. */
+        mitem = STRANGE_OBJECT;
     } else if (mndx == PM_PESTILENCE) {
         mitem = POT_SICKNESS;
     }

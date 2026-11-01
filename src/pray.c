@@ -1990,6 +1990,14 @@ prayer_done(void)
     if (!u.uevent.gibeon_wish && is_gibeon_altar(u.ux, u.uy)
         && gibeon_vision())
         return 1;
+
+    /* Vibrating square: the verse, the walled square, and the gates.
+       This is the way into the Sanctum, so a prayer timeout does not
+       block it, and it does not also grant a miracle. */
+    if (invocation_pos(u.ux, u.uy) && !u.uevent.gates_revealed) {
+        reveal_gates();
+        return 1;
+    }
     
     /* ------------------------------------------------------------------
      *  1. Altar use: always attempt to bless water (anointing oil

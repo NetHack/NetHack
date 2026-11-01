@@ -66,7 +66,10 @@ struct u_event {
     Bitfield(greed_hint, 2);        /* which full-verse hint the gate last gave */
     Bitfield(pride_prayed, 1);      /* prayed at the stone; lures are gone */
     Bitfield(greed_warned, 1);      /* the turn-25 hunger warning has been shown */
-    /* 41 bits */
+    Bitfield(gates_revealed, 1);    /* prayer opened the walled square */
+    Bitfield(lamp_verse, 1);        /* Psalm 119:105 has been shown */
+    Bitfield(lamp_given, 1);        /* quest completion gave the lamp */
+    /* 44 bits */
 };
 
 /*

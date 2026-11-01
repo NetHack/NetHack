@@ -1001,6 +1001,39 @@ It restores you." Hit points return to full and hunger is cured.
 Dipping says "The living water does no harm." There is no snake,
 no demon, and no curse.
 
+### Entering Moloch's Sanctum (2026-11-01)
+
+The Bell of Opening, the Candelabrum of Invocation, and the Book
+of the Dead are not placed, cannot be wished for, and crumble if
+one is used. Vlad does not carry the candelabrum. A quest nemesis
+does not carry the bell. The wizard's tower does not hold the book.
+Reading the book no longer performs the invocation. Class quest
+artifacts are unchanged. Stock quest dialogue may still mention
+the silver bell. That pager which sent you back for the bell is
+no longer shown.
+
+Completing a class quest places a blessed Lamp of God's Word in
+inventory, once. Applying it lights it and does not snuff it on
+the next apply, so it can be read again. The first time, it shows
+Psalm 119:105 KJV without the acrostic heading. On the vibrating
+square's level the flame bends toward a compass point, or burns
+straight up on the square itself. Off that level it bends downward
+or upward.
+
+Praying on the vibrating square, even during a prayer timeout,
+shows Ephesians 6:13 KJV, replaces a 9x9 square with floor and an
+undiggable wall, and puts down stairs in the middle. Those stairs
+are the Gates of Hell. They do not open until the Key to the Gates
+of Hell is applied while standing on them. That shows Matthew
+16:18 KJV, then Psalm 107:16 KJV. Going down before that says the
+gates stay shut and names Peter's key. No Armor of God piece is
+required. Opening the gates does not pretend the Wizard is already
+dead. Wizard mode can levelport with "vibrating" or "gates".
+
+The lines that are not in the plan, and the message order, are
+listed in the pull request for Jon. The plan still marks that
+order as pending.
+
 ### Planned (not done)
 
 Lawful, neutral, and chaotic will eventually be replaced by two
