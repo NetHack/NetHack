@@ -48,7 +48,7 @@ struct u_event {
     Bitfield(uopened_dbridge, 1);   /* opened the drawbridge */
     Bitfield(invoked, 1);           /* invoked Gate to the Sanctum level */
     Bitfield(gehennom_entered, 1);  /* entered Gehennom via Valley */
-    Bitfield(uhand_of_elbereth, 2); /* became Hand of Elbereth */
+    Bitfield(uhand_of_elbereth, 2); /* became the Servant of the Lord */
     Bitfield(udemigod, 1);          /* killed the wiz */
     Bitfield(uvibrated, 1);         /* stepped on "vibrating square" */
     Bitfield(ascended, 1);          /* has offered the Amulet */

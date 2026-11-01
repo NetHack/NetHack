@@ -1476,9 +1476,9 @@ attributes_enlightenment(
     enlght_out(final ? "Final Attributes:" : "Attributes:");
 
     if (u.uevent.uhand_of_elbereth) {
-        /* Lawful play uses "the Hand of the Lord". The other two titles
+        /* Lawful play uses "the Servant of the Lord". The other two titles
            are unused while only lawful can be played. */
-        static const char *const hofe_titles[3] = { "the Hand of the Lord",
+        static const char *const hofe_titles[3] = { "the Servant of the Lord",
                                                     "the Envoy of Balance",
                                                     "the Glory of Arioch" };
         you_are(hofe_titles[u.uevent.uhand_of_elbereth - 1], "");

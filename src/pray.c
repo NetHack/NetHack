@@ -649,9 +649,9 @@ gcrownu(void)
     case A_LAWFUL:
         u.uevent.uhand_of_elbereth = 1;
         SetVoice((struct monst *) 0, 0, 80, voice_deity);
-        verbalize("I anoint thee...  The Hand of the Lord!");
+        verbalize("I anoint thee...  The Servant of the Lord!");
         livelog_printf(LL_DIVINEGIFT,
-                       "was anointed \"the Hand of the Lord\" by %s",
+                       "was anointed \"the Servant of the Lord\" by %s",
                        u_gname());
         break;
     case A_NEUTRAL:

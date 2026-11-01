@@ -348,7 +348,7 @@ Vanilla artifacts are still in `include/artilist.h`.
 | ID-221 | Staff of Signs and Wonders extends prayer favor and can be recharged by prayer | `src/pray.c` |
 | ID-222 | Offering a corpse is refused as human sacrifice, with Leviticus 18:21 and Psalm 19:13 | `src/pray.c` |
 | ID-223 | `desecrate_altar()` declaration removed. `src/dig.c` and `src/music.c` print `placeholder for desecrate_altar` instead of calling it | `include/extern.h`, `src/dig.c`, `src/music.c` |
-| ID-224 | Owner left the crowning title **"The Hand of Elbereth"** in `src/pray.c` and `src/insight.c`. That string is not a mistake to fix. | those files |
+| ID-224 | Lawful anointing title is **"The Servant of the Lord"** in `src/pray.c` and `src/insight.c`. | those files |
 | ID-225 | First-kill livelog text and a comment `RighteousHack - get rid of murderous messages` | `src/mon.c` |
 
 ## 12. Elbereth replaced by PSALM 91
@@ -522,8 +522,8 @@ through ID-190, ID-200 through ID-211, ID-220 through ID-225, ID-230
 through ID-235, ID-240, ID-241, ID-243 through ID-247, ID-260 through
 ID-266, ID-270 through ID-277, ID-281.
 
-ID-224 shipped as "The Hand of Elbereth". The 2026-11-01 cleanup
-changes the lawful event to an anointing: "The Hand of the Lord".
+ID-224 originally kept the Elbereth crowning title. The 2026-11-01
+cleanup changes the lawful event to an anointing: "The Servant of the Lord".
 
 ### Ported
 
@@ -675,8 +675,8 @@ the #overview name, achievements, and the code that looks the
 branch up by name.
 
 Anointing replaces crowning for the lawful hero. The deity says
-"I anoint thee...  The Hand of the Lord!" (two spaces after the
-ellipsis, as in the old line). Enlightenment says "the Hand of
+"I anoint thee...  The Servant of the Lord!" (two spaces after the
+ellipsis, as in the old line). Enlightenment says "the Servant of
 the Lord". The livelog says the hero was anointed. The old
 Excalibur and prophetic-book gifts are not given. PLACEHOLDER:
 the anointing gift itself is not designed yet. Resistances, a
@@ -717,7 +717,7 @@ player's own deity names as opposing each other.
 | ID-212 | Handkerchief of the Apostle Paul is the Healer quest artifact in `src/role.c`, and `include/artilist.h` still gates it to `PM_KNIGHT`. |
 | ID-213 | Champion's quest artifact is still the Orb of Fate. |
 | ID-223 | `desecrate_altar` is gone. `src/dig.c` and `src/music.c` print `placeholder for desecrate_altar`. |
-| ID-224 | Resolved: anointing says "the Hand of the Lord". The gift is a placeholder. |
+| ID-224 | Resolved: anointing says "the Servant of the Lord". The gift is a placeholder. |
 | (new) | Resolved: the owner named the 5.0 stasis rod "stillness" (`WAN_STILLNESS`, "rod of stillness", Psalm 46:10). |
 | ID-084 | Healer's oil rows are tagged `POTION_CLASS` even though the objects are `ANOINTING_CLASS`. Creation uses `trotyp`, so the game start still works. |
 | ID-017 | Only human is playable. `src/u_init.c` still has tables for the removed roles. |
