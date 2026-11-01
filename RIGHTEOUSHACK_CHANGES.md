@@ -817,10 +817,16 @@ Farlook and look-here call a tile "the letter P" (or whichever
 letter it is). They are not engravings. The hint is an engraving
 in the southwest corner of the safe row, so it shows the engraving
 symbol: "Upon this rock I will build my church. Walk upon the rock
-in the tongue of the Greeks." A wrong letter, including a decoy or
-a diagonal step, becomes lava under you and deals 20 damage. If
-that would kill, you are left at 1 hit point. A wrong step at 1 hit
-point kills you. The path is stored on each letter, so a later
+in the tongue of the Greeks." A false letter, such as a decoy,
+becomes ordinary lava under you and deals 20 damage. Fire
+resistance does not reduce that 20. You stay on the square.
+The lava does not sink you or kill you by itself, and the next
+move can step off. Death happens only when the 20 takes you to
+0 hit points or below, and the reason is "a false step." A
+letter of the true path, P through A in order, is never turned
+to lava. Stepping on one out of order, or diagonally, does not
+count and does not hurt, so the path can still be finished.
+The path is stored on each letter, so a later
 layout does not need a coordinate table. The first letter has to
 be stepped on straight north from the safe row. There is one door
 onto the letter floor, directly north of the A. The other two

@@ -6806,6 +6806,9 @@ lava_effects(void)
         debugpline0("Skipping recursive lava_effects().");
         return FALSE;
     }
+    /* False PETRA letter: the burn already happened. Do not sink. */
+    if (petra_lava_safe_here())
+        return FALSE;
     feel_newsym(u.ux, u.uy); /* in case Blind, map the lava here */
     burn_away_slime();
     if (likes_lava(gy.youmonst.data))
@@ -6995,6 +6998,8 @@ sink_into_lava(void)
 {
     static const char sink_deeper[] = "You sink deeper into the lava.";
 
+    if (petra_lava_safe_here())
+        return;
     if (!u.utrap || u.utraptype != TT_LAVA) {
         ; /* do nothing; this usually won't happen but could after
            * polymorphing from a flier into a ceiling hider and then hiding;

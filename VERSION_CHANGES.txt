@@ -11,6 +11,11 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-01
+A false letter at Mines' End becomes lava and burns for 20
+hit points. You stay on it and can step off. A true-path
+letter is never turned to lava.
+
+2026-11-01
 A gift of 1000 shekels or more, within the ten that give
 experience, has Isaiah quote Luke 6:38 from the King James
 Bible. The verse is two messages, split at the sentence.

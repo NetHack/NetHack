@@ -1237,6 +1237,7 @@ extern void set_uinwater(int);
 extern boolean pooleffects(boolean);
 extern void spoteffects(boolean);
 extern char petra_map_letter(coordxy, coordxy);
+extern boolean petra_lava_safe_here(void);
 extern char *in_rooms(coordxy, coordxy, int);
 extern boolean in_town(coordxy, coordxy);
 extern void check_special_room(boolean);

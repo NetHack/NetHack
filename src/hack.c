@@ -3356,6 +3356,11 @@ pooleffects(
         /* drown(),lava_effects() return true if hero changes
            location while surviving the problem */
         if (is_lava(u.ux, u.uy)) {
+            /* A false PETRA letter just became lava. The 20 damage
+               already landed. Do not sink or burn the hero to death
+               for standing on that one square. */
+            if (petra_lava_safe_here())
+                return FALSE;
             if (lava_effects())
                 return TRUE;
         } else if ((!Wwalking || is_waterwall(u.ux,u.uy))
@@ -3399,29 +3404,43 @@ petra_map_letter(coordxy x, coordxy y)
     return ch;
 }
 
+/* The hero is standing on lava that used to be a false letter.
+   Normal lava entry, sinking, and instadeath are skipped until
+   he leaves this square. Not saved: leaving the game while still
+   on that square forgets the exemption. */
+static boolean petra_lava_grace = FALSE;
+static coordxy petra_lava_x, petra_lava_y;
+
+boolean
+petra_lava_safe_here(void)
+{
+    if (!petra_lava_grace)
+        return FALSE;
+    if (u.ux == petra_lava_x && u.uy == petra_lava_y && is_lava(u.ux, u.uy))
+        return TRUE;
+    petra_lava_grace = FALSE;
+    return FALSE;
+}
+
 static void
 petra_fail(coordxy x, coordxy y)
 {
-    int hp = Upolyd ? u.mh : u.uhp;
-
     del_engr_at(x, y);
     levl[x][y].typ = LAVAPOOL;
     newsym(x, y);
+    petra_lava_grace = TRUE;
+    petra_lava_x = x;
+    petra_lava_y = y;
     pline("The letter gives way and the floor becomes lava!");
-    if (hp <= 1) {
-        losehp(hp > 0 ? hp : 1, "a false step", KILLED_BY);
-        return;
-    }
-    if (hp <= 20) {
-        if (Upolyd)
-            u.mh = 1;
-        else
-            u.uhp = 1;
-        disp.botl = TRUE;
-        You("are barely standing.");
-        return;
-    }
+    /* Flat 20. Fire resistance does not reduce it. Death only
+       when this takes hit points to 0 or below. */
     losehp(20, "a false step", KILLED_BY);
+}
+
+static boolean
+petra_path_letter(int step)
+{
+    return step >= 1 && step <= 5;
 }
 
 static void
@@ -3434,36 +3453,29 @@ petra_check(void)
     /* Standing still, or a repeated effect on the same square, is not a step. */
     if (u.ux0 == u.ux && u.uy0 == u.uy)
         return;
-    if (IS_LAVA(levl[u.ux][u.uy].typ))
-        return;
 
     step = petra_step_at(u.ux, u.uy);
     dx = u.ux - u.ux0;
     dy = u.uy - u.uy0;
     /* Already crossed. Walking back is safe, even on a diagonal. */
-    if (step >= 1 && step <= (int) u.uevent.petra_step)
+    if (petra_path_letter(step) && step <= (int) u.uevent.petra_step)
         return;
-    /* A diagonal step onto a letter is never a step on the path. */
-    if (dx && dy) {
-        petra_fail(u.ux, u.uy);
-        return;
-    }
-    if (step != (int) u.uevent.petra_step + 1) {
-        petra_fail(u.ux, u.uy);
-        return;
-    }
-    if (step == 1) {
-        /* First letter: step straight north off the safe row. */
-        if (u.ux0 == u.ux && u.uy0 == u.uy + 1)
-            u.uevent.petra_step = 1;
-        else
-            petra_fail(u.ux, u.uy);
+    /* A letter of the true path is never destroyed. Stepping on it
+       out of order, or diagonally, does not count and does not hurt.
+       The path can still be walked in order. */
+    if (petra_path_letter(step)) {
+        if (!dx || !dy) {
+            if (step == (int) u.uevent.petra_step + 1 && step == 1
+                && u.ux0 == u.ux && u.uy0 == u.uy + 1)
+                u.uevent.petra_step = 1;
+            else if (step == (int) u.uevent.petra_step + 1
+                     && petra_step_at(u.ux0, u.uy0) == step - 1
+                     && abs(dx) + abs(dy) == 1)
+                u.uevent.petra_step = (unsigned) step;
+        }
         return;
     }
-    if (petra_step_at(u.ux0, u.uy0) == step - 1 && abs(dx) + abs(dy) == 1)
-        u.uevent.petra_step = (unsigned) step;
-    else
-        petra_fail(u.ux, u.uy);
+    petra_fail(u.ux, u.uy);
 }
 
 void
