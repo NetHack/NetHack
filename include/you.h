@@ -97,7 +97,7 @@ enum achivements {
     ACH_TOWN = 16, /* reached Capernaum */
     ACH_SHOP = 17, /* entered a shop */
     ACH_TMPL = 18, /* entered a temple */
-    ACH_ORCL = 19, /* consulted the Prophet */
+    ACH_ORCL = 19, /* received a word from the Lord */
     ACH_NOVL = 20, /* read at least one passage from a Discworld novel */
     ACH_SOKO = 21, /* entered Sokoban */
     ACH_BGRM = 22, /* entered Bigroom (not guaranteed to be in every dgn) */

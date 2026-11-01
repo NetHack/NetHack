@@ -3864,7 +3864,7 @@
          Temple       -  Entered a temple.
          Mines        -  Entered the Salt Mines of Galilee.
          Town         -  Entered Capernaum.
-         Prophet      -  Consulted Isaiah, prophet of the Lord.
+         Prophet      -  Received a word from the Lord.
          Novel        -  Read a passage from a Discworld Novel.
          Sokoban      -  Entered Sokoban.
          Big Room     -  Entered the Big Room.

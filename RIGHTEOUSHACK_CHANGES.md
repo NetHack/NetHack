@@ -710,6 +710,19 @@ debug mode say prophet mode. `OPTIONS=playmode:prophet` selects it.
 `playmode:debug` still selects it. The Wizard of Yendor and the
 Wizard role are unchanged. The sysconf list is still named WIZARDS.
 
+### A word from the Lord (2026-11-01)
+
+#chat with Isaiah asks, price in parentheses:
+"Wilt thou settle for a minor word from the Lord?" (50 shekels) [ynq] (q)
+Answering no, when you have more than that, asks:
+"Then dost thou desire a major word from the Lord?" (550 shekels) [yn] (n)
+The major price is 500 plus 50 for each experience level. If he
+is angry: "Isaiah, prophet of the Lord is in no mood to give a
+word from the Lord." The first of either is the achievement and
+the livelog line "received a word from the Lord." Conduct says
+"You have received a word from the Lord." The xlogfile key
+stays consulted_the_prophet.
+
 ### Shekels (2026-11-01)
 
 Prices, shop speech, the inventory gold line, death and score
@@ -721,9 +734,9 @@ game does not say zorkmid.
 ### Prophet, Capernaum, and PETRA (2026-11-01)
 
 The Oracle is Isaiah, prophet of the Lord. That is his monster
-name, and the consultation windows name him that way. Paying for a
-minor consultation hears one of the placeholder proverbs. Paying
-the full price for a major consultation hears "The treasure you
+name, and the text windows name him that way. Paying for a
+minor word from the Lord hears one of the placeholder proverbs. Paying
+the full price for a major word from the Lord hears "The treasure you
 seek has always been yours." A short payment hears "That is not
 enough." That short line is a stand-in; Jon did not write one.
 The overview feature line is exactly "Prophet of the Lord."

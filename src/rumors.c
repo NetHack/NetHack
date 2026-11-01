@@ -730,17 +730,17 @@ doconsult(struct monst *oracl)
     umoney = money_cnt(gi.invent);
 
     if (!oracl) {
-        There("is no one here to consult.");
+        There("is no one here to give a word from the Lord.");
         return ECMD_OK;
     } else if (!oracl->mpeaceful) {
-        pline("%s is in no mood for consultations.", Monnam(oracl));
+        pline("%s is in no mood to give a word from the Lord.", Monnam(oracl));
         return ECMD_OK;
     } else if (!umoney) {
         You("have no gold.");
         return ECMD_OK;
     }
 
-    Sprintf(qbuf, "\"Wilt thou settle for a minor consultation?\" (%d %s)",
+    Sprintf(qbuf, "\"Wilt thou settle for a minor word from the Lord?\" (%d %s)",
             minor_cost, currency((long) minor_cost));
     switch (ynq(qbuf)) {
     default:
@@ -757,7 +757,7 @@ doconsult(struct monst *oracl)
         if (umoney <= (long) minor_cost /* don't even ask */
             || (svo.oracle_cnt == 1 || go.oracle_flg < 0))
             return ECMD_OK;
-        Sprintf(qbuf, "\"Then dost thou desire a major one?\" (%d %s)",
+        Sprintf(qbuf, "\"Then dost thou desire a major word from the Lord?\" (%d %s)",
                 major_cost, currency((long) major_cost));
         if (y_n(qbuf) != 'y')
             return ECMD_OK;
