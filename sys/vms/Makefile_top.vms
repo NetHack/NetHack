@@ -1,5 +1,5 @@
 #      NetHack Top-level Makefile.
-# NetHack 3.7  Makefile.vms    $NHDT-Date: 1642630921 2022/01/19 22:22:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.72 $
+# NetHack 5.0  Makefile.vms    $NHDT-Date: 1642630921 2022/01/19 22:22:01 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.72 $
 # Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
 
@@ -21,7 +21,7 @@ NHSROOT=[]
 # MAKE = make
 
 
-# NetHack 3.7 Makefile.vms $NHDT-Date: 1654287121 2022/06/03 20:12:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.145 $
+# NetHack 5.0 Makefile.vms $NHDT-Date: 1654287121 2022/06/03 20:12:01 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.145 $
 # Copyright (c) 2023 by Michael Allison
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -54,9 +54,9 @@ WINSHIM=[.win.shim]
 WINCHAIN=[.win.chain]
 
 # Lua macros
-LUAVER=546
-LUADOTVER=5.4.6
-LUAUNDERVER=5_4_6
+LUAVER=548
+LUADOTVER=5.4.8
+LUAUNDERVER=5_4_8
 LUAINC=[.lib.lua.lua$(LUAVER).src]
 LUALIB=[.lib.lua]lua$(LUAVER).olb
 LUASRCDIR =[.lib.lua.lua$(LUAVER).src]

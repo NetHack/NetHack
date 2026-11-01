@@ -1,4 +1,4 @@
-/* NetHack 3.7	xwindowp.h	$NHDT-Date: 1596498575 2020/08/03 23:49:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.9 $ */
+/* NetHack 5.0	xwindowp.h	$NHDT-Date: 1596498575 2020/08/03 23:49:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.9 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 

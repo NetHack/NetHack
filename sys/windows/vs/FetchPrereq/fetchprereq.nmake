@@ -1,15 +1,15 @@
-# NetHack 3.7 fetchprereq.nmake
+# NetHack 5.0 fetchprereq.nmake
 #==============================================================================
 #
 #  The version of the game this Makefile was designed for
-NETHACK_VERSION="3.7.0"
+NETHACK_VERSION="5.0.0"
 
 # A brief version for use in macros
 NHV=$(NETHACK_VERSION:.=)
 NHV=$(NHV:"=)
 
 #  The version of Lua we want
-LUA_VERSION=5.4.6
+LUA_VERSION=5.4.8
 CURLLUASRC=https://www.lua.org/ftp/lua-$(LUA_VERSION).tar.gz
 CURLLUADST=lua-$(LUA_VERSION).tar.gz
 

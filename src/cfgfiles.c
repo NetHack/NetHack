@@ -1,4 +1,4 @@
-/* NetHack 3.7	cfgfiles.c	$NHDT-Date: 1740532826 2025/02/25 17:20:26 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.417 $ */
+/* NetHack 5.0	cfgfiles.c	$NHDT-Date: 1740532826 2025/02/25 17:20:26 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.417 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -9,7 +9,7 @@
 #include "dlb.h"
 #include <errno.h>
 
-#if (!defined(MAC) && !defined(O_WRONLY) && !defined(AZTEC_C)) \
+#if (!defined(MACOS9) && !defined(O_WRONLY) && !defined(AZTEC_C)) \
     || defined(USE_FCNTL)
 #include <fcntl.h>
 #endif
@@ -34,7 +34,7 @@ staticfn void free_config_sections(void);
 staticfn char *is_config_section(char *);
 staticfn boolean handle_config_section(char *);
 boolean parse_config_line(char *);
-staticfn char *find_optparam(const char *);
+staticfn char *find_optparam(char *);
 #ifndef SFCTOOL
 staticfn boolean cnf_line_OPTIONS(char *);
 staticfn boolean cnf_line_AUTOPICKUP_EXCEPTION(char *);
@@ -110,6 +110,8 @@ staticfn void parse_conf_buf(struct _cnf_parser_state *parser,
                            boolean (*proc)(char *arg));
 /* next one is in extern.h; why here too? */
 boolean parse_conf_str(const char *str, boolean (*proc)(char *arg));
+static boolean ignore_errors_on_unmatched = FALSE,
+               ignore_statement_errors = FALSE;
 
 #ifdef SFCTOOL
 #ifdef wait_synch
@@ -125,7 +127,7 @@ static const char *default_configfile =
 #ifdef UNIX
     ".nethackrc";
 #else
-#if defined(MAC) || defined(__BEOS__)
+#if defined(MACOS9) || defined(__BEOS__)
     "NetHack Defaults";
 #else
 #if defined(MSDOS) || defined(WIN32)
@@ -274,7 +276,7 @@ fopen_config_file(const char *filename, int src)
     }
     /* fall through to standard names */
 
-#if defined(MICRO) || defined(MAC) || defined(__BEOS__) || defined(WIN32)
+#if defined(MICRO) || defined(MACOS9) || defined(__BEOS__) || defined(WIN32)
     set_configfile_name(fqname(default_configfile, CONFIGPREFIX, 0));
     if ((fp = fopen(configfile, "r")) != (FILE *) 0) {
         return fp;
@@ -365,7 +367,7 @@ fopen_config_file(const char *filename, int src)
         wait_synch();
     }
 #endif /* !VMS => Unix */
-#endif /* !(MICRO || MAC || __BEOS__ || WIN32) */
+#endif /* !(MICRO || MACOS9 || __BEOS__ || WIN32) */
     return (FILE *) 0;
 }
 
@@ -583,7 +585,7 @@ handle_config_section(char *buf)
 
 /* find the '=' or ':' */
 staticfn char *
-find_optparam(const char *buf)
+find_optparam(char *buf)
 {
     char *bufp, *altp;
 
@@ -1203,7 +1205,8 @@ cnf_line_SYMBOLS(char *bufp)
         switch_symbols(TRUE);
         return TRUE;
     }
-    config_error_add("Error in SYMBOLS definition '%s'", bufp);
+    if (!config_unmatched_ignored())
+        config_error_add("Error in SYMBOLS definition '%s'", bufp);
     return FALSE;
 }
 
@@ -1295,7 +1298,7 @@ typedef boolean (*config_line_stmt_func)(char *);
 /* normal, alias */
 #define CNFL_NA(n, l, f) { #n, l, FALSE, FALSE, cnf_line_##f }
 /* sysconf only */
-#define CNFL_S(n, l) { #n, l, TRUE, FALSE,  cnf_line_##n }
+#define CNFL_S(n, l) { #n, l, TRUE, FALSE, cnf_line_##n }
 
 static const struct match_config_line_stmt {
     const char *name;
@@ -1380,6 +1383,8 @@ static const struct match_config_line_stmt {
 #undef CNFL_NA
 #undef CNFL_S
 
+static boolean disregarded_config_lines[SIZE(config_line_stmt)];
+
 boolean
 parse_config_line(char *origbuf)
 {
@@ -1405,7 +1410,8 @@ parse_config_line(char *origbuf)
     /* find the '=' or ':' */
     bufp = find_optparam(buf);
     if (!bufp) {
-        config_error_add("Not a config statement, missing '='");
+        if (!ignore_statement_errors)
+            config_error_add("Not a config statement, missing '='");
         return FALSE;
     }
     /* skip past '=', then space between it and value, if any */
@@ -1422,11 +1428,13 @@ parse_config_line(char *origbuf)
                           config_line_stmt[i].len)) {
             char *parm = config_line_stmt[i].origbuf ? origbuf : bufp;
 
-            return config_line_stmt[i].fn(parm);
+            if (!disregarded_config_lines[i])
+                return config_line_stmt[i].fn(parm);
         }
     }
 
-    config_error_add("Unknown config statement");
+    if (!ignore_errors_on_unmatched)
+        config_error_add("Unknown config statement");
     return FALSE;
 }
 
@@ -1881,6 +1889,142 @@ vconfig_error_add(const char *str, va_list the_args)
     config_erradd(buf);
 }
 
+#ifndef SFCTOOL
+void
+rcfile(void)
+{
+    char *opts = 0, *xtraopts = 0;
+    const char *envname, *namesrc, *nameval;
+
+    go.opt_phase = environ_opt;
+    /* getenv() instead of nhgetenv(): let total length of options be long;
+       parseoptions() will check each individually */
+    envname = "NETHACKOPTIONS";
+    opts = getenv(envname);
+    if (!opts) {
+        /* fall back to original name; discouraged */
+        envname = "HACKOPTIONS";
+        opts = getenv(envname);
+    }
+
+    if (gc.cmdline_rcfile) {
+        namesrc = "command line";
+        nameval = gc.cmdline_rcfile;
+        xtraopts = opts;
+        if (opts && (*opts == '/' || *opts == '\\' || *opts == '@'))
+            xtraopts = 0; /* NETHACKOPTIONS is a file name; ignore it */
+    } else if (opts && (*opts == '/' || *opts == '\\' || *opts == '@')) {
+        /* NETHACKOPTIONS is a file name; use that instead of the default */
+        if (*opts == '@')
+            ++opts; /* @filename */
+        namesrc = envname;
+        nameval = opts;
+        xtraopts = 0;
+    } else {
+        /* either no NETHACKOPTIONS or it wasn't a file name;
+           read the default configuration file */
+        nameval = namesrc = 0;
+        xtraopts = opts;
+    }
+
+    go.opt_phase = rc_file_opt;
+    /* seemingly arbitrary name length restriction is to prevent error
+       messages, if any were to be delivered while accessing the file,
+       from potentially overflowing buffers */
+    if (nameval && (int) strlen(nameval) >= BUFSZ / 2) {
+        config_error_init(TRUE, namesrc, FALSE);
+        config_error_add(
+            "nethackrc file name \"%.40s\"... too long; using default",
+            nameval);
+        config_error_done();
+        nameval = namesrc = 0; /* revert to default nethackrc */
+    }
+
+    config_error_init(TRUE, nameval, nameval ? CONFIG_ERROR_SECURE : FALSE);
+    (void) read_config_file(nameval, set_in_config);
+    config_error_done();
+    if (xtraopts) {
+        /* NETHACKOPTIONS is present and not a file name */
+        go.opt_phase = environ_opt;
+        config_error_init(FALSE, envname, FALSE);
+        (void) parseoptions(xtraopts, TRUE, FALSE);
+        config_error_done();
+    }
+
+    if (gc.cmdline_rcfile)
+        free((genericptr_t) gc.cmdline_rcfile), gc.cmdline_rcfile = 0;
+    /*[end of nethackrc handling]*/
+}
+
+void
+rcfile_interface_options(void)
+{
+    allopt_array_init();
+    disregard_all_options();
+    disregard_all_config_statements();
+    heed_this_option(opt_windowtype);
+    heed_this_option(opt_soundlib);
+    set_ignore_errors_on_unmatched();
+    ignore_statement_errors = TRUE;
+    rcfile();
+    heed_all_config_statements();
+    heed_all_options();
+    disregard_this_option(opt_windowtype);
+    disregard_this_option(opt_soundlib);
+    clear_ignore_errors_on_unmatched();
+    ignore_statement_errors = FALSE;
+}
+
+void
+heed_all_config_statements(void)
+{
+    int i;
+
+    for (i = 0; i < SIZE(disregarded_config_lines); i++) {
+        disregarded_config_lines[i] = FALSE;
+    }
+}
+void
+disregard_all_config_statements(void)
+{
+    int i;
+
+    for (i = 0; i < SIZE(disregarded_config_lines); i++) {
+        disregarded_config_lines[i] = TRUE;
+    }
+}
+void
+heed_this_config_statement(int statement_idx)
+{
+    if (statement_idx >= 0 && statement_idx < SIZE(disregarded_config_lines))
+        disregarded_config_lines[statement_idx] = FALSE;
+}
+void
+disregard_this_config_statement(int statement_idx)
+{
+    if (statement_idx >= 0 && statement_idx < SIZE(disregarded_config_lines))
+        disregarded_config_lines[statement_idx] = TRUE;
+}
+
+void
+clear_ignore_errors_on_unmatched(void)
+{
+    ignore_errors_on_unmatched = FALSE;
+}
+void
+set_ignore_errors_on_unmatched(void)
+{
+    ignore_errors_on_unmatched = TRUE;
+}
+boolean
+config_unmatched_ignored(void)
+{
+    if (ignore_errors_on_unmatched)
+        return TRUE;
+    return FALSE;
+}
+#endif /* SFCTOOL */
+
 #ifdef SYSCF
 #ifdef SYSCF_FILE
 void
@@ -1907,9 +2051,9 @@ assure_syscf_file(void)
 #else
     fd = open(SYSCF_FILE, O_RDONLY);
 #endif
-#else
+#else   /* VMS */
     fd = open(SYSCF_FILE, O_RDONLY, 0);
-#endif
+#endif  /* VMS */
     if (fd >= 0) {
         /* readable */
         close(fd);

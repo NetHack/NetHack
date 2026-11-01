@@ -1,4 +1,4 @@
-/* NetHack 3.7	mhmsgwnd.h	$NHDT-Date: 1596498358 2020/08/03 23:45:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.10 $ */
+/* NetHack 5.0	mhmsgwnd.h	$NHDT-Date: 1596498358 2020/08/03 23:45:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.10 $ */
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 

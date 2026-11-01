@@ -1,4 +1,4 @@
-/* NetHack 3.7	getpos.c	$NHDT-Date: 1763708572 2025/11/20 23:02:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.6 $ */
+/* NetHack 5.0	getpos.c	$NHDT-Date: 1763708572 2025/11/20 23:02:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.6 $ */
 /*-Copyright (c) Pasi Kallinen, 2023. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -561,7 +561,7 @@ dxdy_to_dist_descr(coordxy dx, coordxy dy, boolean fulldir)
 
     if (!dx && !dy) {
         Sprintf(buf, "here");
-    } else if ((dst = xytod(dx, dy)) != -1) {
+    } else if ((dst = xytodir(dx, dy)) != -1) {
         /* explicit direction; 'one step' is implicit */
         Sprintf(buf, "%s", directionname(dst));
     } else {
@@ -852,7 +852,7 @@ getpos(coord *ccp, boolean force, const char *goal)
 #endif
     curs(WIN_MAP, cx, cy);
     flush_screen(0);
-#ifdef MAC
+#ifdef MACOS9
     lock_mouse_cursor(TRUE);
 #endif
     lock_mouse_buttons(TRUE);
@@ -1149,7 +1149,7 @@ getpos(coord *ccp, boolean force, const char *goal)
         flush_screen(0);
     }
  exitgetpos:
-#ifdef MAC
+#ifdef MACOS9
     lock_mouse_cursor(FALSE);
 #endif
     lock_mouse_buttons(FALSE);

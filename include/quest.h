@@ -1,4 +1,4 @@
-/* NetHack 3.7	quest.h	$NHDT-Date: 1596498556 2020/08/03 23:49:16 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.11 $ */
+/* NetHack 5.0	quest.h	$NHDT-Date: 1596498556 2020/08/03 23:49:16 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.11 $ */
 /* Copyright (c) Mike Stephenson 1991.                            */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -14,7 +14,7 @@ struct q_score {              /* Quest "scorecard" */
     Bitfield(killed_leader, 1); /* killed the quest leader */
 
     Bitfield(first_locate, 1); /* only set the first time */
-    Bitfield(met_intermed, 1); /* used if the locate is a person. */
+    Bitfield(met_intermed, 1); /* used if the locate is a person */
     Bitfield(got_final, 1);    /* got the final quest assignment */
 
     Bitfield(made_goal, 3);      /* # of times on goal level */

@@ -1,4 +1,4 @@
-/* NetHack 3.7	vidvga.c	$NHDT-Date: 1606765216 2020/11/30 19:40:16 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.26 $ */
+/* NetHack 5.0	vidvga.c	$NHDT-Date: 1606765216 2020/11/30 19:40:16 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.26 $ */
 /*   Copyright (c) NetHack PC Development Team 1995                 */
 /*   NetHack may be freely redistributed.  See license for details. */
 /*

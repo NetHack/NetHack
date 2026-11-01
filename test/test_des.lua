@@ -88,6 +88,8 @@ function test_monster()
    des.monster();
    des.monster("gnome")
    des.monster("S")
+   des.monster(":", {12,07});
+   des.monster("K", 13,07);
    des.monster("giant eel",11,06);
    des.monster("hill giant", {08,06});
    des.monster({ id = "ogre" })
@@ -100,10 +102,13 @@ function test_monster()
    des.monster({ class = "H", peaceful = 0 })
    des.monster({ id = "giant mimic", appear_as = "obj:boulder" });
    des.monster({ id = "giant mimic", appear_as = "ter:altar" });
+   des.monster({ id = "giant mimic", appear_as = "mon:giant mimic" });
    des.monster({ id = "chameleon", appear_as = "mon:bat" });
+   des.monster({ id = "chameleon", appear_as = "mon:yellow light" });
+   des.monster({ id = "chameleon", appear_as = "mon:random" });
    des.monster({ class = "H", asleep = 1, female = 1, invisible = 1, cancelled = 1, revived = 1, avenge = 1, stunned = 1, confused = 1, fleeing = 20, blinded = 20, paralyzed = 20 })
    des.monster({ class = "H", asleep = true, female = true, invisible = true, cancelled = true, revived = true, avenge = true, stunned = true, confused = true });
-   des.monster({ id = "ogre", x = 10, y = 15, name = "Fred",
+   des.monster({ id = "ogre", x = 10, y = 15, name = "Fred", keep_default_invent = true,
                  inventory = function()
                    des.object();
                    des.object("[");
@@ -116,6 +121,14 @@ function test_monster()
    des.monster({ id = "lurker above", adjacentok = true });
    des.monster({ id = "gnome", ignorewater = true });
    des.monster({ id = "xan", countbirth = false });
+   des.monster({ id = "Angel", align = "law" });
+   des.monster({ id = "archeologist" });
+   des.monster({ id = "wizard", name = "Rincewind", peaceful = true });
+
+   for i = nhc.LOW_PM, nhc.HIGH_PM do
+      des.monster({ id = nh.int_to_pmname(i) });
+   end
+
    des.reset_level();
    des.level_init();
 end
@@ -125,7 +138,10 @@ function test_object()
    des.level_init();
    des.object()
    des.object("*")
+   des.object("*", 55, 12);
+   des.object("*", {55, 12});
    des.object({ class = "%" });
+   des.object({ class = "$" });
    des.object({ id = "statue", contents=0 })
    des.object("sack")
    des.object({ x = 41, y = 03 })
@@ -135,6 +151,9 @@ function test_object()
    des.object("diamond", {68, 04})
    des.object({ id = "egg", x = 05, y = 04, montype = "yellow dragon" });
    des.object({ id = "egg", x = 06, y = 04, montype = "yellow dragon", laid_by_you = true });
+   des.object({ id = "tin", montype = "empty" });
+   des.object({ id = "tin", montype = "spinach" });
+   des.object({ id = "tin", montype = "floating eye" });
    des.object({ id = "corpse", montype = "valkyrie" })
    des.object({ id = "statue", montype = "C", historic = true, male = true });
    des.object({ id = "statue", montype = "C", historic = true, female = true });
@@ -151,12 +170,37 @@ function test_object()
    des.object({ id = "oil lamp", lit = 1 });
    des.object({ id = "silver dagger", spe = 127, buc = "cursed" });
    des.object({ id = "silver dagger", spe = -127, buc = "blessed" });
+   des.object({ class = "/", buc = "uncursed" });
+   des.object({ class = "(", buc = "not-cursed" });
+   des.object({ class = ")", buc = "not-uncursed" });
+   des.object({ class = "=", buc = "not-blessed" });
    des.object({ id = "bamboo arrow", quantity = 100 });
    des.object({ id = "leather armor", eroded = 1 });
    des.object({ id = "probing", recharged = 2, spe = 3 });
    des.object({ name = "Random object" });
    des.object({ class = "*", name = "Random stone" });
    des.object({ id ="broadsword", name = "Dragonbane" })
+
+   for i = nhc.FIRST_OBJECT, nhc.LAST_OBJECT do
+      local oid, oclass = nh.int_to_objname(i);
+      if (oid ~= "") then
+         local o = des.object({ id = oid, class = oclass });
+         local o_t = o:totable();
+
+         -- crysknife reverts to worm tooth on the floor
+         if not(oid == "crysknife" and o_t.otyp_name == "worm tooth") then
+            if (o_t.otyp_name ~= oid) then
+               error("object name \"" .. o_t.otyp_name .. "\" created, wanted \"" .. oid .. "\"");
+            end
+            if (o_t.oclass ~= oclass) then
+               local str = string.format("object class \"%s\" created, wanted \"%s\" (%s)", o_t.oclass, oclass, oid);
+               error(str);
+            end
+         end
+
+      end
+   end
+
    des.reset_level();
    des.level_init();
 end
@@ -200,6 +244,7 @@ function test_altar()
    des.altar({ coord = {48, 20 }, type = "altar", align = "law" });
    des.altar({ coord = {50, 20 }, type = "shrine", align = "noalign" });
    des.altar({ coord = {52, 20 }, type = "sanctum", align = "coaligned" });
+   des.altar({ type = "altar", align = "noncoaligned" });
 end
 
 function test_map()
@@ -305,14 +350,17 @@ function test_trap()
    des.trap("level teleport", {42, 06});
    check_trap_at(42, 06, "level teleport");
 
-   des.trap({ type = "falling rock", x = 43, y = 06 });
+   des.trap({ type = "falling rock", x = 43, y = 06, victim = false });
    check_trap_at(43, 06, "falling rock");
 
-   des.trap({ type = "dart", coord = {44, 06} });
+   des.trap({ type = "dart", coord = {44, 06}, seen = true });
    check_trap_at(44, 06, "dart");
 
    des.trap();
    des.trap("rust");
+   des.trap({ type = "web", spider_on_web = false });
+   des.trap({ type = "rolling boulder", coord = {40,10}, launchfrom = {39,11} });
+   des.trap({ type = "teleport", teledest = {5,5} });
 end
 
 function test_wall_prop()
@@ -384,15 +432,24 @@ function test_room()
                  des.room({ x=4, y=3, w=3,h=3 });
               end
    });
-   des.room({ type="ordinary", coord={3, 3}, w=3, h=3 });
-   des.room();
+   des.room({ xalign="right", yalign="bottom",
+              contents = function(rm)
+                 des.room({ contents = function(rm)
+                               des.door({ state= "random", wall = "random" });
+                 end });
+              end
+   });
    des.room({ contents = function(rm)
                  des.object();
                  des.monster();
+                 des.trap();
                  des.terrain(0,0, "L");
+                 des.altar({ coord = {0,0} });
                  des.terrain(rm.width, rm.height, "T");
                          end
    });
+   des.room({ type="ordinary", coord={3, 3}, w=3, h=3 });
+   des.room();
    des.random_corridors();
 end
 
@@ -494,6 +551,36 @@ function test_corridor()
    des.corridor({ srcroom=0, srcwall="south", srcdoor=0, destroom=1, destwall="north", destdoor=0 });
 end
 
+function test_gas_cloud()
+   des.gas_cloud({ x = 5, y = 5 });
+   des.gas_cloud({ coord = {10,10} });
+   des.gas_cloud({ selection=selection.area(15,5, 17,7), damage = 5 });
+   des.gas_cloud({ selection=selection.area(20,5, 22,7), damage = 5, ttl = 10 });
+end
+
+function test_exclusion()
+   des.exclusion({ type = "teleport", region = { 0,0, 10,5 } });
+   des.exclusion({ type = "teleport-up", region = { 0,0, 10,5 } });
+   des.exclusion({ type = "teleport-down", region = { 0,0, 10,5 } });
+   des.exclusion({ type = "monster-generation", region = { 0,0, 10,5 } });
+end
+
+function test_levregion()
+   des.levregion({ type="stair-up", region={01,00,79,20}, region_islev=1, exclude={0,0,28,12} })
+   des.levregion({ type="stair-down", region={01,00,79,20}, region_islev=1, exclude={0,0,28,12} })
+   des.levregion({ type="branch", region={01,00,79,20}, region_islev=1, exclude={0,0,28,12} })
+   des.levregion({ region={25,11,25,11}, type="portal", name="fakewiz1" });
+end
+
+function test_drawbridge()
+   des.terrain(05,08, "L");
+   des.terrain(06,08, "|");
+   des.drawbridge({ dir="east", state="closed", x=05,y=08 });
+   des.terrain(10,08, "L");
+   des.terrain(10,09, "-");
+   des.drawbridge({ dir="south", state="random", coord={10,08} })
+end
+
 function run_tests()
    test_level_init();
    test_message();
@@ -520,10 +607,14 @@ function run_tests()
    test_terrain();
    test_replace_terrain();
    test_corridor();
+   test_gas_cloud();
+   test_exclusion();
+   test_levregion();
+   test_drawbridge();
 
    des.reset_level();
    des.level_init();
 end
 
-nh.debug_flags({mongen = false, hunger = false, overwrite_stairs = true });
+nh.debug_flags({ hunger = false, overwrite_stairs = true });
 run_tests();

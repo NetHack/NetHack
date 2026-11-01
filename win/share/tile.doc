@@ -1,4 +1,4 @@
-NetHack 3.7  tile.doc	$NHDT-Date: 1596498338 2020/08/03 23:45:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.8 $
+NetHack 5.0  tile.doc	$NHDT-Date: 1596498338 2020/08/03 23:45:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.8 $
 
 Window ports can optionally make use of the tiles (pictures for NetHack
 symbols) found in this directory.  They are distributed in a text format

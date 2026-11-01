@@ -1,4 +1,4 @@
-/* NetHack 3.7	engrave.h	$NHDT-Date: 1596498535 2020/08/03 23:48:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.10 $ */
+/* NetHack 5.0	engrave.h	$NHDT-Date: 1596498535 2020/08/03 23:48:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.10 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -12,6 +12,8 @@ enum engraving_texts {
     pristine_text,
     text_states
 };
+
+#define engr_text_space(ep) ((char *) ((ep) + 1))
 
 struct engr {
     struct engr *nxt_engr;

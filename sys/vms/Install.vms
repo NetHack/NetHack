@@ -1,11 +1,11 @@
-               Instructions for Building and Installing NetHack 3.7.0
+               Instructions for Building and Installing NetHack 5.0.0
                      on a VMS (aka OpenVMS) system
                =========================================
 
 0.  Please read this entire file before trying to build or install
     NetHack, then read it again!
 
-1.  NetHack 3.7 was built and tested on OpenVMS on both the Integrity
+1.  NetHack 5.0 was built and tested on OpenVMS on both the Integrity
     and Alpha platform using the HP C V7.3 for OpenVMS compiler.  While
     not tested, older versions of DEC C will most likely work as compatibility
     with older systems is a goal of the VMS porting team.   Unfortunately,
@@ -145,7 +145,7 @@ Notes:
 0.  Version 3.5.x was never publicly released.
 
 1.  Save files and bones files from 3.6.x and earlier versions will not
-    work with 3.7.0. The scoreboard file (RECORD) from 3.6.x or 3.4.x or
+    work with 5.0.0. The scoreboard file (RECORD) from 3.6.x or 3.4.x or
     3.3.x will work.
 
 2.  Ancient C libs will not work; vsnprintf is required.
@@ -510,6 +510,6 @@ minimally updated 9-NOV-2015...
 and again 5-MAY-2019...
 and yet again 26-JAN-2020...
 
-# NetHack 3.7  Install.vms       $NHDT-Date: 1575245132 2019/12/02 00:05:32 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.16 $
+# NetHack 5.0  Install.vms       $NHDT-Date: 1575245132 2019/12/02 00:05:32 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.16 $
 # Copyright (c) 2003 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.

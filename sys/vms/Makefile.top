@@ -1,5 +1,5 @@
 #	NetHack Makefile (VMS) - top level for making & installing everything.
-#	NetHack 3.7	Makefile.top	$NHDT-Date: 1596498303 2020/08/03 23:45:03 $	$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.11 $
+#	NetHack 5.0	Makefile.top	$NHDT-Date: 1596498303 2020/08/03 23:45:03 $	$NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.11 $
 # Copyright (c) 2011 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
 

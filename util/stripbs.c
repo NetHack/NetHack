@@ -1,4 +1,4 @@
-/* NetHack 3.7  stripbs.c                                         */
+/* NetHack 5.0  stripbs.c                                         */
 /* Copyright (c) Michael Allison, 2025.                                */
 /* NetHack may be freely redistributed.  See license for details. */
 

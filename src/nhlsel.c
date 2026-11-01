@@ -1,4 +1,4 @@
-/* NetHack 3.7	nhlua.c	$NHDT-Date: 1737545957 2025/01/22 03:39:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.64 $ */
+/* NetHack 5.0	nhlua.c	$NHDT-Date: 1769840272 2026/01/30 22:17:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.69 $ */
 /*      Copyright (c) 2018 by Pasi Kallinen */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -33,6 +33,7 @@ staticfn int l_selection_circle(lua_State *);
 staticfn int l_selection_ellipse(lua_State *);
 staticfn int l_selection_gradient(lua_State *);
 staticfn int l_selection_iterate(lua_State *);
+staticfn int l_selection_size_description(lua_State *L);
 staticfn int l_selection_gc(lua_State *);
 staticfn int l_selection_not(lua_State *);
 staticfn int l_selection_and(lua_State *);
@@ -709,6 +710,10 @@ l_selection_match(lua_State *L)
         for (x = 1; x < sel->wid; x++)
             selection_setpoint(x, y, sel, mapfrag_match(mf, x,y) ? 1 : 0);
 
+    /* unless the (0, 1) coordinate is a match, this would wind up with a
+       selection with lx=COLNO, hx=0, etc, so fix the boundaries */
+    selection_recalc_bounds(sel);
+
     mapfrag_free(&mf);
 
     return 1;
@@ -909,6 +914,8 @@ l_selection_gradient(lua_State *L)
     return 1;
 }
 
+DISABLE_WARNING_UNREACHABLE_CODE
+
 /* sel:iterate(function(x,y) ... end);
  * The x, y coordinates passed to the function are map- or room-relative
  * rather than absolute, unless there has been no previous map or room
@@ -949,6 +956,27 @@ l_selection_iterate(lua_State *L)
     return 0;
 }
 
+/* local txt = sel:describe_size(); */
+/* gives a textual description of the selection size */
+staticfn int
+l_selection_size_description(lua_State *L)
+{
+    int argc = lua_gettop(L);
+
+    if (argc == 1) {
+        struct selectionvar *sel = l_selection_check(L, 1);
+        char buf[BUFSZ];
+
+        lua_pushstring(L, selection_size_description(sel, buf));
+        return 1;
+    } else {
+        nhl_error(L, "wrong parameters");
+        /*NOTREACHED*/
+    }
+    return 0;
+}
+
+RESTORE_WARNING_UNREACHABLE_CODE
 
 static const struct luaL_Reg l_selection_methods[] = {
     { "new", l_selection_new },
@@ -974,6 +1002,7 @@ static const struct luaL_Reg l_selection_methods[] = {
     { "iterate", l_selection_iterate },
     { "bounds", l_selection_getbounds },
     { "room", l_selection_room },
+    { "describe_size", l_selection_size_description },
     { NULL, NULL }
 };
 

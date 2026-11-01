@@ -1,4 +1,4 @@
-This is a listing of all files in a full NetHack 3.7 distribution, organized
+This is a listing of all files in a full NetHack 5.0 distribution, organized
 in their standard manner on a UNIX system.  It indicates which files are
 necessary for which versions, so that you can tell which files may be deleted
 from or not transferred to your system if you wish.
@@ -47,21 +47,21 @@ Val-strt.lua  Wiz-fila.lua  Wiz-filb.lua  Wiz-goal.lua  Wiz-loca.lua
 Wiz-strt.lua  air.lua       asmodeus.lua  astral.lua    baalz.lua
 bigrm-1.lua   bigrm-2.lua   bigrm-3.lua   bigrm-4.lua   bigrm-5.lua
 bigrm-6.lua   bigrm-7.lua   bigrm-8.lua   bigrm-9.lua   bigrm-10.lua
-bigrm-11.lua  bigrm-12.lua  bogusmon.txt  castle.lua    cmdhelp
-data.base     dungeon.lua   earth.lua     engrave.txt   epitaph.txt
-fakewiz1.lua  fakewiz2.lua  fire.lua      hellfill.lua  help
-hh            history       juiblex.lua   keyhelp       knox.lua
-license       luahelper     medusa-1.lua  medusa-2.lua  medusa-3.lua
-medusa-4.lua  minefill.lua  minend-1.lua  minend-2.lua  minend-3.lua
-minetn-1.lua  minetn-2.lua  minetn-3.lua  minetn-4.lua  minetn-5.lua
-minetn-6.lua  minetn-7.lua  nhcore.lua    nhlib.lua     opthelp
-optmenu       oracle.lua    oracles.txt   orcus.lua     quest.lua
-rumors.fal    rumors.tru    sanctum.lua   soko1-1.lua   soko1-2.lua
-soko2-1.lua   soko2-2.lua   soko3-1.lua   soko3-2.lua   soko4-1.lua
-soko4-2.lua   symbols       themerms.lua  tower1.lua    tower2.lua
-tower3.lua    tribute       tut-1.lua     tut-2.lua     usagehlp
-valley.lua    water.lua     wizard1.lua   wizard2.lua   wizard3.lua
-wizhelp
+bigrm-11.lua  bigrm-12.lua  bigrm-13.lua  bogusmon.txt  castle.lua
+cmdhelp       data.base     dungeon.lua   earth.lua     engrave.txt
+epitaph.txt   fakewiz1.lua  fakewiz2.lua  fire.lua      hellfill.lua
+help          hh            history       juiblex.lua   keyhelp
+knox.lua      license       luahelper     medusa-1.lua  medusa-2.lua
+medusa-3.lua  medusa-4.lua  minefill.lua  minend-1.lua  minend-2.lua
+minend-3.lua  minetn-1.lua  minetn-2.lua  minetn-3.lua  minetn-4.lua
+minetn-5.lua  minetn-6.lua  minetn-7.lua  nhcore.lua    nhlib.lua
+opthelp       optmenu       oracle.lua    oracles.txt   orcus.lua
+quest.lua     rumors.fal    rumors.tru    sanctum.lua   soko1-1.lua
+soko1-2.lua   soko2-1.lua   soko2-2.lua   soko3-1.lua   soko3-2.lua
+soko4-1.lua   soko4-2.lua   symbols       themerms.lua  tower1.lua
+tower2.lua    tower3.lua    tribute       tut-1.lua     tut-2.lua
+usagehlp      valley.lua    water.lua     wizard1.lua   wizard2.lua
+wizard3.lua   wizhelp
 
 doc:
 (files for all versions)
@@ -76,7 +76,7 @@ fixes3-2-2.txt     fixes3-2-3.txt     fixes3-3-0.txt     fixes3-3-1.txt
 fixes3-4-0.txt     fixes3-4-1.txt     fixes3-4-2.txt     fixes3-4-3.txt
 fixes3-5-0.txt     fixes3-6-0.txt     fixes3-6-1.txt     fixes3-6-2.txt
 fixes3-6-3.txt     fixes3-6-4.txt     fixes3-6-5.txt     fixes3-6-6.txt
-fixes3-6-7.txt     fixes3-7-0.txt     fixesX-X-X.txt     lua.adoc
+fixes3-6-7.txt     fixes5-0-0.txt     fixesX-X-X.txt     lua.adoc
 makedefs.6         makedefs.txt       mn.7               mn.txt
 mnh.7              mnh.txt            nethack.6          nethack.txt
 options.txt        recover.6          recover.txt        sound.txt
@@ -87,23 +87,23 @@ include:
 tile2x11.h  winX.h      xwindow.h   xwindowp.h
 
 (files for all versions)
-align.h       artifact.h    artilist.h    attrib.h      botl.h
-color.h       config.h      config1.h     context.h     coord.h
-cstd.h        decl.h        defsym.h      dgn_file.h    display.h
-dlb.h         dungeon.h     engrave.h     extern.h      flag.h
-fnamesiz.h    func_tab.h    global.h      hack.h        hacklib.h
-integer.h     isaac64.h     lint.h        mail.h        mextra.h
-mfndpos.h     micro.h       mkroom.h      monattk.h     mondata.h
-monflag.h     monst.h       monsters.h    nhmd4.h       nhregex.h
-obj.h         objclass.h    objects.h     optlist.h     patchlevel.h
-pcconf.h      permonst.h    prop.h        quest.h       rect.h
-region.h      rm.h          savefile.h    seffects.h    selvar.h
-sfmacros.h    sfprocs.h     skills.h      sndprocs.h    sp_lev.h
-spell.h       stairs.h      sym.h         sys.h         tcap.h
-tileset.h     timeout.h     tradstdc.h    trap.h        unixconf.h
-vision.h      vmsconf.h     warnings.h    weight.h      winami.h
-wincurs.h     windconf.h    winprocs.h    wintype.h     you.h
-youprop.h
+align.h       amiconf.h     artifact.h    artilist.h    attrib.h
+botl.h        color.h       config.h      config1.h     context.h
+coord.h       cstd.h        decl.h        defsym.h      dgn_file.h
+display.h     dlb.h         dungeon.h     engrave.h     extern.h
+flag.h        fnamesiz.h    func_tab.h    global.h      hack.h
+hacklib.h     integer.h     isaac64.h     lint.h        mail.h
+mcastu.h      mextra.h      mfndpos.h     micro.h       mkroom.h
+monattk.h     mondata.h     monflag.h     monst.h       monsters.h
+nhmd4.h       nhregex.h     obj.h         objclass.h    objects.h
+optlist.h     patchlevel.h  pcconf.h      permonst.h    prop.h
+quest.h       rect.h        region.h      rm.h          savefile.h
+seffects.h    selvar.h      sfmacros.h    sfprocs.h     skills.h
+sndprocs.h    sp_lev.h      spell.h       stairs.h      sym.h
+sys.h         tcap.h        tileset.h     timeout.h     tradstdc.h
+trap.h        unixconf.h    vision.h      vmsconf.h     warnings.h
+weight.h      winami.h      wincurs.h     windconf.h    winprocs.h
+wintype.h     you.h         youprop.h
 
 (file for tty versions)
 wintty.h
@@ -124,30 +124,25 @@ bitmfile.h  gem_rsc.h   load_img.h  wingem.h
 winGnome.h
 
 (files for all versions)
-amiconf.h   beconf.h    def_os2.h   os2conf.h   system.h    tosconf.h
-trampoli.h  wceconf.h
+beconf.h    def_os2.h   os2conf.h   system.h    tosconf.h   trampoli.h
+wceconf.h
 
 (files for various Macintosh versions)
 mac-carbon.h  mac-qt.h      mac-term.h    macconf.h     macpopup.h
 mactty.h      macwin.h      mttypriv.h
 
 outdated/sys/amiga:
-(files for Amiga versions - untested for 3.7)
+(files for Amiga versions - untested for 5.0)
 Build.ami     Install.ami   Makefile.agc  Makefile.ami  NetHack.cnf
-amidos.c      amidos.p      amifont.uu    amifont8.uu   amigst.c
-amii.hlp      amimenu.c     amirip.c      amistack.c    amitty.c
-amiwind.c     amiwind.p     clipwin.c     colorwin.c    grave16.xpm
-ifchange      mkdmake       txt2iff.c     winamenu.c    winami.c
-winami.p      winchar.c     windefs.h     winext.h      winfuncs.c
-winkey.c      winproto.h    winreq.c      winstr.c      xpm2iff.c
+ifchange      mkdmake       txt2iff.c     xpm2iff.c
 
 outdated/sys/atari:
-(files for Atari version - untested for 3.7)
+(files for Atari version - untested for 5.0)
 Install.tos   atarifnt.uue  nethack.mnu   setup.g       tos.c
 unx2atar.sed
 
 outdated/sys/be:
-(files for BeOS version - untested for 3.7)
+(files for BeOS version - untested for 5.0)
 README    bemain.c
 
 outdated/sys/mac:
@@ -164,7 +159,7 @@ Makefile.BC   Makefile.MSC  SCHEMA35.MSC  moveinit.pat  ovlinit.c
 schema1.BC    schema2.BC    schema3.MSC
 
 outdated/sys/os2:
-(files for OS/2 version - untested for 3.7)
+(files for OS/2 version - untested for 5.0)
 Install.os2   Makefile.os2  nhpmico.uu    os2.c
 
 outdated/sys/unix:
@@ -187,7 +182,7 @@ outdated/sys/vms:
 lev_lex.h
 
 outdated/sys/wince:
-(files for Windows CE and PocketPC - untested for 3.7)
+(files for Windows CE and PocketPC - untested for 5.0)
 Install.ce    bootstrp.mak  celib.c       cesetup.bat   cesound.c
 defaults.nh   keypad.uu     menubar.uu    mhaskyn.c     mhaskyn.h
 mhcmd.c       mhcmd.h       mhcolor.c     mhcolor.h     mhdlg.c
@@ -200,20 +195,12 @@ resource.h    winMS.h       winhack.c     winhack.rc    winhcksp.rc
 winmain.c
 
 outdated/sys/wince/ceinc:
-(header files for Windows CE and PocketPC - untested for 3.7)
+(header files for Windows CE and PocketPC - untested for 5.0)
 assert.h  errno.h   fcntl.h
 
 outdated/sys/wince/ceinc/sys:
 (sys/stat.h for Windows CE and PocketPC - untested for 3.6.2)
 stat.h
-
-outdated/sys/windows:
-(files that are no longer maintained for current game code)
-travis-gcc.sh
-
-outdated/sys/windows/vs:
-(files that are no longer maintained for current game code)
-travisci.sh
 
 outdated/win/Qt3:
 (files for the Qt 3 widget library - X11, Windows, Mac OS X, or Qtopia)
@@ -225,12 +212,12 @@ qt3tableview.cpp     qt3tableview.h       tileedit.cpp
 tileedit.h
 
 outdated/win/gem:
-(files for GEM versions - untested for 3.7)
+(files for GEM versions - untested for 5.0)
 Install.gem  bitmfile.c   gem_rsc.uu   gem_rso.uu   gr_rect.c    gr_rect.h
 load_img.c   tile2img.c   title.uu     wingem.c     wingem1.c    xpm2img.c
 
 outdated/win/gnome:
-(files for GNOME versions - untested for 3.7)
+(files for GNOME versions - untested for 5.0)
 README      gn_xpms.h   gnaskstr.c  gnaskstr.h  gnbind.c    gnbind.h
 gnglyph.c   gnglyph.h   gnmain.c    gnmain.h    gnmap.c     gnmap.h
 gnmenu.c    gnmenu.h    gnmesg.c    gnmesg.h    gnomeprv.h  gnopts.c
@@ -296,28 +283,39 @@ allmain.c   alloc.c     apply.c     artifact.c  attrib.c    ball.c
 bones.c     botl.c      calendar.c  cfgfiles.c  cmd.c       coloratt.c
 date.c      dbridge.c   decl.c      detect.c    dig.c       display.c
 dlb.c       do.c        do_name.c   do_wear.c   dog.c       dogmove.c
-dokick.c    dothrow.c   drawing.c   dungeon.c   eat.c       end.c
-engrave.c   exper.c     explode.c   extralev.c  files.c     fountain.c
-getpos.c    glyphs.c    hack.c      hacklib.c   insight.c   invent.c
-isaac64.c   light.c     lock.c      mail.c      makemon.c   mcastu.c
-mdlib.c     mhitm.c     mhitu.c     minion.c    mklev.c     mkmap.c
-mkmaze.c    mkobj.c     mkroom.c    mon.c       mondata.c   monmove.c
-monst.c     mplayer.c   mthrowu.c   muse.c      music.c     nhlobj.c
-nhlsel.c    nhlua.c     nhmd4.c     o_init.c    objects.c   objnam.c
-options.c   pager.c     pickup.c    pline.c     polyself.c  potion.c
-pray.c      priest.c    quest.c     questpgr.c  read.c      rect.c
-region.c    report.c    restore.c   rip.c       rnd.c       role.c
-rumors.c    save.c      selvar.c    sfbase.c    sfstruct.c  shk.c
-shknam.c    sit.c       sounds.c    sp_lev.c    spell.c     stairs.c
-steal.c     steed.c     strutil.c   symbols.c   sys.c       teleport.c
-timeout.c   topten.c    track.c     trap.c      u_init.c    uhitm.c
-utf8map.c   vault.c     version.c   vision.c    weapon.c    were.c
-wield.c     windows.c   wizard.c    wizcmds.c   worm.c      worn.c
-write.c     zap.c
+dokick.c    dothrow.c   drawing.c   dungeon.c   earlyarg.c  eat.c
+end.c       engrave.c   exper.c     explode.c   extralev.c  files.c
+fountain.c  getpos.c    glyphs.c    hack.c      hacklib.c   iactions.c
+insight.c   invent.c    isaac64.c   light.c     lock.c      mail.c
+makemon.c   mcastu.c    mdlib.c     mhitm.c     mhitu.c     minion.c
+mklev.c     mkmap.c     mkmaze.c    mkobj.c     mkroom.c    mon.c
+mondata.c   monmove.c   monst.c     mplayer.c   mthrowu.c   muse.c
+music.c     nhlobj.c    nhlsel.c    nhlua.c     nhmd4.c     o_init.c
+objects.c   objnam.c    options.c   pager.c     pickup.c    pline.c
+polyself.c  potion.c    pray.c      priest.c    quest.c     questpgr.c
+read.c      rect.c      region.c    report.c    restore.c   rip.c
+rnd.c       role.c      rumors.c    save.c      selvar.c    sfbase.c
+sfstruct.c  shk.c       shknam.c    sit.c       sounds.c    sp_lev.c
+spell.c     stairs.c    steal.c     steed.c     strutil.c   symbols.c
+sys.c       teleport.c  timeout.c   topten.c    track.c     trap.c
+u_init.c    uhitm.c     utf8map.c   vault.c     version.c   vision.c
+weapon.c    were.c      wield.c     windows.c   wizard.c    wizcmds.c
+worm.c      worn.c      write.c     zap.c
 
 submodules:
 (files in top directory)
 CHKSUMS      lua          pdcurses     pdcursesmod
+
+sys/amiga:
+(files for Amiga versions)
+README.amiga    amidos.c        amidos.p        amifont.uu
+amifont8.uu     amigst.c        amii.hlp        amimenu.c
+amirip.c        amistack.c      amitty.c        amiwind.c
+amiwind.p       bmp2iff_host.c  clipwin.c       colorwin.c
+grave16.xpm     nethack.cnf     winamenu.c      winami.c
+winami.p        winchar.c       windefs.h       winext.h
+winfuncs.c      winkey.c        winproto.h      winreq.c
+winstr.c        xpm2iff_host.c
 
 sys/libnh:
 (files in top directory)
@@ -353,11 +351,8 @@ random.c
 (Berkeley uudecode file, which may be used in build process of any version)
 uudecode.c
 
-(file for MSDOS, OS/2, Amiga, and Atari versions - only MSDOS tested for 3.7)
-pcmain.c
-
-(file for MSDOS, OS/2, and Atari versions - only MSDOS tested for 3.7)
-NetHack.cnf  pctty.c
+(file for MSDOS, Amiga versions)
+NetHack.cnf  pcmain.c     pctty.c
 
 (file for MSDOS, OS/2, and VMS versions)
 termcap
@@ -365,10 +360,10 @@ termcap
 (file for VMS version)
 tclib.c
 
-(files for MSDOS, OS/2 and Atari versions - only MSDOS tested for 3.7)
+(files for MSDOS, Amiga versions)
 pcsys.c   pcunix.c
 
-(files for OS/2 version - untested for 3.7)
+(files for OS/2 version - untested for 5.0)
 Makefile.lib  termcap.uu
 
 (files for UNIX and Be versions)
@@ -388,8 +383,9 @@ sys/unix:
 Install.unx     Makefile.check  Makefile.dat    Makefile.doc
 Makefile.src    Makefile.top    Makefile.utl    NewInstall.unx
 README-hints    README.xcode    XCode.xcconfig  depend.awk
-gitinfo.sh      mkmkfile.sh     nethack.sh      setup.sh
-sysconf         unixmain.c      unixres.c       unixunix.c
+gitinfo.sh      macuuid.m       mkmkfile.sh     nethack.sh
+setup.sh        sysconf         unixmain.c      unixres.c
+unixunix.c
 
 sys/unix/NetHack.xcodeproj:
 (file for macOS Xcode)
@@ -409,16 +405,16 @@ NetHack.xcscheme   makedefs.xcscheme  recover.xcscheme
 
 sys/unix/hints:
 (files for configuring UNIX NetHack versions)
-linux-minimal       linux.370           macOS.370
+linux-minimal       linux.500           macOS.500
 macosx.sh           solaris             solaris-playground
 unix
 
 sys/unix/hints/include:
 (files for configuring UNIX NetHack versions)
-compiler.370       cross-post.370     cross-pre1.370     cross-pre2.370
-gbdates-post.370   gbdates-pre.370    misc.370           multisnd-post.370
-multisnd1-pre.370  multisnd2-pre.370  multiw-1.370       multiw-2.370
-response.370
+compiler.500       cross-post.500     cross-pre1.500     cross-pre2.500
+gbdates-post.500   gbdates-pre.500    misc.500           multisnd-post.500
+multisnd1-pre.500  multisnd2-pre.500  multiw-1.500       multiw-2.500
+response.500
 
 sys/vms:
 (files for VMS version)
@@ -636,8 +632,8 @@ win/share:
 (files for versions using optional tiles)
 bmptiles.c     gifread.c      giftiles.c     monsters.txt   nhicns.uu
 nhsplash.xpm   objects.txt    other.txt      ppmwrite.c     renumtiles.pl
-safeproc.c     thintile.c     tile.doc       tile.h         tile2bmp.c
-tilemap.c      tileset.c      tiletext.c     tiletxt.c
+thintile.c     tile.doc       tile.h         tile2bmp.c     tilemap.c
+tileset.c      tiletext.c     tiletxt.c
 
 win/shim:
 (file in top directory)
@@ -695,7 +691,7 @@ GNUmakefile  Makefile
 qt_kde0.moc   qt_main.moc   qt_map.moc    qt_menu.moc   qt_msg.moc
 qt_plsel.moc  qt_set.moc    qt_stat.moc   qt_xcmd.moc   qt_yndlg.moc
 
-(file generated by makedefs -m but unused in 3.7)
+(file generated by makedefs -m but unused in 5.0)
 monstr.c
 
 (file optionally generated by tilemap at compile time)

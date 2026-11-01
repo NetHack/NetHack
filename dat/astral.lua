@@ -35,7 +35,7 @@ des.map([[
 
 -- chance to alter above map and turn the wings of the bottom-center into
 -- a pair of big (5x15) rooms
-for i=1,2 do
+for i = 1, 2 do
    -- 3.6.[01]: 75% chance that both sides opened up, 25% that neither did;
    -- 3.6.2: 60% twice == 36% chance that both sides open up, 24% left side
    -- only, 24% right side only, 16% that neither side opens up
@@ -58,7 +58,7 @@ for i=1,2 do
         des.terrain(41,18, ".")
      end
      -- extra monsters; was [6 + 3d4] when both wings were opened up at once
-     for i=1,3 + math.random(2 - 1,2*3) do
+     for j = 1, math.random(4,9) do
         des.monster({ id="Angel", coord = hall:rndcoord(1), align="noalign", peaceful=0 })
         if percent(50) then
            des.monster({ coord = hall:rndcoord(1), peaceful=0 })

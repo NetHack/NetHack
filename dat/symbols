@@ -1,4 +1,4 @@
-# NetHack 3.7  symbols       $NHDT-Date: 1725052751 2024/08/30 21:19:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.36 $
+# NetHack 5.0  symbols       $NHDT-Date: 1725052751 2024/08/30 21:19:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.36 $
 # Copyright (c) 2006 by Michael Allison
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -803,26 +803,151 @@ start: MACgraphics
 	S_pool: \xe0
 finish
 
+# When using Unicode glyphs, care must be taken with how terminals
+# render them and how completely fonts cover them.
+#
+# Depending on the font, terminal, and operating system, unsupported
+# glyphs may be replaced by placeholder symbols (e.g. � U+FFFD
+# replacement character or □ U+25A1 white square), omitted entirely, or
+# substituted from fallback fonts. Such fallback can introduce visual
+# inconsistencies due to differences in style, metrics, or alignment.
+#
+# Support for glyphs defined in the Windows Glyph List 4
+# (https://en.wikipedia.org/wiki/WGL4) is generally good across common
+# fonts and platforms. Beyond that baseline, coverage becomes less
+# predictable and should be evaluated case by case.
+#
+# Emoji support often is problematic, and wide glyphs occupy two display
+# columns, which NetHack does not support.
+#
+# Symset Enhanced1 should be considered the conservative Unicode symset,
+# while Enhanced2 (and any future symsets) may make use of more advanced
+# Unicode features.
 start: Enhanced1
 	Description: Enhanced with Unicode glyphs and 24-bit color
 	Restrictions: primary
 	Handling: UTF8
-	S_vwall: U+2502                     # BOX DRAWINGS LIGHT VERTICAL
-	S_hwall: U+2500                     # BOX DRAWINGS LIGHT HORIZONTAL
-	S_tlcorn: U+250c                    # BOX DRAWINGS LIGHT DOWN AND RIGHT
-	S_trcorn: U+2510                    # BOX DRAWINGS LIGHT DOWN AND LEFT
-	S_blcorn: U+2514                    # BOX DRAWINGS LIGHT UP AND RIGHT
-	S_brcorn: U+2518                    # BOX DRAWINGS LIGHT UP AND LEFT
-	S_crwall: U+253c                    # BOX DRAWINGS LIGHT VERTICAL AND HORIZONTAL
-	S_tuwall: U+2534                    # BOX DRAWINGS LIGHT UP AND HORIZONTAL
-	S_tdwall: U+252c                    # BOX DRAWINGS LIGHT DOWN AND HORIZONTAL
-	S_tlwall: U+2524                    # BOX DRAWINGS LIGHT VERTICAL AND LEFT
-	S_trwall: U+251c                    # BOX DRAWINGS LIGHT VERTICAL AND RIGHT
+	S_corr: U+2591                      # ░ LIGHT SHADE
+	S_engrcorr: U+2591                  # ░ LIGHT SHADE
+	S_litcorr: U+2592                   # ▒ MEDIUM SHADE
+	S_vwall: U+2502                     # │ BOX DRAWINGS LIGHT VERTICAL
+	S_hwall: U+2500                     # ─ BOX DRAWINGS LIGHT HORIZONTAL
+	S_tlcorn: U+250c                    # ┌ BOX DRAWINGS LIGHT DOWN AND RIGHT
+	S_trcorn: U+2510                    # ┐ BOX DRAWINGS LIGHT DOWN AND LEFT
+	S_blcorn: U+2514                    # └ BOX DRAWINGS LIGHT UP AND RIGHT
+	S_brcorn: U+2518                    # ┘ BOX DRAWINGS LIGHT UP AND LEFT
+	S_crwall: U+253c                    # ┼ BOX DRAWINGS LIGHT VERTICAL AND HORIZONTAL
+	S_tuwall: U+2534                    # ┴ BOX DRAWINGS LIGHT UP AND HORIZONTAL
+	S_tdwall: U+252c                    # ┬ BOX DRAWINGS LIGHT DOWN AND HORIZONTAL
+	S_tlwall: U+2524                    # ┤ BOX DRAWINGS LIGHT VERTICAL AND LEFT
+	S_trwall: U+251c                    # ├ BOX DRAWINGS LIGHT VERTICAL AND RIGHT
+	S_ndoor: U+00b7                     # · MIDDLE DOT
+	S_vodoor: U+2592                    # ▒ MEDIUM SHADE
+	S_hodoor: U+2592                    # ▒ MEDIUM SHADE
+	S_bars: U+2261                      # ≡ IDENTICAL TO
+	S_tree: U+03a8                      # Ψ GREEK CAPITAL LETTER PSI
+	S_room: U+00b7                      # · MIDDLE DOT
+	S_engroom: U+03BE                   # ξ Greek Small Letter Xi
+	S_darkroom: U+00b7                  # · MIDDLE DOT
+	S_upladder: U+2264                  # ≤ LESS-THAN OR EQUAL TO
+	S_dnladder: U+2265                  # ≥ GREATER-THAN OR EQUAL TO
+	S_altar: U+03A9                     # Ω GREEK CAPITAL LETTER OMEGA
+	S_grave: U+2020                     # † DAGGER
+	G_fountain: U+2320/0-150-255        # ⌠ TOP HALF INTEGRAL
+	S_pool: U+224b                      # ≋ TRIPLE TILDE
+	S_ice: U+00b7                       # · MIDDLE DOT
+	S_lava: U+224b                      # ≋ TRIPLE TILDE
+	S_lavawall: U+2248                  # ≈ ALMOST EQUAL TO
+	S_vodbridge: U+00b7                 # · MIDDLE DOT
+	S_hodbridge: U+00b7                 # · MIDDLE DOT
+	S_water: U+2248                     # ≈ ALMOST EQUAL TO
+	S_web: U+00A4                       # ¤ CURRENCY SIGN
+	S_vbeam: U+2502                     # │ BOX DRAWINGS LIGHT VERTICAL
+	S_hbeam: U+2500                     # ─ BOX DRAWINGS LIGHT HORIZONTAL
+	S_sw_tc: U+2594                     # ▔ UPPER ONE EIGHTH BLOCK
+	S_sw_ml: U+258f                     # ▏ LEFT ONE EIGHTH BLOCK
+	S_sw_mr: U+2595                     # ▕ RIGHT ONE EIGHTH BLOCK
+	S_sw_bc: U+2581                     #   LOWER ONE EIGHTH BLOCK
+	S_expl_tc: U+2594                   # ▔ UPPER ONE EIGHTH BLOCK
+	S_expl_ml: U+258f                   # ▏ LEFT ONE EIGHTH BLOCK
+	S_expl_mr: U+2595                   # ▕ RIGHT ONE EIGHTH BLOCK
+	S_expl_bc: U+2581                   #   LOWER ONE EIGHTH BLOCK
+	G_vwall_sokoban:  U+2502/blue       # │ BOX DRAWINGS LIGHT VERTICAL
+	G_hwall_sokoban:  U+2500/blue       # ─ BOX DRAWINGS LIGHT HORIZONTAL
+	G_tlcorn_sokoban: U+250c/blue       # ┌ BOX DRAWINGS LIGHT DOWN AND RIGHT
+	G_trcorn_sokoban: U+2510/blue       # ┐ BOX DRAWINGS LIGHT DOWN AND LEFT
+	G_blcorn_sokoban: U+2514/blue       # └ BOX DRAWINGS LIGHT UP AND RIGHT
+	G_brcorn_sokoban: U+2518/blue       # ┘ BOX DRAWINGS LIGHT UP AND LEFT
+	G_crwall_sokoban: U+253C/blue       # ┼ BOX DRAWINGS LIGHT VERTICAL AND HORIZONTAL
+	G_tuwall_sokoban: U+2534/blue       # ┴ BOX DRAWINGS LIGHT UP AND HORIZONTAL
+	G_tdwall_sokoban: U+252C/blue       # ┬ BOX DRAWINGS LIGHT DOWN AND HORIZONTAL
+	G_tlwall_sokoban: U+2524/blue       # ┤ BOX DRAWINGS LIGHT VERTICAL AND LEFT
+	G_trwall_sokoban: U+251C/blue       # ├ BOX DRAWINGS LIGHT VERTICAL AND RIGHT
+	G_vwall_gehennom:  U+2502/red       # │ BOX DRAWINGS LIGHT VERTICAL
+	G_hwall_gehennom:  U+2500/red       # ─ BOX DRAWINGS LIGHT HORIZONTAL
+	G_tlcorn_gehennom: U+250c/red       # ┌ BOX DRAWINGS LIGHT DOWN AND RIGHT
+	G_trcorn_gehennom: U+2510/red       # ┐ BOX DRAWINGS LIGHT DOWN AND LEFT
+	G_blcorn_gehennom: U+2514/red       # └ BOX DRAWINGS LIGHT UP AND RIGHT
+	G_brcorn_gehennom: U+2518/red       # ┘ BOX DRAWINGS LIGHT UP AND LEFT
+	G_crwall_gehennom: U+253C/red       # ┼ BOX DRAWINGS LIGHT VERTICAL AND HORIZONTAL
+	G_tuwall_gehennom: U+2534/red       # ┴ BOX DRAWINGS LIGHT UP AND HORIZONTAL
+	G_tdwall_gehennom: U+252C/red       # ┬ BOX DRAWINGS LIGHT DOWN AND HORIZONTAL
+	G_tlwall_gehennom: U+2524/red       # ┤ BOX DRAWINGS LIGHT VERTICAL AND LEFT
+	G_trwall_gehennom: U+251C/red       # ├ BOX DRAWINGS LIGHT VERTICAL AND RIGHT
+	G_vwall_knox:  U+2502/126-230-230   # │ BOX DRAWINGS LIGHT VERTICAL
+	G_hwall_knox:  U+2500/126-230-230   # ─ BOX DRAWINGS LIGHT HORIZONTAL
+	G_tlcorn_knox: U+250c/126-230-230   # ┌ BOX DRAWINGS LIGHT DOWN AND RIGHT
+	G_trcorn_knox: U+2510/126-230-230   # ┐ BOX DRAWINGS LIGHT DOWN AND LEFT
+	G_blcorn_knox: U+2514/126-230-230   # └ BOX DRAWINGS LIGHT UP AND RIGHT
+	G_brcorn_knox: U+2518/126-230-230   # ┘ BOX DRAWINGS LIGHT UP AND LEFT
+	G_crwall_knox: U+253C/126-230-230   # ┼ BOX DRAWINGS LIGHT VERTICAL AND HORIZONTAL
+	G_tuwall_knox: U+2534/126-230-230   # ┴ BOX DRAWINGS LIGHT UP AND HORIZONTAL
+	G_tdwall_knox: U+252C/126-230-230   # ┬ BOX DRAWINGS LIGHT DOWN AND HORIZONTAL
+	G_tlwall_knox: U+2524/126-230-230   # ┤ BOX DRAWINGS LIGHT VERTICAL AND LEFT
+	G_trwall_knox: U+251C/126-230-230   # ├ BOX DRAWINGS LIGHT VERTICAL AND RIGHT
+	G_vwall_mines:  U+2502/190-126-0    # │ BOX DRAWINGS LIGHT VERTICAL
+	G_hwall_mines:  U+2500/190-126-0    # ─ BOX DRAWINGS LIGHT HORIZONTAL
+	G_tlcorn_mines: U+250c/190-126-0    # ┌ BOX DRAWINGS LIGHT DOWN AND RIGHT
+	G_trcorn_mines: U+2510/190-126-0    # ┐ BOX DRAWINGS LIGHT DOWN AND LEFT
+	G_blcorn_mines: U+2514/190-126-0    # └ BOX DRAWINGS LIGHT UP AND RIGHT
+	G_brcorn_mines: U+2518/190-126-0    # ┘ BOX DRAWINGS LIGHT UP AND LEFT
+	G_crwall_mines: U+253C/190-126-0    # ┼ BOX DRAWINGS LIGHT VERTICAL AND HORIZONTAL
+	G_tuwall_mines: U+2534/190-126-0    # ┴ BOX DRAWINGS LIGHT UP AND HORIZONTAL
+	G_tdwall_mines: U+252C/190-126-0    # ┬ BOX DRAWINGS LIGHT DOWN AND HORIZONTAL
+	G_tlwall_mines: U+2524/190-126-0    # ┤ BOX DRAWINGS LIGHT VERTICAL AND LEFT
+	G_trwall_mines: U+251C/190-126-0    # ├ BOX DRAWINGS LIGHT VERTICAL AND RIGHT
+finish
+
+start: Enhanced2
+#       contributed in GitHub pull request 1503 by abcbarryn.
+#       This has double line wall symbols.
+	Description: Enhanced with more Unicode glyphs and 24-bit color
+	Restrictions: primary
+	Handling: UTF8
+	S_corr: U+2591
+	S_litcorr: U+2592
+	S_engrcorr: U+2591
+	S_amulet: U+2299                    # ☉
+	S_cloud: U+2601                     # ☁
+	S_vwall: U+2551                     # ║ BOX DRAWINGS DOUBLE VERTICAL
+	S_hwall: U+2550                     # ═ BOX DRAWINGS DOUBLE HORIZONTAL
+	S_tlcorn: U+2554                    # ╔ BOX DRAWINGS DOUBLE DOWN AND RIGHT
+	S_trcorn: U+2557                    # ╗ BOX DRAWINGS DOUBLE DOWN AND LEFT
+	S_blcorn: U+255a                    # ╚ BOX DRAWINGS DOUBLE UP AND RIGHT
+	S_brcorn: U+255d                    # ╝ BOX DRAWINGS DOUBLE UP AND LEFT
+	S_crwall: U+256c                    # ╬ BOX DRAWINGS DOUBLE VERTICAL AND HORIZONTAL
+	S_tuwall: U+2569                    # ╩ BOX DRAWINGS DOUBLE UP AND HORIZONTAL
+	S_tdwall: U+2566                    # ╦ BOX DRAWINGS DOUBLE DOWN AND HORIZONTAL
+	S_tlwall: U+2563                    # ╣ BOX DRAWINGS DOUBLE VERTICAL AND LEFT
+	S_trwall: U+2560                    # ╠ BOX DRAWINGS DOUBLE VERTICAL AND RIGHT
 	S_ndoor: U+00b7                     # MIDDLE DOT
 	S_vodoor: U+2592                    # MEDIUM SHADE
 	S_hodoor: U+2592                    # MEDIUM SHADE
-	S_bars: U+2261                      # IDENTICAL TO
-	S_tree: U+03a8                      # GREEK CAPITAL LETTER PSI
+#	S_bars: U+2261                      # IDENTICAL TO
+	S_bars: U+2980                      # ⦀
+#	S_tree: U+03a8                      # GREEK CAPITAL LETTER PSI
+#	S_tree: U+1F332                     # 🌲
+	S_tree: U+2660                      # ♠
 	S_room: U+00b7                      # MIDDLE DOT
 	S_engroom: U+03BE                   # Greek Small Letter Xi
 	S_darkroom: U+00b7                  # MIDDLE DOT
@@ -833,6 +958,7 @@ start: Enhanced1
 	G_fountain: U+2320/0-150-255        # TOP HALF INTEGRAL
 	S_pool: U+224b                      # TRIPLE TILDE
 	S_ice: U+00b7                       # MIDDLE DOT
+#	S_ice: U+2744                       # ❄️
 	S_lava: U+224b                      # TRIPLE TILDE
 	S_lavawall: U+2248                  # ALMOST EQUAL TO
 	S_vodbridge: U+00b7                 # MIDDLE DOT
@@ -871,28 +997,106 @@ start: Enhanced1
 	G_tdwall_gehennom: U+252C/red
 	G_tlwall_gehennom: U+2524/red
 	G_trwall_gehennom: U+251C/red
-	G_vwall_knox:  U+2502/150-75-0
-	G_hwall_knox:  U+2500/150-75-0
-	G_tlcorn_knox: U+250c/150-75-0
-	G_trcorn_knox: U+2510/150-75-0
-	G_blcorn_knox: U+2514/150-75-0
-	G_brcorn_knox: U+2518/150-75-0
-	G_crwall_knox: U+253C/150-75-0
-	G_tuwall_knox: U+2534/150-75-0
-	G_tdwall_knox: U+252C/150-75-0
-	G_tlwall_knox: U+2524/150-75-0
-	G_trwall_knox: U+251C/150-75-0
-	G_vwall_mines:  U+2502/113-126-142
-	G_hwall_mines:  U+2500/113-126-142
-	G_tlcorn_mines: U+250c/113-126-142
-	G_trcorn_mines: U+2510/113-126-142
-	G_blcorn_mines: U+2514/113-126-142
-	G_brcorn_mines: U+2518/113-126-142
-	G_crwall_mines: U+253C/113-126-142
-	G_tuwall_mines: U+2534/113-126-142
-	G_tdwall_mines: U+252C/113-126-142
-	G_tlwall_mines: U+2524/113-126-142
-	G_trwall_mines: U+251C/113-126-142
+	G_vwall_knox:  U+2502/126-230-230
+	G_hwall_knox:  U+2500/126-230-230
+	G_tlcorn_knox: U+250c/126-230-230
+	G_trcorn_knox: U+2510/126-230-230
+	G_blcorn_knox: U+2514/126-230-230
+	G_brcorn_knox: U+2518/126-230-230
+	G_crwall_knox: U+253C/126-230-230
+	G_tuwall_knox: U+2534/126-230-230
+	G_tdwall_knox: U+252C/126-230-230
+	G_tlwall_knox: U+2524/126-230-230
+	G_trwall_knox: U+251C/126-230-230
+	G_vwall_mines:  U+2502/190-126-0
+	G_hwall_mines:  U+2500/190-126-0
+	G_tlcorn_mines: U+250c/190-126-0
+	G_trcorn_mines: U+2510/190-126-0
+	G_blcorn_mines: U+2514/190-126-0
+	G_brcorn_mines: U+2518/190-126-0
+	G_crwall_mines: U+253C/190-126-0
+	G_tuwall_mines: U+2534/190-126-0
+	G_tdwall_mines: U+252C/190-126-0
+	G_tlwall_mines: U+2524/190-126-0
+	G_trwall_mines: U+251C/190-126-0
+finish
+
+start: AmigaFont
+	Description: Amiga hack.font line-drawing and effect characters
+	# Dungeon features
+	S_stone: \x20
+	S_vwall: \xc0
+	S_hwall: \xc1
+	S_tlcorn: \xc2
+	S_trcorn: \xc3
+	S_blcorn: \xc4
+	S_brcorn: \xc5
+	S_crwall: \xc6
+	S_tuwall: \xd8
+	S_tdwall: \xd6
+	S_tlwall: \xd7
+	S_trwall: \xd5
+	S_ndoor: \xd9
+	S_vodoor: \x91
+	S_hodoor: \x92
+	S_vcdoor: \x93
+	S_hcdoor: \x94
+	S_bars: '#'
+	S_tree: '#'
+	S_room: '.'
+	S_darkroom: \x20
+	S_corr: \xe5
+	S_litcorr: \xe5
+	S_upstair: '<'
+	S_dnstair: '>'
+	S_upladder: '<'
+	S_dnladder: '>'
+	S_altar: '_'
+	S_grave: \x5c
+	S_throne: '#'
+	S_sink: '{'
+	S_fountain: '}'
+	S_pool: '*'
+	S_ice: '}'
+	S_lava: '*'
+	S_vodbridge: '*'
+	S_hodbridge: '#'
+	S_vcdbridge: '#'
+	S_hcdbridge: '.'
+	S_air: '#'
+	S_cloud: '}'
+	# Traps: all default to '^' except web
+	S_web: '"'
+	# Effects
+	S_vbeam: \xf1
+	S_hbeam: \xf0
+	S_lslant: \xf2
+	S_rslant: \xf3
+	S_digbeam: '*'
+	S_flashbeam: '!'
+	S_boomleft: '{'
+	S_boomright: '}'
+	S_ss1: '@'
+	S_ss2: '&'
+	S_ss3: '*'
+	S_ss4: '#'
+	S_sw_tl: \xf4
+	S_sw_tc: \xf5
+	S_sw_tr: \xf6
+	S_sw_ml: \xf7
+	S_sw_mr: \xef
+	S_sw_bl: \xf8
+	S_sw_bc: \xf9
+	S_sw_br: \xfa
+	S_explode1: \xe6
+	S_explode2: \xea
+	S_explode3: \xe7
+	S_explode4: \xec
+	S_explode5: \xd4
+	S_explode6: \xed
+	S_explode7: \xe8
+	S_explode8: \xeb
+	S_explode9: \xe9
 finish
 
 # symbols EOF

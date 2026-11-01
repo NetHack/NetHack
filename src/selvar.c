@@ -1,4 +1,4 @@
-/* NetHack 3.7	selvar.c	$NHDT-Date: 1709677544 2024/03/05 22:25:44 $  $NHDT-Branch: keni-mdlib-followup $:$NHDT-Revision: 1.360 $ */
+/* NetHack 5.0	selvar.c	$NHDT-Date: 1769840272 2026/01/30 22:17:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.4 $ */
 /* Copyright (c) 2024 by Pasi Kallinen */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -189,11 +189,18 @@ selection_setpoint(
         return;
 
     if (c && !sel->bounds_dirty) {
-        if (sel->bounds.lx > x) sel->bounds.lx = x;
-        if (sel->bounds.ly > y) sel->bounds.ly = y;
-        if (sel->bounds.hx < x) sel->bounds.hx = x;
-        if (sel->bounds.hy < y) sel->bounds.hy = y;
-    } else {
+        if (sel->bounds.lx > x)
+            sel->bounds.lx = x;
+        if (sel->bounds.ly > y)
+            sel->bounds.ly = y;
+        if (sel->bounds.hx < x)
+            sel->bounds.hx = x;
+        if (sel->bounds.hy < y)
+            sel->bounds.hy = y;
+
+    /* only set bounds_dirty if changing a point from 1 to 0; if changing
+       a point from 0 to 0, nothing has really changed with the bounds */
+    } else if (sel->map[sel->wid * y + x] != 0) {
         sel->bounds_dirty = TRUE;
     }
 

@@ -1,4 +1,4 @@
-/* NetHack 3.7	windows.c	$NHDT-Date: 1737345149 2025/01/19 19:52:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.138 $ */
+/* NetHack 5.0	windows.c	$NHDT-Date: 1737345149 2025/01/19 19:52:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.138 $ */
 /* Copyright (c) D. Cohrs, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -22,7 +22,7 @@ extern struct window_procs Qt_procs;
 #ifdef GEM_GRAPHICS
 /*#include "wingem.h"*/
 #endif
-#ifdef MAC
+#ifdef MACOS9
 extern struct window_procs mac_procs;
 #endif
 #ifdef BEOS_GRAPHICS
@@ -111,7 +111,7 @@ static struct win_choices {
 #ifdef GEM_GRAPHICS
     { &Gem_procs, win_Gem_init CHAINR(0) },
 #endif
-#ifdef MAC
+#ifdef MACOS9
     { &mac_procs, 0 CHAINR(0) },
 #endif
 #ifdef BEOS_GRAPHICS
@@ -333,7 +333,7 @@ choose_windows(const char *s)
     if (tmps)
         free((genericptr_t) tmps) /*, tmps = 0*/ ;
 
-    if (windowprocs.win_raw_print == def_raw_print || WINDOWPORT(safestartup))
+    if (windowprocs.win_raw_print == def_raw_print)
         nh_terminate(EXIT_SUCCESS);
 }
 
@@ -543,7 +543,7 @@ staticfn void hup_cliparound(int, int);
 #endif
 #ifdef CHANGE_COLOR
 staticfn void hup_change_color(int, long, int);
-#ifdef MAC
+#ifdef MACOS9
 staticfn short hup_set_font_name(winid, char *);
 #endif
 staticfn char *hup_get_color_string(void);
@@ -592,7 +592,7 @@ static struct window_procs hup_procs = {
     hup_void_ndecl,                                   /* nh_delay_output  */
 #ifdef CHANGE_COLOR
     hup_change_color,
-#ifdef MAC
+#ifdef MACOS9
     hup_void_fdecl_int,                               /* change_background */
     hup_set_font_name,
 #endif
@@ -795,14 +795,14 @@ hup_change_color(int color UNUSED, long rgb UNUSED, int reverse UNUSED)
     return;
 }
 
-#ifdef MAC
+#ifdef MACOS9
 /*ARGSUSED*/
 staticfn short
 hup_set_font_name(winid window UNUSED, char *fontname UNUSED)
 {
     return 0;
 }
-#endif /* MAC */
+#endif /* MACOS9 */
 
 staticfn char *
 hup_get_color_string(void)
@@ -1186,7 +1186,7 @@ dump_fmtstr(
                 else
                     Strcpy(tmpbuf, "{current date+time}");
                 break;
-            case 'v': /* version, eg. "3.7.0-0" */
+            case 'v': /* version, eg. "5.0.0,-0" */
                 Sprintf(tmpbuf, "%s", version_string(verbuf, sizeof verbuf));
                 break;
             case 'u': /* UID */
@@ -1852,7 +1852,8 @@ get_menu_coloring(const char *str, int *color, int *attr)
     return FALSE;
 }
 
-int select_menu(winid window, int how, menu_item **menu_list)
+int
+select_menu(winid window, int how, menu_item **menu_list)
 {
     int reslt;
     boolean old_bot_disabled = gb.bot_disabled;
@@ -1867,6 +1868,31 @@ void
 getlin(const char *query, char *bufp)
 {
     boolean old_bot_disabled = gb.bot_disabled;
+    char *obufp = bufp;
+    boolean got_cmdq = FALSE;
+    struct _cmd_queue *cmdq = NULL;
+
+    while ((cmdq = cmdq_pop()) != 0) {
+        if (cmdq->typ == CMDQ_KEY) {
+            got_cmdq = TRUE;
+            *bufp = (cmdq->key != '\n') ? cmdq->key : '\0';
+            bufp++;
+            if (cmdq->key == '\n')
+                break;
+        } else {
+            break;
+        }
+        free(cmdq);
+        cmdq = NULL;
+    }
+    if (cmdq)
+        free(cmdq);
+
+    if (got_cmdq) {
+        *bufp = '\0';
+        pline("%s %s", query, obufp);
+        return;
+    }
 
     program_state.in_getlin = 1;
     gb.bot_disabled = TRUE;

@@ -1,4 +1,4 @@
-NetHack 3.7  sound.txt	$NHDT-Date: 1693253363 2023/08/28 20:09:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.7 $
+NetHack 5.0  sound.txt	$NHDT-Date: 1693253363 2023/08/28 20:09:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.7 $
 
 Introduction
 
@@ -495,7 +495,7 @@ use the following guidelines:
                         These hints files might require updates to
                         include your new soundlib addition. You can
                         look at what was done for macsound support
-                        in sys/unix/hints/macOS.370 for inspiration.
+                        in sys/unix/hints/macOS.500 for inspiration.
 
        sys/unix/NetHack.xcodeproj/project.pbxproj
 

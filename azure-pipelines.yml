@@ -24,10 +24,15 @@ strategy:
       imageName: 'macOS-15'
       toolchainName: clang
       buildTargetName: all
-    windows-visualstudio:
+    windows-x64-vstudio:
       imageName: 'windows-latest'
       toolchainName: vs
       buildTargetName: all
+    windows-arm64-vstudio:
+      imageName: 'windows-latest'
+      toolchainName: vs
+      buildTargetName: all
+      buildPlatform: 'ARM64' # Targeting Snapdragon
     windows-mingw:
       imageName: 'windows-2025'
       toolchainName: mingw
@@ -129,7 +134,7 @@ steps:
     export LUASRC=../submodules/lua
     export ADD_CURSES=Y
     export PDCURSES_TOP=../submodules/pdcursesmod
-    export LUA_VERSION=5.4.6
+    export LUA_VERSION=5.4.8
     #
     # 64-bit
     #export CURLSRC=https://github.com/brechtsanders/winlibs_mingw/releases/download/14.2.0posix-19.1.1-12.0.0-ucrt-r2/winlibs-x86_64-posix-seh-gcc-14.2.0-llvm-19.1.1-mingw-w64ucrt-12.0.0-r2.zip
@@ -235,13 +240,13 @@ steps:
     sys/msdos/fetch-cross-compiler.sh
     retVal=$?
     if [ $retVal -eq 0 ]; then
-        make LUA_VERSION=5.4.6 WANT_WIN_TTY=1 WANT_WIN_CURSES=1 CROSS_TO_MSDOS=1 $IN_CI package
+        make LUA_VERSION=5.4.8 WANT_WIN_TTY=1 WANT_WIN_CURSES=1 CROSS_TO_MSDOS=1 $IN_CI package
     fi
   condition: and(eq( variables['Agent.OS'], 'Linux' ), eq( variables.toolchain, 'cross'))
   workingDirectory: $(Agent.BuildDirectory)/$(netHackPath)
   displayName: 'Building MSDOS build'
 - bash: |
-    sudo apt-get install texlive
+    sudo apt install texlive texlive-latex-extra
     make Guidebook
     make Guidebook.txt
     make Guidebook.pdf

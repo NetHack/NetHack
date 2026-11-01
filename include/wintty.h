@@ -1,4 +1,4 @@
-/* NetHack 3.7	wintty.h	$NHDT-Date: 1656014599 2022/06/23 20:03:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.55 $ */
+/* NetHack 5.0	wintty.h	$NHDT-Date: 1656014599 2022/06/23 20:03:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.55 $ */
 /* Copyright (c) David Cohrs, 1991,1992                           */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -280,7 +280,7 @@ extern void tty_number_pad(int);
 extern void tty_delay_output(void);
 #ifdef CHANGE_COLOR
 extern void tty_change_color(int color, long rgb, int reverse);
-#ifdef MAC
+#ifdef MACOS9
 extern void tty_change_background(int white_or_black);
 extern short set_tty_font_name(winid, char *);
 #endif
@@ -331,7 +331,7 @@ extern char *tgetstr(const char *, char **);
 extern char *tgoto(const char *, int, int);
 #endif /* NO_TERMCAP_HEADERS */
 #else  /* ?NO_TERMS */
-#ifdef MAC
+#ifdef MACOS9
 #ifdef putchar
 #undef putchar
 #undef putc
@@ -342,7 +342,7 @@ extern char *tgoto(const char *, int, int);
 extern int term_putc(int c);
 extern int term_flush(void *desc);
 extern int term_puts(const char *str);
-#endif /* MAC */
+#endif /* MACOS9 */
 #if defined(MSDOS) || defined(WIN32)
 #if defined(SCREEN_BIOS) || defined(SCREEN_DJGPPFAST) || defined(WIN32)
 #undef putchar

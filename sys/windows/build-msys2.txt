@@ -30,7 +30,7 @@ Prerequisite Requirements:
                +----------+          +------+      +----+     +----+
                |          |          |      |      |    |     |    |
                |          |          |      |      |    |     |    |
-           lua-5.4.6  pdcursesmod  share windows  tty  win32 lua pdcursesmod
+           lua-5.4.8  pdcursesmod  share windows  tty  win32 lua pdcursesmod
                                                   |
                                                   vs
                                                   |
@@ -46,7 +46,7 @@ Required components that are not bundled in the NetHack repository, but
 are required to build NetHack yourself.
 
 Lua
-        NetHack 3.7 for Windows requires 3rd party Lua source that is not part
+        NetHack 5.0 for Windows requires 3rd party Lua source that is not part
         of the NetHack distribution or repository.
 
         A bash shell script for fetching prerequisite
@@ -55,7 +55,7 @@ Lua
             sh sys/windows/fetch.sh lua
 
 Curses
-        If you want to include curses interface support in NetHack 3.7 for
+        If you want to include curses interface support in NetHack 5.0 for
         3rd part pdcursesmod source code is required and is not part of the
         NetHack distribution or repository.
 
@@ -82,7 +82,7 @@ architectures have evolved and you can now choose whether to build
 a 32-bit x86 version, or a 64-bit x64 version.  The default Makefile
 is set up for a 32-bit x86 version, but that's only because it will
 run on the largest number of existing Windows environments. Change it if you
-want. Be aware that NetHack's save files and bones files in the 3.7.0
+want. Be aware that NetHack's save files and bones files in the 5.0.0
 release are not interchangeable between the 32-bit version and the
 64-bit version (or between different platforms).
 

@@ -1,4 +1,4 @@
-# NetHack 3.7  bogusmon.txt       $NHDT-Date: 1596498237 2020/08/03 23:43:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.10 $
+# NetHack 5.0  bogusmon.txt       $NHDT-Date: 1596498237 2020/08/03 23:43:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.10 $
 # Copyright (c) 2016 by Pasi Kallinen
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -97,6 +97,22 @@ voussoir
 barking spider
 frog cloud
 toothsayer
+third eye
+owlpug
+pugasus
+acorn
+red dot
+robot chicken
+doozer
+poison cackler
+lhurgoyf
+phelddagrif
+tiktaalik
+weremoustache
+rapier tapir
+choplet
+pommelbug
+quest sprout
 
 # Quendor (Zork, &c.)
 grue
@@ -301,6 +317,7 @@ wiki
 peer
 COBOL
 wire shark
+stray tab
 
 # bugs
 bohrbug
@@ -383,9 +400,6 @@ little green man
 
 # Portal
 weighted Companion Cube
-
-# /b/
-/b/tard
 
 # South Park
 manbearpig

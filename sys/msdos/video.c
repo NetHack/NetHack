@@ -1,4 +1,4 @@
-/* NetHack 3.7	video.c	$NHDT-Date: 1596498277 2020/08/03 23:44:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.16 $ */
+/* NetHack 5.0	video.c	$NHDT-Date: 1596498277 2020/08/03 23:44:37 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.16 $ */
 /*   Copyright (c) NetHack PC Development Team 1993, 1994, 2001     */
 /*   NetHack may be freely redistributed.  See license for details. */
 
@@ -174,28 +174,28 @@ term_curs_set(int visibility)
         return;
 
     if (!visibility) {
-	if (!iflags.grmode) {
+        if (!iflags.grmode) {
             txt_hide_cursor();
 #ifdef SCREEN_VGA
-	} else if (iflags.usevga) {
-	    vga_hide_cursor();
+        } else if (iflags.usevga) {
+            vga_hide_cursor();
 #endif
 #ifdef SCREEN_VESA
-	} else if (iflags.usevesa) {
-	    vesa_hide_cursor();
-	}
+        } else if (iflags.usevesa) {
+            vesa_hide_cursor();
+        }
 #endif
     } else if (visibility) {
-	if (!iflags.grmode) {
+        if (!iflags.grmode) {
             txt_show_cursor();
 #ifdef SCREEN_VGA
-	} else if (iflags.usevga) {
+        } else if (iflags.usevga) {
             vga_show_cursor();
 #endif
 #ifdef SCREEN_VESA
-	} else if (iflags.usevesa) {
+        } else if (iflags.usevesa) {
             vesa_show_cursor();
-	}
+        }
 #endif
     }
     vis = visibility;
@@ -419,7 +419,7 @@ term_start_color(int color)
     if (monoflag) {
         g_attribute = attrib_text_normal;
     } else {
-        if (color == NO_COLOR) { /* 3.7 behave like term_end_color() */
+        if (color == NO_COLOR) { /* 5.0 behave like term_end_color() */
             g_attribute = iflags.grmode ? attrib_gr_normal : attrib_text_normal;
             curframecolor = NO_COLOR;
         } else if (color >= 0 && color < CLR_MAX) {

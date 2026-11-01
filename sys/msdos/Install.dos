@@ -1,14 +1,14 @@
 
-	   Copyright (c) NetHack PC Development Team 1990-2023.
+	   Copyright (c) NetHack PC Development Team 1990-2026.
        NetHack may be freely redistributed.  See license for details.
        ==============================================================
               Instructions for compiling and installing
-		     NetHack 3.7 on a DOS system
+		     NetHack 5.0 on a DOS system
          ======================================================
-                   (or, How to make PC NetHack 3.7)
+                   (or, How to make PC NetHack 5.0)
         Last revision: $NHDT-Date: 1596508786 2021/06/04 08:45:00 $
 
-Credit for a runnable full PC NetHack 3.7 goes to the PC Development team
+Credit for a runnable full PC NetHack 5.0 goes to the PC Development team
 of Paul Winner, Kevin Smolkowski, Michael Allison, Yitzhak Sapir, Bill Dyer,
 Timo Hakulinen, Yamamoto Keizo, Mike Threepoint, Mike Stephenson,
 Stephen White, Ken Washikita and Janet Walz.  The present port is based
@@ -42,7 +42,7 @@ II. There once was a time when people built NetHack right on their DOS machine.
     a DOS-extender (for including in msdos packaging) from:
         http://sandmann.dotster.com/cwsdpmi/csdpmi7b.zip
     and Lua from:
-        http://www.lua.org/ftp/lua-5.4.6.tar.gz
+        http://www.lua.org/ftp/lua-5.4.8.tar.gz
 
     If you want the DOSVGA build, to support higher resolutions and Unicode
     symbols, you also need:
@@ -61,7 +61,7 @@ II. There once was a time when people built NetHack right on their DOS machine.
         sys/msdos/fetch-cross-compiler.sh
 
     That script won't install anything, it just does file fetches and stores
-    them in subfolders of lib. The linux.370 and macOS.370 hints files are
+    them in subfolders of lib. The linux.500 and macOS.500 hints files are
     configured to find the cross-compiler there if you add
         CROSS_TO_MSDOS=1
     on your make command line.
@@ -72,12 +72,12 @@ II. There once was a time when people built NetHack right on their DOS machine.
 
     On your linux host:
 
-        cd sys/unix ; sh setup.sh hints/linux.370 ; cd ../..
+        cd sys/unix ; sh setup.sh hints/linux.500 ; cd ../..
         make fetch-lua
 
     On your macOS host:
 
-        cd sys/unix ; sh setup.sh hints/macOS.370 ; cd ../..
+        cd sys/unix ; sh setup.sh hints/macOS.500 ; cd ../..
         make fetch-lua
 
     The MSDOS cross-compile can then be carried out by specifying
@@ -123,7 +123,7 @@ Appendix B - Common Difficulties Encountered
 
      For example:
          make CROSS_TO_MSDOS=1 package
-         ( cd src ; make LUA_VERSION=5.4.6 nethack )
+         ( cd src ; make LUA_VERSION=5.4.8 nethack )
          make[1]: Entering directory '/home/johndoe/NHsource/src'
          mkdir -p ../targets/msdos ; make ../targets/msdos/exceptn.o ;
          make[2]: Entering directory '/home/johndoe/NHsource/src'

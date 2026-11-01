@@ -2,7 +2,7 @@
 // Qt4 conversion copyright (c) Ray Chason, 2012-2014.
 // NetHack may be freely redistributed.  See license for details.
 
-// Qt Windowing interface for NetHack 3.7
+// Qt Windowing interface for NetHack 5.0
 //
 // Copyright (C) 1996-2001 by Warwick W. Allison (warwick@troll.no)
 // 

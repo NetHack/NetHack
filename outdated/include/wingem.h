@@ -1,4 +1,4 @@
-/* NetHack 3.7	wingem.h	$NHDT-Date: 1596498570 2020/08/03 23:49:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.15 $ */
+/* NetHack 3.6	wingem.h	$NHDT-Date: 1596498570 2020/08/03 23:49:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.15 $ */
 /* Copyright (c) Christian Bressler, 1999				  */
 /* NetHack may be freely redistributed.  See license for details. */
 

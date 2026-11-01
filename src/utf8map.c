@@ -1,4 +1,4 @@
-/* NetHack 3.7	utf8map.c	*/
+/* NetHack 5.0	utf8map.c	*/
 /* Copyright (c) Michael Allison, 2021. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -207,7 +207,8 @@ add_custom_urep_entry(
 }
 #endif /* ENHANCED_SYMBOLS */
 
-void reset_customsymbols(void)
+void
+reset_customsymbols(void)
 {
 #ifdef ENHANCED_SYMBOLS
     free_all_glyphmap_u();

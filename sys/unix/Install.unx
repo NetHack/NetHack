@@ -1,4 +1,4 @@
-                Instructions for installing NetHack 3.7
+                Instructions for installing NetHack 5.0
                            on a UNIX system
                 =======================================
 NB: We are gradually replacing this process with the process documented in
@@ -109,7 +109,7 @@ the file NewInstall.unx.
 Notes:
 
 1.  Save files and bones files from previous versions will not work with
-    NetHack 3.7.  Don't bother trying to keep them.
+    NetHack 5.0.  Don't bother trying to keep them.
 
 2.  To install an update of this version of NetHack after changing something,
     type 'make update' from the main directory.  If you created the new
@@ -251,6 +251,6 @@ Notes:
     to CFLAGS in src/Makefile.  (The hints files for Mac OSX already do the
     latter.)
 
-# NetHack 3.7  Install.unx       $NHDT-Date: 1577568915 2019/12/28 21:35:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.14 $
+# NetHack 5.0  Install.unx       $NHDT-Date: 1577568915 2019/12/28 21:35:15 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.14 $
 # Copyright (c) 2012 by Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.

@@ -1,12 +1,9 @@
-/* NetHack 3.7	botl.c	$NHDT-Date: 1742207239 2025/03/17 02:27:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.274 $ */
+/* NetHack 5.0	botl.c	$NHDT-Date: 1769839231 2026/01/30 22:00:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.277 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-#ifndef LONG_MAX
-#include <limits.h>
-#endif
 
 extern const char *const hu_stat[]; /* defined in eat.c */
 
@@ -19,9 +16,8 @@ const char *const enc_stat[] = {
 staticfn const char *rank(void);
 staticfn void bot_via_windowport(void);
 staticfn void stat_update_time(void);
-staticfn char *get_strength_str(void);
 
-staticfn char *
+char *
 get_strength_str(void)
 {
     static char buf[32];
@@ -61,7 +57,7 @@ do_statusline1(void)
     Strcpy(newbot1, svp.plname);
     if ('a' <= newbot1[0] && newbot1[0] <= 'z')
         newbot1[0] += 'A' - 'a';
-    newbot1[10] = 0;
+    newbot1[BOTL_NSIZ] = 0;
     Sprintf(nb = eos(newbot1), " the ");
 
     if (Upolyd) {
@@ -479,6 +475,145 @@ describe_level(
     return ret;
 }
 
+/* weapon description for status lines; started as a terser version of
+   what ^X shows but has diverged to some extent */
+char *
+weapon_status(char *outbuf)
+{
+    const char *res = 0;
+
+    *outbuf = '\0'; /* lint suppression */
+    if (!uwep) {
+        /* no weapon; gloves imply hands; humanoid also implies hands;
+           otherwise make no assumptions */
+        res = uarmg ? "Empty-hnd" /* empty handed means "gloves only" */
+              : humanoid(gy.youmonst.data) ? "Bare-hnds" /* bare hands */
+                : "No-weapon";
+    } else if (u.twoweap) {
+        /* two-weaponing implies hands and a weapon or wep-tool
+           (not other odd stuff) in each hand */
+        res = "Dual-weps";
+        /* note: dual wielding two lances doesn't produce double joust */
+        if (u.usteed && (weapon_type(uwep) == P_LANCE
+                         || weapon_type(uswapwep) == P_LANCE))
+            res = "Dual+joust"; /* lance behaves specially when mounted */
+    } else {
+        /* report most weapons by their skill class (so a katana will be
+           described as a long sword, for instance; mattock and hook are
+           exceptions), or wielded non-weapon item by its object class */
+        char *p;
+        int skill = weapon_type(uwep);
+
+        if (u.usteed && skill == P_LANCE) {
+            /* lance behaves specially when hero is mounted */
+            res = "joust";
+        } else if (uwep->otyp == AKLYS) {
+            /* aklys behaves specially when thrown while wielded, so
+               give it a distinct name instead of skill name of "club";
+               [maybe FIXME?] for the time being
+               use real name even if 'obj' is undiscovered "thonged club" */
+            res = "aklys";
+        } else if (is_sword(uwep)) {
+            /* simplify short short/broad sword/long sword/two-handed sword
+               (similar to messages when dropped due to slippery fingers) */
+            res = "sword";
+        } else {
+            /* shorten several */
+            switch (skill) {
+            case P_QUARTERSTAFF:
+                res = "staff";
+                break;
+            case P_MORNING_STAR:
+                res = "mrng-star"; /* still pretty long */
+                break;
+            case P_POLEARMS:
+                res = "pole";
+                break;
+            case P_UNICORN_HORN:
+                res = "unihorn";
+                break;
+            default:
+                res = weapon_descr(uwep);
+                /* [should this be moved into weapon_descr()?] */
+                if (!strcmpi(res, "food") && uwep->otyp == CREAM_PIE)
+                    res = "pie";
+                break;
+            }
+        }
+
+        if ((uwep->oclass == WEAPON_CLASS || is_weptool(uwep))
+            && bimanual(uwep) && *res != '2' && strncmpi(res, "two", 3))
+            Strcat(outbuf, "2H-");
+        Strcpy(p = eos(outbuf), res), res = outbuf;
+        *p = highc(*p);
+        /* avoid embedded spaces since its designed to appear as part
+           of a space-separated status line */
+        (void) strNsubst(outbuf, " ", "-", 0);
+    }
+
+    return (outbuf == res) ? outbuf : strcpy(outbuf, res);
+}
+
+/* armor description for status lines */
+char *
+armor_status(char *armbuf)
+{
+    int n = !!uarmg + !!uarmc + !!uarm + !!uarmu + !!uarmh + !!uarmf + !!uarms;
+
+    /*
+     * FIXME: ^X needs to provide non-abbreviated version of this info.
+     * At present it just reports the "no armor" case.
+     */
+    if (n == 0) { /* no armor */
+        Strcpy(armbuf, "naked");
+    } else if (n == 1) { /* just one piece; spell it out */
+        Strcpy(armbuf, uarmg ? "gloves"
+                       : uarmc ? "cloak"
+                         : uarm  ? "suit"
+                           : uarmu ? "shirt"
+                             : uarmh ? helm_simple_name(uarmh) /* hat|helm */
+                               : uarmf ? "boots"
+                                 : uarms ? "shield"
+                                   : ""); /* not possible */
+    } else { /* more than one piece */
+        char *p = armbuf;
+
+        /* gloves first since this is expected to follow weapon_status();
+           cloak next since it tends to provide the most protection
+           aside from raw AC */
+        if (uarmg)
+            *p++ = 'G'; /* gloves */
+        if (uarmc)
+            *p++ = 'C'; /* cloak */
+        if (uarm)
+            *p++ = 'A'; /* suit but 's' is for shield */
+        if (uarmu)
+            *p++ = 'U'; /* underwear? => shirt */
+        if (uarmh)
+            *p++ = 'H'; /* hat/helm */
+        if (uarmf)
+            *p++ = 'B'; /* footwear => boots */
+        if (uarms)
+            *p++ = 'S'; /* shield */
+        *p = '\0';
+    }
+    /*
+     * Add a hint about MC by appending a plus sign if that's augmented.
+     * Bug:  we should modfiy magical_negation() to return extra info and
+     * call it to scan whole inventory looking for sources of protection.
+     * This is a hack for efficiency to avoid that during status updates.
+     */
+    if ((uright && uright->otyp == RIN_PROTECTION)
+        || (uleft && uleft->otyp == RIN_PROTECTION)
+        || (uamul && uamul->otyp == AMULET_OF_GUARDING)
+        || (uarmc && uarmc->otyp == CLOAK_OF_PROTECTION)
+        || (uarmh && uarmh->oartifact == ART_MITRE_OF_HOLINESS)
+        || (uwep && uwep->oartifact == ART_TSURUGI_OF_MURAMASA))
+        (void) strkitten(armbuf, '+');
+
+    return upstart(armbuf);
+}
+
 /* =======================================================================*/
 /*  statusnew routines                                                    */
 /* =======================================================================*/
@@ -554,9 +689,17 @@ staticfn void status_hilites_viewall(void);
       { (genericptr_t) 0 }, { (genericptr_t) 0 }, (char *) 0,           \
       wid, maxfld, fld  INIT_THRESH }
 
-/* If entries are added to this, botl.h will require updating too.
-   'max' value of BL_EXP gets special handling since the percentage
-   involved isn't a direct 100*current/maximum calculation. */
+/*
+ * If entries are added to this, botl.h will require updating too.
+ *
+ * 'max' values of BL_XP and BL_EXP get special handling since the
+ * percentage involved isn't a direct 100*current/maximum calculation.
+ *
+ * long int fields are given a buffer size of 30 which is guaranteed to
+ * be big enough for short prefix followed by a 20+ digit 64-bit long
+ * even though the actual values will be much smaller.  The gold field
+ * is even bigger due to its encoded dollar sign prefix.
+ */
 static struct istat_s initblstats[MAXBLSTATS] = {
     INIT_BLSTAT("title", "%s", ANY_STR, MAXVALWIDTH, BL_TITLE),
     INIT_BLSTAT("strength", " St:%s", ANY_INT, 10, BL_STR),
@@ -565,28 +708,36 @@ static struct istat_s initblstats[MAXBLSTATS] = {
     INIT_BLSTAT("intelligence", " In:%s", ANY_INT, 10, BL_IN),
     INIT_BLSTAT("wisdom", " Wi:%s", ANY_INT, 10, BL_WI),
     INIT_BLSTAT("charisma", " Ch:%s", ANY_INT, 10, BL_CH),
-    INIT_BLSTAT("alignment", " %s", ANY_STR, 40, BL_ALIGN),
-    INIT_BLSTAT("score", " S:%s", ANY_LONG, 20, BL_SCORE),
+    INIT_BLSTAT("alignment", " %s", ANY_STR, 20, BL_ALIGN),
+    INIT_BLSTAT("score", " S:%s", ANY_LONG, 30, BL_SCORE),
     INIT_BLSTAT("carrying-capacity", " %s", ANY_INT, 20, BL_CAP),
-    INIT_BLSTAT("gold", " %s", ANY_LONG, 30, BL_GOLD),
+    INIT_BLSTAT("gold", " %s", ANY_LONG, 40, BL_GOLD),
     INIT_BLSTATP("power", " Pw:%s", ANY_INT, 10, BL_ENEMAX, BL_ENE),
     INIT_BLSTAT("power-max", "(%s)", ANY_INT, 10, BL_ENEMAX),
     INIT_BLSTATP("experience-level", " Xp:%s", ANY_INT, 10, BL_EXP, BL_XP),
     INIT_BLSTAT("armor-class", " AC:%s", ANY_INT, 10, BL_AC),
     INIT_BLSTAT("HD", " HD:%s", ANY_INT, 10, BL_HD),
-    INIT_BLSTAT("time", " T:%s", ANY_LONG, 20, BL_TIME),
+    INIT_BLSTAT("time", " T:%s", ANY_LONG, 30, BL_TIME),
     /* hunger used to be 'ANY_UINT'; see note below in bot_via_windowport() */
-    INIT_BLSTAT("hunger", " %s", ANY_INT, 40, BL_HUNGER),
+    INIT_BLSTAT("hunger", " %s", ANY_INT, 20, BL_HUNGER),
     INIT_BLSTATP("hitpoints", " HP:%s", ANY_INT, 10, BL_HPMAX, BL_HP),
     INIT_BLSTAT("hitpoints-max", "(%s)", ANY_INT, 10, BL_HPMAX),
     INIT_BLSTAT("dungeon-level", "%s", ANY_STR, MAXVALWIDTH, BL_LEVELDESC),
-    INIT_BLSTATP("experience", "/%s", ANY_LONG, 20, BL_EXP, BL_EXP),
+    INIT_BLSTATP("experience", "/%s", ANY_LONG, 30, BL_EXP, BL_EXP),
     INIT_BLSTAT("condition", "%s", ANY_MASK32, 0, BL_CONDITION),
     /* optional; once set it doesn't change unless 'showvers' option is
        toggled or player modifies the 'versinfo' option;
        available mostly for screenshots or someone looking over shoulder;
        blstat[][BL_VERS] is actually an int copy of flags.versinfo (0...7) */
     INIT_BLSTAT("version", " %s", ANY_STR, MAXVALWIDTH, BL_VERS),
+    /* weapon and armor are constructed strings with no particular numeric
+       equivalent */
+    INIT_BLSTAT("weapon", " %s", ANY_STR, 20, BL_WEAPON),
+    INIT_BLSTAT("armor", " %s", ANY_STR, 20, BL_ARMOR),
+    /* terrain is tracked by a number but designating it as type 'int'
+       isn't useful; using type 'string' allows highlighting based on text
+       matching which is potentially useful */
+    INIT_BLSTAT("terrain", " %s", ANY_STR, 20, BL_TERRAIN),
 };
 
 #undef INIT_BLSTATP
@@ -642,25 +793,27 @@ const struct conditions_t conditions[] = {
     { 10, BL_MASK_HALLU,     bl_hallu,     { "Hallu",    "Hal",   "Hl"  } },
     { 20, BL_MASK_HELD,      bl_held,      { "Held",     "Hld",   "Hd"  } },
     { 20, BL_MASK_ICY,       bl_icy,       { "Icy",      "Icy",   "Ic"  } },
-    {  8, BL_MASK_INLAVA,    bl_inlava,    { "Lava",     "Lav",   "La"  } },
+    {  8, BL_MASK_INLAVA,    bl_inlava,    { "InLava",   "Lav",   "La"  } },
     { 10, BL_MASK_LEV,       bl_lev,       { "Lev",      "Lev",   "Lv"  } },
     { 20, BL_MASK_PARLYZ,    bl_parlyz,    { "Parlyz",   "Para",  "Par" } },
     { 10, BL_MASK_RIDE,      bl_ride,      { "Ride",     "Rid",   "Rd"  } },
     { 20, BL_MASK_SLEEPING,  bl_sleeping,  { "Zzz",      "Zzz",   "Zz"  } },
     {  6, BL_MASK_SLIME,     bl_slime,     { "Slime",    "Slim",  "Slm" } },
-    { 20, BL_MASK_SLIPPERY,  bl_slippery,  { "Slip",     "Sli",   "Sl"  } },
+    { 20, BL_MASK_SLIPPERY,  bl_slippery,  { "Slip",     "Slp",   "Sl"  } },
     {  6, BL_MASK_STONE,     bl_stone,     { "Stone",    "Ston",  "Sto" } },
     {  4, BL_MASK_STRNGL,    bl_strngl,    { "Strngl",   "Stngl", "Str" } },
     { 10, BL_MASK_STUN,      bl_stun,      { "Stun",     "Stun",  "St"  } },
-    { 15, BL_MASK_SUBMERGED, bl_submerged, { "Sub",      "Sub",   "Sw"  } },
+    { 15, BL_MASK_SUBMERGED, bl_submerged, { "Submrg",   "Subm",  "Sm"  } },
     {  6, BL_MASK_TERMILL,   bl_termill,   { "TermIll",  "Ill",   "Ill" } },
     { 20, BL_MASK_TETHERED,  bl_tethered,  { "Teth",     "Tth",   "Te"  } },
     { 20, BL_MASK_TRAPPED,   bl_trapped,   { "Trap",     "Trp",   "Tr"  } },
     { 20, BL_MASK_UNCONSC,   bl_unconsc,   { "Out",      "Out",   "KO"  } },
-    { 20, BL_MASK_WOUNDEDL,  bl_woundedl,  { "Legs",     "Leg",   "Lg"  } },
+    { 20, BL_MASK_WOUNDEDL,  bl_woundedl,  { "WLegs",    "Leg",   "Lg"  } },
     { 20, BL_MASK_HOLDING,   bl_holding,   { "UHold",    "UHld",  "UHd" } },
 };
 
+/* [perhaps these should all be opt_out with default of 'in';
+   otherwise some players may never learn about them] */
 struct condtests_t condtests[CONDITION_COUNT] = {
     /* id, useropt, opt_in or out, enabled, configchoice, testresult;
        default value for enabled is !opt_in but can get changed via options */
@@ -697,6 +850,70 @@ struct condtests_t condtests[CONDITION_COUNT] = {
 };
 /* condition indexing */
 int cond_idx[CONDITION_COUNT] = { 0 };
+
+static const char c_Wall[] = "Wall";
+/*
+ *  Terrain descriptions for flags.terrainstatus; simplified from
+ *  def_syms[].name and indexed by iflags.terrain_typ; should be
+ *  kept in sync with rm.h types and the first half of def_syms[].
+ *  The extra pseudo-types are specified by classify_terrain()
+ *  when it sets up iflags.terrain_typ.  Walls and a few of the
+ *  others can only occur when hero has the Passes_walls ability.
+ */
+const char *terrain_descr[] = {
+/* 0*/ "Stone",         /* stone */
+       c_Wall,          /* vwall */
+       c_Wall,          /* hwall */
+       c_Wall,          /* tlcorner */
+       c_Wall,          /* trcorner */
+       c_Wall,          /* blcorner */
+       c_Wall,          /* brcorner */
+       c_Wall,          /* crosswall */
+       c_Wall,          /* tuwall */
+       c_Wall,          /* tdwall */
+/*10*/ c_Wall,          /* tlwall */
+       c_Wall,          /* trwall */
+       "Portcullis",    /* dbwall, closed drawbridge 'door' */
+       "Tree",
+       c_Wall,          /* sdoor: secret door */
+       "Stone",         /* scorr: secret corridor */
+       "Pool",          /* pool or non-moat water; can be boiled away */
+       "Moat",          /* water that can't be boiled away */
+       "Water",         /* water on Water level; can't be boiled or frozen */
+       "(gap)",         /* drawbridge_up; replaced by whatever is under */
+/*20*/ "Lava",          /* lavapool */
+       "LavaWall",      /* lava that extends to ceiling */
+       "Bars",          /* ironbars */
+       "Doorway",       /* doorless or broken door; diagonal movement is ok */
+       "Corridor",      /* replaced by "Floor" */
+       "Room",          /* also replaced by "Floor" */
+       "Stairs",
+       "Ladder",
+       "Fountain",
+       "Throne",
+/*30*/ "Sink",
+       "Grave",
+       "Altar",
+       "Ice",
+       "Bridge",        /* drawbridge_down, span across moat/ice/lava/floor */
+       "Air",           /* open air on Air level or bubble on Water level */
+       "Cloud",         /* [part of] a cloud or Air level */
+       /*
+        */
+/*37*/ "",              /* MAX_TYPE; skipped ratther than overloaded */
+/*38*/ c_Wall,          /* MATCH_WALL for special levels; shouldn't happen */
+       /*
+        * additional terrain names that aren't simple levl[][].typ values
+        */
+/*39*/ "Floor",         /* substituted for room or corridor */
+/*40*/ "Ground",        /* 'room' on Earth level */
+       "Open-door",     /* open (not broken or doorless) */
+       "Shut-door",     /* closed or locked (or trapped) */
+       "Swamp",         /* Juiblex level */
+       "Submerged",     /* under water */
+       "Sea",           /* moat terrain on Medusa's level: "shallow sea" */
+       "WaterWall",     /* water that extends to the ceiling */
+};
 
 /* cache-related */
 static boolean cache_avail[3] = { FALSE, FALSE, FALSE };
@@ -773,12 +990,12 @@ bot_via_windowport(void)
     nb[0] = highc(nb[0]);
     titl = !Upolyd ? rank() : pmname(&mons[u.umonnum], Ugender);
     i = (int) (strlen(buf) + sizeof " the " + strlen(titl) - sizeof "");
-    /* if "Name the Rank/monster" is too long, we truncate the name
-       but always keep at least 10 characters of it; when hitpointbar is
+    /* if "Name the Rank/monster" is too long, we truncate the name but
+       always keep at least BOTL_NSIZ characters of it; when hitpointbar is
        enabled, anything beyond 30 (long monster name) will be truncated */
     if (i > 30) {
         i = 30 - (int) (sizeof " the " + strlen(titl) - sizeof "");
-        nb[max(i, 10)] = '\0';
+        nb[max(i, BOTL_NSIZ)] = '\0';
     }
     Strcpy(nb = eos(nb), " the ");
     Strcpy(nb = eos(nb), titl);
@@ -1028,6 +1245,35 @@ bot_via_windowport(void)
     }
 #undef cond_bitset
 
+    /*
+     * Optionally displayed weapon(s), armor, and terrain.
+     */
+    if (flags.weaponstatus)
+        (void) weapon_status(gb.blstats[idx][BL_WEAPON].val);
+    else
+        *gb.blstats[idx][BL_WEAPON].val = '\0';
+
+    if (flags.armorstatus)
+        (void) armor_status(gb.blstats[idx][BL_ARMOR].val);
+    else
+        *gb.blstats[idx][BL_ARMOR].val = '\0';
+
+    if (flags.terrainstatus) {
+        if (iflags.terrain_typ == MAX_TYPE)
+            classify_terrain();
+        i = iflags.terrain_typ;
+        if (gb.blstats[idx][BL_TERRAIN].a.a_int != i) {
+            Strcpy(gb.blstats[idx][BL_TERRAIN].val, terrain_descr[i]);
+            gb.blstats[idx][BL_TERRAIN].a.a_int = i;
+        }
+    } else {
+        *gb.blstats[idx][BL_TERRAIN].val = '\0';
+        /* MAX_TYPE is "none of the above" for levl[][].typ */
+        gb.blstats[idx][BL_TERRAIN].a.a_int = MAX_TYPE;
+    }
+    gv.valset[BL_TERRAIN] = TRUE;
+
+    /* now request rendering */
     evaluate_and_notify_windowport(gv.valset, idx);
 #undef test_if_enabled
 }
@@ -1387,8 +1633,11 @@ evaluate_and_notify_windowport(
             || ((fld == BL_EXP) && !flags.showexp)
             || ((fld == BL_TIME) && !flags.time)
             || ((fld == BL_HD) && !Upolyd)
-            || ((fld == BL_XP || i == BL_EXP) && Upolyd)
+            || ((fld == BL_XP || fld == BL_EXP) && Upolyd)
             || ((fld == BL_VERS) && !flags.showvers)
+            || ((fld == BL_TERRAIN) && !flags.terrainstatus)
+            || ((fld == BL_WEAPON) && !flags.weaponstatus)
+            || ((fld == BL_ARMOR) && !flags.armorstatus)
             ) {
             continue;
         }
@@ -1456,7 +1705,10 @@ status_initialize(
                        : (fld == BL_XP) ? (boolean) !Upolyd
                          : (fld == BL_HD) ? (boolean) Upolyd
                            : (fld == BL_VERS) ? flags.showvers
-                             : TRUE;
+                             : (fld == BL_WEAPON) ? flags.weaponstatus
+                               : (fld == BL_ARMOR) ? flags.armorstatus
+                                 : (fld == BL_TERRAIN) ? flags.terrainstatus
+                                   : TRUE;
 
         fieldname = initblstats[i].fldname;
         fieldfmt = (fld == BL_TITLE && iflags.wc2_hitpointbar) ? "%-30.30s"
@@ -1573,6 +1825,10 @@ compare_blstats(struct istat_s *bl1, struct istat_s *bl2)
               fmt_ptr((genericptr_t) bl1->a.a_void),
               fmt_ptr((genericptr_t) bl2->a.a_void));
     }
+    /* cheat; terrain is highlighted as a string but we have a handy int
+       reflecting its value to use when checking for changes */
+    if (bl1->fld == BL_TERRAIN)
+        anytype = ANY_INT;
 
     fld = bl1->fld;
     use_rawval = (fld == BL_HP || fld == BL_HPMAX
@@ -3641,6 +3897,7 @@ status_hilite_menu_add(int origfld)
     unsigned long cond = 0UL;
     char colorqry[BUFSZ];
     char attrqry[BUFSZ];
+    int retry = 0;
 
  choose_field:
     fld = origfld;
@@ -3676,6 +3933,10 @@ status_hilite_menu_add(int origfld)
     hilite.behavior = behavior;
 
  choose_value:
+    if (retry++ > 5) {
+        pline("That's enough tries.");
+        return FALSE;
+    }
     if (behavior == BL_TH_VAL_PERCENTAGE
         || behavior == BL_TH_VAL_ABSOLUTE) {
         char inbuf[BUFSZ], buf[BUFSZ];
@@ -4302,7 +4563,9 @@ status_hilite_menu(void)
     countall = status_hilite_linestr_countfield(BL_FLUSH);
     status_hilite_linestr_done();
 
-    if (redo)
+    /* fuzzer is unlikely to pick something useful within nested menus;
+       limit it to one try */
+    if (redo && !iflags.debug_fuzzer)
         goto shlmenu_redo;
 
     /* hilite_delta=='statushilites' does double duty:  it is the

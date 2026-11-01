@@ -1,4 +1,4 @@
-/* NetHack 3.7	sfstruct.c	$NHDT-Date: 1606765215 2020/11/30 19:40:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.4 $ */
+/* NetHack 5.0	sfstruct.c	$NHDT-Date: 1606765215 2020/11/30 19:40:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.4 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2025. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -308,7 +308,7 @@ static long floc = 0L;
 
 /*
  * historical structlevel savefile writing and reading routines follow.
- * These were moved here from save.c and restore.c between 3.6.3 and 3.7.0.
+ * These were moved here from save.c and restore.c between 3.6.3 and 5.0.0,.
  */
 
 staticfn int getidx(int, int);
@@ -572,7 +572,8 @@ mread(int fd, genericptr_t buf, unsigned len)
         /* Not perfect, but we don't have ssize_t available. */
     rlen = (readLenType) read(fd, buf, (readLenType) len);
     if ((readLenType) rlen != (readLenType) len) {
-        if (restoreinfo.mread_flags == 1) { /* means "return anyway" */
+        if ((restoreinfo.mread_flags == 1) /* means "return anyway" */
+            || (program_state.reading_bonesfile == 1)) {
             restoreinfo.mread_flags = -1;
             return;
         } else {

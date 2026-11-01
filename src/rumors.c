@@ -1,4 +1,4 @@
-/* NetHack 3.7	rumors.c	$NHDT-Date: 1594370241 2020/07/10 08:37:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.56 $ */
+/* NetHack 5.0	rumors.c	$NHDT-Date: 1594370241 2020/07/10 08:37:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.56 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -7,7 +7,7 @@
 #include "dlb.h"
 
 /*      [Note:  this comment is fairly old, but still accurate for 3.1;
- *       it's no longer accurate for 3.7 but may still be of interest.]
+ *       it's no longer accurate for 5.0 but may still be of interest.]
  * Rumors have been entirely rewritten to speed up the access.  This is
  * essential when working from floppies.  Using fseek() the way that's done
  * here means rumors following longer rumors are output more often than those
@@ -303,7 +303,7 @@ rumor_check(void)
 
 DISABLE_WARNING_FORMAT_NONLITERAL
 
-/* 3.7: augments rumors_check(); test 'engrave' or 'epitaph' or 'bogusmon' */
+/* 5.0: augments rumors_check(); test 'engrave' or 'epitaph' or 'bogusmon' */
 staticfn void
 others_check(
     const char *ftype, /* header: "{Engravings|Epitaphs|Bogus monsters}:" */

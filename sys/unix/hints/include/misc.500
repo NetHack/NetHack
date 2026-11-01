@@ -1,0 +1,110 @@
+#------------------------------------------------------------------------------
+# NetHack 5.0  misc.500 $NHDT-Date: 1668359836 2022/11/13 17:17:16 $  $NHDT-Branch: NetHack-5.0 $
+#
+# Further set-up  for miscellaneous odds and ends (after compiler.500)
+#
+# Included from:
+#           hints/linux.500
+#           hints/macOS.500
+#
+
+# This ensures that .moc files are compatible with the version of Qt chosen.
+#
+ifdef MAKEFILE_SRC
+ifdef WANT_WIN_QT
+# when switching from Qt5 to Qt6 or vice versa, any old .moc files will be
+# incompatible; get rid of them in case user hasn't run 'make spotless';
+# object files are incompatible with Qt library, so get rid of them too;
+# Qt*.h-t are empty timestamp files and at most one should exist
+QTany_H = Qt*.h-t
+ifdef WANT_WIN_QT6
+# Qt 6 builds and runs (with a couple of warnings) but needs more testing
+QTn_H = Qt6.h-t
+else
+# Qt 5 is currently the default version for nethack NetHack 5.0.x's Qt interface
+QTn_H = Qt5.h-t
+endif
+$(QTn_H) ::
+	@if test ! -f $@; then ( rm -f $(QTany_H) *.moc qt_*.o; touch $@ ); fi;
+endif #WANT_WIN_QT
+endif #MAKFILE_SRC
+
+ifdef WANT_WIN_TTY
+USE_CURSESLIB=1
+endif
+
+ifdef WANT_WIN_CURSES
+ifneq "$(USE_CURSESLIB)" "1"
+USE_CURSESLIB=1
+endif
+endif
+
+ifeq "$(GIT)" "1"
+ifndef GITSUBMODULES
+GITSUBMODULES=1
+endif
+endif
+
+ifeq "$(git)" "1"
+ifndef GITSUBMODULES
+GITSUBMODULES=1
+endif
+endif
+
+ifeq "$(CPPREGEX)" "1"
+REGEXOBJ=$(TARGETPFX)cppregex.o
+ifndef CPLUSPLUS_NEEDED
+CPLUSPLUS_NEEDED = 1
+endif
+endif
+
+ifeq "$(cppregex)" "1"
+REGEXOBJ=$(TARGETPFX)cppregex.o
+ifndef CPLUSPLUS_NEEDED
+CPLUSPLUS_NEEDED = 1
+endif
+endif
+
+ifdef USE_MANDOC
+NROFF = mandoc
+MAN2TXTPRE = -T ascii
+MAN2TXTPOST= | col -b
+else
+#
+# Detect groff.
+NROFFISGROFF := $(shell echo `nroff --version | grep -c 'GNU.*groff.*version'`)
+#$(info NROFFISGROFF=$(NROFFISGROFF))
+ifneq "$(NROFFISGROFF)" "0"
+# Gather groff's minor version number (register `.y`).
+GROFFMINORVERSION := $(shell printf '.tm \\n[.y]\n' | nroff 2>&1)
+#$(info GROFFMINORVERSION=$(GROFFMINORVERSION))
+# Silence warnings produced by tmac.n, which NetHack does not modify.
+NROFF_FLAGS := -wall -Wrange -Wscale -Wtab
+# groff <= 1.23 also supported an "el" warning category that was buggy.
+GROFFLE123 := $(shell expr $(GROFFMINORVERSION) \<= 23)
+#$(info GROFFLE123=$(GROFFLE123))
+ifeq "$(GROFFLE123)" "1"
+NROFF_FLAGS += -Wel
+endif  # end groff less than 1.23
+endif  # end NROFFISGROFF
+# $(info NROFF_FLAGS=$(NROFF_FLAGS))
+
+ifneq "$(NROFFISGROFF)" ""   # It's groff
+# add the -Tascii flag used by groff
+MAN2TXTPRE += -Tascii
+# nroff in groff 1.23 supports the -P option to pass arguments to the
+# output driver.  -cbou are flags to grotty(1).
+GROFFGE123 := $(shell expr $(GROFFMINORVERSION) \>= 23)
+#$(info GROFFGE123=$(GROFFGE123))
+ifeq "$(GROFFGE123)" "1"
+MAN2TXTPRE += -P -cbou
+MAN2TXTPOST=
+else
+MAN2TXTPRE += -c
+endif  # end groff less than 1.23
+endif  # end groff-specific
+endif  # not USE_MANDOC
+
+#end of hints/include/misc.500
+#------------------------------------------------------------------------------
+

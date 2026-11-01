@@ -523,6 +523,40 @@ function test_sel_numpoints()
    end
 end
 
+function test_sel_room()
+   des.reset_level();
+   des.level_init({ style = "solidfill", fg = " " });
+   des.room({ w = 5, h = 3,
+              contents = function(rm)
+                 local sel = selection.room();
+                 sel_has_n_points(sel, 5*3, __func__);
+              end
+   });
+end
+
+function test_sel_gradient()
+   local sela = selection.gradient({ type = "radial", x = 3, y = 5, x2 = 10, y2 = 12, mindist = 4, maxdist = 10});
+   local selb = selection.gradient({ type = "square", x = 3, y = 5, x2 = 10, y2 = 12, mindist = 4, maxdist = 10});
+   local selc = selection.gradient({ x = 3, y = 5, x2 = 10, y2 = 12, maxdist = 10});
+end
+
+function test_sel_describe_size()
+   local sela = selection.fillrect(1,1, 3,3);
+   if (sela:describe_size() ~= "square 3 by 3") then
+      error("selection.describe_size returned \"" .. sela:describe_size() "\", not \"square 3 by 3\"");
+   end
+
+   local selb = selection.fillrect(1,1, 4,3);
+   if (selb:describe_size() ~= "rectangular 4 by 3") then
+      error("selection.describe_size returned \"" .. selb:describe_size() "\", not \"rectangular 4 by 3\"");
+   end
+
+   sela:set(1,1, 0);
+   if (sela:describe_size() ~= "irregularly shaped 3 by 3") then
+      error("selection.describe_size returned \"" .. sela:describe_size() "\", not \"irregularly shaped 3 by 3\"");
+   end
+end
+
 nh.debug_flags({mongen = false, hunger = false, overwrite_stairs = true });
 test_selection_params();
 test_sel_negate();
@@ -544,3 +578,6 @@ test_sel_iterate();
 test_sel_bounds();
 test_sel_map();
 test_sel_numpoints();
+test_sel_room();
+test_sel_gradient();
+test_sel_describe_size();

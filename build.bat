@@ -22,6 +22,8 @@ REM ─────────────────────────�
 if %errorlevel%==1 (
     echo.
     echo *** Full clean + package ***
+    call :refresh_makefile
+    if errorlevel 1 goto :done
     cd src
     nmake -f Makefile clean
     nmake -f Makefile package
@@ -31,6 +33,8 @@ if %errorlevel%==1 (
 if %errorlevel%==2 (
     echo.
     echo "*** Quick rebuild (only changed files) ***"
+    call :refresh_makefile
+    if errorlevel 1 goto :done
     cd src
     nmake -f Makefile
     goto :done
@@ -44,11 +48,25 @@ if %errorlevel%==3 (
         start "" "binary\nethack.exe" -D -u prophet
     ) else (
         echo No binary\nethack.exe found – doing a quick build first...
+        call :refresh_makefile
+        if errorlevel 1 goto :done
         cd src
-        nmake -f Makefile.vstudio
+        nmake -f Makefile
     )
     goto :done
 )
+
+:refresh_makefile
+REM src\Makefile is not in git. nhsetup.bat copies Makefile.nmake there.
+REM A copy left over from the 3.7 tree still lists win\share\safeproc.c,
+REM which NetHack 5.0 removed, and nmake then stops with U1073.
+echo Refreshing src\Makefile from sys\windows\Makefile.nmake
+copy /Y "%~dp0sys\windows\Makefile.nmake" "%~dp0src\Makefile" >nul
+if errorlevel 1 (
+    echo Failed to copy sys\windows\Makefile.nmake to src\Makefile
+    exit /b 1
+)
+exit /b 0
 
 :done
 echo.

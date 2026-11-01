@@ -1,4 +1,4 @@
-/* NetHack 3.7	wizard.c	$NHDT-Date: 1741407262 2025/03/07 20:14:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.116 $ */
+/* NetHack 5.0	wizard.c	$NHDT-Date: 1741407262 2025/03/07 20:14:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.116 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -386,10 +386,12 @@ tactics(struct monst *mtmp)
         mtmp->mavenge = 1; /* covetous monsters attack while fleeing */
         if (In_W_tower(mx, my, &u.uz)
             || (mtmp->iswiz && !sx && !mon_has_amulet(mtmp))) {
-            if (!rn2(3 + mtmp->mhp / 10))
+            if (!noteleport_level(mtmp) &&
+                !rn2(3 + mtmp->mhp / 10))
                 (void) rloc(mtmp, RLOC_MSG);
         } else if (sx && (mx != sx || my != sy)) {
-            if (!mnearto(mtmp, sx, sy, TRUE, RLOC_MSG)) {
+            if (!noteleport_level(mtmp) &&
+                !mnearto(mtmp, sx, sy, TRUE, RLOC_MSG)) {
                 /* couldn't move to the target spot for some reason,
                    so stay where we are (don't actually need rloc_to()
                    because mtmp is still on the map at <mx,my>... */
@@ -408,7 +410,7 @@ tactics(struct monst *mtmp)
         /*FALLTHRU*/
 
     case STRAT_NONE: /* harass */
-        if (!rn2(!mtmp->mflee ? 5 : 33))
+        if (!noteleport_level(mtmp) && !rn2(!mtmp->mflee ? 5 : 33))
             mnexto(mtmp, RLOC_MSG);
         return 0;
 
@@ -419,13 +421,16 @@ tactics(struct monst *mtmp)
         int targ = (int) (strat & STRAT_GOAL);
         struct obj *otmp;
 
-        if (!targ) { /* simply wants you to close */
+        if (!targ || !isok(tx, ty)) { /* simply wants you to close */
             return 0;
         }
+        if (noteleport_level(mtmp) && !monnear(mtmp, tx, ty))
+            return 0;
         if (u_at(tx, ty) || where == STRAT_PLAYER) {
             /* player is standing on it (or has it) */
             mx = mtmp->mx, my = mtmp->my;
-            if (!mnearto(mtmp, tx, ty, FALSE, RLOC_MSG))
+            if (noteleport_level(mtmp) ||
+                !mnearto(mtmp, tx, ty, FALSE, RLOC_MSG))
                 rloc_to(mtmp, mx, my); /* no room? stay put */
             return 0;
         }
@@ -445,13 +450,14 @@ tactics(struct monst *mtmp)
                     return 0;
             } else {
                 /* a monster is standing on it - cause some trouble */
-                if (!rn2(5))
+                if (!rn2(5) && !noteleport_level(mtmp))
                     mnexto(mtmp, RLOC_MSG);
                 return 0;
             }
         } else { /* a monster has it - 'port beside it. */
             mx = mtmp->mx, my = mtmp->my;
-            if (!mnearto(mtmp, tx, ty, FALSE, RLOC_MSG))
+            if (!noteleport_level(mtmp) &&
+                !mnearto(mtmp, tx, ty, FALSE, RLOC_MSG))
                 rloc_to(mtmp, mx, my); /* no room? stay put */
             return 0;
         }
@@ -614,7 +620,7 @@ nasty(struct monst *summoner)
         for (i = rnd(tmp); i > 0 && count < MAXNASTIES; --i) {
             /* Of the 44 nasties[], 10 are lawful, 14 are chaotic,
              * and 20 are neutral.  [These numbers are up date for
-             * 3.7.0; the ones in the next paragraph are not....]
+             * 5.0.0; the ones in the next paragraph are not....]
              *
              * Neutral caster, used for late-game harassment,
              * has 18/42 chance to stop the inner loop on each
@@ -631,7 +637,7 @@ nasty(struct monst *summoner)
              * randomized so it won't always do so.
              */
             for (j = 0; j < 20; j++) {
-                /* Don't create more spellcasters of the monsters' level or
+                /* Don't create more spellcasters of the monster's level or
                  * higher--avoids chain summoners filling up the level.
                  */
                 trylimit = 10 + 1; /* 10 tries */
@@ -704,7 +710,7 @@ nasty(struct monst *summoner)
     return count;
 }
 
-/* Let's resurrect the wizard, for some unexpected fun. */
+/* Let's resurrect the Wizard, for some unexpected fun. */
 void
 resurrect(void)
 {
@@ -744,7 +750,7 @@ resurrect(void)
                     if (!mtmp->mx)
                         mtmp = 0;
                     /* note: there might be a second Wizard; if so,
-                       he'll have to wait til the next resurrection */
+                       he'll have to wait until the next resurrection */
                     break;
                 }
             }

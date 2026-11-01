@@ -1,4 +1,4 @@
-/* NetHack 3.7	coloratt.c	$NHDT-Date: 1737286550 2025/01/19 03:35:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.14 $ */
+/* NetHack 5.0	coloratt.c	$NHDT-Date: 1737286550 2025/01/19 03:35:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.14 $ */
 /* Copyright (c) Pasi Kallinen, 2024 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -58,172 +58,183 @@ static const struct attr_names attrnames[] = {
     { "reverse", ATR_INVERSE },
 };
 
-/* { colortyp, tableindex, rgbindx, name, hexval, r, g, b }, */
+/* { colortyp, tableindex, rgbindx, name, r, g, b }, */
 
-static struct nethack_color colortable[] = {
-  { nh_color,    0,   0, "black",                   "",   0,   0,   0 },
-  { nh_color,    1,   0, "red",                     "", 255,   0,   0 },
-  { nh_color,    2,   0, "green",                   "",  34, 139,  34 },
-  { nh_color,    3,   0, "brown",                   "", 165,  42,  42 },
-  { nh_color,    4,   0, "blue",                    "",   0,   0, 255 },
-  { nh_color,    5,   0, "magenta",                 "", 255,   0, 255 },
-  { nh_color,    6,   0, "cyan",                    "",   0, 255, 255 },
-  { nh_color,    7,   0, "gray",                    "", 128, 128, 128 },
-  { no_color,    8,   0, "nocolor",                 "",   0,   0,   0 },
-  { nh_color,    9,   0, "orange",                  "", 255, 165,   0 },
-  { nh_color,   10,   0, "bright-green",            "",   0, 128,   0 },
-  { nh_color,   11,   0, "yellow",                  "", 255, 255,   0 },
-  { nh_color,   12,   0, "bright-blue",             "", 173, 216, 230 },
-  { nh_color,   13,   0, "bright-magenta",          "", 147, 112, 219 },
-  { nh_color,   14,   0, "light-cyan",              "", 224, 255, 255 },
-  { nh_color,   15,   0, "white",                   "", 255, 255, 255 },
-  { rgb_color,  16,   0, "maroon",                  "#800000", 128,   0,   0 },
-  { rgb_color,  17,   1, "dark-red",                "#8B0000", 139,   0,   0 },
-  { rgb_color,  18,   2, "brown",                   "#A52A2A", 165,  42,  42 },
-  { rgb_color,  19,   3, "firebrick",               "#B22222", 178,  34,  34 },
-  { rgb_color,  20,   4, "crimson",                 "#DC143C", 220,  20,  60 },
-  { rgb_color,  21,   5, "red",                     "#FF0000", 255,   0,   0 },
-  { rgb_color,  22,   6, "tomato",                  "#FF6347", 255,  99,  71 },
-  { rgb_color,  23,   7, "coral",                   "#FF7F50", 255, 127,  80 },
-  { rgb_color,  24,   8, "indian-red",              "#CD5C5C", 205,  92,  92 },
-  { rgb_color,  25,   9, "light-coral",             "#F08080", 240, 128, 128 },
-  { rgb_color,  26,  10, "dark-salmon",             "#E9967A", 233, 150, 122 },
-  { rgb_color,  27,  11, "salmon",                  "#FA8072", 250, 128, 114 },
-  { rgb_color,  28,  12, "light-salmon",            "#FFA07A", 255, 160, 122 },
-  { rgb_color,  29,  13, "orange-red",              "#FF4500", 255,  69,   0 },
-  { rgb_color,  30,  14, "dark-orange",             "#FF8C00", 255, 140,   0 },
-  { rgb_color,  31,  15, "orange",                  "#FFA500", 255, 165,   0 },
-  { rgb_color,  32,  16, "gold",                    "#FFD700", 255, 215,   0 },
-  { rgb_color,  33,  17, "dark-golden-rod",         "#B8860B", 184, 134,  11 },
-  { rgb_color,  34,  18, "golden-rod",              "#DAA520", 218, 165,  32 },
-  { rgb_color,  35,  19, "pale-golden-rod",         "#EEE8AA", 238, 232, 170 },
-  { rgb_color,  36,  20, "dark-khaki",              "#BDB76B", 189, 183, 107 },
-  { rgb_color,  37,  21, "khaki",                   "#F0E68C", 240, 230, 140 },
-  { rgb_color,  38,  22, "olive",                   "#808000", 128, 128,   0 },
-  { rgb_color,  39,  23, "yellow",                  "#FFFF00", 255, 255,   0 },
-  { rgb_color,  40,  24, "yellow-green",            "#9ACD32", 154, 205,  50 },
-  { rgb_color,  41,  25, "dark-olive-green",        "#556B2F",  85, 107,  47 },
-  { rgb_color,  42,  26, "olive-drab",              "#6B8E23", 107, 142,  35 },
-  { rgb_color,  43,  27, "lawn-green",              "#7CFC00", 124, 252,   0 },
-  { rgb_color,  44,  28, "chart-reuse",             "#7FFF00", 127, 255,   0 },
-  { rgb_color,  45,  29, "green-yellow",            "#ADFF2F", 173, 255,  47 },
-  { rgb_color,  46,  30, "dark-green",              "#006400",   0, 100,   0 },
-  { rgb_color,  47,  31, "green",                   "#008000",   0, 128,   0 },
-  { rgb_color,  48,  32, "forest-green",            "#228B22",  34, 139,  34 },
-  { rgb_color,  49,  33, "lime",                    "#00FF00",   0, 255,   0 },
-  { rgb_color,  50,  34, "lime-green",              "#32CD32",  50, 205,  50 },
-  { rgb_color,  51,  35, "light-green",             "#90EE90", 144, 238, 144 },
-  { rgb_color,  52,  36, "pale-green",              "#98FB98", 152, 251, 152 },
-  { rgb_color,  53,  37, "dark-sea-green",          "#8FBC8F", 143, 188, 143 },
-  { rgb_color,  54,  38, "medium-spring-green",     "#00FA9A",   0, 250, 154 },
-  { rgb_color,  55,  39, "spring-green",            "#00FF7F",   0, 255, 127 },
-  { rgb_color,  56,  40, "sea-green",               "#2E8B57",  46, 139,  87 },
-  { rgb_color,  57,  41, "medium-aqua-marine",      "#66CDAA", 102, 205, 170 },
-  { rgb_color,  58,  42, "medium-sea-green",        "#3CB371",  60, 179, 113 },
-  { rgb_color,  59,  43, "light-sea-green",         "#20B2AA",  32, 178, 170 },
-  { rgb_color,  60,  44, "dark-slate-gray",         "#2F4F4F",  47,  79,  79 },
-  { rgb_color,  61,  45, "teal",                    "#008080",   0, 128, 128 },
-  { rgb_color,  62,  46, "dark-cyan",               "#008B8B",   0, 139, 139 },
-  { rgb_color,  63,  47, "aqua",                    "#00FFFF",   0, 255, 255 },
-  { rgb_color,  64,  48, "cyan",                    "#00FFFF",   0, 255, 255 },
-  { rgb_color,  65,  49, "light-cyan",              "#E0FFFF", 224, 255, 255 },
-  { rgb_color,  66,  50, "dark-turquoise",          "#00CED1",   0, 206, 209 },
-  { rgb_color,  67,  51, "turquoise",               "#40E0D0",  64, 224, 208 },
-  { rgb_color,  68,  52, "medium-turquoise",        "#48D1CC",  72, 209, 204 },
-  { rgb_color,  69,  53, "pale-turquoise",          "#AFEEEE", 175, 238, 238 },
-  { rgb_color,  70,  54, "aqua-marine",             "#7FFFD4", 127, 255, 212 },
-  { rgb_color,  71,  55, "powder-blue",             "#B0E0E6", 176, 224, 230 },
-  { rgb_color,  72,  56, "cadet-blue",              "#5F9EA0",  95, 158, 160 },
-  { rgb_color,  73,  57, "steel-blue",              "#4682B4",  70, 130, 180 },
-  { rgb_color,  74,  58, "corn-flower-blue",        "#6495ED", 100, 149, 237 },
-  { rgb_color,  75,  59, "deep-sky-blue",           "#00BFFF",   0, 191, 255 },
-  { rgb_color,  76,  60, "dodger-blue",             "#1E90FF",  30, 144, 255 },
-  { rgb_color,  77,  61, "light-blue",              "#ADD8E6", 173, 216, 230 },
-  { rgb_color,  78,  62, "sky-blue",                "#87CEEB", 135, 206, 235 },
-  { rgb_color,  79,  63, "light-sky-blue",          "#87CEFA", 135, 206, 250 },
-  { rgb_color,  80,  64, "midnight-blue",           "#191970",  25,  25, 112 },
-  { rgb_color,  81,  65, "navy",                    "#000080",   0,   0, 128 },
-  { rgb_color,  82,  66, "dark-blue",               "#00008B",   0,   0, 139 },
-  { rgb_color,  83,  67, "medium-blue",             "#0000CD",   0,   0, 205 },
-  { rgb_color,  84,  68, "blue",                    "#0000FF",   0,   0, 255 },
-  { rgb_color,  85,  69, "royal-blue",              "#4169E1",  65, 105, 225 },
-  { rgb_color,  86,  70, "blue-violet",             "#8A2BE2", 138,  43, 226 },
-  { rgb_color,  87,  71, "indigo",                  "#4B0082",  75,   0, 130 },
-  { rgb_color,  88,  72, "dark-slate-blue",         "#483D8B",  72,  61, 139 },
-  { rgb_color,  89,  73, "slate-blue",              "#6A5ACD", 106,  90, 205 },
-  { rgb_color,  90,  74, "medium-slate-blue",       "#7B68EE", 123, 104, 238 },
-  { rgb_color,  91,  75, "medium-purple",           "#9370DB", 147, 112, 219 },
-  { rgb_color,  92,  76, "dark-magenta",            "#8B008B", 139,   0, 139 },
-  { rgb_color,  93,  77, "dark-violet",             "#9400D3", 148,   0, 211 },
-  { rgb_color,  94,  78, "dark-orchid",             "#9932CC", 153,  50, 204 },
-  { rgb_color,  95,  79, "medium-orchid",           "#BA55D3", 186,  85, 211 },
-  { rgb_color,  96,  80, "purple",                  "#800080", 128,   0, 128 },
-  { rgb_color,  97,  81, "thistle",                 "#D8BFD8", 216, 191, 216 },
-  { rgb_color,  98,  82, "plum",                    "#DDA0DD", 221, 160, 221 },
-  { rgb_color,  99,  83, "violet",                  "#EE82EE", 238, 130, 238 },
-  { rgb_color, 100,  84, "magenta",                 "#FF00FF", 255,   0, 255 },
-  { rgb_color, 101,  85, "orchid",                  "#DA70D6", 218, 112, 214 },
-  { rgb_color, 102,  86, "medium-violet-red",       "#C71585", 199,  21, 133 },
-  { rgb_color, 103,  87, "pale-violet-red",         "#DB7093", 219, 112, 147 },
-  { rgb_color, 104,  88, "deep-pink",               "#FF1493", 255,  20, 147 },
-  { rgb_color, 105,  89, "hot-pink",                "#FF69B4", 255, 105, 180 },
-  { rgb_color, 106,  90, "light-pink",              "#FFB6C1", 255, 182, 193 },
-  { rgb_color, 107,  91, "pink",                    "#FFC0CB", 255, 192, 203 },
-  { rgb_color, 108,  92, "antique-white",           "#FAEBD7", 250, 235, 215 },
-  { rgb_color, 109,  93, "beige",                   "#F5F5DC", 245, 245, 220 },
-  { rgb_color, 110,  94, "bisque",                  "#FFE4C4", 255, 228, 196 },
-  { rgb_color, 111,  95, "blanched-almond",         "#FFEBCD", 255, 235, 205 },
-  { rgb_color, 112,  96, "wheat",                   "#F5DEB3", 245, 222, 179 },
-  { rgb_color, 113,  97, "corn-silk",               "#FFF8DC", 255, 248, 220 },
-  { rgb_color, 114,  98, "lemon-chiffon",           "#FFFACD", 255, 250, 205 },
-  { rgb_color, 115,  99, "light-golden-rod-yellow", "#FAFAD2", 250, 250, 210 },
-  { rgb_color, 116, 100, "light-yellow",            "#FFFFE0", 255, 255, 224 },
-  { rgb_color, 117, 101, "saddle-brown",            "#8B4513", 139,  69,  19 },
-  { rgb_color, 118, 102, "sienna",                  "#A0522D", 160,  82,  45 },
-  { rgb_color, 119, 103, "chocolate",               "#D2691E", 210, 105,  30 },
-  { rgb_color, 120, 104, "peru",                    "#CD853F", 205, 133,  63 },
-  { rgb_color, 121, 105, "sandy-brown",             "#F4A460", 244, 164,  96 },
-  { rgb_color, 122, 106, "burly-wood",              "#DEB887", 222, 184, 135 },
-  { rgb_color, 123, 107, "tan",                     "#D2B48C", 210, 180, 140 },
-  { rgb_color, 124, 108, "rosy-brown",              "#BC8F8F", 188, 143, 143 },
-  { rgb_color, 125, 109, "moccasin",                "#FFE4B5", 255, 228, 181 },
-  { rgb_color, 126, 110, "navajo-white",            "#FFDEAD", 255, 222, 173 },
-  { rgb_color, 127, 111, "peach-puff",              "#FFDAB9", 255, 218, 185 },
-  { rgb_color, 128, 112, "misty-rose",              "#FFE4E1", 255, 228, 225 },
-  { rgb_color, 129, 113, "lavender-blush",          "#FFF0F5", 255, 240, 245 },
-  { rgb_color, 130, 114, "linen",                   "#FAF0E6", 250, 240, 230 },
-  { rgb_color, 131, 115, "old-lace",                "#FDF5E6", 253, 245, 230 },
-  { rgb_color, 132, 116, "papaya-whip",             "#FFEFD5", 255, 239, 213 },
-  { rgb_color, 133, 117, "sea-shell",               "#FFF5EE", 255, 245, 238 },
-  { rgb_color, 134, 118, "mint-cream",              "#F5FFFA", 245, 255, 250 },
-  { rgb_color, 135, 119, "slate-gray",              "#708090", 112, 128, 144 },
-  { rgb_color, 136, 120, "light-slate-gray",        "#778899", 119, 136, 153 },
-  { rgb_color, 137, 121, "light-steel-blue",        "#B0C4DE", 176, 196, 222 },
-  { rgb_color, 138, 122, "lavender",                "#E6E6FA", 230, 230, 250 },
-  { rgb_color, 139, 123, "floral-white",            "#FFFAF0", 255, 250, 240 },
-  { rgb_color, 140, 124, "alice-blue",              "#F0F8FF", 240, 248, 255 },
-  { rgb_color, 141, 125, "ghost-white",             "#F8F8FF", 248, 248, 255 },
-  { rgb_color, 142, 126, "honeydew",                "#F0FFF0", 240, 255, 240 },
-  { rgb_color, 143, 127, "ivory",                   "#FFFFF0", 255, 255, 240 },
-  { rgb_color, 144, 128, "azure",                   "#F0FFFF", 240, 255, 255 },
-  { rgb_color, 145, 129, "snow",                    "#FFFAFA", 255, 250, 250 },
-  { rgb_color, 146, 130, "black",                   "#000000",   0,   0,   0 },
-  { rgb_color, 147, 131, "dim-gray",                "#696969", 105, 105, 105 },
-  { rgb_color, 148, 132, "gray",                    "#808080", 128, 128, 128 },
-  { rgb_color, 149, 133, "dark-gray",               "#A9A9A9", 169, 169, 169 },
-  { rgb_color, 150, 134, "silver",                  "#C0C0C0", 192, 192, 192 },
-  { rgb_color, 151, 135, "light-gray",              "#D3D3D3", 211, 211, 211 },
-  { rgb_color, 152, 136, "gainsboro",               "#DCDCDC", 220, 220, 220 },
-  { rgb_color, 153, 137, "white-smoke",             "#F5F5F5", 245, 245, 245 },
-  { rgb_color, 154, 138, "white",                   "#FFFFFF", 255, 255, 255 },
+#define NHC nh_color
+#define NOC no_color
+#define RGBC rgb_color
+
+const struct nethack_color colortable[] = {
+    { NHC,    0,   0, "black", 0x00, 0x00, 0x00 },      /*        CLR_BLACK */
+    { NHC,    1,   0, "red", 0xFF, 0x00, 0x00 },        /*          CLR_RED */
+    { NHC,    2,   0, "green", 0x22, 0x8B, 0x22 },      /*        CLR_GREEN */
+    { NHC,    3,   0, "brown", 0xA5, 0x2A, 0x2A },      /*        CLR_BROWN */
+    { NHC,    4,   0, "blue", 0x00, 0x00, 0xFF },       /*         CLR_BLUE */
+    { NHC,    5,   0, "magenta", 0xFF, 0x00, 0xFF },    /*      CLR_MAGENTA */
+    { NHC,    6,   0, "cyan", 0x00, 0xFF, 0xFF },       /*         CLR_CYAN */
+    { NHC,    7,   0, "gray", 0x80, 0x80, 0x80 },       /*         CLR_GRAY */
+    { NOC,    8,   0, "nocolor", 0x00, 0x00, 0x00 },    /*         NO_COLOR */
+    { NHC,    9,   0, "orange", 0xFF, 0xA5, 0x00 },     /*       CLR_ORANGE */
+    { NHC,   10,   0, "bright-green",
+                      0x00, 0x80, 0x00 },               /* CLR_BRIGHT_GREEN */
+    { NHC,   11,   0, "yellow", 0xFF, 0xFF, 0x00 },     /*       CLR_YELLOW */
+    { NHC,   12,   0, "bright-blue", 0xAD, 0xD8, 0xE6 }, /* CLR_BRIGHT_BLUE */
+    { NHC,   13,   0, "bright-magenta",
+                      0x93, 0x70, 0xDB },             /* CLR_BRIGHT_MAGENTA */
+    { NHC,   14,   0, "light-cyan", 0xE0, 0xFF, 0xFF }, /*  CLR_BRIGHT_CYAN */
+    { NHC,   15,   0, "white", 0xFF, 0xFF, 0xFF },      /*        CLR_WHITE */
+    { RGBC,  16,   0, "maroon", 0x80, 0x00, 0x00 },              /* #800000 */
+    { RGBC,  17,   1, "dark-red", 0x8B, 0x00, 0x00 },            /* #8B0000 */
+    { RGBC,  18,   2, "brown", 0xA5, 0x2A, 0x2A },               /* #A52A2A */
+    { RGBC,  19,   3, "firebrick", 0xB2, 0x22, 0x22 },           /* #B22222 */
+    { RGBC,  20,   4, "crimson", 0xDC, 0x14, 0x3C },             /* #DC143C */
+    { RGBC,  21,   5, "red", 0xFF, 0x00, 0x00 },                 /* #FF0000 */
+    { RGBC,  22,   6, "tomato", 0xFF, 0x63, 0x47 },              /* #FF6347 */
+    { RGBC,  23,   7, "coral", 0xFF, 0x7F, 0x50 },               /* #FF7F50 */
+    { RGBC,  24,   8, "indian-red", 0xCD, 0x5C, 0x5C },          /* #CD5C5C */
+    { RGBC,  25,   9, "light-coral", 0xF0, 0x80, 0x80 },         /* #F08080 */
+    { RGBC,  26,  10, "dark-salmon", 0xE9, 0x96, 0x7A },         /* #E9967A */
+    { RGBC,  27,  11, "salmon", 0xFA, 0x80, 0x72 },              /* #FA8072 */
+    { RGBC,  28,  12, "light-salmon", 0xFF, 0xA0, 0x7A },        /* #FFA07A */
+    { RGBC,  29,  13, "orange-red", 0xFF, 0x45, 0x00 },          /* #FF4500 */
+    { RGBC,  30,  14, "dark-orange", 0xFF, 0x8C, 0x00 },         /* #FF8C00 */
+    { RGBC,  31,  15, "orange", 0xFF, 0xA5, 0x00 },              /* #FFA500 */
+    { RGBC,  32,  16, "gold", 0xFF, 0xD7, 0x00 },                /* #FFD700 */
+    { RGBC,  33,  17, "dark-golden-rod", 0xB8, 0x86, 0x0B },     /* #B8860B */
+    { RGBC,  34,  18, "golden-rod", 0xDA, 0xA5, 0x20 },          /* #DAA520 */
+    { RGBC,  35,  19, "pale-golden-rod", 0xEE, 0xE8, 0xAA },     /* #EEE8AA */
+    { RGBC,  36,  20, "dark-khaki", 0xBD, 0xB7, 0x6B },          /* #BDB76B */
+    { RGBC,  37,  21, "khaki", 0xF0, 0xE6, 0x8C },               /* #F0E68C */
+    { RGBC,  38,  22, "olive", 0x80, 0x80, 0x00 },               /* #808000 */
+    { RGBC,  39,  23, "yellow", 0xFF, 0xFF, 0x00 },              /* #FFFF00 */
+    { RGBC,  40,  24, "yellow-green", 0x9A, 0xCD, 0x32 },        /* #9ACD32 */
+    { RGBC,  41,  25, "dark-olive-green", 0x55, 0x6B, 0x2F },    /* #556B2F */
+    { RGBC,  42,  26, "olive-drab", 0x6B, 0x8E, 0x23 },          /* #6B8E23 */
+    { RGBC,  43,  27, "lawn-green", 0x7C, 0xFC, 0x00 },          /* #7CFC00 */
+    { RGBC,  44,  28, "chart-reuse", 0x7F, 0xFF, 0x00 },         /* #7FFF00 */
+    { RGBC,  45,  29, "green-yellow", 0xAD, 0xFF, 0x2F },        /* #ADFF2F */
+    { RGBC,  46,  30, "dark-green", 0x00, 0x64, 0x00 },          /* #006400 */
+    { RGBC,  47,  31, "green", 0x00, 0x80, 0x00 },               /* #008000 */
+    { RGBC,  48,  32, "forest-green", 0x22, 0x8B, 0x22 },        /* #228B22 */
+    { RGBC,  49,  33, "lime", 0x00, 0xFF, 0x00 },                /* #00FF00 */
+    { RGBC,  50,  34, "lime-green", 0x32, 0xCD, 0x32 },          /* #32CD32 */
+    { RGBC,  51,  35, "light-green", 0x90, 0xEE, 0x90 },         /* #90EE90 */
+    { RGBC,  52,  36, "pale-green", 0x98, 0xFB, 0x98 },          /* #98FB98 */
+    { RGBC,  53,  37, "dark-sea-green", 0x8F, 0xBC, 0x8F },      /* #8FBC8F */
+    { RGBC,  54,  38, "medium-spring-green", 0x00, 0xFA, 0x9A }, /* #00FA9A */
+    { RGBC,  55,  39, "spring-green", 0x00, 0xFF, 0x7F },        /* #00FF7F */
+    { RGBC,  56,  40, "sea-green", 0x2E, 0x8B, 0x57 },           /* #2E8B57 */
+    { RGBC,  57,  41, "medium-aqua-marine", 0x66, 0xCD, 0xAA },  /* #66CDAA */
+    { RGBC,  58,  42, "medium-sea-green", 0x3C, 0xB3, 0x71 },    /* #3CB371 */
+    { RGBC,  59,  43, "light-sea-green", 0x20, 0xB2, 0xAA },     /* #20B2AA */
+    { RGBC,  60,  44, "dark-slate-gray", 0x2F, 0x4F, 0x4F },     /* #2F4F4F */
+    { RGBC,  61,  45, "teal", 0x00, 0x80, 0x80 },                /* #008080 */
+    { RGBC,  62,  46, "dark-cyan", 0x00, 0x8B, 0x8B },           /* #008B8B */
+    { RGBC,  63,  47, "aqua", 0x00, 0xFF, 0xFF },                /* #00FFFF */
+    { RGBC,  64,  48, "cyan", 0x00, 0xFF, 0xFF },                /* #00FFFF */
+    { RGBC,  65,  49, "light-cyan", 0xE0, 0xFF, 0xFF },          /* #E0FFFF */
+    { RGBC,  66,  50, "dark-turquoise", 0x00, 0xCE, 0xD1 },      /* #00CED1 */
+    { RGBC,  67,  51, "turquoise", 0x40, 0xE0, 0xD0 },           /* #40E0D0 */
+    { RGBC,  68,  52, "medium-turquoise", 0x48, 0xD1, 0xCC },    /* #48D1CC */
+    { RGBC,  69,  53, "pale-turquoise", 0xAF, 0xEE, 0xEE },      /* #AFEEEE */
+    { RGBC,  70,  54, "aqua-marine", 0x7F, 0xFF, 0xD4 },         /* #7FFFD4 */
+    { RGBC,  71,  55, "powder-blue", 0xB0, 0xE0, 0xE6 },         /* #B0E0E6 */
+    { RGBC,  72,  56, "cadet-blue", 0x5F, 0x9E, 0xA0 },          /* #5F9EA0 */
+    { RGBC,  73,  57, "steel-blue", 0x46, 0x82, 0xB4 },          /* #4682B4 */
+    { RGBC,  74,  58, "corn-flower-blue", 0x64, 0x95, 0xED },    /* #6495ED */
+    { RGBC,  75,  59, "deep-sky-blue", 0x00, 0xBF, 0xFF },       /* #00BFFF */
+    { RGBC,  76,  60, "dodger-blue", 0x1E, 0x90, 0xFF },         /* #1E90FF */
+    { RGBC,  77,  61, "light-blue", 0xAD, 0xD8, 0xE6 },          /* #ADD8E6 */
+    { RGBC,  78,  62, "sky-blue", 0x87, 0xCE, 0xEB },            /* #87CEEB */
+    { RGBC,  79,  63, "light-sky-blue", 0x87, 0xCE, 0xFA },      /* #87CEFA */
+    { RGBC,  80,  64, "midnight-blue", 0x19, 0x19, 0x70 },       /* #191970 */
+    { RGBC,  81,  65, "navy", 0x00, 0x00, 0x80 },                /* #000080 */
+    { RGBC,  82,  66, "dark-blue", 0x00, 0x00, 0x8B },           /* #00008B */
+    { RGBC,  83,  67, "medium-blue", 0x00, 0x00, 0xCD },         /* #0000CD */
+    { RGBC,  84,  68, "blue", 0x00, 0x00, 0xFF },                /* #0000FF */
+    { RGBC,  85,  69, "royal-blue", 0x41, 0x69, 0xE1 },          /* #4169E1 */
+    { RGBC,  86,  70, "blue-violet", 0x8A, 0x2B, 0xE2 },         /* #8A2BE2 */
+    { RGBC,  87,  71, "indigo", 0x4B, 0x00, 0x82 },              /* #4B0082 */
+    { RGBC,  88,  72, "dark-slate-blue", 0x48, 0x3D, 0x8B },     /* #483D8B */
+    { RGBC,  89,  73, "slate-blue", 0x6A, 0x5A, 0xCD },          /* #6A5ACD */
+    { RGBC,  90,  74, "medium-slate-blue", 0x7B, 0x68, 0xEE },   /* #7B68EE */
+    { RGBC,  91,  75, "medium-purple", 0x93, 0x70, 0xDB },       /* #9370DB */
+    { RGBC,  92,  76, "dark-magenta", 0x8B, 0x00, 0x8B },        /* #8B008B */
+    { RGBC,  93,  77, "dark-violet", 0x94, 0x00, 0xD3 },         /* #9400D3 */
+    { RGBC,  94,  78, "dark-orchid", 0x99, 0x32, 0xCC },         /* #9932CC */
+    { RGBC,  95,  79, "medium-orchid", 0xBA, 0x55, 0xD3 },       /* #BA55D3 */
+    { RGBC,  96,  80, "purple", 0x80, 0x00, 0x80 },              /* #800080 */
+    { RGBC,  97,  81, "thistle", 0xD8, 0xBF, 0xD8 },             /* #D8BFD8 */
+    { RGBC,  98,  82, "plum", 0xDD, 0xA0, 0xDD },                /* #DDA0DD */
+    { RGBC,  99,  83, "violet", 0xEE, 0x82, 0xEE },              /* #EE82EE */
+    { RGBC, 100,  84, "magenta", 0xFF, 0x00, 0xFF },             /* #FF00FF */
+    { RGBC, 101,  85, "orchid", 0xDA, 0x70, 0xD6 },              /* #DA70D6 */
+    { RGBC, 102,  86, "medium-violet-red", 0xC7, 0x15, 0x85 },   /* #C71585 */
+    { RGBC, 103,  87, "pale-violet-red", 0xDB, 0x70, 0x93 },     /* #DB7093 */
+    { RGBC, 104,  88, "deep-pink", 0xFF, 0x14, 0x93 },           /* #FF1493 */
+    { RGBC, 105,  89, "hot-pink", 0xFF, 0x69, 0xB4 },            /* #FF69B4 */
+    { RGBC, 106,  90, "light-pink", 0xFF, 0xB6, 0xC1 },          /* #FFB6C1 */
+    { RGBC, 107,  91, "pink", 0xFF, 0xC0, 0xCB },                /* #FFC0CB */
+    { RGBC, 108,  92, "antique-white", 0xFA, 0xEB, 0xD7 },       /* #FAEBD7 */
+    { RGBC, 109,  93, "beige", 0xF5, 0xF5, 0xDC },               /* #F5F5DC */
+    { RGBC, 110,  94, "bisque", 0xFF, 0xE4, 0xC4 },              /* #FFE4C4 */
+    { RGBC, 111,  95, "blanched-almond", 0xFF, 0xEB, 0xCD },     /* #FFEBCD */
+    { RGBC, 112,  96, "wheat", 0xF5, 0xDE, 0xB3 },               /* #F5DEB3 */
+    { RGBC, 113,  97, "corn-silk", 0xFF, 0xF8, 0xDC },           /* #FFF8DC */
+    { RGBC, 114,  98, "lemon-chiffon", 0xFF, 0xFA, 0xCD },       /* #FFFACD */
+    { RGBC, 115,  99, "light-golden-rod-yellow",
+                      0xFA, 0xFA, 0xD2 },                        /* #FAFAD2 */
+    { RGBC, 116, 100, "light-yellow", 0xFF, 0xFF, 0xE0 },        /* #FFFFE0 */
+    { RGBC, 117, 101, "saddle-brown", 0x8B, 0x45, 0x13 },        /* #8B4513 */
+    { RGBC, 118, 102, "sienna", 0xA0, 0x52, 0x2D },              /* #A0522D */
+    { RGBC, 119, 103, "chocolate", 0xD2, 0x69, 0x1E },           /* #D2691E */
+    { RGBC, 120, 104, "peru", 0xCD, 0x85, 0x3F },                /* #CD853F */
+    { RGBC, 121, 105, "sandy-brown", 0xF4, 0xA4, 0x60 },         /* #F4A460 */
+    { RGBC, 122, 106, "burly-wood", 0xDE, 0xB8, 0x87 },          /* #DEB887 */
+    { RGBC, 123, 107, "tan", 0xD2, 0xB4, 0x8C },                 /* #D2B48C */
+    { RGBC, 124, 108, "rosy-brown", 0xBC, 0x8F, 0x8F },          /* #BC8F8F */
+    { RGBC, 125, 109, "moccasin", 0xFF, 0xE4, 0xB5 },            /* #FFE4B5 */
+    { RGBC, 126, 110, "navajo-white", 0xFF, 0xDE, 0xAD },        /* #FFDEAD */
+    { RGBC, 127, 111, "peach-puff", 0xFF, 0xDA, 0xB9 },          /* #FFDAB9 */
+    { RGBC, 128, 112, "misty-rose", 0xFF, 0xE4, 0xE1 },          /* #FFE4E1 */
+    { RGBC, 129, 113, "lavender-blush", 0xFF, 0xF0, 0xF5 },      /* #FFF0F5 */
+    { RGBC, 130, 114, "linen", 0xFA, 0xF0, 0xE6 },               /* #FAF0E6 */
+    { RGBC, 131, 115, "old-lace", 0xFD, 0xF5, 0xE6 },            /* #FDF5E6 */
+    { RGBC, 132, 116, "papaya-whip", 0xFF, 0xEF, 0xD5 },         /* #FFEFD5 */
+    { RGBC, 133, 117, "sea-shell", 0xFF, 0xF5, 0xEE },           /* #FFF5EE */
+    { RGBC, 134, 118, "mint-cream", 0xF5, 0xFF, 0xFA },          /* #F5FFFA */
+    { RGBC, 135, 119, "slate-gray", 0x70, 0x80, 0x90 },          /* #708090 */
+    { RGBC, 136, 120, "light-slate-gray", 0x77, 0x88, 0x99 },    /* #778899 */
+    { RGBC, 137, 121, "light-steel-blue", 0xB0, 0xC4, 0xDE },    /* #B0C4DE */
+    { RGBC, 138, 122, "lavender", 0xE6, 0xE6, 0xFA },            /* #E6E6FA */
+    { RGBC, 139, 123, "floral-white", 0xFF, 0xFA, 0xF0 },        /* #FFFAF0 */
+    { RGBC, 140, 124, "alice-blue", 0xF0, 0xF8, 0xFF },          /* #F0F8FF */
+    { RGBC, 141, 125, "ghost-white", 0xF8, 0xF8, 0xFF },         /* #F8F8FF */
+    { RGBC, 142, 126, "honeydew", 0xF0, 0xFF, 0xF0 },            /* #F0FFF0 */
+    { RGBC, 143, 127, "ivory", 0xFF, 0xFF, 0xF0 },               /* #FFFFF0 */
+    { RGBC, 144, 128, "azure", 0xF0, 0xFF, 0xFF },               /* #F0FFFF */
+    { RGBC, 145, 129, "snow", 0xFF, 0xFA, 0xFA },                /* #FFFAFA */
+    { RGBC, 146, 130, "black", 0x00, 0x00, 0x00 },               /* #000000 */
+    { RGBC, 147, 131, "dim-gray", 0x69, 0x69, 0x69 },            /* #696969 */
+    { RGBC, 148, 132, "gray", 0x80, 0x80, 0x80 },                /* #808080 */
+    { RGBC, 149, 133, "dark-gray", 0xA9, 0xA9, 0xA9 },           /* #A9A9A9 */
+    { RGBC, 150, 134, "silver", 0xC0, 0xC0, 0xC0 },              /* #C0C0C0 */
+    { RGBC, 151, 135, "light-gray", 0xD3, 0xD3, 0xD3 },          /* #D3D3D3 */
+    { RGBC, 152, 136, "gainsboro", 0xDC, 0xDC, 0xDC },           /* #DCDCDC */
+    { RGBC, 153, 137, "white-smoke", 0xF5, 0xF5, 0xF5 },         /* #F5F5F5 */
+    { RGBC, 154, 138, "white", 0xFF, 0xFF, 0xFF },               /* #FFFFFF */
 };
+
+#undef NHC
+#undef NOC
+#undef RGBC
 
 #ifdef CHANGE_COLOR
 staticfn int32 alt_color_spec(const char *cp);
 #endif
 
 int32
-colortable_to_int32(struct nethack_color *cte)
+colortable_to_int32(const struct nethack_color *cte)
 {
     int32 clr = NO_COLOR | NH_BASIC_COLOR;
 

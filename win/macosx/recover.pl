@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# NetHack 3.7  recover.pl $NHDT-Date: 1596498329 2020/08/03 23:45:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.13 $
+# NetHack 5.0  recover.pl $NHDT-Date: 1596498329 2020/08/03 23:45:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.13 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2009
 # NetHack may be freely redistributed.  See license for details.
 

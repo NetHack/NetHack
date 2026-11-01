@@ -1,4 +1,4 @@
-/* NetHack 3.7	sounds.c	$NHDT-Date: 1736530208 2025/01/10 09:30:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.165 $ */
+/* NetHack 5.0	sounds.c	$NHDT-Date: 1736530208 2025/01/10 09:30:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.165 $ */
 /*      Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -719,6 +719,17 @@ domonnoise(struct monst *mtmp)
     if (!canspotmon(mtmp))
         map_invisible(mtmp->mx, mtmp->my);
 
+    if (has_mgivenname(mtmp)
+        && !strcmp(MGIVENNAME(mtmp), "King Solomon")) {
+        SetVoice(mtmp, 0, 80, 0);
+        /* Either line, with equal chance. */
+        if (rn2(2))
+            verbalize("When the Lord came to me in this place, I could have asked for gold or the lives of my enemies. Instead I asked for a heart to judge His people rightly.");
+        else
+            verbalize("For what shall it profit a man, if he shall gain the whole world, and lose his own soul?");
+        return ECMD_TIME;
+    }
+
     switch (msound) {
     case MS_ORACLE:
         return doconsult(mtmp); /* check this */
@@ -1080,7 +1091,7 @@ domonnoise(struct monst *mtmp)
         } else
             switch (monsndx(ptr)) {
             case PM_HOBBIT:
-                /* 3.7: the 'complains' message used to be given if the
+                /* 5.0: the 'complains' message used to be given if the
                    hobbit's current hit points were at 10 below max or
                    less, but their max is normally less than 10 so it
                    would almost never occur */

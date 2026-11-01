@@ -1,4 +1,4 @@
-/* NetHack 3.7	sfexpasc.c.c $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 5.0	sfexpasc.c.c $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
 /* Copyright (c) Michael Allison, 2025. */
 /* NetHack may be freely redistributed.  See license for details. */
 

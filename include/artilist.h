@@ -1,4 +1,4 @@
-/* NetHack 3.7  artilist.h      $NHDT-Date: 1710957374 2024/03/20 17:56:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.30 $ */
+/* NetHack 5.0  artilist.h      $NHDT-Date: 1710957374 2024/03/20 17:56:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.30 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -197,7 +197,7 @@ static NEARDATA struct artifact artilist[] = {
      *              or the shriek that shrieked he,
      *      As I gnashed my teeth, and from my sheath
      *              I drew my Snickersnee!
-     *                      --Koko, Lord high executioner of Titipu
+     *                      --Ko-Ko, Lord high executioner of Titipu
      *                        (From Sir W.S. Gilbert's "The Mikado")
      */
     A("Snickersnee", KATANA, SPFX_RESTR, 0, 0, PHYS(0, 8), NO_DFNS, NO_CARY,
@@ -395,7 +395,7 @@ static NEARDATA struct artifact artilist[] = {
     
      /*
     =================================
-      GOSPLE OF THE PEACE
+      GOSPEL OF PEACE
       Water Walking
       Haste
       Fire Resistance (Carried or Worn)
@@ -403,7 +403,7 @@ static NEARDATA struct artifact artilist[] = {
       +modifier to charisma
     =================================
     */
-    A("Gosple of the Peace", SANDALS,
+    A("Gospel of Peace", SANDALS,
       (SPFX_NOGEN), 0,
       0, NO_ATTK, DFNS(AD_FIRE), CARY(AD_FIRE), TAMING, A_LAWFUL,
       NON_PM, NON_PM,

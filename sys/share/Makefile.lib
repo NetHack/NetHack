@@ -1,4 +1,4 @@
-# NetHack 3.7	Makefile.lib	$NHDT-Date: 1596498281 2020/08/03 23:44:41 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.8 $
+# NetHack 5.0	Makefile.lib	$NHDT-Date: 1596498281 2020/08/03 23:44:41 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.8 $
 #	Nethack makefile for Fred fish termlib -- Norman Meluch
 #
 CC	= cl /c

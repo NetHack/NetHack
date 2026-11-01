@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-    <LUA_VERSION>5.4.6</LUA_VERSION>
+    <LUA_VERSION>5.4.8</LUA_VERSION>
     <RootDir>$(MSBuildProjectDirectory)\..\..\..\..\</RootDir>
     <BinDir>$(RootDir)binary\$(Configuration)\$(Platform)\</BinDir>
     <ObjDir>$(ProjectDir)obj\$(Configuration)\$(Platform)\$(TargetName)\</ObjDir>

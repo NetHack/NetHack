@@ -1,4 +1,4 @@
-/* NetHack 3.7	consoletty.c	$NHDT-Date: 1596498316 2020/08/03 23:45:16 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.117 $ */
+/* NetHack 5.0	consoletty.c	$NHDT-Date: 1596498316 2020/08/03 23:45:16 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.117 $ */
 /* Copyright (c) NetHack PC Development Team 1993    */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -98,22 +98,22 @@ cell_t undefined_cell = { CONSOLE_UNDEFINED_CHARACTER,
                           CONSOLE_UNDEFINED_ATTRIBUTE };
 #else /* VIRTUAL_TERMINAL_SEQUENCES */
 cell_t clear_cell = {
-	        { CONSOLE_CLEAR_CHARACTER, 0, 0, 0, 0, 0, 0 },
+                { CONSOLE_CLEAR_CHARACTER, 0, 0, 0, 0, 0, 0 },
                 CONSOLE_CLEAR_CHARACTER,         /* wcharacter */
-		0,                               /* attr */
-		0L,                              /* color24 */
-		0,                               /* color256idx */
-		"\x1b[0m",                       /* bkcolorseq */
-		0                                /* colorseq */
+                0,                               /* attr */
+                0L,                              /* color24 */
+                0,                               /* color256idx */
+                "\x1b[0m",                       /* bkcolorseq */
+                0                                /* colorseq */
 };
 cell_t undefined_cell = {
-		{ CONSOLE_UNDEFINED_CHARACTER, 0, 0, 0, 0, 0, 0 },
+               { CONSOLE_UNDEFINED_CHARACTER, 0, 0, 0, 0, 0, 0 },
                 CONSOLE_UNDEFINED_CHARACTER,     /* wcharacter */
-		0,                               /* attr */
-		0L,                              /* color24 */
-		0,                               /* color256idx */
-		(const char *) 0,                /* bkcolorseq */
-		(const char *) 0                 /* colorseq */
+                0,                               /* attr */
+                0L,                              /* color24 */
+                0,                               /* color256idx */
+                (const char *) 0,                /* bkcolorseq */
+                (const char *) 0                 /* colorseq */
 };
 #if 0
 static const uint8 empty_utf8str[MAX_UTF8_SEQUENCE] = { 0 };
@@ -156,7 +156,6 @@ static boolean check_font_widths(void);
 #endif
 static void set_known_good_console_font(void);
 static void restore_original_console_font(void);
-extern void safe_routines(void);
 void tty_ibmgraphics_fixup(void);
 #ifdef VIRTUAL_TERMINAL_SEQUENCES
 extern void (*ibmgraphics_mode_callback)(void);  /* symbols.c */
@@ -344,160 +343,13 @@ WHITE           255,255,255                242,242,242
 */
 
 #ifdef VIRTUAL_TERMINAL_SEQUENCES
-long customcolors[CLR_MAX];
+int32 customcolors[CLR_MAX];
 const char *esc_seq_colors[CLR_MAX] = { 0 };
 const char *esc_seq_bkcolors[CLR_MAX] = { 0 };
 
-struct rgbvalues {
-    int idx;
-    const char *name;
-    const char *hexval;
-    long r, gn, b;
-} rgbtable[] = {
-    { 0, "maroon", "#800000", 128, 0, 0 },
-    { 1, "dark red", "#8B0000", 139, 0, 0 },
-    { 2, "brown", "#A52A2A", 165, 42, 42 },
-    { 3, "firebrick", "#B22222", 178, 34, 34 },
-    { 4, "crimson", "#DC143C", 220, 20, 60 },
-    { 5, "red", "#FF0000", 255, 0, 0 },
-    { 6, "tomato", "#FF6347", 255, 99, 71 },
-    { 7, "coral", "#FF7F50", 255, 127, 80 },
-    { 8, "indian red", "#CD5C5C", 205, 92, 92 },
-    { 9, "light coral", "#F08080", 240, 128, 128 },
-    { 10, "dark salmon", "#E9967A", 233, 150, 122 },
-    { 11, "salmon", "#FA8072", 250, 128, 114 },
-    { 12, "light salmon", "#FFA07A", 255, 160, 122 },
-    { 13, "orange red", "#FF4500", 255, 69, 0 },
-    { 14, "dark orange", "#FF8C00", 255, 140, 0 },
-    { 15, "orange", "#FFA500", 255, 165, 0 },
-    { 16, "gold", "#FFD700", 255, 215, 0 },
-    { 17, "dark golden rod", "#B8860B", 184, 134, 11 },
-    { 18, "golden rod", "#DAA520", 218, 165, 32 },
-    { 19, "pale golden rod", "#EEE8AA", 238, 232, 170 },
-    { 20, "dark khaki", "#BDB76B", 189, 183, 107 },
-    { 21, "khaki", "#F0E68C", 240, 230, 140 },
-    { 22, "olive", "#808000", 128, 128, 0 },
-    { 23, "yellow", "#FFFF00", 255, 255, 0 },
-    { 24, "yellow green", "#9ACD32", 154, 205, 50 },
-    { 25, "dark olive green", "#556B2F", 85, 107, 47 },
-    { 26, "olive drab", "#6B8E23", 107, 142, 35 },
-    { 27, "lawn green", "#7CFC00", 124, 252, 0 },
-    { 28, "chart reuse", "#7FFF00", 127, 255, 0 },
-    { 29, "green yellow", "#ADFF2F", 173, 255, 47 },
-    { 30, "dark green", "#006400", 0, 100, 0 },
-    { 31, "green", "#008000", 0, 128, 0 },
-    { 32, "forest green", "#228B22", 34, 139, 34 },
-    { 33, "lime", "#00FF00", 0, 255, 0 },
-    { 34, "lime green", "#32CD32", 50, 205, 50 },
-    { 35, "light green", "#90EE90", 144, 238, 144 },
-    { 36, "pale green", "#98FB98", 152, 251, 152 },
-    { 37, "dark sea green", "#8FBC8F", 143, 188, 143 },
-    { 38, "medium spring green", "#00FA9A", 0, 250, 154 },
-    { 39, "spring green", "#00FF7F", 0, 255, 127 },
-    { 40, "sea green", "#2E8B57", 46, 139, 87 },
-    { 41, "medium aqua marine", "#66CDAA", 102, 205, 170 },
-    { 42, "medium sea green", "#3CB371", 60, 179, 113 },
-    { 43, "light sea green", "#20B2AA", 32, 178, 170 },
-    { 44, "dark slate gray", "#2F4F4F", 47, 79, 79 },
-    { 45, "teal", "#008080", 0, 128, 128 },
-    { 46, "dark cyan", "#008B8B", 0, 139, 139 },
-    { 47, "aqua", "#00FFFF", 0, 255, 255 },
-    { 48, "cyan", "#00FFFF", 0, 255, 255 },
-    { 49, "light cyan", "#E0FFFF", 224, 255, 255 },
-    { 50, "dark turquoise", "#00CED1", 0, 206, 209 },
-    { 51, "turquoise", "#40E0D0", 64, 224, 208 },
-    { 52, "medium turquoise", "#48D1CC", 72, 209, 204 },
-    { 53, "pale turquoise", "#AFEEEE", 175, 238, 238 },
-    { 54, "aqua marine", "#7FFFD4", 127, 255, 212 },
-    { 55, "powder blue", "#B0E0E6", 176, 224, 230 },
-    { 56, "cadet blue", "#5F9EA0", 95, 158, 160 },
-    { 57, "steel blue", "#4682B4", 70, 130, 180 },
-    { 58, "corn flower blue", "#6495ED", 100, 149, 237 },
-    { 59, "deep sky blue", "#00BFFF", 0, 191, 255 },
-    { 60, "dodger blue", "#1E90FF", 30, 144, 255 },
-    { 61, "light blue", "#ADD8E6", 173, 216, 230 },
-    { 62, "sky blue", "#87CEEB", 135, 206, 235 },
-    { 63, "light sky blue", "#87CEFA", 135, 206, 250 },
-    { 64, "midnight blue", "#191970", 25, 25, 112 },
-    { 65, "navy", "#000080", 0, 0, 128 },
-    { 66, "dark blue", "#00008B", 0, 0, 139 },
-    { 67, "medium blue", "#0000CD", 0, 0, 205 },
-    { 68, "blue", "#0000FF", 0, 0, 255 },
-    { 69, "royal blue", "#4169E1", 65, 105, 225 },
-    { 70, "blue violet", "#8A2BE2", 138, 43, 226 },
-    { 71, "indigo", "#4B0082", 75, 0, 130 },
-    { 72, "dark slate blue", "#483D8B", 72, 61, 139 },
-    { 73, "slate blue", "#6A5ACD", 106, 90, 205 },
-    { 74, "medium slate blue", "#7B68EE", 123, 104, 238 },
-    { 75, "medium purple", "#9370DB", 147, 112, 219 },
-    { 76, "dark magenta", "#8B008B", 139, 0, 139 },
-    { 77, "dark violet", "#9400D3", 148, 0, 211 },
-    { 78, "dark orchid", "#9932CC", 153, 50, 204 },
-    { 79, "medium orchid", "#BA55D3", 186, 85, 211 },
-    { 80, "purple", "#800080", 128, 0, 128 },
-    { 81, "thistle", "#D8BFD8", 216, 191, 216 },
-    { 82, "plum", "#DDA0DD", 221, 160, 221 },
-    { 83, "violet", "#EE82EE", 238, 130, 238 },
-    { 84, "magenta / fuchsia", "#FF00FF", 255, 0, 255 },
-    { 85, "orchid", "#DA70D6", 218, 112, 214 },
-    { 86, "medium violet red", "#C71585", 199, 21, 133 },
-    { 87, "pale violet red", "#DB7093", 219, 112, 147 },
-    { 88, "deep pink", "#FF1493", 255, 20, 147 },
-    { 89, "hot pink", "#FF69B4", 255, 105, 180 },
-    { 90, "light pink", "#FFB6C1", 255, 182, 193 },
-    { 91, "pink", "#FFC0CB", 255, 192, 203 },
-    { 92, "antique white", "#FAEBD7", 250, 235, 215 },
-    { 93, "beige", "#F5F5DC", 245, 245, 220 },
-    { 94, "bisque", "#FFE4C4", 255, 228, 196 },
-    { 95, "blanched almond", "#FFEBCD", 255, 235, 205 },
-    { 96, "wheat", "#F5DEB3", 245, 222, 179 },
-    { 97, "corn silk", "#FFF8DC", 255, 248, 220 },
-    { 98, "lemon chiffon", "#FFFACD", 255, 250, 205 },
-    { 99, "light golden rod yellow", "#FAFAD2", 250, 250, 210 },
-    { 100, "light yellow", "#FFFFE0", 255, 255, 224 },
-    { 101, "saddle brown", "#8B4513", 139, 69, 19 },
-    { 102, "sienna", "#A0522D", 160, 82, 45 },
-    { 103, "chocolate", "#D2691E", 210, 105, 30 },
-    { 104, "peru", "#CD853F", 205, 133, 63 },
-    { 105, "sandy brown", "#F4A460", 244, 164, 96 },
-    { 106, "burly wood", "#DEB887", 222, 184, 135 },
-    { 107, "tan", "#D2B48C", 210, 180, 140 },
-    { 108, "rosy brown", "#BC8F8F", 188, 143, 143 },
-    { 109, "moccasin", "#FFE4B5", 255, 228, 181 },
-    { 110, "navajo white", "#FFDEAD", 255, 222, 173 },
-    { 111, "peach puff", "#FFDAB9", 255, 218, 185 },
-    { 112, "misty rose", "#FFE4E1", 255, 228, 225 },
-    { 113, "lavender blush", "#FFF0F5", 255, 240, 245 },
-    { 114, "linen", "#FAF0E6", 250, 240, 230 },
-    { 115, "old lace", "#FDF5E6", 253, 245, 230 },
-    { 116, "papaya whip", "#FFEFD5", 255, 239, 213 },
-    { 117, "sea shell", "#FFF5EE", 255, 245, 238 },
-    { 118, "mint cream", "#F5FFFA", 245, 255, 250 },
-    { 119, "slate gray", "#708090", 112, 128, 144 },
-    { 120, "light slate gray", "#778899", 119, 136, 153 },
-    { 121, "light steel blue", "#B0C4DE", 176, 196, 222 },
-    { 122, "lavender", "#E6E6FA", 230, 230, 250 },
-    { 123, "floral white", "#FFFAF0", 255, 250, 240 },
-    { 124, "alice blue", "#F0F8FF", 240, 248, 255 },
-    { 125, "ghost white", "#F8F8FF", 248, 248, 255 },
-    { 126, "honeydew", "#F0FFF0", 240, 255, 240 },
-    { 127, "ivory", "#FFFFF0", 255, 255, 240 },
-    { 128, "azure", "#F0FFFF", 240, 255, 255 },
-    { 129, "snow", "#FFFAFA", 255, 250, 250 },
-    { 130, "black", "#000000", 0, 0, 0 },
-    { 131, "dim gray / dim grey", "#696969", 105, 105, 105 },
-    { 132, "gray / grey", "#808080", 128, 128, 128 },
-    { 133, "dark gray / dark grey", "#A9A9A9", 169, 169, 169 },
-    { 134, "silver", "#C0C0C0", 192, 192, 192 },
-    { 135, "light gray / light grey", "#D3D3D3", 211, 211, 211 },
-    { 136, "gainsboro", "#DCDCDC", 220, 220, 220 },
-    { 137, "white smoke", "#F5F5F5", 245, 245, 245 },
-    { 138, "white", "#FFFFFF", 255, 255, 255 },
-};
-
 void buffer_fill_to_end(cell_t * buffer, cell_t * fill, int x, int y);
 void buffer_write(cell_t * buffer, cell_t * cell, COORD pos);
-static long rgbtable_to_long(struct rgbvalues *);
+static int32 rgbtable_to_int32(const struct nethack_color *tbl);
 void term_start_256color(int idx);
 void set_cp_map(void);
 #ifdef PORT_DEBUG
@@ -505,34 +357,37 @@ void win32con_debug_keystrokes(void);
 void win32con_toggle_cursor_info(void);
 #endif
 
-static long
-rgbtable_to_long(struct rgbvalues *tbl)
+/* GDI typically represents color as BGR (Blue-Green-Red) in memory */
+static int32
+colortable_to_bgr_int32(const struct nethack_color *tbl)
 {
-    long rgblong = (tbl->r << 0) | (tbl->gn << 8) | (tbl->b << 16);
-    return rgblong;
+    int32 bgrint32 = (tbl->r << 0) | (tbl->g << 8) | (tbl->b << 16);
+    return bgrint32;
 }
+
+#define rgbtable_offset 16
 
 static void
 init_custom_colors(void)
 {
     char bkcolorbuf[32];
 
-    customcolors[CLR_BLACK] = rgbtable_to_long(&rgbtable[131]);
-    customcolors[CLR_RED] = rgbtable_to_long(&rgbtable[5]);
-    customcolors[CLR_GREEN] = rgbtable_to_long(&rgbtable[31]);
-    customcolors[CLR_BROWN] = rgbtable_to_long(&rgbtable[104]);
-    customcolors[CLR_BLUE] = rgbtable_to_long(&rgbtable[58]);
-    customcolors[CLR_MAGENTA] = rgbtable_to_long(&rgbtable[76]);
-    customcolors[CLR_CYAN] = rgbtable_to_long(&rgbtable[48]);
-    customcolors[CLR_GRAY] = rgbtable_to_long(&rgbtable[73]);
-    customcolors[NO_COLOR] = rgbtable_to_long(&rgbtable[137]);
-    customcolors[CLR_ORANGE] = rgbtable_to_long(&rgbtable[15]);
-    customcolors[CLR_BRIGHT_GREEN] = rgbtable_to_long(&rgbtable[34]);
-    customcolors[CLR_YELLOW] = rgbtable_to_long(&rgbtable[18]);
-    customcolors[CLR_BRIGHT_BLUE] = rgbtable_to_long(&rgbtable[69]);
-    customcolors[CLR_BRIGHT_MAGENTA] = rgbtable_to_long(&rgbtable[84]);
-    customcolors[CLR_BRIGHT_CYAN] = rgbtable_to_long(&rgbtable[49]);
-    customcolors[CLR_WHITE] = rgbtable_to_long(&rgbtable[138]);
+    customcolors[CLR_BLACK] = colortable_to_bgr_int32(&colortable[rgbtable_offset + 131]);
+    customcolors[CLR_RED] = colortable_to_bgr_int32(&colortable[rgbtable_offset + 5]);
+    customcolors[CLR_GREEN] = colortable_to_bgr_int32(&colortable[rgbtable_offset + 31]);
+    customcolors[CLR_BROWN] = colortable_to_bgr_int32(&colortable[rgbtable_offset + 104]);
+    customcolors[CLR_BLUE] = colortable_to_bgr_int32(&colortable[rgbtable_offset + 58]);
+    customcolors[CLR_MAGENTA] = colortable_to_bgr_int32(&colortable[rgbtable_offset + 76]);
+    customcolors[CLR_CYAN] = colortable_to_bgr_int32(&colortable[rgbtable_offset + 48]);
+    customcolors[CLR_GRAY] = colortable_to_bgr_int32(&colortable[rgbtable_offset + 73]);
+    customcolors[NO_COLOR] = colortable_to_bgr_int32(&colortable[rgbtable_offset + 137]);
+    customcolors[CLR_ORANGE] = colortable_to_bgr_int32(&colortable[rgbtable_offset + 15]);
+    customcolors[CLR_BRIGHT_GREEN] = colortable_to_bgr_int32(&colortable[rgbtable_offset + 34]);
+    customcolors[CLR_YELLOW] = colortable_to_bgr_int32(&colortable[rgbtable_offset + 18]);
+    customcolors[CLR_BRIGHT_BLUE] = colortable_to_bgr_int32(&colortable[rgbtable_offset + 69]);
+    customcolors[CLR_BRIGHT_MAGENTA] = colortable_to_bgr_int32(&colortable[rgbtable_offset + 84]);
+    customcolors[CLR_BRIGHT_CYAN] = colortable_to_bgr_int32(&colortable[rgbtable_offset + 49]);
+    customcolors[CLR_WHITE] = colortable_to_bgr_int32(&colortable[rgbtable_offset + 138]);
 
 /*    esc_seq_colors[CLR_BLACK] = "\x1b[30m"; */
     esc_seq_colors[CLR_BLACK] = "\x1b[38;2;47;79;79m";
@@ -871,7 +726,8 @@ back_buffer_flip(void)
                     do_anything |= do_wide_content;
             } else {
 #endif
-                if (strcmp((const char *) back->utf8str,
+                if (back->utf8str[0] && front->utf8str[0]
+                    && strcmp((const char *) back->utf8str,
                            (const char *) front->utf8str))
                     do_anything |= do_utf8_content;
 #ifdef UTF8_FROM_CORE
@@ -1146,7 +1002,7 @@ CtrlHandler(DWORD ctrltype)
     case CTRL_BREAK_EVENT:
         term_clear_screen();
         FALLTHROUGH;
-	/* FALLTHRU */
+        /* FALLTHRU */
     case CTRL_CLOSE_EVENT:
     case CTRL_LOGOFF_EVENT:
     case CTRL_SHUTDOWN_EVENT:
@@ -1185,17 +1041,18 @@ consoletty_open(int mode UNUSED)
     really_move_cursor();
     nhUse(debugvar);
 }
+extern void set_emergency_io(void);
 
 void
 consoletty_exit(void)
 {
-    /* go back to using the safe routines */
-    safe_routines();
     free_custom_colors();
     free((genericptr_t) console.front_buffer);
     free((genericptr_t) console.back_buffer);
+    console.front_buffer = console.back_buffer = 0;
     free((genericptr_t) console.localestr);
     free((genericptr_t) console.orig_localestr);
+    set_emergency_io();
 }
 
 int
@@ -1308,8 +1165,8 @@ really_move_cursor(void)
             oldtitle[39] = '\0';
         }
         Snprintf(newtitle, sizeof newtitle,
-		 "%-55s tty=(%02d,%02d) consoletty=(%02d,%02d)",
-		 oldtitle,
+                 "%-55s tty=(%02d,%02d) consoletty=(%02d,%02d)",
+                 oldtitle,
                  ttyDisplay->curx, ttyDisplay->cury,
                  console.cursor.X, console.cursor.Y);
         (void) SetConsoleTitle(newtitle);
@@ -2544,11 +2401,18 @@ void early_raw_print(const char *s)
  *
  */
 
+
+DISABLE_WARNING_CONDEXPR_IS_CONSTANT
+
 void nethack_enter_consoletty(void)
 {
+    int width;
 #ifdef VIRTUAL_TERMINAL_SEQUENCES
     char buf[BUFSZ], *bp, *localestr;
     BOOL apisuccess;
+//    DWORD unused;
+//    int i = 0;
+
 #endif /* VIRTUAL_TERMINAL_SEQUENCES */
 #if 0
     /* set up state needed by early_raw_print() */
@@ -2562,13 +2426,41 @@ void nethack_enter_consoletty(void)
                   GetWindowLong(console.hWnd, GWL_STYLE)
                      & ~WS_MAXIMIZEBOX & ~WS_SIZEBOX);
 #endif
+
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    if (GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi)) {
+        /* srWindow identifies the visible area; dwSize identifies the buffer
+         */
+        width = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+#ifdef DEBUG
+        if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
+            fprintf(stdout, "width = %d\n", width);
+#endif
+    }
+
     console.hConOut = GetStdHandle(STD_OUTPUT_HANDLE);
     nhassert(console.hConOut != NULL); // NOTE: this assert will not print
+    GetConsoleScreenBufferInfo(console.hConOut, &console.orig_csbi);
+    //COORD screencheck = GetLargestConsoleWindowSize(console.hConOut);
+
+    GetConsoleMode(console.hConOut, &console.orig_out_cmode);
+    console.out_cmode = console.orig_out_cmode;
+    console.out_cmode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+    SetConsoleMode(console.hConOut, console.out_cmode);
+#if 0
+    /* tests */
+    WriteConsoleA(console.hConOut, "\033[8;;133t",9, &unused, NULL);
+    for (i = 0; i < 13; ++i) {
+        WriteConsoleA(console.hConOut, "0123456789", 10, &unused, NULL);
+    }
+    WriteConsoleA(console.hConOut, "\033[3;133ftest", 12, &unused, NULL);
     GetConsoleScreenBufferInfo(console.hConOut, &console.orig_csbi);
     /* Testing of widths != COLNO has not turned up any problems.  Need
      * to do a bit more testing and then we are likely to enable having
      * console width match window width.
      */
+#endif
+
 #if 0
     console.width = console.orig_csbi.srWindow.Right -
                      console.orig_csbi.srWindow.Left + 1;
@@ -2590,19 +2482,19 @@ void nethack_enter_consoletty(void)
 
 
     /* clear the entire console buffer */
-    int size = console.orig_csbi.dwSize.X * console.orig_csbi.dwSize.Y;
-    DWORD unused;
-    set_console_cursor(0, 0);
-    FillConsoleOutputAttribute(
-        console.hConOut, CONSOLE_CLEAR_ATTRIBUTE,
-        size, console.cursor, &unused);
+    //int size = console.orig_csbi.dwSize.X * console.orig_csbi.dwSize.Y;
+    //DWORD unused;
+    //set_console_cursor(0, 0);
+  //  FillConsoleOutputAttribute(
+  //      console.hConOut, CONSOLE_CLEAR_ATTRIBUTE,
+  //      size, console.cursor, &unused);
 
-    FillConsoleOutputCharacter(
-        console.hConOut, CONSOLE_CLEAR_CHARACTER,
-        size, console.cursor, &unused);
+  //  FillConsoleOutputCharacter(
+  //      console.hConOut, CONSOLE_CLEAR_CHARACTER,
+  //      size, console.cursor, &unused);
 
-    set_console_cursor(1, 0);
-    SetConsoleCursorPosition(console.hConOut, console.cursor);
+    //set_console_cursor(1, 0);
+    //SetConsoleCursorPosition(console.hConOut, console.cursor);
 
     /* At this point early_raw_print will work */
 
@@ -2745,6 +2637,9 @@ void nethack_enter_consoletty(void)
     console.is_ready = TRUE;
     nhUse(apisuccess);
 }
+
+RESTORE_WARNING_CONDEXPR_IS_CONSTANT
+
 #endif /* TTY_GRAPHICS */
 
 /* this is used as a printf() replacement when the window
@@ -2757,7 +2652,7 @@ VA_DECL(const char *, fmt)
     VA_START(fmt);
     VA_INIT(fmt, const char *);
     (void) vsnprintf(buf, sizeof buf, fmt, VA_ARGS);
-    if (redirect_stdout)
+    if (redirect_stdout || program_state.early_options)
         fprintf(stdout, "%s", buf);
     else {
 #ifdef TTY_GRAPHICS
@@ -3202,7 +3097,8 @@ default_checkinput(
     DWORD dwWait;
 #endif
     int ch = 0;
-    boolean valid = 0, done = 0;
+    boolean valid = 0, done = 0, done_a_checkpoint = FALSE;
+    DWORD how_many_milliseconds = 0;
 
 #ifdef QWERTZ_SUPPORT
     if (numberpad & 0x10) {
@@ -3212,54 +3108,78 @@ default_checkinput(
         qwertz = FALSE;
     }
 #endif
+    done_a_checkpoint = FALSE;
+    how_many_milliseconds = (iflags.idlecheckpoint)
+        ? (IDLECHECKPOINT_WAIT_TIME * 1000)
+        : INFINITE;
     while (!done) {
-#if defined(SAFERHANGUP)
         dwWait = WaitForSingleObjectEx(hConIn,   // event object to wait for
-                                       INFINITE, // waits indefinitely
+                                       how_many_milliseconds,
                                        TRUE);    // alertable wait enabled
+#if defined(SAFERHANGUP)
         if (dwWait == WAIT_FAILED)
             return '\033';
 #endif
-        ReadConsoleInput(hConIn, ir, 1, count);
-        if (mode == 0) {
-            if ((ir->EventType == KEY_EVENT) && ir->Event.KeyEvent.bKeyDown) {
-                ch = default_processkeystroke(hConIn, ir, &valid, numberpad, 0);
-                done = valid;
-            }
-        } else {
-            if (*count > 0) {
-                if (ir->EventType == KEY_EVENT
+        if (iflags.idlecheckpoint
+            && dwWait == WAIT_TIMEOUT && !done_a_checkpoint) {
+            /* no input for 30 seconds, so let's take
+             * advantage and do a game checkpoint,
+             * then resume the wait.
+             */
+#ifdef INSURANCE
+            save_currentstate();
+#endif  /* INSURANCE */
+            done_a_checkpoint = TRUE;
+        } else
+        {
+            ReadConsoleInput(hConIn, ir, 1, count);
+            if (mode == 0) {
+                if ((ir->EventType == KEY_EVENT)
                     && ir->Event.KeyEvent.bKeyDown) {
+                    ch = default_processkeystroke(hConIn, ir, &valid,
+                                                  numberpad, 0);
+                    done = valid;
+                }
+            } else {
+                if (*count > 0) {
+                    if (ir->EventType == KEY_EVENT
+                        && ir->Event.KeyEvent.bKeyDown) {
 #ifdef QWERTZ_SUPPORT
-                    if (qwertz)
-                        numberpad |= 0x10;
+                        if (qwertz)
+                            numberpad |= 0x10;
 #endif
-                    ch = default_processkeystroke(hConIn, ir, &valid, numberpad, 0);
+                        ch = default_processkeystroke(hConIn, ir, &valid,
+                                                      numberpad, 0);
 #ifdef QWERTZ_SUPPORT
-                    numberpad &= ~0x10;
+                        numberpad &= ~0x10;
 #endif
-                    if (valid)
-                        return ch;
-                } else if (ir->EventType == MOUSE_EVENT) {
-                    if ((ir->Event.MouseEvent.dwEventFlags == 0)
-                        && (ir->Event.MouseEvent.dwButtonState & MOUSEMASK)) {
-                        cc->x = ir->Event.MouseEvent.dwMousePosition.X + 1;
-                        cc->y = ir->Event.MouseEvent.dwMousePosition.Y - 1;
+                        if (valid)
+                            return ch;
+                    } else if (ir->EventType == MOUSE_EVENT) {
+                        if ((ir->Event.MouseEvent.dwEventFlags == 0)
+                            && (ir->Event.MouseEvent.dwButtonState
+                                & MOUSEMASK)) {
+                            cc->x =
+                                ir->Event.MouseEvent.dwMousePosition.X + 1;
+                            cc->y =
+                                ir->Event.MouseEvent.dwMousePosition.Y - 1;
 
-                        if (ir->Event.MouseEvent.dwButtonState & LEFTBUTTON)
-                            *mod = CLICK_1;
-                        else if (ir->Event.MouseEvent.dwButtonState
-                                 & RIGHTBUTTON)
-                            *mod = CLICK_2;
+                            if (ir->Event.MouseEvent.dwButtonState
+                                & LEFTBUTTON)
+                                *mod = CLICK_1;
+                            else if (ir->Event.MouseEvent.dwButtonState
+                                     & RIGHTBUTTON)
+                                *mod = CLICK_2;
 #if 0 /* middle button */
                                     else if (ir->Event.MouseEvent.dwButtonState & MIDBUTTON)
                                         *mod = CLICK_3;
 #endif
-                        return 0;
+                            return 0;
+                        }
                     }
-                }
-            } else
-                done = 1;
+                } else
+                    done = 1;
+            }
         }
     }
     return mode ? 0 : ch;

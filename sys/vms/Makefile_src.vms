@@ -1,4 +1,4 @@
-# NetHack 3.7 Makefile.src $NHDT-Date: 1654287121 2022/06/03 20:12:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.145 $
+# NetHack 5.0 Makefile.src $NHDT-Date: 1654287121 2022/06/03 20:12:01 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.145 $
 # Copyright (c) 2024 by Michael Allison
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -35,9 +35,9 @@ WINSHIM=[-.win.shim]
 WINCHAIN=[-.win.chain]
 
 # Lua
-LUAVER=546
-LUADOTVER=5.4.6
-LUAUNDERVER=5_4_6
+LUAVER=548
+LUADOTVER=5.4.8
+LUAUNDERVER=5_4_8
 # Lua location relative to src
 LUAINC=[-.lib.lua.lua$(LUAVER).src]
 LUALIB=[-.lib.lua]lua$(LUAVER).olb
@@ -117,10 +117,10 @@ HACK_H = $(addsuffix .h, $(addprefix $(INCL), $(CONFIGBASEH) $(HACKBASEH)))
 HACKFILES := allmain alloc apply artifact attrib ball bones botl \
 	   calendar cfgfiles cmd coloratt dbridge decl detect \
 	   dig display dlb do do_name do_wear dog dogmove dokick \
-           dothrow drawing dungeon eat end engrave exper explode extralev \
-	   files fountain getpos glyphs hack hacklib insight invent isaac64 \
-	   light lock mail makemon mcastu mdlib mhitm mhitu minion mklev \
-	   mkmap mkmaze mkobj mkroom mon \
+           dothrow drawing dungeon earlyarg eat end engrave exper explode \
+	   extralev files fountain getpos glyphs hack hacklib iactions \
+	   insight invent isaac64 light lock mail makemon mcastu mdlib mhitm \
+	   mhitu minion mklev mkmap mkmaze mkobj mkroom mon \
 	   mondata monmove monst mplayer mthrowu muse music \
 	   nhlua nhlsel nhlobj objnam o_init objects \
 	   options pager pickup pline polyself potion pray \
@@ -735,6 +735,7 @@ $(TARGETPFX)getpos.obj: getpos.c $(HACK_H)
 $(TARGETPFX)glyphs.obj: glyphs.c $(HACK_H)
 $(TARGETPFX)hack.obj: hack.c $(HACK_H)
 $(TARGETPFX)hacklib.obj: hacklib.c $(HACK_H)
+$(TARGETPFX)iactions.obj: iactions.c $(HACK_H)
 $(TARGETPFX)insight.obj: insight.c $(HACK_H)
 $(TARGETPFX)invent.obj: invent.c $(HACK_H)
 $(TARGETPFX)isaac64.obj: isaac64.c $(CONFIG_H) $(INCL)isaac64.h

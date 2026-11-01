@@ -1,4 +1,4 @@
-/* NetHack 3.7	mail.h	$NHDT-Date: 1596498544 2020/08/03 23:49:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.10 $ */
+/* NetHack 5.0	mail.h	$NHDT-Date: 1596498544 2020/08/03 23:49:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.10 $ */
 /*      Copyright (c) 2015 by Kenneth Lorber              */
 /* NetHack may be freely redistributed.  See license for details. */
 

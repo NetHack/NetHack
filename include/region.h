@@ -1,4 +1,4 @@
-/* NetHack 3.7	region.h	$NHDT-Date: 1596498557 2020/08/03 23:49:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.15 $ */
+/* NetHack 5.0	region.h	$NHDT-Date: 1596498557 2020/08/03 23:49:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.15 $ */
 /* Copyright (c) 1996 by Jean-Christophe Collet                   */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -56,7 +56,7 @@ typedef struct {
 
     /* Should probably do the same thing about objects */
 
-    boolean visible;       /* Is the region visible ? */
+    boolean visible;       /* Is the region visible? */
     int glyph;             /* Which glyph to use if visible */
     anything arg;          /* Optional user argument (Ex: strength of
                             * force field, damage of a fire zone, ...*/

@@ -70,6 +70,14 @@ static struct key_macro_rec {
     { 0, 0U, (const char *) 0, (const char *) 0 }
 };
 
+#ifdef IDLECHECKPOINT
+#ifndef IDLECHECKPOINT_WAIT_TIME
+#define IDLECHECKPOINT_WAIT_TIME 10
+#endif
+static void qt_timer_fire(void);
+QTimer *qt_input_timer;
+#endif
+
 static QPen *pen = (QPen *) 0;
 
 NetHackQtBind::NetHackQtBind(int& argc, char** argv) :
@@ -230,7 +238,7 @@ static bool have_asked = false;
 void NetHackQtBind::qt_player_selection()
 {
     if ( !have_asked )
-	qt_askname();
+        qt_askname();
 }
 
 void NetHackQtBind::qt_askname()
@@ -309,6 +317,11 @@ public:
  
 void NetHackQtBind::qt_exit_nhwindows(const char *)
 {
+#ifdef IDLECHECKPOINT
+    if (qt_input_timer) {
+        NetHackQtBind::free_qt_input_timer();
+    }
+#endif
 #if defined(QWS)
     // Avoids bug in SHARP SL5500
     ((TApp*)qApp)->lwc();
@@ -332,38 +345,38 @@ winid NetHackQtBind::qt_create_nhwindow(int type)
 {
     winid id;
     for (id = 0; id < (winid) id_to_window.size(); id++) {
-	if ( !id_to_window[(int)id] )
-	    break;
+        if ( !id_to_window[(int)id] )
+            break;
     }
     if ( id == (winid) id_to_window.size() )
-	id_to_window.resize(id+1);
+        id_to_window.resize(id+1);
 
     NetHackQtWindow* window=0;
 
     switch (type) {
     case NHW_MAP: {
-	NetHackQtMapWindow2* w=new NetHackQtMapWindow2(clickbuffer);
-	main->AddMapWindow(w);
-	window=w;
+        NetHackQtMapWindow2* w=new NetHackQtMapWindow2(clickbuffer);
+        main->AddMapWindow(w);
+        window=w;
         break;
     }
     case NHW_MESSAGE: {
-	NetHackQtMessageWindow* w=new NetHackQtMessageWindow;
-	main->AddMessageWindow(w);
-	window=w;
+        NetHackQtMessageWindow* w=new NetHackQtMessageWindow;
+        main->AddMessageWindow(w);
+        window=w;
         break;
     }
     case NHW_STATUS: {
-	NetHackQtStatusWindow* w=new NetHackQtStatusWindow;
-	main->AddStatusWindow(w);
-	window=w;
+        NetHackQtStatusWindow* w=new NetHackQtStatusWindow;
+        main->AddStatusWindow(w);
+        window=w;
         break;
     }
     case NHW_MENU:
-	window=new NetHackQtMenuOrTextWindow(mainWidget());
+        window=new NetHackQtMenuOrTextWindow(mainWidget());
         break;
     case NHW_TEXT:
-	window=new NetHackQtTextWindow(mainWidget());
+        window=new NetHackQtTextWindow(mainWidget());
         break;
     }
 
@@ -374,11 +387,11 @@ winid NetHackQtBind::qt_create_nhwindow(int type)
 #if QT_VERSION >= 300
         && !main->isHidden()
 #else
-	&& main->isVisible()
+        && main->isVisible()
 #endif
-	) {
-	delete splash;
-	splash = 0;
+        ) {
+        delete splash;
+        splash = 0;
     }
 
     id_to_window[(int)id] = window;
@@ -440,30 +453,30 @@ void NetHackQtBind::qt_display_file(const char *filename, boolean must_exist)
     bool complain = false;
 
     {
-	dlb *f;
-	char buf[BUFSZ];
-	char *cr;
+        dlb *f;
+        char buf[BUFSZ];
+        char *cr;
 
-	window->Clear();
-	f = dlb_fopen(filename, "r");
-	if (!f) {
-	    complain = must_exist;
-	} else {
-	    while (dlb_fgets(buf, BUFSZ, f)) {
-		if ((cr = strchr(buf, '\n')) != 0) *cr = 0;
+        window->Clear();
+        f = dlb_fopen(filename, "r");
+        if (!f) {
+            complain = must_exist;
+        } else {
+            while (dlb_fgets(buf, BUFSZ, f)) {
+                if ((cr = strchr(buf, '\n')) != 0) *cr = 0;
 #ifdef MSDOS
-		if ((cr = strchr(buf, '\r')) != 0) *cr = 0;
+                if ((cr = strchr(buf, '\r')) != 0) *cr = 0;
 #endif
-		window->PutStr(ATR_NONE, tabexpand(buf));
-	    }
-	    window->Display(false);
-	    (void) dlb_fclose(f);
-	}
+                window->PutStr(ATR_NONE, tabexpand(buf));
+            }
+            window->Display(false);
+            (void) dlb_fclose(f);
+        }
     }
 
     if (complain) {
-	QString message = nh_qsprintf("File not found: %s\n",filename);
-	QMessageBox::warning(NULL, "File Error", message, QMessageBox::Ignore);
+        QString message = nh_qsprintf("File not found: %s\n",filename);
+        QMessageBox::warning(NULL, "File Error", message, QMessageBox::Ignore);
     }
 }
 
@@ -498,7 +511,7 @@ int NetHackQtBind::qt_select_menu(winid wid, int how, MENU_ITEM_P **menu_list)
 void NetHackQtBind::qt_update_inventory(int arg UNUSED)
 {
     if (main)
-	main->updateInventory(); // update the paper doll inventory subset
+        main->updateInventory(); // update the paper doll inventory subset
 
     /* doesn't work yet
     if (program_state.something_worth_saving && iflags.perm_invent)
@@ -623,7 +636,7 @@ const QPen NetHackQtBind::nhcolor_to_pen(uint32_t c)
 int NetHackQtBind::qt_nhgetch()
 {
     if (main)
-	main->fadeHighlighting(true);
+        main->fadeHighlighting(true);
 
     // Process events until a key arrives.
     //
@@ -653,11 +666,58 @@ QCoreApplication::exec: The event loop is already running
     return keybuffer.GetAscii();
 }
 
+#ifdef IDLECHECKPOINT
+void
+NetHackQtBind::free_qt_input_timer(void)
+{
+    if (qt_input_timer) {
+        if (qt_input_timer->isActive())
+            qt_input_timer->stop();
+        if (qt_input_timer)
+            delete qt_input_timer;
+        qt_input_timer = 0;
+    }
+}
+
+static void
+qt_timer_fire(void)
+{
+    if (iflags.idlecheckpoint) {
+        /* no input for 30 seconds, so let's take
+         * advantage and do a game checkpoint,
+         * then resume the wait.
+         */
+#if defined(INSURANCE)
+        save_currentstate();
+#endif /* INSURANCE */
+    }
+    if (qt_input_timer->isActive())
+        qt_input_timer->stop();
+}
+
+//void
+//cancel_qt_input_timer(void)
+//{
+//
+//}
+#endif  /* IDLECHECKPOINT */
+
 int NetHackQtBind::qt_nh_poskey(coordxy *x, coordxy *y, int *mod)
 {
     if (main)
-	main->fadeHighlighting(true);
+        main->fadeHighlighting(true);
 
+#ifdef IDLECHECKPOINT
+    if (iflags.idlecheckpoint) {
+        if (!qt_input_timer) {
+            qt_input_timer = new QTimer();
+            qt_input_timer->setSingleShot(true);
+            connect(qt_input_timer, &QTimer::timeout, &qt_timer_fire);
+        }
+        if (!qt_input_timer->isActive())
+            qt_input_timer->start(IDLECHECKPOINT_WAIT_TIME * 1000);
+    }
+#endif
     // Process events until a key or map-click arrives.
     //
     while (keybuffer.Empty() && clickbuffer.Empty()) {
@@ -672,13 +732,21 @@ int NetHackQtBind::qt_nh_poskey(coordxy *x, coordxy *y, int *mod)
         main->fadeHighlighting(false);
 
     if (!keybuffer.Empty()) {
-	return keybuffer.GetAscii();
+#ifdef IDLECHECKPOINT
+        if (qt_input_timer->isActive())
+            qt_input_timer->stop();
+#endif
+        return keybuffer.GetAscii();
     } else {
-	*x=clickbuffer.NextX();
-	*y=clickbuffer.NextY();
-	*mod=clickbuffer.NextMod();
-	clickbuffer.Get();
-	return 0;
+        *x=clickbuffer.NextX();
+        *y=clickbuffer.NextY();
+        *mod=clickbuffer.NextMod();
+        clickbuffer.Get();
+#ifdef IDLECHECKPOINT
+        if (qt_input_timer->isActive())
+            qt_input_timer->stop();
+#endif
+        return 0;
     }
 }
 
@@ -724,10 +792,10 @@ char NetHackQtBind::qt_more()
         int complain = 0;
         do {
             ch = NetHackQtBind::qt_nhgetch();
-	    if (::program_state.savefile_completed) {
-		retry = false;
-		break;
-	    }
+            if (::program_state.savefile_completed) {
+                retry = false;
+                break;
+            }
             switch (ch) {
             case '\0': // hypothetical
                 ch = '\033';
@@ -808,26 +876,26 @@ char NetHackQtBind::qt_yn_function(const char *question_,
         !::iflags.wc_popup_dialog
 #endif
         && WIN_MESSAGE != WIN_ERR) {
-	// Similar to X11 windowport `slow' feature.
+        // Similar to X11 windowport `slow' feature.
 
         char cbuf[20];
         cbuf[0] = '\0';
 
         // add the prompt to the message window
-	NetHackQtBind::qt_putstr(WIN_MESSAGE, ATR_BOLD, message);
+        NetHackQtBind::qt_putstr(WIN_MESSAGE, ATR_BOLD, message);
 
-	while (result < 0) {
+        while (result < 0) {
             cbuf[0] = '\0';
-	    char ch=NetHackQtBind::qt_nhgetch();
-	    if (ch=='\033') {
-		result=yn_esc_map;
+            char ch=NetHackQtBind::qt_nhgetch();
+            if (ch=='\033') {
+                result=yn_esc_map;
                 Strcpy(cbuf, "ESC");
-	    } else if (choices && !strchr(choices,ch)) {
-		if (def && (ch==' ' || ch=='\r' || ch=='\n')) {
-		    result=def;
+            } else if (choices && !strchr(choices,ch)) {
+                if (def && (ch==' ' || ch=='\r' || ch=='\n')) {
+                    result=def;
                     Strcpy(cbuf, visctrl(def));
-		} else {
-		    NetHackQtBind::qt_nhbell();
+                } else {
+                    NetHackQtBind::qt_nhbell();
                     // typing anything caused the most recent message line
                     // (which happens to our prompt) from having highlighting
                     // be removed; put that back
@@ -835,13 +903,13 @@ char NetHackQtBind::qt_yn_function(const char *question_,
                             *mesgwin = main ? main->GetMessageWindow() : NULL;
                     if (mesgwin)
                         mesgwin->RehighlightPrompt();
-		    // and try again...
-		}
-	    } else {
-		result=ch;
+                    // and try again...
+                }
+            } else {
+                result=ch;
                 Strcpy(cbuf, visctrl(ch));
-	    }
-	}
+            }
+        }
 
         // update the prompt message line to include the response
         if (cbuf[0]) {

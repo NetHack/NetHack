@@ -1,4 +1,4 @@
-/* NetHack 3.7	allmain.c	$NHDT-Date: 1744860497 2025/04/16 19:28:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.276 $ */
+/* NetHack 5.0	allmain.c	$NHDT-Date: 1771213100 2026/02/15 19:38:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.286 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -13,6 +13,7 @@
 
 staticfn void moveloop_preamble(boolean);
 staticfn void u_calc_moveamt(int);
+staticfn void maybe_generate_rnd_mon(void);
 staticfn void maybe_do_tutorial(void);
 #ifdef POSITIONBAR
 staticfn void do_positionbar(void);
@@ -20,10 +21,6 @@ staticfn void do_positionbar(void);
 staticfn void regen_pw(int);
 staticfn void regen_hp(int);
 staticfn void interrupt_multi(const char *);
-staticfn void debug_fields(const char *);
-#ifndef NODUMPENUMS
-staticfn void dump_enums(void);
-#endif
 
 #ifdef CRASHREPORT
 #define USED_FOR_CRASHREPORT
@@ -35,6 +32,7 @@ staticfn void dump_enums(void);
 void
 early_init(int argc USED_FOR_CRASHREPORT, char *argv[] USED_FOR_CRASHREPORT)
 {
+    program_state_init();
 #ifdef CRASHREPORT
     /* Do this as early as possible, but let ports do other things first. */
     crashreport_init(argc, argv);
@@ -159,6 +157,16 @@ u_calc_moveamt(int wtcap)
         u.umovement = 0;
 }
 
+/* small chance of generating a new random monster */
+staticfn void
+maybe_generate_rnd_mon(void)
+{
+    if (!rn2(u.uevent.udemigod ? 25
+             : (depth(&u.uz) > depth(&stronghold_level)) ? 50
+             : 70))
+        (void) makemon((struct permonst *) 0, 0, 0, NO_MM_FLAGS);
+}
+
 #if defined(MICRO) || defined(WIN32)
 static int mvl_abort_lev;
 #endif
@@ -200,7 +208,6 @@ moveloop_core(void)
             encumber_msg();
 
             svc.context.mon_moving = TRUE;
-            gu.uhp_at_start_of_monster_turn = u.uhp;
             do {
                 monscanmove = movemon();
                 if (u.umovement >= NORMAL_SPEED)
@@ -229,11 +236,7 @@ moveloop_core(void)
                 /* occasionally add another monster; since this takes
                    place after movement has been allotted, the new
                    monster effectively loses its first turn */
-                if (!rn2(u.uevent.udemigod ? 25
-                         : (depth(&u.uz) > depth(&stronghold_level)) ? 50
-                         : 70))
-                    (void) makemon((struct permonst *) 0, 0, 0,
-                                   NO_MM_FLAGS);
+                maybe_generate_rnd_mon();
 
                 u_calc_moveamt(mvl_wtcap);
                 settrack();
@@ -272,8 +275,6 @@ moveloop_core(void)
 
                 if (u.ublesscnt)
                     u.ublesscnt--;
-
-                gs.saving_grace_turn = FALSE;
 
                 /* One possible result of prayer is healing.  Whether or
                  * not you get healed depends on your current hit points.
@@ -426,8 +427,6 @@ moveloop_core(void)
         else if (!u.umoved)
             (void) pooleffects(FALSE);
 
-        gs.saving_grace_turn = FALSE;
-
         /* vision while buried or underwater is updated here */
         if (Underwater)
             under_water(0);
@@ -446,6 +445,8 @@ moveloop_core(void)
     /* the Amulet of Yendor gives a wish when initially picked up */
     if (u.uhave.amulet && !u.uevent.amulet_wish) {
         u.uevent.amulet_wish = 1;
+        display_nhwindow(WIN_MESSAGE, TRUE);
+        urgent_pline("The Amulet is bestowing a wish upon you!");
         makewish();
     }
 
@@ -509,11 +510,6 @@ moveloop_core(void)
         return;
     }
 
-#ifdef CLIPPING
-    /* just before rhack */
-    cliparound(u.ux, u.uy);
-#endif
-
     u.umoved = FALSE;
 
     if (gm.multi > 0) {
@@ -544,6 +540,11 @@ moveloop_core(void)
 
     if (gv.vision_full_recalc)
         vision_recalc(0); /* vision! */
+#ifdef CLIPPING
+    /* after rhack() and vision_recalc() so that the map is redrawn
+       once with correct vision data, not twice (overshoot+correct) */
+    cliparound(u.ux, u.uy);
+#endif
     /* when running in non-tport mode, this gets done through domove() */
     if ((!svc.context.run || flags.runmode == RUN_TPORT)
         && (gm.multi && (!svc.context.travel ? !(gm.multi % 7)
@@ -604,6 +605,9 @@ regen_pw(int wtcap)
                               * (Role_if(PM_WIZARD) ? 3 : 4)
                               / 6)))) || Energy_regeneration)) {
         int upper = (int) (ACURR(A_WIS) + ACURR(A_INT)) / 15 + 1;
+
+        if (EMagical_breathing)
+            upper += 2;
 
         u.uen += rn1(upper, 1);
         if (u.uen > u.uenmax)
@@ -733,7 +737,7 @@ init_sound_disp_gamewindows(void)
        ever having been used, use it here to pacify the Qt interface */
     start_menu(WIN_INVEN, menu_behavior), end_menu(WIN_INVEN, (char *) 0);
 
-#ifdef MAC
+#ifdef MACOS9
     /* This _is_ the right place for this - maybe we will
      * have to split init_sound_disp_gamewindows into
      * create_gamewindows and show_gamewindows to get rid of this ifdef...
@@ -756,7 +760,7 @@ init_sound_disp_gamewindows(void)
     if (iflags.perm_invent_pending)
         check_perm_invent_again();
 #endif
- }
+}
 
 void
 newgame(void)
@@ -771,6 +775,7 @@ newgame(void)
     svc.context.next_attrib_check = 600L; /* arbitrary first setting */
     svc.context.tribute.enabled = TRUE;   /* turn on 3.6 tributes    */
     svc.context.tribute.tributesz = sizeof(struct tribute_info);
+    get_nhuuid();
 
     for (i = LOW_PM; i < NUMMONS; i++)
         svm.mvitals[i].mvflags = mons[i].geno & G_NOCORPSE;
@@ -786,7 +791,7 @@ newgame(void)
                        * in hero's initial inventory */
     init_artifacts(); /* before u_init() in case $WIZKIT specifies
                        * any artifacts */
-    u_init();
+    u_init_misc();
 
     l_nhcore_init();  /* create a Lua state that lasts until end of game */
     reset_glyphmap(gm_newgame);
@@ -801,18 +806,29 @@ newgame(void)
 
     mklev();
     u_on_upstairs();
-    if (wizard)
-        obj_delivery(FALSE); /* finish wizkit */
     vision_reset();          /* set up internals for level (after mklev) */
     check_special_room(FALSE);
 
     if (MON_AT(u.ux, u.uy))
         mnexto(m_at(u.ux, u.uy), RLOC_NOMSG);
     (void) makedog();
+
+    u_init_inventory_attrs();
     docrt();
+    flush_screen(1);
+    bot();
+    while (u.uroleplay.reroll && reroll_menu()) {
+        u_init_inventory_attrs();
+        bot();
+    }
+    u_init_skills_discoveries();
+
+    if (wizard) {
+        read_wizkit();
+        obj_delivery(FALSE); /* finish wizkit */
+    }
 
     if (flags.legacy) {
-        flush_screen(1);
         com_pager(u.uroleplay.pauper ? "pauper_legacy" : "legacy");
     }
 
@@ -838,7 +854,8 @@ void
 welcome(boolean new_game) /* false => restoring an old game */
 {
     char buf[BUFSZ];
-    boolean currentgend = Upolyd ? u.mfemale : flags.female;
+    boolean currentgend = Upolyd ? u.mfemale : flags.female,
+            adrift = (u.ualign.type != u.ualignbase[A_CURRENT]);
 
     l_nhcore_call(new_game ? NHCORE_START_NEW_GAME : NHCORE_RESTORE_OLD_GAME);
 
@@ -861,8 +878,30 @@ welcome(boolean new_game) /* false => restoring an old game */
      * restores it's only shown if different from its original value.
      */
     *buf = '\0';
+#if 0
     if (new_game || u.ualignbase[A_ORIGINAL] != u.ualignbase[A_CURRENT])
         Sprintf(eos(buf), " %s", align_str(u.ualignbase[A_ORIGINAL]));
+#else
+    /*
+     * 2026-04-24
+     * GitHub issue https://github.com/NetHack/NetHack/issues/537
+     * "Judging by the comment above, it should display your new alignment
+     *  if it was changed, so align_str(u.ualignbase[A_CURRENT]) would
+     *  probably be more appropriate. This won't affect the new game message."
+     *
+     * That is followed by a suggestion to revisit the matter (paraphrased):
+     * "That's actually intentional; the comment oversimplifies.
+     *  When it was implemented, it may have been the only way to tell that
+     *  you had converted alignment. Now ^X mentions your starting alignment
+     *  if base alignment has been changed, so revisiting this welcome back
+     *  message."
+     */
+    if (new_game || u.ualignbase[A_ORIGINAL] != u.ualignbase[A_CURRENT] || adrift)
+        Sprintf(eos(buf), " %s%s",
+                adrift ? "adrift " : "",
+                adrift ? align_str(u.ualign.type)
+                       : align_str(u.ualignbase[A_CURRENT]));
+#endif
     if (!gu.urole.name.f
         && (new_game
             ? (gu.urole.allow & ROLE_GENDMASK) == (ROLE_MALE | ROLE_FEMALE)
@@ -943,218 +982,6 @@ interrupt_multi(const char *msg)
     }
 }
 
-/*
- * Argument processing helpers - for xxmain() to share
- * and call.
- *
- * These should return TRUE if the argument matched,
- * whether the processing of the argument was
- * successful or not.
- *
- * Most of these do their thing, then after returning
- * to xxmain(), the code exits without starting a game.
- *
- */
-
-static const struct early_opt earlyopts[] = {
-    { ARG_DEBUG, "debug", 5, TRUE },
-    { ARG_VERSION, "version", 4, TRUE },
-    { ARG_SHOWPATHS, "showpaths", 8, FALSE },
-#ifndef NODUMPENUMS
-    { ARG_DUMPENUMS, "dumpenums", 9, FALSE },
-#endif
-    { ARG_DUMPGLYPHIDS, "dumpglyphids", 12, FALSE },
-    { ARG_DUMPMONGEN, "dumpmongen", 10, FALSE },
-    { ARG_DUMPWEIGHTS, "dumpweights", 11, FALSE },
-#ifdef WIN32
-    { ARG_WINDOWS, "windows", 4, TRUE },
-#endif
-#if defined(CRASHREPORT)
-    { ARG_BIDSHOW, "bidshow", 7, FALSE },
-#endif
-};
-
-#ifdef WIN32
-extern int windows_early_options(const char *);
-#endif
-
-/*
- * Returns:
- *    0 = no match
- *    1 = found and skip past this argument
- *    2 = found and trigger immediate exit
- */
-int
-argcheck(int argc, char *argv[], enum earlyarg e_arg)
-{
-    int i, idx;
-    boolean match = FALSE;
-    char *userea = (char *) 0;
-    const char *dashdash = "";
-
-    for (idx = 0; idx < SIZE(earlyopts); idx++) {
-        if (earlyopts[idx].e == e_arg){
-            break;
-        }
-    }
-    if (idx >= SIZE(earlyopts) || argc < 1)
-        return 0;
-
-    for (i = 0; i < argc; ++i) {
-        if (argv[i][0] != '-')
-            continue;
-        if (argv[i][1] == '-') {
-            userea = &argv[i][2];
-            dashdash = "-";
-        } else {
-            userea = &argv[i][1];
-        }
-        match = match_optname(userea, earlyopts[idx].name,
-                              earlyopts[idx].minlength,
-                              earlyopts[idx].valallowed);
-        if (match)
-            break;
-    }
-
-    if (match) {
-        const char *extended_opt = strchr(userea, ':');
-
-        if (!extended_opt)
-            extended_opt = strchr(userea, '=');
-        switch(e_arg) {
-        case ARG_DEBUG:
-            if (extended_opt) {
-                extended_opt++;
-                debug_fields(extended_opt);
-            }
-            return 1;
-        case ARG_VERSION: {
-            boolean insert_into_pastebuf = FALSE;
-
-            if (extended_opt) {
-                extended_opt++;
-                    /* Deprecated in favor of "copy" - remove no later
-                       than  next major version */
-                if (match_optname(extended_opt, "paste", 5, FALSE)) {
-                    insert_into_pastebuf = TRUE;
-                } else if (match_optname(extended_opt, "copy", 4, FALSE)) {
-                    insert_into_pastebuf = TRUE;
-                } else if (match_optname(extended_opt, "dump", 4, FALSE)) {
-                    /* version number plus enabled features and sanity
-                       values that the program compares against the same
-                       thing recorded in save and bones files to check
-                       whether they're being used compatibly */
-                    dump_version_info();
-                    return 2; /* done */
-                } else if (!match_optname(extended_opt, "show", 4, FALSE)) {
-                    raw_printf("-%sversion can only be extended with"
-                               " -%sversion:copy or :dump or :show.\n",
-                               dashdash, dashdash);
-                    /* exit after we've reported bad command line argument */
-                    return 2;
-                }
-            }
-            early_version_info(insert_into_pastebuf);
-            return 2;
-        }
-        case ARG_SHOWPATHS:
-            return 2;
-#ifndef NODUMPENUMS
-        case ARG_DUMPENUMS:
-            dump_enums();
-            return 2;
-#endif
-        case ARG_DUMPGLYPHIDS:
-            dump_glyphids();
-            return 2;
-        case ARG_DUMPMONGEN:
-            dump_mongen();
-            return 2;
-        case ARG_DUMPWEIGHTS:
-            dump_weights();
-            return 2;
-#ifdef CRASHREPORT
-        case ARG_BIDSHOW:
-            crashreport_bidshow();
-            return 2;
-#endif
-#ifdef WIN32
-        case ARG_WINDOWS:
-            if (extended_opt) {
-                extended_opt++;
-                return windows_early_options(extended_opt);
-            }
-        FALLTHROUGH;
-        /*FALLTHRU*/
-#endif
-        default:
-            break;
-        }
-    };
-    return 0;
-}
-
-/*
- * These are internal controls to aid developers with
- * testing and debugging particular aspects of the code.
- * They are not player options and the only place they
- * are documented is right here. No gameplay is altered.
- *
- * test             - test whether this parser is working
- * ttystatus        - TTY:
- * immediateflips   - WIN32: turn off display performance
- *                    optimization so that display output
- *                    can be debugged without buffering.
- * fuzzer           - enable fuzzer without debugger intervention.
- */
-staticfn void
-debug_fields(const char *opts)
-{
-    char *op;
-    boolean negated = FALSE;
-
-    while ((op = strchr(opts, ',')) != 0) {
-        *op++ = 0;
-        /* recurse */
-        debug_fields(op);
-    }
-    if (strlen(opts) > BUFSZ / 2)
-        return;
-
-
-    /* strip leading and trailing white space */
-    while (isspace((uchar) *opts))
-        opts++;
-    op = eos((char *) opts);
-    while (--op >= opts && isspace((uchar) *op))
-        *op = '\0';
-
-    if (!*opts) {
-        /* empty */
-        return;
-    }
-    while ((*opts == '!') || !strncmpi(opts, "no", 2)) {
-        if (*opts == '!')
-            opts++;
-        else
-            opts += 2;
-        negated = !negated;
-    }
-    if (match_optname(opts, "test", 4, FALSE))
-        iflags.debug.test = negated ? FALSE : TRUE;
-#ifdef TTY_GRAPHICS
-    if (match_optname(opts, "ttystatus", 9, FALSE))
-        iflags.debug.ttystatus = negated ? FALSE : TRUE;
-#endif
-#ifdef WIN32
-    if (match_optname(opts, "immediateflips", 14, FALSE))
-        iflags.debug.immediateflips = negated ? FALSE : TRUE;
-#endif
-    if (match_optname(opts, "fuzzer", 4, FALSE))
-        iflags.fuzzerpending = TRUE;
-    return;
-}
-
 /* convert from time_t to number of seconds */
 long
 timet_to_seconds(time_t ttim)
@@ -1172,178 +999,5 @@ timet_delta(time_t etim, time_t stim) /* end and start times */
        between two time_t values as a 'double' */
     return (long) difftime(etim, stim);
 }
-
-#if !defined(NODUMPENUMS)
-/* monsdump[] and objdump[] are also used in utf8map.c */
-
-#define DUMP_ENUMS
-#define UNPREFIXED_COUNT (5)
-struct enum_dump monsdump[] = {
-#include "monsters.h"
-    { NUMMONS, "NUMMONS" },
-    { NON_PM, "NON_PM" },
-    { LOW_PM, "LOW_PM" },
-    { HIGH_PM, "HIGH_PM" },
-    { SPECIAL_PM, "SPECIAL_PM" }
-};
-struct enum_dump objdump[] = {
-#include "objects.h"
-    { NUM_OBJECTS, "NUM_OBJECTS" },
-};
-
-#define DUMP_ENUMS_PCHAR
-static struct enum_dump defsym_cmap_dump[] = {
-#include "defsym.h"
-    { MAXPCHARS, "MAXPCHARS" },
-};
-#undef DUMP_ENUMS_PCHAR
-
-#define DUMP_ENUMS_MONSYMS
-static struct enum_dump defsym_mon_syms_dump[] = {
-#include "defsym.h"
-    { MAXMCLASSES, "MAXMCLASSES" },
-};
-#undef DUMP_ENUMS_MONSYMS
-
-#define DUMP_ENUMS_MONSYMS_DEFCHAR
-static struct enum_dump defsym_mon_defchars_dump[] = {
-#include "defsym.h"
-};
-#undef DUMP_ENUMS_MONSYMS_DEFCHAR
-
-#define DUMP_ENUMS_OBJCLASS_DEFCHARS
-static struct enum_dump objclass_defchars_dump[] = {
-#include "defsym.h"
-};
-#undef DUMP_ENUMS_OBJCLASS_DEFCHARS
-
-#define DUMP_ENUMS_OBJCLASS_CLASSES
-static struct enum_dump objclass_classes_dump[] = {
-#include "defsym.h"
-    { MAXOCLASSES, "MAXOCLASSES" },
-};
-#undef DUMP_ENUMS_OBJCLASS_CLASSES
-
-#define DUMP_ENUMS_OBJCLASS_SYMS
-static struct enum_dump objclass_syms_dump[] = {
-#include "defsym.h"
-};
-#undef DUMP_ENUMS_OBJCLASS_SYMS
-
-#define DUMP_ARTI_ENUM
-static struct enum_dump arti_enum_dump[] = {
-#include "artilist.h"
-    { AFTER_LAST_ARTIFACT, "AFTER_LAST_ARTIFACT" }
-};
-#undef DUMP_ARTI_ENUM
-
-#undef DUMP_ENUMS
-
-
-#ifndef NODUMPENUMS
-
-staticfn void
-dump_enums(void)
-{
-    enum enum_dumps {
-        monsters_enum,
-        objects_enum,
-        objects_misc_enum,
-        defsym_cmap_enum,
-        defsym_mon_syms_enum,
-        defsym_mon_defchars_enum,
-        objclass_defchars_enum,
-        objclass_classes_enum,
-        objclass_syms_enum,
-        arti_enum,
-        NUM_ENUM_DUMPS
-    };
-
-#define dump_om(om) { om, #om }
-    static const struct enum_dump omdump[] = {
-        dump_om(LAST_GENERIC),
-        dump_om(OBJCLASS_HACK),
-        dump_om(FIRST_OBJECT),
-        dump_om(FIRST_AMULET),
-        dump_om(LAST_AMULET),
-        dump_om(FIRST_SPELL),
-        dump_om(LAST_SPELL),
-        dump_om(MAXSPELL),
-        dump_om(FIRST_REAL_GEM),
-        dump_om(LAST_REAL_GEM),
-        dump_om(FIRST_GLASS_GEM),
-        dump_om(LAST_GLASS_GEM),
-        dump_om(NUM_REAL_GEMS),
-        dump_om(NUM_GLASS_GEMS),
-        dump_om(MAX_GLYPH),
-    };
-#undef dump_om
-
-    static const struct enum_dump *const ed[NUM_ENUM_DUMPS] = {
-        monsdump, objdump, omdump,
-        defsym_cmap_dump, defsym_mon_syms_dump,
-        defsym_mon_defchars_dump,
-        objclass_defchars_dump,
-        objclass_classes_dump,
-        objclass_syms_dump,
-        arti_enum_dump,
-    };
-
-    static const struct de_params {
-        const char *const title;
-        const char *const pfx;
-        int unprefixed_count;
-        int dumpflgs;  /* 0 = dump numerically only, 1 = add 'char' comment */
-        int szd;
-    } edmp[NUM_ENUM_DUMPS] = {
-        { "monnums", "PM_", UNPREFIXED_COUNT, 0, SIZE(monsdump) },
-        { "objects_nums", "", 1, 0, SIZE(objdump) },
-        { "misc_object_nums", "", 1, 0, SIZE(omdump) },
-        { "cmap_symbols", "", 1, 0, SIZE(defsym_cmap_dump) },
-        { "mon_syms", "", 1, 0, SIZE(defsym_mon_syms_dump) },
-        { "mon_defchars", "", 1, 1, SIZE(defsym_mon_defchars_dump) },
-        { "objclass_defchars", "", 1, 1, SIZE(objclass_defchars_dump) },
-        { "objclass_classes", "", 1, 0, SIZE(objclass_classes_dump) },
-        { "objclass_syms", "", 1, 0, SIZE(objclass_syms_dump) },
-        { "artifacts_nums", "", 1, 0, SIZE(arti_enum_dump) },
-    };
-
-    const char *nmprefix;
-    int i, j, nmwidth;
-    char comment[BUFSZ];
-
-    for (i = 0; i < NUM_ENUM_DUMPS; ++ i) {
-        raw_printf("enum %s = {", edmp[i].title);
-        for (j = 0; j < edmp[i].szd; ++j) {
-            nmprefix = (j >= edmp[i].szd - edmp[i].unprefixed_count)
-                           ? "" : edmp[i].pfx; /* "" or "PM_" */
-            nmwidth = 27 - (int) strlen(nmprefix); /* 27 or 24 */
-            if (edmp[i].dumpflgs > 0) {
-                Snprintf(comment, sizeof comment,
-                         "    /* '%c' */",
-                         (ed[i][j].val >= 32 && ed[i][j].val <= 126)
-                         ? ed[i][j].val : ' ');
-            } else {
-                comment[0] = '\0';
-            }
-            raw_printf("    %s%*s = %3d,%s",
-                       nmprefix, -nmwidth,
-                       ed[i][j].nm, ed[i][j].val,
-                       comment);
-       }
-        raw_print("};");
-        raw_print("");
-    }
-    raw_print("");
-}
-#undef UNPREFIXED_COUNT
-#endif /* NODUMPENUMS */
-
-void
-dump_glyphids(void)
-{
-    dump_all_glyphids(stdout);
-}
-#endif /* !NODUMPENUMS */
 
 /*allmain.c*/

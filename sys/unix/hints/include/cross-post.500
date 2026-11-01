@@ -1,0 +1,496 @@
+#===============-=================================================
+# NetHack 5.0  include/cross-post $NHDT-Date: 1597332785 2020/08/13 15:33:05 $  $NHDT-Branch: NetHack-5.0 $
+#
+# Cross-compiling -POST section
+
+ifdef CROSS_TO_MSDOS
+#
+$(TARGETPFX)msdos.o : ../sys/msdos/msdos.c $(HACK_H)
+$(TARGETPFX)font.o : ../sys/msdos/font.c ../sys/msdos/font.h $(HACK_H)
+$(TARGETPFX)pckeys.o : ../sys/msdos/pckeys.c $(HACK_H)
+$(TARGETPFX)pctiles.o : ../sys/msdos/pctiles.c ../sys/msdos/portio.h $(HACK_H)
+$(TARGETPFX)video.o : ../sys/msdos/video.c ../sys/msdos/portio.h $(HACK_H)
+$(TARGETPFX)vidtxt.o : ../sys/msdos/vidtxt.c ../sys/msdos/portio.h \
+		../win/share/tile.h ../include/tileset.h $(HACK_H)
+$(TARGETPFX)vidvga.o : ../sys/msdos/vidvga.c ../sys/msdos/portio.h \
+		../win/share/tile.h ../include/tileset.h $(HACK_H)
+$(TARGETPFX)vidvesa.o : ../sys/msdos/vidvesa.c ../sys/msdos/portio.h \
+		../win/share/tile.h ../include/tileset.h ../sys/msdos/font.h $(HACK_H)
+$(TARGETPFX)vidstub.o : ../sys/msdos/vidvesa.c ../sys/msdos/portio.h \
+		$(HACK_H)
+$(TARGETPFX)tile.o : tile.c
+$(TARGETPFX)exceptn.o : ../lib/djgpp/djgpp-patch/src/libc/go32/exceptn.S
+	$(TARGET_CC) -c -o $@ ../lib/djgpp/djgpp-patch/src/libc/go32/exceptn.S
+	$(TARGET_AR) ru ../lib/djgpp/i586-pc-msdosdjgpp/lib/libc.a $(TARGETPFX)exceptn.o
+$(GAMEBIN) : $(HOBJ) $(TARGETPFX)date.o $(TARGET_HACKLIB) $(LUACROSSLIB)
+	$(TARGET_LINK) $(TARGET_LFLAGS) -o $@ \
+	$(HOBJ) $(TARGET_HACKLIB) $(WINLIB) $(TARGET_LIBS)
+$(DOSFONT)/ter-u16b.psf: $(FONTTOP)/ter-u16b.bdf $(DOSFONT)/nh-u16b.bdf $(DOSFONT)/makefont.lua $(LUABIN)
+	$(LUABIN) $(DOSFONT)/makefont.lua $(FONTTOP)/ter-u16b.bdf $(DOSFONT)/nh-u16b.bdf $@
+$(DOSFONT)/ter-u16v.psf: $(FONTTOP)/ter-u16v.bdf $(DOSFONT)/nh-u16v.bdf $(DOSFONT)/makefont.lua $(LUABIN)
+	$(LUABIN) $(DOSFONT)/makefont.lua $(FONTTOP)/ter-u16v.bdf $(DOSFONT)/nh-u16v.bdf $@
+$(DOSFONT)/ter-u18b.psf: $(FONTTOP)/ter-u18b.bdf $(DOSFONT)/nh-u18b.bdf $(DOSFONT)/makefont.lua $(LUABIN)
+	$(LUABIN) $(DOSFONT)/makefont.lua $(FONTTOP)/ter-u18b.bdf $(DOSFONT)/nh-u18b.bdf $@
+$(DOSFONT)/ter-u20b.psf: $(FONTTOP)/ter-u20b.bdf $(DOSFONT)/nh-u20b.bdf $(DOSFONT)/makefont.lua $(LUABIN)
+	$(LUABIN) $(DOSFONT)/makefont.lua $(FONTTOP)/ter-u20b.bdf $(DOSFONT)/nh-u20b.bdf $@
+$(DOSFONT)/ter-u22b.psf: $(FONTTOP)/ter-u22b.bdf $(DOSFONT)/nh-u22b.bdf $(DOSFONT)/makefont.lua $(LUABIN)
+	$(LUABIN) $(DOSFONT)/makefont.lua $(FONTTOP)/ter-u22b.bdf $(DOSFONT)/nh-u22b.bdf $@
+$(DOSFONT)/ter-u24b.psf: $(FONTTOP)/ter-u24b.bdf $(DOSFONT)/nh-u24b.bdf $(DOSFONT)/makefont.lua $(LUABIN)
+	$(LUABIN) $(DOSFONT)/makefont.lua $(FONTTOP)/ter-u24b.bdf $(DOSFONT)/nh-u24b.bdf $@
+$(DOSFONT)/ter-u28b.psf: $(FONTTOP)/ter-u28b.bdf $(DOSFONT)/nh-u28b.bdf $(DOSFONT)/makefont.lua $(LUABIN)
+	$(LUABIN) $(DOSFONT)/makefont.lua $(FONTTOP)/ter-u28b.bdf $(DOSFONT)/nh-u28b.bdf $@
+$(DOSFONT)/ter-u32b.psf: $(FONTTOP)/ter-u32b.bdf $(DOSFONT)/nh-u32b.bdf $(DOSFONT)/makefont.lua $(LUABIN)
+	$(LUABIN) $(DOSFONT)/makefont.lua $(FONTTOP)/ter-u32b.bdf $(DOSFONT)/nh-u32b.bdf $@
+#
+.PHONY: dodata dospkg dosfonts
+dosfonts: $(FONTTARGETS)
+dospkg: dodata dosfonts $(GAMEBIN) $(TARGETPFX)recover.exe ../dat/nhtiles.bmp
+	$(TARGET_STUBEDIT) $(GAMEBIN) minstack=2048K
+	mkdir -p $(TARGETPFX)pkg
+	cp $(GAMEBIN) $(TARGETPFX)pkg/NETHACK.EXE
+	cp $(TARGETPFX)recover.exe $(TARGETPFX)pkg/RECOVER.EXE
+	-cp $(SFCTOOLBIN) $(TARGETPFX)pkg/SFCTOOL.EXE
+	cp ../dat/nhdat $(TARGETPFX)pkg/NHDAT
+	cp ../dat/license $(TARGETPFX)pkg/LICENSE
+	cp ../dat/nhtiles.bmp $(TARGETPFX)pkg/NHTILES.BMP
+	cp ../dat/symbols $(TARGETPFX)pkg/SYMBOLS
+	cp ../sys/share/NetHack.cnf $(TARGETPFX)pkg/NETHACK.CNF
+	cp ../sys/msdos/sysconf $(TARGETPFX)pkg/SYSCONF
+	cp ../doc/nethack.txt $(TARGETPFX)pkg/NETHACK.TXT
+	-cp $(DOSFONT)/ter-u16b.psf $(TARGETPFX)pkg/TER-U16B.PSF
+	-cp $(DOSFONT)/ter-u16v.psf $(TARGETPFX)pkg/TER-U16V.PSF
+	-cp $(DOSFONT)/ter-u18b.psf $(TARGETPFX)pkg/TER-U18B.PSF
+	-cp $(DOSFONT)/ter-u20b.psf $(TARGETPFX)pkg/TER-U20B.PSF
+	-cp $(DOSFONT)/ter-u22b.psf $(TARGETPFX)pkg/TER-U22B.PSF
+	-cp $(DOSFONT)/ter-u24b.psf $(TARGETPFX)pkg/TER-U24B.PSF
+	-cp $(DOSFONT)/ter-u28b.psf $(TARGETPFX)pkg/TER-U28B.PSF
+	-cp $(DOSFONT)/ter-u32b.psf $(TARGETPFX)pkg/TER-U32B.PSF
+	cp  ../lib/djgpp/cwsdpmi/bin/CWSDPMI.EXE $(TARGETPFX)pkg/CWSDPMI.EXE
+	( if [ -f ../lib/djgpp/target/bin/symify.exe ]; then \
+	      cp  ../lib/djgpp/target/bin/symify.exe $(TARGETPFX)pkg/SYMIFY.EXE; \
+          else \
+              pwd; echo "../lib/djgpp/target/bin/symify.exe not found"; \
+	  fi; )
+ifeq "$(WANT_DEBUG)" "1"
+	( if [ -f $(GDBEXE) ]; \
+	  then \
+		cp  $(GDBEXE) $(TARGETPFX)pkg/GDB.EXE; \
+		echo "gdb -ex '$(GDBCMDLINE)' NETHACK.EXE"> $(TARGETPFX)pkg/$(GDBBAT); \
+          else \
+		pwd; echo "$(GDBEXE) not found and WANT_DEBUG=1 specified"; \
+	  fi; )
+else
+	-( if [ -f $(TARGETPFX)pkg/GDB.EXE ]; \
+	  then \
+		rm $(TARGETPFX)pkg/GDB.EXE; \
+	  fi; )
+	-( if [ -f $(TARGETPFX)pkg/NHGDB.BAT ]; \
+	  then \
+		rm $(TARGETPFX)pkg/NHGDB.BAT; \
+	  fi; )
+endif
+	-touch $(TARGETPFX)pkg/RECORD
+	cd $(TARGETPFX)pkg ; zip -9 ../NH370DOS.ZIP * ; cd ../../..
+	@echo msdos package zip file $(TARGETPFX)NH370DOS.ZIP
+
+$(LUABIN):
+	( cd .. && make luabin && cd src)
+dodata:
+	( cd .. && make dlb && cd src)
+ifdef dosbox
+# make CROSS_TO_MSDOS=1 dosbox=~/dosbox deploy-to-dosbox
+ifdef MAKEFILE_TOP
+deploy-to-dosbox: 
+	( cd src; make $(DEPLOY); cd .. )
+endif
+.PHONY: deploytodosbox
+
+deploytodosbox: $(TARGETPFX)NH370DOS.ZIP $(dosboxnhfolder) $(dosboxnhsrc) \
+			$(dosboxnhsrc)/src $(dosboxnhsrc)/include \
+			$(dosboxnhsrc)/sys/msdos $(dosboxnhsrc)/sys/share \
+			$(dosboxnhsrc)/win/share $(dosboxnhsrc)/win/curses \
+			$(dosboxnhsrc)/win/tty $(dosboxnhsrc)/util \
+			$(dosboxnhfolder)/NETHACK.EXE
+	@echo DOS NetHack deployed to dosbox at $(dosboxnhfolder)
+$(TARGETPFX)NH370DOS.ZIP: dospkg
+$(dosboxnhfolder):
+	mkdir -p $@
+$(dosboxnhsrc): $(dosboxnhfolder)
+	mkdir -p $@
+$(dosboxnhsrc)/src: $(dosboxnhsrc)
+	mkdir -p $@
+	cp --preserve=timestamps $(FLDR)src/*.c $(dosboxnhsrc)/src
+$(dosboxnhsrc)/include: $(dosboxnhsrc)
+	mkdir -p $@
+	cp --preserve=timestamps $(FLDR)include/*.h $(dosboxnhsrc)/include
+$(dosboxnhsrc)/sys/msdos: $(dosboxnhsrc)
+	mkdir -p $@
+	cp --preserve=timestamps $(FLDR)sys/msdos/*.c $(dosboxnhsrc)/sys/msdos
+	cp --preserve=timestamps $(FLDR)sys/msdos/*.h $(dosboxnhsrc)/sys/msdos
+$(dosboxnhsrc)/sys/share: $(dosboxnhsrc)
+	mkdir -p $@
+	cp --preserve=timestamps $(FLDR)sys/share/*.c $(dosboxnhsrc)/sys/share
+$(dosboxnhsrc)/win/share: $(dosboxnhsrc)
+	mkdir -p $@
+	cp --preserve=timestamps $(FLDR)win/share/*.c $(dosboxnhsrc)/win/share
+$(dosboxnhsrc)/win/curses: $(dosboxnhsrc)
+	mkdir -p $@
+	cp --preserve=timestamps $(FLDR)win/curses/*.c $(dosboxnhsrc)/win/curses
+	cp --preserve=timestamps $(FLDR)win/curses/*.h $(dosboxnhsrc)/win/curses
+$(dosboxnhsrc)/win/tty: $(dosboxnhsrc)
+	mkdir -p $@
+	cp --preserve=timestamps $(FLDR)win/tty/*.c $(dosboxnhsrc)/win/tty
+$(dosboxnhsrc)/util: $(dosboxnhsrc)
+	mkdir -p $@
+	cp --preserve=timestamps $(FLDR)util/*.c $(dosboxnhsrc)/util
+	cp --preserve=timestamps $(FLDR)util/*.h $(dosboxnhsrc)/util
+$(dosboxnhfolder)/NETHACK.EXE: $(TARGETPFX)NH370DOS.ZIP
+	unzip -o $(TARGETPFX)NH370DOS.ZIP -d $(dosboxnhfolder)
+	find $(dosboxnhfolder) -type f -name "$(dosboxconfigfile)" \
+		| xargs sed -i 's/#OPTIONS=video:autodetect/OPTIONS=video:autodetect/g'
+endif  # dosbox
+endif  # CROSS_TO_MSDOS
+
+ifdef CROSS_TO_WASM
+$(WASM_TARGET): pregame $(TARGET_HACKLIB) $(TARGETPFX)date.o $(HOSTOBJ) $(HOBJ) $(LUACROSSLIB) $(WASM_DATA_DIR)
+	-rm $@
+	$(TARGET_CC) $(TARGET_LFLAGS) $(TARGET_CFLAGS) -o $@ \
+		$(HOBJ) $(TARGETPFX)date.o $(TARGET_HACKLIB) $(TARGET_LIBS)
+
+$(WASM_DATA_DIR): $(WASM_DATA_DIR)/nhdat
+	touch $(WASM_DATA_DIR)/perm
+	touch $(WASM_DATA_DIR)/record
+	touch $(WASM_DATA_DIR)/logfile
+	touch $(WASM_DATA_DIR)/xlogfile
+	touch $(WASM_DATA_DIR)/livelog
+	cp ../sys/libnh/sysconf $(WASM_DATA_DIR)/sysconf
+
+$(WASM_DATA_DIR)/nhdat:
+	( cd ..; $(MAKE) INSTDIR='$(WASM_DATA_DIR)' $(WASMDEP) dofiles-dlb )
+
+#
+$(TARGETPFX)unixmain.o : ../sys/unix/unixmain.c $(HACK_H)
+$(TARGETPFX)unixres.o : ../sys/unix/unixres.c $(HACK_H)
+$(TARGETPFX)unixunix.o : ../sys/unix/unixunix.c $(HACK_H)
+$(TARGETPFX)ioctl.o : ../sys/share/ioctl.c $(HACK_H)
+$(TARGETPFX)unixtty.o : ../sys/share/unixtty.c $(HACK_H)
+$(TARGETPFX)winshim.o : ../win/shim/winshim.c $(HACK_H)
+$(TARGETPFX)libnhmain.o : ../sys/libnh/libnhmain.c $(HACK_H)
+endif  # CROSS_TO_WASM
+
+#
+ifdef CROSS_TO_MIPS
+$(MIPS_TARGET): pregame $(TARGETPFX)date.o $(HOSTOBJ) $(HOBJ) $(LUACROSSLIB) \
+			$(TARGETPFX)ncurses/lib/libncurses.a \
+			$(MIPS_DATA_DIR)
+	-rm $@
+	$(TARGET_LINK) $(TARGET_LFLAGS) -o $@ \
+		$(HOBJ) $(TARGETPFX)date.o $(TARGETPFX)$(HACKLIB) \
+		$(TARGETPFX)ncurses/lib/libncurses.a \
+		$(TARGET_LIBS)
+
+$(MIPS_DATA_DIR): $(MIPS_DATA_DIR)/nhdat
+	touch $(MIPS_DATA_DIR)/perm
+	touch $(MIPS_DATA_DIR)/record
+	touch $(MIPS_DATA_DIR)/logfile
+	touch $(MIPS_DATA_DIR)/xlogfile
+	touch $(MIPS_DATA_DIR)/livelog
+	cp ../sys/unix/sysconf $(MIPS_DATA_DIR)/sysconf
+
+$(MIPS_DATA_DIR)/nhdat:
+	( cd ..; $(MAKE) INSTDIR='$(MIPS_DATA_DIR)' $(MIPSDEP) dofiles-dlb )
+
+#
+$(TARGETPFX)unixmain.o : ../sys/unix/unixmain.c $(HACK_H)
+$(TARGETPFX)unixres.o : ../sys/unix/unixres.c $(HACK_H)
+$(TARGETPFX)unixunix.o : ../sys/unix/unixunix.c $(HACK_H)
+$(TARGETPFX)ioctl.o : ../sys/share/ioctl.c $(HACK_H)
+$(TARGETPFX)unixtty.o : ../sys/share/unixtty.c $(HACK_H)
+
+$(LUABIN):
+	( cd .. && make luabin && cd src)
+dodata:
+	( cd .. && make dlb && cd src)
+
+mipsrecover: $(TARGETPFX)recover
+.PHONY: mipspkg
+mipspkg: dodata $(GAMEBIN) $(TARGETPFX)recover
+	mkdir -p $(TARGETPFX)pkg
+	cp $(GAMEBIN) $(TARGETPFX)pkg/nethack
+	cp $(TARGETPFX)recover $(TARGETPFX)pkg/recover
+	cp ../dat/nhdat $(TARGETPFX)pkg/nhdat
+	cp ../dat/license $(TARGETPFX)pkg/license
+	cp ../dat/symbols $(TARGETPFX)pkg/symbols
+	cp ../sys/share/NetHack.cnf $(TARGETPFX)pkg/.nethackrc
+	cp ../sys/msdos/sysconf $(TARGETPFX)pkg/sysconf
+	cp ../doc/nethack.txt $(TARGETPFX)pkg/nethack.txt
+	-touch $(TARGETPFX)pkg/record
+	cd $(TARGETPFX)pkg ; zip -9 ../nh370mips.zip * ; cd ../../..
+	@echo MIPS package zip file $(TARGETPFX)nh370mips.zip
+endif  # CROSS_TO_MIPS
+
+
+ifdef CROSS_TO_AMIGA
+$(TARGETPFX)amidos.o : ../sys/amiga/amidos.c $(HACK_H)
+$(TARGETPFX)amigst.o : ../sys/amiga/amigst.c $(HACK_H)
+$(TARGETPFX)amirip.o : ../sys/amiga/amirip.c $(HACK_H)
+$(TARGETPFX)amistack.o : ../sys/amiga/amistack.c $(HACK_H)
+$(TARGETPFX)amitty.o : ../sys/amiga/amitty.c $(HACK_H)
+$(TARGETPFX)amiwind.o : ../sys/amiga/amiwind.c \
+		../sys/amiga/amimenu.c $(HACK_H)
+$(TARGETPFX)winami.o : ../sys/amiga/winami.c $(HACK_H)
+$(TARGETPFX)winchar.o : ../sys/amiga/winchar.c tile.c $(HACK_H)
+$(TARGETPFX)winfuncs.o : ../sys/amiga/winfuncs.c $(HACK_H)
+$(TARGETPFX)winkey.o : ../sys/amiga/winkey.c $(HACK_H)
+$(TARGETPFX)winamenu.o : ../sys/amiga/winamenu.c $(HACK_H)
+$(TARGETPFX)winreq.o : ../sys/amiga/winreq.c \
+		../sys/amiga/colorwin.c \
+		../sys/amiga/clipwin.c $(HACK_H)
+$(TARGETPFX)winstr.o : ../sys/amiga/winstr.c $(HACK_H)
+$(GAMEBIN) : $(HOBJ) $(LUACROSSLIB)
+	$(TARGET_LINK) $(TARGET_LFLAGS) -o $(GAMEBIN) \
+	$(HOBJ) $(WINLIB) $(TARGET_LIBS)
+#
+# Host-side IFF tile conversion tools (run on Linux, produce Amiga IFF files)
+#
+AMISRC = ../sys/amiga
+
+$(TARGETPFX)xpm2iff_host: $(AMISRC)/xpm2iff_host.c
+	$(CC) $(CFLAGS) -o $@ $<
+$(TARGETPFX)tomb.iff: $(AMISRC)/grave16.xpm $(TARGETPFX)xpm2iff_host
+	$(TARGETPFX)xpm2iff_host $(AMISRC)/grave16.xpm $@
+
+$(TARGETPFX)bmp2iff_host: $(AMISRC)/bmp2iff_host.c
+	$(CC) $(CFLAGS) -o $@ $<
+$(TARGETPFX)tiles16.iff: ../dat/nhtiles.bmp $(TARGETPFX)bmp2iff_host
+	$(TARGETPFX)bmp2iff_host -planes 4 ../dat/nhtiles.bmp $@
+$(TARGETPFX)tiles32.iff: ../dat/nhtiles.bmp $(TARGETPFX)bmp2iff_host
+	$(TARGETPFX)bmp2iff_host -planes 5 ../dat/nhtiles.bmp $@
+
+AMITILES = $(TARGETPFX)tiles16.iff $(TARGETPFX)tiles32.iff $(TARGETPFX)tomb.iff
+
+AMIREGEX_URL = https://github.com/garyhouston/regex.git
+AMIREGEX_SRCDIR = $(AMISRC)/regex
+
+.PHONY: fetch-regex amigapkg amitiles
+
+fetch-regex:
+	@DSTDIR=sys/amiga/regex; \
+	if [ ! -d src ]; then DSTDIR=../$$DSTDIR; fi; \
+	if [ -f $$DSTDIR/regcomp.c ]; then \
+	  echo "BSD regex already present"; \
+	else \
+	  echo "Fetching BSD regex from $(AMIREGEX_URL)"; \
+	  tmpdir=$$(mktemp -d) && \
+	  git clone --depth 1 $(AMIREGEX_URL) $$tmpdir && \
+	  cd $$tmpdir && \
+	  sh ./mkh -p regcomp.c > regcomp.ih && \
+	  sh ./mkh -p engine.c > engine.ih && \
+	  sh ./mkh -p regexec.c > regexec.ih && \
+	  sh ./mkh -p regerror.c > regerror.ih && \
+	  sh ./mkh -i _REGEX_H_ regex2.h regcomp.c \
+	    regexec.c regerror.c regfree.c > regex.h && \
+	  cd - > /dev/null && \
+	  mkdir -p $$DSTDIR && \
+	  for f in regcomp.c regexec.c regerror.c regfree.c \
+	    engine.c regex.h regex2.h cclass.h cname.h \
+	    utils.h regcomp.ih engine.ih regexec.ih \
+	    regerror.ih \
+	    COPYRIGHT; do \
+	    cp $$tmpdir/$$f $$DSTDIR/; \
+	  done && \
+	  rm -rf $$tmpdir && \
+	  echo "BSD regex installed in $$DSTDIR"; \
+	fi
+amitiles: $(AMITILES)
+
+UUDECODE = ../util/uudecode
+
+../util/uudecode: ../sys/share/uudecode.c
+	$(CC) $(CFLAGS) -o $@ $<
+
+amigapkg: $(AMITILES) ../util/uudecode
+	mkdir -p $(TARGETPFX)pkg/tiles $(TARGETPFX)pkg/hack
+	cp $(GAMEBIN) $(TARGETPFX)pkg/nethack
+	cp ../dat/nhdat $(TARGETPFX)pkg/nhdat
+	cp ../dat/license $(TARGETPFX)pkg/license
+	cp ../dat/symbols $(TARGETPFX)pkg/symbols
+	cp $(TARGETPFX)tiles16.iff $(TARGETPFX)pkg/tiles/tiles16.iff
+	cp $(TARGETPFX)tiles32.iff $(TARGETPFX)pkg/tiles/tiles32.iff
+	cp $(TARGETPFX)tomb.iff $(TARGETPFX)pkg/tomb.iff
+	cp ../sys/msdos/sysconf $(TARGETPFX)pkg/sysconf
+	cp ../doc/nethack.txt $(TARGETPFX)pkg/nethack.txt
+	( cd $(TARGETPFX)pkg && ../../../util/uudecode ../../../sys/amiga/amifont8.uu && mv 8 hack/8 )
+	( cd $(TARGETPFX)pkg && ../../../util/uudecode ../../../sys/amiga/amifont.uu )
+	cp $(AMISRC)/nethack.cnf $(TARGETPFX)pkg/nethack.cnf
+	-( cd $(TARGETPFX)pkg && test -f ../../../sys/amiga/dflticon.uu && \
+		../../../util/uudecode ../../../sys/amiga/dflticon.uu )
+	-( cd $(TARGETPFX)pkg && test -f ../../../sys/amiga/NHinfo.uu && \
+		../../../util/uudecode ../../../sys/amiga/NHinfo.uu )
+	-( cd $(TARGETPFX)pkg && test -f ../../../sys/amiga/NewGame.uu && \
+		../../../util/uudecode ../../../sys/amiga/NewGame.uu )
+	-( cd $(TARGETPFX)pkg && test -f ../../../sys/amiga/HackWB.uu && \
+		../../../util/uudecode ../../../sys/amiga/HackWB.uu )
+	touch $(TARGETPFX)pkg/record
+	( cd $(TARGETPFX)pkg && zip -9r ../NH370AMI.ZIP * )
+	@echo amiga package zip file $(TARGETPFX)NH370AMI.ZIP
+endif  # CROSS_TO_AMIGA
+
+ifdef CROSS_SHARED
+# shared file dependencies
+$(TARGETPFX)pcmain.o : ../sys/share/pcmain.c $(HACK_H)
+$(TARGETPFX)pcsys.o : ../sys/share/pcsys.c $(HACK_H)
+$(TARGETPFX)pctty.o : ../sys/share/pctty.c $(HACK_H)
+$(TARGETPFX)pcunix.o : ../sys/share/pcunix.c $(HACK_H)
+$(TARGETPFX)tileset.o : ../win/share/tileset.c
+$(TARGETPFX)bmptiles.o : ../win/share/bmptiles.c
+$(TARGETPFX)giftiles.o : ../win/share/giftiles.c
+endif  # CROSS_SHARED
+#
+ifdef CROSS
+$(TARGETPFX)hacklib.a: $(TARGETPFX)hacklib.o
+	$(TARGET_AR) $(TARGET_ARFLAGS) $@ $(TARGETPFX)hacklib.o
+ifdef MAKEFILE_UTL
+$(TARGETPFX)recover.o: recover.c $(CONFIG_H)
+	$(TARGET_CC) $(TARGET_CFLAGS) $(CSTD) -c recover.c -o $@
+ifdef CROSS_TO_MSDOS
+$(TARGETPFX)recover.exe : $(TARGETPFX)recover.o $(TARGETPFX)rversion.o $(TARGETPFX)hacklib.a
+	$(TARGET_LINK) $(TARGET_LFLAGS) \
+	$(TARGETPFX)recover.o $(TARGETPFX)rversion.o $(TARGETPFX)hacklib.a -o $@
+else
+$(TARGETPFX)recover : $(TARGETPFX)recover.o $(TARGETPFX)rversion.o $(TARGETPFX)hacklib.a
+	$(TARGET_LINK) $(TARGET_LFLAGS) \
+	$(TARGETPFX)recover.o $(TARGETPFX)rversion.o $(TARGETPFX)hacklib.a -o $@
+endif
+$(TARGETPFX)rversion.o: ../src/version.c $(HACK_H)
+	$(TARGET_CC) $(TARGET_CFLAGS) -DMINIMAL_FOR_RECOVER  $(CSTD) -c ../src/version.c -o $@
+endif  # MAKEFILE_UTL
+endif  # CROSS
+
+ifdef BUILD_TARGET_LUA
+# Lua lib
+$(LUACROSSLIB): $(LUALIBOBJS)
+	if [ -f $@ ]; then rm $@; fi;
+	$(TARGET_AR) rcS $@ $(LUAOBJFILES1)
+	$(TARGET_AR) rcS $@ $(LUAOBJFILES2)
+	$(TARGET_AR) rcS $@ $(LUAOBJFILES3)
+	$(TARGET_AR) rcs $@ $(LUAOBJFILES4)
+
+#	$(TARGET_AR) rcs $@ $(LUALIBOBJS)
+
+# Lua src
+$(TARGETPFX)lapi.o : $(LUATOP)/src/lapi.c
+$(TARGETPFX)lauxlib.o : $(LUATOP)/src/lauxlib.c
+$(TARGETPFX)lbaselib.o : $(LUATOP)/src/lbaselib.c
+$(TARGETPFX)lbitlib.o : $(LUATOP)/src/lbitlib.c
+$(TARGETPFX)lcode.o : $(LUATOP)/src/lcode.c
+$(TARGETPFX)lcorolib.o : $(LUATOP)/src/lcorolib.c
+$(TARGETPFX)lctype.o : $(LUATOP)/src/lctype.c
+$(TARGETPFX)ldblib.o : $(LUATOP)/src/ldblib.c
+$(TARGETPFX)ldebug.o : $(LUATOP)/src/ldebug.c
+$(TARGETPFX)ldo.o : $(LUATOP)/src/ldo.c
+$(TARGETPFX)ldump.o : $(LUATOP)/src/ldump.c
+$(TARGETPFX)lfunc.o : $(LUATOP)/src/lfunc.c
+$(TARGETPFX)lgc.o : $(LUATOP)/src/lgc.c
+$(TARGETPFX)linit.o : $(LUATOP)/src/linit.c
+$(TARGETPFX)liolib.o : $(LUATOP)/src/liolib.c
+$(TARGETPFX)llex.o : $(LUATOP)/src/llex.c
+$(TARGETPFX)lmathlib.o : $(LUATOP)/src/lmathlib.c
+$(TARGETPFX)lmem.o : $(LUATOP)/src/lmem.c
+$(TARGETPFX)loadlib.o : $(LUATOP)/src/loadlib.c
+$(TARGETPFX)lobject.o : $(LUATOP)/src/lobject.c
+$(TARGETPFX)lopcodes.o : $(LUATOP)/src/lopcodes.c
+$(TARGETPFX)loslib.o : $(LUATOP)/src/loslib.c
+$(TARGETPFX)lparser.o : $(LUATOP)/src/lparser.c
+$(TARGETPFX)lstate.o : $(LUATOP)/src/lstate.c
+$(TARGETPFX)lstring.o : $(LUATOP)/src/lstring.c
+$(TARGETPFX)lstrlib.o : $(LUATOP)/src/lstrlib.c
+$(TARGETPFX)ltable.o : $(LUATOP)/src/ltable.c
+$(TARGETPFX)ltablib.o : $(LUATOP)/src/ltablib.c
+$(TARGETPFX)ltm.o : $(LUATOP)/src/ltm.c
+$(TARGETPFX)lundump.o : $(LUATOP)/src/lundump.c
+$(TARGETPFX)lutf8lib.o : $(LUATOP)/src/lutf8lib.c
+$(TARGETPFX)lvm.o : $(LUATOP)/src/lvm.c
+$(TARGETPFX)lzio.o : $(LUATOP)/src/lzio.c
+endif  # BUILD_TARGET_LUA
+
+ifdef BUILD_TARGET_NCURSES
+.PHONY: build-ncurses
+ifdef MAKEFILE_SRC
+../lib/ncurses.tar.gz:
+	@echo "You will need to successfully execute 'make CROSS_TO_$(NCURSES_PLATFORM)=1 fetch-ncurses' first"
+	@false
+$(TARGETPFX)ncurses/lib/libncurses.a: ../lib/ncurses.tar.gz
+	(cd $(TARGETDIR) ; mkdir -p ncurses ; cd ncurses ; tar -xf ../../../lib/ncurses.tar.gz --strip-components=1 ; \
+	./configure --build $(NCURSES_CONFIGURE_BUILD) --host $(NCURSES_CONFIGURE_HOST) ; \
+	make ; \
+	cd ../../../src)
+endif   #MAKEFILE_SRC
+ifdef MAKEFILE_TOP
+.PHONY: fetch-ncurses
+fetch-ncurses:
+	(cd lib ; curl https://invisible-island.net/datafiles/release/ncurses.tar.gz --output ncurses.tar.gz ; cd ..)
+endif
+endif   #BUILD_TARGET_NCURSES
+
+ifdef BUILD_PDCURSES
+ifdef WANT_WIN_CURSES
+$(TARGETPFX)pdclib.a : $(PDCLIBOBJS) $(PDCOBJS)
+	if [ -f $@ ]; then rm $@; fi;
+	$(TARGET_AR) rcs $@ $(PDCLIBOBJS) $(PDCOBJS)
+endif  #WANT_WIN_CURSES
+# PDCurses src
+$(TARGETPFX)addch.o : $(PDCTOP)/pdcurses/addch.c
+$(TARGETPFX)addchstr.o : $(PDCTOP)/pdcurses/addchstr.c
+$(TARGETPFX)addstr.o : $(PDCTOP)/pdcurses/addstr.c
+$(TARGETPFX)attr.o : $(PDCTOP)/pdcurses/attr.c
+$(TARGETPFX)beep.o : $(PDCTOP)/pdcurses/beep.c
+$(TARGETPFX)bkgd.o : $(PDCTOP)/pdcurses/bkgd.c
+$(TARGETPFX)border.o : $(PDCTOP)/pdcurses/border.c
+$(TARGETPFX)clear.o : $(PDCTOP)/pdcurses/clear.c
+$(TARGETPFX)color.o : $(PDCTOP)/pdcurses/color.c
+$(TARGETPFX)delch.o : $(PDCTOP)/pdcurses/delch.c
+$(TARGETPFX)deleteln.o : $(PDCTOP)/pdcurses/deleteln.c
+$(TARGETPFX)getch.o : $(PDCTOP)/pdcurses/getch.c
+$(TARGETPFX)getstr.o : $(PDCTOP)/pdcurses/getstr.c
+$(TARGETPFX)getyx.o : $(PDCTOP)/pdcurses/getyx.c
+$(TARGETPFX)inch.o : $(PDCTOP)/pdcurses/inch.c
+$(TARGETPFX)inchstr.o : $(PDCTOP)/pdcurses/inchstr.c
+$(TARGETPFX)initscr.o : $(PDCTOP)/pdcurses/initscr.c
+$(TARGETPFX)inopts.o : $(PDCTOP)/pdcurses/inopts.c
+$(TARGETPFX)insch.o : $(PDCTOP)/pdcurses/insch.c
+$(TARGETPFX)insstr.o : $(PDCTOP)/pdcurses/insstr.c
+$(TARGETPFX)instr.o : $(PDCTOP)/pdcurses/instr.c
+$(TARGETPFX)kernel.o : $(PDCTOP)/pdcurses/kernel.c
+$(TARGETPFX)keyname.o : $(PDCTOP)/pdcurses/keyname.c
+$(TARGETPFX)mouse.o : $(PDCTOP)/pdcurses/mouse.c
+$(TARGETPFX)move.o : $(PDCTOP)/pdcurses/move.c
+$(TARGETPFX)outopts.o : $(PDCTOP)/pdcurses/outopts.c
+$(TARGETPFX)overlay.o : $(PDCTOP)/pdcurses/overlay.c
+$(TARGETPFX)pad.o : $(PDCTOP)/pdcurses/pad.c
+$(TARGETPFX)panel.o : $(PDCTOP)/pdcurses/panel.c
+$(TARGETPFX)printw.o : $(PDCTOP)/pdcurses/printw.c
+$(TARGETPFX)refresh.o : $(PDCTOP)/pdcurses/refresh.c
+$(TARGETPFX)scanw.o : $(PDCTOP)/pdcurses/scanw.c
+$(TARGETPFX)scr_dump.o : $(PDCTOP)/pdcurses/scr_dump.c
+$(TARGETPFX)scroll.o : $(PDCTOP)/pdcurses/scroll.c
+$(TARGETPFX)slk.o : $(PDCTOP)/pdcurses/slk.c
+$(TARGETPFX)termattr.o : $(PDCTOP)/pdcurses/termattr.c
+$(TARGETPFX)touch.o : $(PDCTOP)/pdcurses/touch.c
+$(TARGETPFX)util.o : $(PDCTOP)/pdcurses/util.c
+$(TARGETPFX)window.o : $(PDCTOP)/pdcurses/window.c
+$(TARGETPFX)debug.o : $(PDCTOP)/pdcurses/debug.c
+$(TARGETPFX)pdcclip.o : $(PDCPORT)/pdcclip.c
+$(TARGETPFX)pdcdisp.o : $(PDCPORT)/pdcdisp.c
+$(TARGETPFX)pdcgetsc.o : $(PDCPORT)/pdcgetsc.c
+$(TARGETPFX)pdckbd.o : $(PDCPORT)/pdckbd.c
+$(TARGETPFX)pdcscrn.o : $(PDCPORT)/pdcscrn.c
+$(TARGETPFX)pdcsetsc.o : $(PDCPORT)/pdcsetsc.c
+$(TARGETPFX)pdcutil.o : $(PDCPORT)/pdcutil.c
+	$(TARGET_CC) $(PDCINCL) $(PDC_TARGET_CFLAGS) \
+		-Wno-sign-compare -o$@  $(PDCPORT)/pdcutil.c
+# -Wno-sign-compare
+endif  # BUILD_PDCURSES
+#
+# End of cross-compiling -POST section
+#===============-=================================================

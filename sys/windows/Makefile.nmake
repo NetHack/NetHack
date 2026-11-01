@@ -1,15 +1,15 @@
-# NetHack 3.7 Makefile.nmake
-#       Copyright (c) NetHack Development Team 1993-2025
+# NetHack 5.0 Makefile.nmake
+#       Copyright (c) NetHack Development Team 1993-2026
 #
 #==============================================================================
 # Build Tools Environment
 #
-#       NetHack 3.7 Work-in-progress Makefile for
+#       NetHack 5.0 Work-in-progress Makefile for
 #       MS Visual Studio Visual C++ compiler
 #
 #       Visual Studio Compilers Tested:
-#            - Microsoft Visual Studio Community 2022 v 17.14.21
-#            - Microsoft Visual Studio Community 2026 v 18.0.2
+#            - Microsoft Visual Studio Community 2022 v 17.14.31
+#            - Microsoft Visual Studio Community 2026 v 18.5.2
 #
 #==============================================================================
 #   This is used for building two distinct executables of NetHack:
@@ -139,10 +139,8 @@ GIT_AVAILABLE = N
 # if next line is commented out, full compiler command lines will be output
 Q=@
 
-SKIP_NETHACKW = N
-
 !IFNDEF LUA_VERSION
-LUAVER=5.4.6
+LUAVER=5.4.8
 !ELSE
 LUAVER=$(LUA_VERSION)
 !ENDIF
@@ -160,7 +158,7 @@ GIT_AVAILABLE=Y
 #==============================================================================
 #
 #  The version of the game this Makefile was designed for
-NETHACK_VERSION="3.7.0"
+NETHACK_VERSION="5.0.0"
 
 # A brief version for use in macros
 NHV=$(NETHACK_VERSION:.=)
@@ -243,7 +241,7 @@ GAMEDIR   = $(R_GAMEDIR)$(BACKSLASH)
 #U_BinDir    = $(BinDir:\=/)
 #U_PkgDir    = $(PkgDir:\=/)
 #U_SOUNDDIR  = $(SOUNDDIR:\=/)
-U_GAMEDIR   = $(GAMEDIR:\=/)
+U_GAMEDIR   = $(R_GAMEDIR:\=/)
 #
 #!MESSAGE $(U_SRC)
 #!MESSAGE $(U_GAMEDIR)
@@ -313,7 +311,7 @@ LUA_MAY_PROCEED=Y
 !MESSAGE or modify your Makefile to set the following:
 !MESSAGE     INTERNET_AVAILABLE=Y
 !MESSAGE     GIT_AVAILABLE=Y
-!ERROR Stopping because NetHack 3.7 requires Lua for its build.
+!ERROR Stopping because NetHack 5.0 requires Lua for its build.
 !ENDIF  # LUA_MAY_PROCEED
 
 # Now, pdcursesmod
@@ -387,7 +385,7 @@ ADD_CURSES = N
 !ENDIF  # WANT_CURSES
 
 !IF "$(ADD_CURSES)" != "Y"
-!MESSAGE NetHack 3.7 will be built without support for the curses window-port.
+!MESSAGE NetHack 5.0 will be built without support for the curses window-port.
 !ENDIF
 
 #These will be in the environment variables with one of the Visual Studio
@@ -466,37 +464,37 @@ DLBDEF =
 #  Object file directories.
 #
 
-R_OBJTTY_B  = objtty
-R_OBJGUI_B  = objgui
-R_OBJUTIL_B = objutil
-R_OBJLUA_B  = objlua
-R_OBJPDC_B  = objpdc
-R_OBJPDCC_B = objpdcc
-R_OBJPDCG_B = objpdcg
+R_OBJTTY_B    = objtty
+R_OBJGUI_B    = objgui
+R_OBJUTIL_B   = objutil
+R_OBJLUA_B    = objlua
+R_OBJPDC_B    = objpdc
+R_OBJPDCTXT_B = objpdctxt
+R_OBJPDCGUI_B = objpdcgui
 
 OBJTTY_B  = $(R_OBJTTY_B)$(BACKSLASH)
 OBJGUI_B  = $(R_OBJGUI_B)$(BACKSLASH)
 OBJUTIL_B = $(R_OBJUTIL_B)$(BACKSLASH)
 OBJLUA_B  = $(R_OBJLUA_B)$(BACKSLASH)
 OBJPDC_B  = $(R_OBJPDC_B)$(BACKSLASH)
-OBJPDCC_B = $(R_OBJPDCC_B)$(BACKSLASH)
-OBJPDCG_B = $(R_OBJPDCG_B)$(BACKSLASH)
+OBJPDCTXT_B = $(R_OBJPDCTXT_B)$(BACKSLASH)
+OBJPDCGUI_B = $(R_OBJPDCGUI_B)$(BACKSLASH)
 
 R_OBJTTY  = $(OBJTTY_B)$(TARGET_CPU)
 R_OBJGUI  = $(OBJGUI_B)$(TARGET_CPU)
 R_OBJUTIL = $(OBJUTIL_B)$(TARGET_CPU)
 R_OBJLUA  = $(OBJLUA_B)$(TARGET_CPU)
 R_OBJPDC  = $(OBJPDC_B)$(TARGET_CPU)
-R_OBJPDCC = $(OBJPDCC_B)$(TARGET_CPU)
-R_OBJPDCG = $(OBJPDCG_B)$(TARGET_CPU)
+R_OBJPDCTXT = $(OBJPDCTXT_B)$(TARGET_CPU)
+R_OBJPDCGUI = $(OBJPDCGUI_B)$(TARGET_CPU)
 
 OBJTTY    = $(R_OBJTTY)$(BACKSLASH)
 OBJGUI    = $(R_OBJGUI)$(BACKSLASH)
 OBJUTIL   = $(R_OBJUTIL)$(BACKSLASH)
 OBJLUA    = $(R_OBJLUA)$(BACKSLASH)
 OBJPDC    = $(R_OBJPDC)$(BACKSLASH)
-OBJPDCC   = $(R_OBJPDCC)$(BACKSLASH)
-OBJPDCG   = $(R_OBJPDCG)$(BACKSLASH)
+OBJPDCTXT   = $(R_OBJPDCTXT)$(BACKSLASH)
+OBJPDCGUI   = $(R_OBJPDCGUI)$(BACKSLASH)
 
 #
 # Shorten up the location for some files
@@ -507,8 +505,8 @@ OGUI   = $(OBJGUI)
 OUTL   = $(OBJUTIL)
 OLUA   = $(OBJLUA)
 OPDC   = $(OBJPDC)
-OPDCC  = $(OBJPDCC)
-OPDCG  = $(OBJPDCG)
+OPDCTXT  = $(OBJPDCTXT)
+OPDCGUI  = $(OBJPDCGUI)
 
 U  = $(UTIL)
 
@@ -534,9 +532,9 @@ GITBRANCH = -DNETHACK_GIT_BRANCH=\"$(GIT_BRANCH)\"
 GITPREFIX = -DNETHACK_GIT_PREFIX=\"$(GIT_PREFIX)\"
 !ENDIF
 
-#===============-=================================================
+#=================================================================
 # LUA library
-# Official source for Lua is http://www.lua.org/ftp/lua-5.4.6.tar.gz
+# Official source for Lua is http://www.lua.org/ftp/lua-5.4.8.tar.gz
 #
 # Source for the NetHack repository submodule in ../submodules/lua
 # is https://github.com/lua/lua.git
@@ -545,17 +543,17 @@ GITPREFIX = -DNETHACK_GIT_PREFIX=\"$(GIT_PREFIX)\"
 # Location of LUA
 #
 # Original source needs to be obtained from:
-#    http://www.lua.org/ftp/lua-5.4.6.tar.gz
+#    http://www.lua.org/ftp/lua-5.4.8.tar.gz
 #
 #    This build assumes that the LUA sources are located
 #    at the specified location. If they are actually elsewhere
 #    you'll need to specify the correct spot below in order to
-#    successfully build NetHack-3.7.  You cannot build a functional
-#    version of NetHack-3.7 Work-in-progress without including Lua.
+#    successfully build NetHack-5.0.  You cannot build a functional
+#    version of NetHack-5.0 Work-in-progress without including Lua.
 #
 
 !IFNDEF LUAVER
-LUAVER=5.4.6
+LUAVER=5.4.8
 !ENDIF
 
 LUALIB   = $(LIBDIR)lua$(LUAVER)-$(TARGET_CPU)-static.lib
@@ -598,20 +596,23 @@ LUAOBJFILES =   $(LUAOBJFILES) $(OLUA)lbitlib.o
 #=================================================================
 
 !IF "$(ADD_CURSES)" == "Y"
+PDCTXTFOLDER            = wincon
+#PDCTXTFOLDER            = vt
 PDCURSES_CURSES_H	= $(PDCURSES_TOP)curses.h
 PDCURSES_CURSPRIV_H	= $(PDCURSES_TOP)curspriv.h
 PDCURSES_HEADERS	= $(PDCURSES_CURSES_H) $(PDCURSES_CURSPRIV_H)
 R_PDCSRC                = $(PDCURSES_TOP)pdcurses
 PDCSRC                  = $(R_PDCSRC)$(BACKSLASH)
 !IF "$(CURSES_CONSOLE)" == "Y"
-R_PDCWINCON               = $(PDCURSES_TOP)wincon
-PDCWINCON               = $(PDCURSES_TOP)wincon$(BACKSLASH)
+R_PDCTXT             = $(PDCURSES_TOP)$(PDCTXTFOLDER)
+PDCTXT               = $(PDCURSES_TOP)$(PDCTXTFOLDER)$(BACKSLASH)
+#!MESSAGE PDCTXT = $(PDCTXT)
 !ENDIF
 !IF "$(CURSES_GRAPHICAL)" == "Y"
-R_PDCWINGUI               = $(PDCURSES_TOP)wingui
-PDCWINGUI               = $(PDCURSES_TOP)wingui$(BACKSLASH)
+R_PDCGUI               = $(PDCURSES_TOP)wingui
+PDCGUI                 = $(PDCURSES_TOP)wingui$(BACKSLASH)
 !ENDIF
-PDCDEP                  = $(PDCURSES_TOP)curses.h
+PDCDEP                    = $(PDCURSES_TOP)curses.h
 
 PDCCOMMONOBJS = $(OPDC)addch.o $(OPDC)addchstr.o $(OPDC)addstr.o $(OPDC)attr.o $(OPDC)beep.o \
 	$(OPDC)bkgd.o $(OPDC)border.o $(OPDC)clear.o $(OPDC)color.o $(OPDC)debug.o \
@@ -625,23 +626,23 @@ PDCCOMMONOBJS = $(OPDC)addch.o $(OPDC)addchstr.o $(OPDC)addstr.o $(OPDC)attr.o $
 	$(OPDC)util.o $(OPDC)window.o
 PDCINCL = /I$(R_PDCURSES_TOP) /I$(R_PDCSRC)
 !IF "$(CURSES_CONSOLE)" == "Y"
-PDCINCLCON = /I$(PDCWINCON)
-PDCWINCONOBJS = $(OPDCC)pdcclip.o $(OPDCC)pdcdisp.o $(OPDCC)pdcgetsc.o \
-	$(OPDCC)pdckbd.o $(OPDCC)pdcscrn.o $(OPDCC)pdcsetsc.o $(OPDCC)pdcutil.o
+PDCINCLTXT = /I$(R_PDCTXT)
+PDCTXTOBJS = $(OPDCTXT)pdcclip.o $(OPDCTXT)pdcdisp.o $(OPDCTXT)pdcgetsc.o \
+	$(OPDCTXT)pdckbd.o $(OPDCTXT)pdcscrn.o $(OPDCTXT)pdcsetsc.o $(OPDCTXT)pdcutil.o
 !ENDIF
 !IF "$(CURSES_GRAPHICAL)" == "Y"
-PDCWINGUIOBJS = $(OPDCG)pdcclip.o $(OPDCG)pdcdisp.o $(OPDCG)pdcgetsc.o \
-	$(OPDCG)pdckbd.o $(OPDCG)pdcscrn.o $(OPDCG)pdcsetsc.o $(OPDCG)pdcutil.o
-PDCINCLGUI = /I$(PDCWINCON)
+PDCGUIOBJS = $(OPDCGUI)pdcclip.o $(OPDCGUI)pdcdisp.o $(OPDCGUI)pdcgetsc.o \
+	$(OPDCGUI)pdckbd.o $(OPDCGUI)pdcscrn.o $(OPDCGUI)pdcsetsc.o $(OPDCGUI)pdcutil.o
+PDCINCLGUI = /I$(R_PDCGUI)
 !ENDIF
 !ELSE
 PDCDEP=
 PDCCOMMONOBJS=
-PDCWINCONOBJS=
-PDCWINGUIOBJS=
+PDCTXTOBJS=
+PDCGUIOBJS=
 PDCINCL=
 PDINCLGUI=
-PDCINCLCON=
+PDCINCLTXT=
 !ENDIF
 
 
@@ -650,67 +651,68 @@ PDCINCLCON=
 # windowing-system specific
 
 HACKCSRC = \
-	$(SRC)allmain.c  $(SRC)alloc.c   $(SRC)apply.c    $(SRC)artifact.c \
-	$(SRC)attrib.c   $(SRC)ball.c    $(SRC)bones.c    $(SRC)botl.c \
-	$(SRC)calendar.c $(SRC)cmd.c     $(SRC)coloratt.c $(SRC)dbridge.c \
-	$(SRC)decl.c     $(SRC)detect.c  $(SRC)dig.c      $(SRC)display.c \
-	$(SRC)dlb.c      $(SRC)do.c      $(SRC)do_name.c  $(SRC)do_wear.c \
-	$(SRC)dog.c      $(SRC)dogmove.c $(SRC)dokick.c   $(SRC)dothrow.c \
-	$(SRC)drawing.c  $(SRC)dungeon.c $(SRC)eat.c      $(SRC)end.c \
-	$(SRC)engrave.c  $(SRC)exper.c   $(SRC)explode.c  $(SRC)files.c \
-	$(SRC)fountain.c $(SRC)getpos.c  $(SRC)glyphs.c   $(SRC)hack.c \
-	$(SRC)insight.c  $(SRC)invent.c  $(SRC)isaac64.c  $(SRC)light.c \
-	$(SRC)lock.c     $(SRC)mail.c    $(SRC)makemon.c  $(SRC)mcastu.c \
-	$(SRC)mdlib.c    $(SRC)mhitm.c   $(SRC)mhitu.c    $(SRC)minion.c \
-	$(SRC)mklev.c    $(SRC)mkmap.c   $(SRC)mkmaze.c   $(SRC)mkobj.c \
-	$(SRC)mkroom.c   $(SRC)mon.c     $(SRC)mondata.c  $(SRC)monmove.c \
-	$(SRC)monst.c    $(SRC)mplayer.c $(SRC)mthrowu.c  $(SRC)muse.c \
-	$(SRC)music.c    $(SRC)nhlua.c   $(SRC)nhlsel.c   $(SRC)nhlobj.c \
-	$(SRC)o_init.c   $(SRC)objects.c $(SRC)objnam.c   $(SRC)options.c \
-	$(SRC)pager.c    $(SRC)pickup.c  $(SRC)pline.c    $(SRC)polyself.c \
-	$(SRC)potion.c   $(SRC)pray.c    $(SRC)priest.c   $(SRC)quest.c \
-	$(SRC)questpgr.c $(SRC)read.c    $(SRC)rect.c     $(SRC)region.c \
-	$(SRC)restore.c  $(SRC)rip.c     $(SRC)rnd.c      $(SRC)role.c \
-	$(SRC)rumors.c   $(SRC)save.c    $(SRC)selvar.c\
-	$(SRC)sfbase.c   $(SRC)sfstruct.c \
-	$(SRC)shk.c      $(SRC)shknam.c  $(SRC)sit.c      $(SRC)sounds.c \
-	$(SRC)sp_lev.c   $(SRC)spell.c   $(SRC)stairs.c   $(SRC)steal.c \
-	$(SRC)steed.c    $(SRC)symbols.c $(SRC)sys.c      $(SRC)teleport.c \
-	$(SRC)timeout.c  $(SRC)topten.c  $(SRC)track.c    $(SRC)trap.c \
-	$(SRC)u_init.c   $(SRC)uhitm.c   $(SRC)utf8map.c  $(SRC)vault.c \
-	$(SRC)version.c  $(SRC)vision.c  $(SRC)weapon.c   $(SRC)were.c \
-	$(SRC)wield.c    $(SRC)windows.c $(SRC)wizard.c   $(SRC)worm.c \
-	$(SRC)worn.c     $(SRC)write.c   $(SRC)zap.c
+	$(SRC)allmain.c  $(SRC)alloc.c    $(SRC)apply.c    $(SRC)artifact.c \
+	$(SRC)attrib.c   $(SRC)ball.c     $(SRC)bones.c    $(SRC)botl.c \
+	$(SRC)calendar.c $(SRC)cmd.c      $(SRC)coloratt.c $(SRC)dbridge.c \
+	$(SRC)decl.c     $(SRC)detect.c   $(SRC)dig.c      $(SRC)display.c \
+	$(SRC)dlb.c      $(SRC)do.c       $(SRC)do_name.c  $(SRC)do_wear.c \
+	$(SRC)dog.c      $(SRC)dogmove.c  $(SRC)dokick.c   $(SRC)dothrow.c \
+	$(SRC)drawing.c  $(SRC)dungeon.c  $(SRC)earlyarg.c $(SRC)eat.c \
+	$(SRC)end.c      $(SRC)engrave.c  $(SRC)exper.c    $(SRC)explode.c \
+	$(SRC)files.c    $(SRC)fountain.c $(SRC)getpos.c   $(SRC)glyphs.c \
+	$(SRC)hack.c     $(SRC)iactions.c $(SRC)insight.c  $(SRC)invent.c \
+	$(SRC)isaac64.c  $(SRC)light.c    $(SRC)lock.c     $(SRC)mail.c \
+	$(SRC)makemon.c  $(SRC)mcastu.c   $(SRC)mdlib.c    $(SRC)mhitm.c \
+	$(SRC)mhitu.c    $(SRC)minion.c   $(SRC)mklev.c    $(SRC)mkmap.c \
+	$(SRC)mkmaze.c   $(SRC)mkobj.c    $(SRC)mkroom.c   $(SRC)mon.c \
+	$(SRC)mondata.c  $(SRC)monmove.c  $(SRC)monst.c    $(SRC)mplayer.c \
+	$(SRC)mthrowu.c  $(SRC)muse.c     $(SRC)music.c    $(SRC)nhlua.c \
+	$(SRC)nhlsel.c   $(SRC)nhlobj.c   $(SRC)o_init.c   $(SRC)objects.c \
+	$(SRC)objnam.c   $(SRC)options.c  $(SRC)pager.c    $(SRC)pickup.c \
+	$(SRC)pline.c    $(SRC)polyself.c $(SRC)potion.c   $(SRC)pray.c \
+	$(SRC)priest.c   $(SRC)quest.c    $(SRC)questpgr.c $(SRC)read.c \
+	$(SRC)rect.c     $(SRC)region.c   $(SRC)restore.c  $(SRC)rip.c \
+	$(SRC)rnd.c      $(SRC)role.c     $(SRC)rumors.c   $(SRC)save.c \
+	$(SRC)selvar.c   $(SRC)sfbase.c   $(SRC)sfstruct.c $(SRC)shk.c \
+	$(SRC)shknam.c   $(SRC)sit.c      $(SRC)sounds.c   $(SRC)sp_lev.c \
+	$(SRC)spell.c    $(SRC)stairs.c   $(SRC)steal.c    $(SRC)steed.c \
+	$(SRC)symbols.c  $(SRC)sys.c      $(SRC)teleport.c $(SRC)timeout.c \
+	$(SRC)topten.c   $(SRC)track.c    $(SRC)trap.c     $(SRC)u_init.c \
+	$(SRC)uhitm.c    $(SRC)utf8map.c  $(SRC)vault.c    $(SRC)version.c \
+	$(SRC)vision.c   $(SRC)weapon.c   $(SRC)were.c     $(SRC)wield.c \
+	$(SRC)windows.c  $(SRC)wizard.c   $(SRC)worm.c     $(SRC)worn.c \
+	$(SRC)write.c    $(SRC)zap.c
 
 # all .h files except date.h
 HACKINCL = \
-	$(INCL)align.h      $(INCL)artifact.h $(INCL)artilist.h \
-	$(INCL)attrib.h     $(INCL)botl.h     $(INCL)color.h \
-	$(INCL)config.h     $(INCL)config1.h  $(INCL)context.h \
-	$(INCL)coord.h      $(INCL)cstd.h     $(INCL)decl.h \
-	$(INCL)defsym.h     $(INCL)display.h  $(INCL)dlb.h \
-	$(INCL)dungeon.h    $(INCL)engrave.h  $(INCL)extern.h \
-	$(INCL)flag.h       $(INCL)fnamesiz.h $(INCL)func_tab.h \
-	$(INCL)global.h     $(INCL)warnings.h $(INCL)hack.h \
-	$(INCL)lint.h       $(INCL)mextra.h   $(INCL)micro.h \
-	$(INCL)mfndpos.h    $(INCL)mkroom.h   $(INCL)monattk.h \
-	$(INCL)mondata.h    $(INCL)monflag.h  $(INCL)monst.h \
-	$(INCL)monsters.h   $(INCL)nhmd4.h    $(INCL)obj.h \
-	$(INCL)objects.h    $(INCL)objclass.h $(INCL)optlist.h \
-	$(INCL)patchlevel.h $(INCL)pcconf.h   $(INCL)permonst.h \
-	$(INCL)prop.h       $(INCL)rect.h     $(INCL)region.h \
-	$(INCL)savefile.h   $(INCL)selvar.h   $(INCL)sfprocs.h \
-	$(INCL)sym.h        $(INCL)rm.h       $(INCL)sp_lev.h \
-	$(INCL)spell.h      $(INCL)sndprocs.h $(INCL)seffects.h \
-	$(INCL)stairs.h     $(INCL)sys.h      $(INCL)tcap.h \
-	$(INCL)timeout.h    $(INCL)tradstdc.h $(INCL)trap.h \
-	$(INCL)unixconf.h   $(INCL)vision.h   $(INCL)vmsconf.h \
-	$(INCL)wintty.h     $(INCL)wincurs.h  $(INCL)winX.h \
-	$(INCL)winprocs.h   $(INCL)wintype.h  $(INCL)you.h \
-	$(INCL)youprop.h    $(INCL)weight.h
+	$(INCL)align.h    $(INCL)artifact.h   $(INCL)artilist.h \
+	$(INCL)attrib.h   $(INCL)botl.h       $(INCL)color.h \
+	$(INCL)config.h   $(INCL)config1.h    $(INCL)context.h \
+	$(INCL)coord.h    $(INCL)cstd.h       $(INCL)decl.h \
+	$(INCL)defsym.h   $(INCL)display.h    $(INCL)dlb.h \
+	$(INCL)dungeon.h  $(INCL)engrave.h    $(INCL)extern.h \
+	$(INCL)flag.h     $(INCL)fnamesiz.h   $(INCL)func_tab.h \
+	$(INCL)global.h   $(INCL)warnings.h   $(INCL)hack.h \
+	$(INCL)lint.h     $(INCL)mextra.h     $(INCL)micro.h \
+	$(INCL)mcastu.h   $(INCL)mfndpos.h    $(INCL)mkroom.h \
+	$(INCL)monattk.h  $(INCL)mondata.h    $(INCL)monflag.h \
+	$(INCL)monst.h    $(INCL)monsters.h   $(INCL)nhmd4.h \
+	$(INCL)obj.h      $(INCL)objects.h    $(INCL)objclass.h \
+	$(INCL)optlist.h  $(INCL)patchlevel.h $(INCL)pcconf.h \
+	$(INCL)permonst.h $(INCL)prop.h       $(INCL)rect.h \
+	$(INCL)region.h   $(INCL)savefile.h   $(INCL)selvar.h \
+	$(INCL)sfprocs.h  $(INCL)sym.h        $(INCL)rm.h \
+	$(INCL)sp_lev.h   $(INCL)spell.h      $(INCL)sndprocs.h \
+	$(INCL)seffects.h $(INCL)stairs.h     $(INCL)sys.h \
+	$(INCL)tcap.h     $(INCL)timeout.h    $(INCL)tradstdc.h \
+	$(INCL)trap.h     $(INCL)unixconf.h   $(INCL)vision.h \
+	$(INCL)vmsconf.h  $(INCL)wintty.h     $(INCL)wincurs.h \
+	$(INCL)winX.h     $(INCL)winprocs.h   $(INCL)wintype.h \
+	$(INCL)you.h      $(INCL)youprop.h  $(INCL)weight.h
 
 LUA_FILES = $(DAT)asmodeus.lua $(DAT)baalz.lua $(DAT)bigrm-1.lua \
 	$(DAT)bigrm-10.lua $(DAT)bigrm-11.lua $(DAT)bigrm-12.lua \
+	$(DAT)bigrm-13.lua \
 	$(DAT)bigrm-2.lua $(DAT)bigrm-3.lua $(DAT)bigrm-4.lua \
 	$(DAT)bigrm-5.lua $(DAT)bigrm-6.lua $(DAT)bigrm-7.lua \
 	$(DAT)bigrm-8.lua $(DAT)bigrm-9.lua $(DAT)castle.lua \
@@ -751,7 +753,17 @@ LUA_FILES = $(DAT)asmodeus.lua $(DAT)baalz.lua $(DAT)bigrm-1.lua \
 	$(DAT)Cav-strt.lua $(DAT)Hea-strt.lua $(DAT)Kni-strt.lua \
 	$(DAT)Mon-strt.lua $(DAT)Pri-strt.lua $(DAT)Ran-strt.lua \
 	$(DAT)Rog-strt.lua $(DAT)Sam-strt.lua $(DAT)Tou-strt.lua \
-	$(DAT)Val-strt.lua $(DAT)Wiz-strt.lua $(DAT)dungeon.lua \
+	$(DAT)Val-strt.lua $(DAT)Wiz-strt.lua \
+	$(DAT)His-fila.lua $(DAT)His-filb.lua $(DAT)His-goal.lua \
+	$(DAT)His-loca.lua $(DAT)His-strt.lua \
+	$(DAT)Pht-fila.lua $(DAT)Pht-filb.lua $(DAT)Pht-goal.lua \
+	$(DAT)Pht-loca.lua $(DAT)Pht-strt.lua \
+	$(DAT)his-treasure-1.lua \
+	$(DAT)gibeon.lua \
+	$(DAT)Adv-fila.lua $(DAT)Adv-filb.lua $(DAT)Adv-goal.lua \
+	$(DAT)Adv-loca.lua $(DAT)Adv-strt.lua \
+	$(DAT)Chp-fila.lua $(DAT)Chp-filb.lua $(DAT)Chp-goal.lua \
+	$(DAT)Chp-loca.lua $(DAT)Chp-strt.lua $(DAT)dungeon.lua \
 	$(DAT)quest.lua
 
 luawildcards = asmodeus.lua baalz.lua bigrm-*.lua castle.lua fakewiz?.lua \
@@ -776,7 +788,7 @@ RECOVOBJS      = $(OUTL)recover.o
 TILEFILES      = $(WSHR)monsters.txt $(WSHR)objects.txt $(WSHR)other.txt
 
 #
-# These are not invoked during a normal game build in 3.7
+# These are not invoked during a normal game build in 5.0
 #
 
 TEXT_IO   = $(OUTL)tiletext.o	$(OUTL)tiletxt.o	$(OUTL)drawing$(HOST).o \
@@ -803,14 +815,14 @@ CURSESOBJ= $(OTTY)cursdial.o $(OTTY)cursinit.o $(OTTY)cursinvt.o \
 	$(OTTY)cursstat.o $(OTTY)curswins.o
 !IF "$(CURSES_CONSOLE)" == "Y"
 CURSESWINCONOBJS = $(CURSESOBJ)
-PDCWINCONLIB = $(LIBDIR)$(PDCDIST)-wincon-$(TARGET_CPU)-static.lib
+PDCTXTLIB = $(LIBDIR)$(R_PDCDIST)-$(PDCTXTFOLDER)-$(TARGET_CPU)-static.lib
 CURSESCONDEF1=-D"CURSES_GRAPHICS" -DPDC_NCMOUSE
 #CURSESDEF2=-D"CURSES_BRIEF_INCLUDE" -DCHTYPE_32
 CURSESDEF2=-DCURSES_UNICODE $(PDCURSESFLAGS)
 !ENDIF
 !IF "$(CURSES_GRAPHICAL)" == "Y"
 CURSESWINGUIOBJS = $(CURSESOBJ) $(OGUI)guitty.o
-PDCWINGUILIB = $(LIBDIR)$(PDCDIST)-wingui-$(TARGET_CPU)-static.lib
+PDCGUILIB = $(LIBDIR)$(R_PDCDIST)-wingui-$(TARGET_CPU)-static.lib
 CURSESGUIDEF1=-D"CURSES_GRAPHICS" -DPDC_NCMOUSE
 #CURSESDEF2=-D"CURSES_BRIEF_INCLUDE" -DCHTYPE_32
 CURSESDEF2=-DCURSES_UNICODE $(PDCURSESFLAGS)
@@ -822,8 +834,8 @@ CURSESDEF2=-DCURSES_UNICODE $(PDCURSESFLAGS)
 !UNDEF CURSESOBJ
 !UNDEF CURSESWINCONOBJS
 !UNDEF CURSESWINGUIOBJS
-!UNDEF PDCWINCONLIB
-!UNDEF PDCWINGUILIB
+!UNDEF PDCTXTLIB
+!UNDEF PDCGUILIB
 !ENDIF
 
 OUTLHACKLIBOBJS = $(OUTL)hacklib.o
@@ -846,8 +858,7 @@ REGEXTTY  = $(OTTY)cppregex.o
 LUAOBJTTY = $(OTTY)nhlua.o    $(OTTY)nhlsel.o    $(OTTY)nhlobj.o
 VVOBJTTY  = $(OTTY)version.o
 
-SOBJTTY   = $(OTTY)windmain.o $(OTTY)windsys.o $(OTTY)win10.o \
-		$(OTTY)safeproc.o
+SOBJTTY   = $(OTTY)windmain.o $(OTTY)windsys.o $(OTTY)win10.o
 
 TTYOBJTTY = $(OTTY)topl.o $(OTTY)getline.o  $(OTTY)wintty.o
 
@@ -858,30 +869,31 @@ COREOBJTTY = \
 	$(OTTY)dbridge.o  $(OTTY)decl.o     $(OTTY)detect.o   $(OTTY)dig.o \
 	$(OTTY)display.o  $(OTTY)do.o       $(OTTY)do_name.o  $(OTTY)do_wear.o \
 	$(OTTY)dog.o      $(OTTY)dogmove.o  $(OTTY)dokick.o   $(OTTY)dothrow.o \
-	$(OTTY)drawing.o  $(OTTY)dungeon.o  $(OTTY)eat.o      $(OTTY)end.o \
-	$(OTTY)engrave.o  $(OTTY)exper.o    $(OTTY)explode.o  $(OTTY)extralev.o \
-	$(OTTY)files.o    $(OTTY)fountain.o $(OTTY)getpos.o   $(OTTY)glyphs.o \
-	$(OTTY)hack.o     $(OTTY)insight.o  $(OTTY)invent.o   $(OTTY)isaac64.o \
-	$(OTTY)light.o    $(OTTY)lock.o     $(OTTY)mail.o     $(OTTY)makemon.o \
-	$(OTTY)mcastu.o   $(OTTY)mhitm.o    $(OTTY)mhitu.o    $(OTTY)minion.o \
-	$(OTTY)mklev.o    $(OTTY)mkmap.o    $(OTTY)mkmaze.o   $(OTTY)mkobj.o \
-	$(OTTY)mkroom.o   $(OTTY)mon.o      $(OTTY)mondata.o  $(OTTY)monmove.o \
-	$(OTTY)monst.o    $(OTTY)mplayer.o  $(OTTY)mthrowu.o  $(OTTY)muse.o \
-	$(OTTY)music.o    $(OTTY)o_init.o   $(OTTY)objects.o  $(OTTY)objnam.o \
-	$(OTTY)options.o  $(OTTY)pager.o    $(OTTY)pickup.o   $(OTTY)pline.o \
-	$(OTTY)polyself.o $(OTTY)potion.o   $(OTTY)pray.o     $(OTTY)priest.o \
-	$(OTTY)quest.o    $(OTTY)questpgr.o $(OTTY)read.o     $(OTTY)rect.o \
-	$(OTTY)region.o   $(OTTY)report.o   $(OTTY)restore.o  $(OTTY)rip.o \
-	$(OTTY)rnd.o      $(OTTY)role.o     $(OTTY)rumors.o   $(OTTY)save.o \
-	$(OTTY)selvar.o   $(OTTY)sfbase.o   $(OTTY)sfstruct.o $(OTTY)shk.o \
-	$(OTTY)shknam.o   $(OTTY)sit.o      $(OTTY)sounds.o   $(OTTY)sp_lev.o \
-	$(OTTY)spell.o    $(OTTY)stairs.o   $(OTTY)steal.o    $(OTTY)steed.o \
-	$(OTTY)strutil.o  $(OTTY)symbols.o  $(OTTY)sys.o      $(OTTY)teleport.o \
-	$(OTTY)timeout.o  $(OTTY)topten.o   $(OTTY)track.o    $(OTTY)trap.o \
-	$(OTTY)u_init.o   $(OTTY)uhitm.o    $(OTTY)utf8map.o  $(OTTY)vault.o \
-	$(OTTY)vision.o   $(OTTY)weapon.o   $(OTTY)were.o     $(OTTY)wield.o \
-	$(OTTY)windows.o  $(OTTY)wizard.o   $(OTTY)wizcmds.o  $(OTTY)worm.o \
-	$(OTTY)worn.o     $(OTTY)write.o    $(OTTY)zap.o
+	$(OTTY)drawing.o  $(OTTY)dungeon.o  $(OTTY)earlyarg.o $(OTTY)eat.o \
+	$(OTTY)end.o      $(OTTY)engrave.o  $(OTTY)exper.o    $(OTTY)explode.o \
+	$(OTTY)extralev.o $(OTTY)files.o    $(OTTY)fountain.o $(OTTY)getpos.o \
+	$(OTTY)glyphs.o   $(OTTY)iactions.o $(OTTY)hack.o     $(OTTY)insight.o \
+	$(OTTY)invent.o   $(OTTY)isaac64.o  $(OTTY)light.o    $(OTTY)lock.o \
+	$(OTTY)mail.o     $(OTTY)makemon.o  $(OTTY)mcastu.o   $(OTTY)mhitm.o \
+	$(OTTY)mhitu.o    $(OTTY)minion.o   $(OTTY)mklev.o    $(OTTY)mkmap.o \
+	$(OTTY)mkmaze.o   $(OTTY)mkobj.o    $(OTTY)mkroom.o   $(OTTY)mon.o \
+	$(OTTY)mondata.o  $(OTTY)monmove.o  $(OTTY)monst.o    $(OTTY)mplayer.o \
+	$(OTTY)mthrowu.o  $(OTTY)muse.o     $(OTTY)music.o    $(OTTY)o_init.o \
+	$(OTTY)objects.o  $(OTTY)objnam.o   $(OTTY)options.o  $(OTTY)pager.o \
+	$(OTTY)pickup.o   $(OTTY)pline.o    $(OTTY)polyself.o $(OTTY)potion.o \
+	$(OTTY)pray.o     $(OTTY)priest.o   $(OTTY)quest.o    $(OTTY)questpgr.o \
+	$(OTTY)read.o     $(OTTY)rect.o     $(OTTY)region.o   $(OTTY)report.o \
+	$(OTTY)restore.o  $(OTTY)rip.o      $(OTTY)rnd.o      $(OTTY)role.o \
+	$(OTTY)rumors.o   $(OTTY)save.o     $(OTTY)selvar.o   $(OTTY)sfbase.o \
+	$(OTTY)sfstruct.o $(OTTY)shk.o      $(OTTY)shknam.o   $(OTTY)sit.o \
+	$(OTTY)sounds.o   $(OTTY)sp_lev.o   $(OTTY)spell.o    $(OTTY)stairs.o \
+	$(OTTY)steal.o    $(OTTY)steed.o    $(OTTY)strutil.o  $(OTTY)symbols.o \
+	$(OTTY)sys.o      $(OTTY)teleport.o $(OTTY)timeout.o  $(OTTY)topten.o \
+	$(OTTY)track.o    $(OTTY)trap.o     $(OTTY)u_init.o   $(OTTY)uhitm.o \
+	$(OTTY)utf8map.o  $(OTTY)vault.o    $(OTTY)vision.o   $(OTTY)weapon.o \
+	$(OTTY)were.o     $(OTTY)wield.o    $(OTTY)windows.o  $(OTTY)wizard.o \
+	$(OTTY)wizcmds.o  $(OTTY)worm.o     $(OTTY)worn.o     $(OTTY)write.o \
+	$(OTTY)zap.o
 
 OBJSTTY = $(MDLIBTTY) $(COREOBJTTY) $(REGEXTTY) $(RANDOMTTY)
 
@@ -906,8 +918,7 @@ REGEXGUI  = $(OGUI)cppregex.o
 LUAOBJGUI = $(OGUI)nhlua.o    $(OGUI)nhlsel.o   $(OGUI)nhlobj.o
 VVOBJGUI  = $(OGUI)version.o
 
-SOBJGUI   = $(OGUI)windmain.o $(OGUI)windsys.o $(OGUI)win10.o \
-		$(OGUI)safeproc.o
+SOBJGUI   = $(OGUI)windmain.o $(OGUI)windsys.o $(OGUI)win10.o
 
 GUIOBJ	= $(OGUI)mhaskyn.o $(OGUI)mhdlg.o \
 	$(OGUI)mhfont.o $(OGUI)mhinput.o $(OGUI)mhmain.o $(OGUI)mhmap.o \
@@ -921,30 +932,31 @@ COREOBJGUI = \
 	$(OGUI)dbridge.o  $(OGUI)decl.o     $(OGUI)detect.o   $(OGUI)dig.o \
 	$(OGUI)display.o  $(OGUI)do.o       $(OGUI)do_name.o  $(OGUI)do_wear.o \
 	$(OGUI)dog.o      $(OGUI)dogmove.o  $(OGUI)dokick.o   $(OGUI)dothrow.o \
-	$(OGUI)drawing.o  $(OGUI)dungeon.o  $(OGUI)eat.o      $(OGUI)end.o \
-	$(OGUI)engrave.o  $(OGUI)exper.o    $(OGUI)explode.o  $(OGUI)extralev.o \
-	$(OGUI)files.o    $(OGUI)fountain.o $(OGUI)getpos.o   $(OGUI)glyphs.o \
-	$(OGUI)hack.o     $(OGUI)insight.o  $(OGUI)invent.o   $(OGUI)isaac64.o \
-	$(OGUI)light.o    $(OGUI)lock.o     $(OGUI)mail.o     $(OGUI)makemon.o \
-	$(OGUI)mcastu.o   $(OGUI)mhitm.o    $(OGUI)mhitu.o    $(OGUI)minion.o \
-	$(OGUI)mklev.o    $(OGUI)mkmap.o    $(OGUI)mkmaze.o   $(OGUI)mkobj.o \
-	$(OGUI)mkroom.o   $(OGUI)mon.o      $(OGUI)mondata.o  $(OGUI)monmove.o \
-	$(OGUI)monst.o    $(OGUI)mplayer.o  $(OGUI)mthrowu.o  $(OGUI)muse.o \
-	$(OGUI)music.o    $(OGUI)o_init.o   $(OGUI)objects.o  $(OGUI)objnam.o \
-	$(OGUI)options.o  $(OGUI)pager.o    $(OGUI)pickup.o   $(OGUI)pline.o \
-	$(OGUI)polyself.o $(OGUI)potion.o   $(OGUI)pray.o     $(OGUI)priest.o \
-	$(OGUI)quest.o    $(OGUI)questpgr.o $(OGUI)read.o     $(OGUI)rect.o \
-	$(OGUI)region.o   $(OGUI)report.o   $(OGUI)restore.o  $(OGUI)rip.o \
-	$(OGUI)rnd.o      $(OGUI)role.o     $(OGUI)rumors.o   $(OGUI)save.o \
-	$(OGUI)selvar.o   $(OGUI)sfbase.o   $(OGUI)sfstruct.o $(OGUI)shk.o \
-	$(OGUI)shknam.o   $(OGUI)sit.o      $(OGUI)sounds.o   $(OGUI)sp_lev.o \
-	$(OGUI)spell.o    $(OGUI)stairs.o   $(OGUI)steal.o    $(OGUI)steed.o \
-	$(OGUI)strutil.o  $(OGUI)symbols.o  $(OGUI)sys.o      $(OGUI)teleport.o \
-	$(OGUI)timeout.o  $(OGUI)topten.o   $(OGUI)track.o    $(OGUI)trap.o \
-	$(OGUI)u_init.o   $(OGUI)uhitm.o    $(OGUI)utf8map.o  $(OGUI)vault.o \
-	$(OGUI)vision.o   $(OGUI)weapon.o   $(OGUI)were.o     $(OGUI)wield.o \
-	$(OGUI)windows.o  $(OGUI)wizard.o   $(OGUI)wizcmds.o  $(OGUI)worm.o \
-	$(OGUI)worn.o     $(OGUI)write.o    $(OGUI)zap.o
+	$(OGUI)drawing.o  $(OGUI)dungeon.o  $(OGUI)earlyarg.o $(OGUI)eat.o \
+	$(OGUI)end.o      $(OGUI)engrave.o  $(OGUI)exper.o    $(OGUI)explode.o \
+	$(OGUI)extralev.o $(OGUI)files.o    $(OGUI)fountain.o $(OGUI)getpos.o \
+	$(OGUI)glyphs.o   $(OGUI)iactions.o $(OGUI)hack.o     $(OGUI)insight.o \
+	$(OGUI)invent.o   $(OGUI)isaac64.o  $(OGUI)light.o    $(OGUI)lock.o \
+	$(OGUI)mail.o     $(OGUI)makemon.o  $(OGUI)mcastu.o   $(OGUI)mhitm.o \
+	$(OGUI)mhitu.o    $(OGUI)minion.o   $(OGUI)mklev.o    $(OGUI)mkmap.o \
+	$(OGUI)mkmaze.o   $(OGUI)mkobj.o    $(OGUI)mkroom.o   $(OGUI)mon.o \
+	$(OGUI)mondata.o  $(OGUI)monmove.o  $(OGUI)monst.o    $(OGUI)mplayer.o \
+	$(OGUI)mthrowu.o  $(OGUI)muse.o     $(OGUI)music.o    $(OGUI)o_init.o \
+	$(OGUI)objects.o  $(OGUI)objnam.o   $(OGUI)options.o  $(OGUI)pager.o \
+	$(OGUI)pickup.o   $(OGUI)pline.o    $(OGUI)polyself.o $(OGUI)potion.o \
+	$(OGUI)pray.o     $(OGUI)priest.o   $(OGUI)quest.o    $(OGUI)questpgr.o \
+	$(OGUI)read.o     $(OGUI)rect.o     $(OGUI)region.o   $(OGUI)report.o \
+	$(OGUI)restore.o  $(OGUI)rip.o      $(OGUI)rnd.o      $(OGUI)role.o \
+	$(OGUI)rumors.o   $(OGUI)save.o     $(OGUI)selvar.o   $(OGUI)sfbase.o \
+	$(OGUI)sfstruct.o $(OGUI)shk.o      $(OGUI)shknam.o   $(OGUI)sit.o \
+	$(OGUI)sounds.o   $(OGUI)sp_lev.o   $(OGUI)spell.o    $(OGUI)stairs.o \
+	$(OGUI)steal.o    $(OGUI)steed.o    $(OGUI)strutil.o  $(OGUI)symbols.o \
+	$(OGUI)sys.o      $(OGUI)teleport.o $(OGUI)timeout.o  $(OGUI)topten.o \
+	$(OGUI)track.o    $(OGUI)trap.o     $(OGUI)u_init.o   $(OGUI)uhitm.o \
+	$(OGUI)utf8map.o  $(OGUI)vault.o    $(OGUI)vision.o   $(OGUI)weapon.o \
+	$(OGUI)were.o     $(OGUI)wield.o    $(OGUI)windows.o  $(OGUI)wizard.o \
+	$(OGUI)wizcmds.o  $(OGUI)worm.o     $(OGUI)worn.o     $(OGUI)write.o \
+	$(OGUI)zap.o
 
 OBJSGUI   = $(MDLIBGUI) $(COREOBJGUI) $(REGEXGUI) $(RANDOMGUI)
 
@@ -1127,6 +1139,7 @@ HACK_H = $(CONFIG_H) $(INCL)align.h $(INCL)artilist.h \
 	$(INCL)decl.h $(INCL)defsym.h $(INCL)display.h \
 	$(INCL)dungeon.h $(INCL)engrave.h $(INCL)flag.h \
 	$(INCL)hack.h $(INCL)lint.h $(INCL)mextra.h \
+	$(INCL)mcastu.h \
 	$(INCL)mkroom.h $(INCL)monattk.h $(INCL)mondata.h \
 	$(INCL)monflag.h $(INCL)monst.h $(INCL)monsters.h \
 	$(INCL)nhlua.h $(INCL)obj.h $(INCL)objclass.h \
@@ -1184,9 +1197,8 @@ rc=Rc.exe
 # is too old or untested.
 #
 # Recently tested versions:
-TESTEDVS2022 = 14.44.35221.0
-# Other versions:
-TESTEDVS2026 = 14.50.35719.0
+TESTEDVS2022 = 14.44.35225.0
+TESTEDVS2026 = 14.50.35730.0
 
 VS20261ST = 1450000000
 VS2026CUR = $(TESTEDVS2026:.=)
@@ -1361,8 +1373,8 @@ INCLUSIONS= /I$(R_INCL) /I$(R_MSWSYS) $(R_LUAINCL) $(R_SOUNDLIBINCL)
 # Util and console builds
 #==========================================
 
-CFLAGS   = $(ctmpflags) $(INCLUSIONS) $(DLBDEF) -DSAFEPROCS $(SOUNDLIBDEFS)
-CPPFLAGS = $(cpptmpflags) $(INCLUSIONS) $(DLBDEF) -DSAFEPROCS $(SOUNDLIBDEFS)
+CFLAGS   = $(ctmpflags) $(INCLUSIONS) $(DLBDEF) $(SOUNDLIBDEFS)
+CPPFLAGS = $(cpptmpflags) $(INCLUSIONS) $(DLBDEF) $(SOUNDLIBDEFS)
 LFLAGS   = $(lflags) $(conlibs) $(MACHINE)
 
 #==========================================
@@ -1516,7 +1528,7 @@ DLB =
 #!MESSAGE {$(R_PDCSRC)}.c{$(R_OBJPDC)}.o:
 #!MESSAGE PDCINCL = $(PDCINCL)
 #!MESSAGE PDCINCLGUI = $(PDCINCLGUI)
-#!MESSAGE PDCINCLCON = $(PDCINCLCON)
+#!MESSAGE PDCINCLTXT = $(PDCINCLTXT)
 #!MESSAGE $(Q)$(CC) /wd4244 /wd4267 /wd4774 $(R_PDCINCL) $(CFLAGS:-w44774= ) $(CURSESDEF2) /wd5262 $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -FoX2 X1
 
 #
@@ -1528,15 +1540,15 @@ DLB =
 	$(Q)$(CC) /wd4244 /wd4267 /wd4774 $(PDCINCL) $(CFLAGS:-w44774= ) $(CURSESDEF2) /wd5262 $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
 
 !IF "$(CURSES_CONSOLE)" == "Y"
-{$(R_PDCWINCON)}.c{$(R_OBJPDCC)}.o:
-	$(Q)$(CC) /wd4244 /wd4267 /wd4774 $(PDCINCL) $(PDCINCLCON) $(CFLAGS) $(CURSESDEF2) /wd5262 $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
-#!MESSAGE {$(R_PDCWINCON)}.c{$(R_OBJPDCC)}.o:
+{$(R_PDCTXT)}.c{$(R_OBJPDCTXT)}.o:
+	$(Q)$(CC) /wd4244 /wd4267 /wd4774 $(PDCINCL) $(PDCINCLTXT) $(CFLAGS) $(CURSESDEF2) /wd5262 $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
+#!MESSAGE {$(R_PDCTXT)}.c{$(R_OBJPDCTXT)}.o:
 !ENDIF
 
 !IF "$(CURSES_GRAPHICAL)" == "Y"
-{$(R_PDCWINGUI)}.c{$(R_OBJPDCG)}.o:
+{$(R_PDCGUI)}.c{$(R_OBJPDCGUI)}.o:
 	$(Q)$(CC) /wd4244 /wd4267 /wd4774 $(PDCINCL) $(PDCINCLGUI) $(CFLAGS) $(CURSESDEF2) /wd5262 $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
-#!MESSAGE {$(R_PDCWINGUI)}.c{$(R_OBJPDCG)}.o:
+#!MESSAGE {$(R_PDCGUI)}.c{$(R_OBJPDCGUI)}.o:
 !ENDIF
 !ENDIF
 
@@ -1604,8 +1616,8 @@ $(PDCURSES_TOP)curses.h:
 #	git submodule update --remote $(SUBM)$(R_PDCDIST)
 !ENDIF
 !ELSE  # GIT_AVAILABLE no
-CURLLUASRC=http://www.lua.org/ftp/lua-5.4.6.tar.gz
-CURLLUADST=lua-5.4.6.tar.gz
+CURLLUASRC=http://www.lua.org/ftp/lua-5.4.8.tar.gz
+CURLLUADST=lua-5.4.8.tar.gz
 
 #CURLPDCSRC=https://github.com/wmcbrine/PDCurses/archive/refs/tags/3.9.zip
 CURLPDCSRC=https://github.com/Bill-Gray/PDCursesMod/archive/refs/tags/v4.4.0.zip
@@ -1677,16 +1689,16 @@ GAMEOBJ=$(GAMEOBJ:^ =^
 $(GAMEDIR)NetHack.exe : gamedir.tag $(OTTY)consoletty.o \
 			$(ALLOBJTTY) $(CURSESWINCONOBJS) \
 			$(TTYSOUNDOBJS) $(OTTY)date.o $(OTTY)console.res \
-			$(LUALIB) $(TTYOBJTTY) $(PDCWINCONLIB) $(PDCWINCONOBJS) $(OTTYHACKLIB)
+			$(LUALIB) $(TTYOBJTTY) $(PDCTXTLIB) $(PDCTXTOBJS) $(OTTYHACKLIB)
 	@if not exist $(GAMEDIR)*.* mkdir $(R_GAMEDIR)
 	@echo Linking $(@:\=/)
 	$(link) $(LFLAGS) $(conlflags) /STACK:2048 /PDB:$(GAMEDIR)$(@B).PDB /MAP:$(OTTY)$(@B).MAP \
-		$(LIBS) $(PDCWINCONLIB) $(LUALIB) $(TTYSOUNDLIBS) $(OTTYHACKLIB) \
+		$(LIBS) $(PDCTXTLIB) $(LUALIB) $(TTYSOUNDLIBS) $(OTTYHACKLIB) \
 		$(conlibs) $(BCRYPT) -out:$@ @<<$(@B).lnk
 		$(GAMEOBJTTY)
 		$(ALLOBJTTY)
 		$(TTYOBJTTY)
-		$(TTYSOUNDOBJS) $(CURSESWINCONOBJS) $(PDCWINCONOBJS)
+		$(TTYSOUNDOBJS) $(CURSESWINCONOBJS) $(PDCTXTOBJS)
 		$(OTTY)consoletty.o
 		$(OTTY)date.o
 		$(OTTY)console.res
@@ -1701,18 +1713,18 @@ $(GAMEDIR)NetHackW.exe : gamedir.tag $(OGUI)tile.o \
 			$(ALLOBJGUI) $(GAMEOBJGUI) $(GUIOBJ) $(GUISOUNDOBJS) \
 			$(CURSESWINGUIOBJS) $(OGUI)date.o \
 			$(OGUI)NetHackW.res \
-			$(LUALIB) $(PDCWINGUILIB) $(PDCWINGUIOBJS) $(OGUIHACKLIB)
+			$(LUALIB) $(PDCGUILIB) $(PDCGUIOBJS) $(OGUIHACKLIB)
 	@if not exist $(GAMEDIR)*.* mkdir $(R_GAMEDIR)
 	@echo   Linking $(@:\=/)
 	$(link) $(LFLAGS) $(guilflags) /STACK:2048 /PDB:$(GAMEDIR)$(@B).PDB \
 		/MAP:$(OGUI)$(@B).MAP \
-		$(LIBS) $(PDCWINGUILIB) $(LUALIB) \
+		$(LIBS) $(PDCGUILIB) $(LUALIB) \
 		$(GUISOUNDLIBS) $(OGUIHACKLIB) \
 		$(guilibs) $(COMCTRL) $(BCRYPT) -out:$@ @<<$(@B).lnk
 		$(GAMEOBJGUI)
 		$(ALLOBJGUI)
 		$(GUIOBJ)
-		$(GUISOUNDOBJS) $(CURSESWINGUIOBJS) $(PDCWINGUIOBJS)
+		$(GUISOUNDOBJS) $(CURSESWINGUIOBJS) $(PDCGUIOBJS)
 		$(OGUI)tile.o
 		$(OGUI)date.o
 		$(OGUI)NetHackW.res
@@ -1884,9 +1896,9 @@ $(OTTY)sfbase.o: sfbase.c $(HACK_H) $(INCL)sfmacros.h
 	$(Q)$(CC) $(CFLAGS) -Fo$@ $(@B).c
 
 #
-#  date.h is not used with NetHack 3.7
-#  onames.h is not used with NetHack 3.7
-#  pm.h is not used with NetHack 3.7
+#  date.h is not used with NetHack 5.0
+#  onames.h is not used with NetHack 5.0
+#  pm.h is not used with NetHack 5.0
 
 $(INCL)date.h $(OPTIONS_FILE) : $(U)makedefs.exe
 	$(U)makedefs -v
@@ -1977,14 +1989,14 @@ opdcdir$(TARGET_CPU).tag:
 	@if not exist $(OBJPDC)*.* mkdir $(R_OBJPDC)
 	@echo directory created >$@
 
-opdccdir$(TARGET_CPU).tag:
-	@if not exist $(OBJPDCC)*.* echo creating directory $(OBJPDCC:\=/)
-	@if not exist $(OBJPDCC)*.* mkdir $(R_OBJPDCC)
+opdctxtdir$(TARGET_CPU).tag:
+	@if not exist $(OBJPDCTXT)*.* echo creating directory $(OBJPDCTXT:\=/)
+	@if not exist $(OBJPDCTXT)*.* mkdir $(R_OBJPDCTXT)
 	@echo directory created >$@
 
-opdcgdir$(TARGET_CPU).tag:
-	@if not exist $(OBJPDCG)*.* echo creating directory $(OBJPDCG:\=/)
-	@if not exist $(OBJPDCG)*.* mkdir $(R_OBJPDCG)
+opdcguidir$(TARGET_CPU).tag:
+	@if not exist $(OBJPDCGUI)*.* echo creating directory $(OBJPDCGUI:\=/)
+	@if not exist $(OBJPDCGUI)*.* mkdir $(R_OBJPDCGUI)
 	@echo directory created >$@
 
 libdir.tag:
@@ -2024,7 +2036,7 @@ cpu.tag:
 !	IF "$(TARGET_CPU)"=="x64"
 	@echo Windows x64 64-bit target build
 !	ELSE
-!          IF "$(TARGET_CPU)"=="arm64" 
+!          IF "$(TARGET_CPU)"=="arm64"
 	@echo Windows arm64 64-bit target build
 !          ELSE
 	@echo Windows x86 32-bit target build
@@ -2064,6 +2076,54 @@ fetch-pdcurses:
 	cd $(R_SRC)
 	@echo $(PDCDIST) has been fetched into $(LIBDIR)$(PDCDIST)
 !ENDIF
+
+#https://github.com/universal-ctags/ctags/archive/refs/tags/v6.2.1.zip
+CTAGSVER=6.2.1
+CTAGSURL=https://github.com/universal-ctags/ctags/archive/refs/tags/v$(CTAGSVER).zip
+
+fetch-ctags: $(LIBDIR)ctags.zip
+
+build-ctags: $(LIBDIR)ctags\ctags-$(CTAGSVER)\ctags.exe
+
+$(LIBDIR)ctags\ctags-$(CTAGSVER)\ctags.exe: $(LIBDIR)ctags\ctags-$(CTAGSVER)\mk_mvc.mak
+	@ECHO on
+	cd $(LIBDIR)
+	cd ctags\ctags-$(CTAGSVER)
+	copy win32\config_mvc.h config.h
+	copy win32\gnulib_h\langinfo.h gnulib
+	copy win32\gnulib_h\fnmatch.h gnulib
+	nmake -f mk_mvc.mak
+        copy /Y ctags.exe ..\ctags.exe
+	@echo ctags has been compiled into $(LIBDIR)ctags
+	@ECHO off
+	cd ..\..
+	cd $(R_SRC)
+
+$(LIBDIR)ctags.zip:
+	@if not exist $(LIBDIR)*.* mkdir $(R_LIBDIR)
+	cd $(LIBDIR)
+	curl -L -R $(CTAGSURL) -o ctags.zip
+	cd $(R_SRC)
+	@echo ctags source has been fetched into $@
+
+$(LIBDIR)ctags\ctags-$(CTAGSVER)\mk_mvc.mak: $(LIBDIR)ctags.zip
+	@if not exist $(LIBDIR)*.* mkdir $(R_LIBDIR)
+	cd $(LIBDIR)
+	powershell -command "Expand-Archive -Path $(LIBDIR)ctags.zip -DestinationPath $(LIBDIR)ctags"
+	cd $(R_SRC)
+	@echo ctags source has been expanded from zip file into $(LIBDIR)\ctags\ctags-$(CTAGSVER)
+
+clean-ctags:
+	cd $(LIBDIR)
+	rd $(LIBDIR)\ctags\ctags-$(CTAGSVER) /S
+        cd $(R_SRC)
+
+spotless-ctags:
+	cd $(LIBDIR)
+	@if exist ctags\ctags.exe del ctags\ctags.exe
+	@if exist ctags.zip del ctags.zip
+        cd $(R_SRC)
+
 
 #==========================================
 # DLB utility and nhdatNNN file creation
@@ -2274,14 +2334,14 @@ $(SRC)x11tiles: $(U)tile2x11.exe $(WSHR)monsters.txt $(WSHR)objects.txt \
 #===============================================================================
 !IF "$(ADD_CURSES)" == "Y"
 !IF "$(CURSES_CONSOLE)" == "Y"
-$(PDCWINCONLIB) : $(PDCCOMMONOBJS) $(PDCWINCONOBJS)
+$(PDCTXTLIB) : $(PDCCOMMONOBJS) $(PDCTXTOBJS)
 	@echo Building library $@ from $**
-	@$(librarian) -nologo /out:$@ $(PDCCOMMONOBJS) $(PDCWINCONOBJS)
+	@$(librarian) -nologo /out:$@ $(PDCCOMMONOBJS) $(PDCTXTOBJS)
 !ENDIF
 !IF "$(CURSES_GRAPHICAL)" == "Y"
-$(PDCWINGUILIB) : $(PDCCOMMONOBJS) $(PDCWINGUIOBJS)
+$(PDCGUILIB) : $(PDCCOMMONOBJS) $(PDCGUIOBJS)
 	@echo Building library $@ from $**
-	@$(librarian) -nologo /out:$@ $(PDCCOMMONOBJS) $(PDCWINGUIOBJS)
+	@$(librarian) -nologo /out:$@ $(PDCCOMMONOBJS) $(PDCGUIOBJS)
 !ENDIF
 !ENDIF
 $(OGUI)guitty.o: $(MSWSYS)guitty.c $(WINDHDR) $(HACK_H) $(TILE_H)
@@ -2339,14 +2399,12 @@ $(OTTY)windsys.o:  $(MSWSYS)windsys.c $(WINDHDR) $(HACK_H)
 $(OTTY)windsound.o: $(WINDSOUNDDIR)windsound.c $(HACK_H)
 #$(OTTY)sample.o: $(SOUNDDIR)sample.c $(HACK_H)
 $(OTTY)windmain.o: $(MSWSYS)windmain.c $(WINDHDR) $(HACK_H)
-$(OTTY)safeproc.o: $(WSHR)safeproc.c $(WINDHDR) $(HACK_H)
 
 $(OGUI)consoletty.o:   $(MSWSYS)consoletty.c $(WINDHDR) $(HACK_H) $(TILE_H)
 $(OGUI)win10.o:  $(MSWSYS)win10.c $(WINDHDR) $(HACK_H)
 $(OGUI)windsys.o:  $(MSWSYS)windsys.c $(WINDHDR) $(HACK_H)
 $(OGUI)windsound.o: $(WINDSOUNDDIR)windsound.c $(HACK_H)
 $(OGUI)windmain.o: $(MSWSYS)windmain.c $(WINDHDR) $(HACK_H)
-$(OGUI)safeproc.o: $(WSHR)safeproc.c $(WINDHDR) $(HACK_H)
 
 #===================================================================
 # win/win32 dependencies
@@ -2490,6 +2548,20 @@ $(DAT)bogusmon: $(U)makedefs.exe $(DAT)bogusmon.txt
 #===============================================================================
 # sfutil
 #===============================================================================
+SFCTOOLBIN = $(BinDir)sfctool.exe
+!IF "$(SFCTOOL)" == "1"
+SFCTOOLPKG=$(SFCTOOLBIN)
+SFCTOOLBASENAM=sfctool.exe
+SFCTOOLPDBNAM=sfctool.PDB
+SFCTOOLPDBBIN=$(BinDir)sfctool.PDB
+!ELSE
+SFCTOOLPKG=
+SFCTOOLBASENAM=
+SFCTOOLPDBNAM=
+SFCTOOLPDBBIN=
+!ENDIF
+
+!IF "$(SFCTOOLPKG)" != ""
 SFCTOOLOBJS = $(OUTL)sfctool.o \
 	    $(OUTL)sf-alloc.o $(OUTL)sf-artifact.o $(OUTL)sfdata.o \
 	    $(OUTL)sf-date.o $(OUTL)sf-decl.o $(OUTL)sf-calendar.o \
@@ -2503,7 +2575,6 @@ SFCTOOLOBJS = $(OUTL)sfctool.o \
 	    $(OUTL)sf-sys.o $(OUTL)sf-timeout.o $(OUTL)sf-track.o \
 	    $(OUTL)sf-version.o $(OUTL)sf-worm.o $(OUTL)sf-windsys.o
 
-SFCTOOLBIN = $(BinDir)sfctool.exe
 SFFLAGS = -DSFCTOOL -DNOPANICTRACE -DNOCRASHREPORT -DNO_CHRONICLE
 
 #CTAGSCMD = $(LIB)\ctags\ctags.exe
@@ -2585,8 +2656,10 @@ $(OUTL)sf-sys.o: $(SRC)sys.c $(HACK_H)
 $(OUTL)sf-windsys.o: $(MSWSYS)windsys.c $(HACK_H)
 	$(Q)$(CC) $(CFLAGS) $(SFFLAGS) -Fo$@ -c $(MSWSYS)windsys.c
 
-$(UTIL)sftags.exe: $(OUTL)sftags.o $(OUTLHACKLIB)
-	$(link) $(LFLAGS) /OUT:$@ $(OUTL)sftags.o $(OUTLHACKLIB)
+$(UTIL)sftags.exe: $(OUTL)sftags.o $(OUTL)sf-alloc.o $(OUTL)panic.o $(OUTLHACKLIB)
+	$(link) $(LFLAGS) /OUT:$@ $(OUTL)sftags.o \
+		$(OUTL)sf-alloc.o $(OUTL)panic.o \
+		$(OUTLHACKLIB)
 $(OUTL)sftags.o: $(UTIL)sftags.c $(HACK_H)
 	$(Q)$(CC) $(CFLAGS) -Fo$@ -c $(UTIL)sftags.c
 $(INCL)sfproto.h: $(UTIL)sftags.exe $(UTIL)sf.tags
@@ -2599,7 +2672,7 @@ CTAGDEP = $(INCL)align.h  $(INCL)artifact.h $(INCL)artilist.h \
 	  $(INCL)attrib.h $(INCL)context.h  $(INCL)coord.h    \
 	  $(INCL)decl.h   $(INCL)dungeon.h  $(INCL)engrave.h  \
 	  $(INCL)flag.h   $(INCL)func_tab.h $(INCL)global.h   \
-	  $(INCL)hack.h   $(INCL)mextra.h   \
+	  $(INCL)hack.h   $(INCL)mextra.h   $(INCL)mcastu.h   \
 	  $(INCL)mkroom.h $(INCL)monst.h    \
 	  $(INCL)obj.h    $(INCL)objclass.h $(INCL)prop.h     \
 	  $(INCL)quest.h  $(INCL)rect.h     $(INCL)region.h   \
@@ -2610,7 +2683,7 @@ CTAGDEP = $(INCL)align.h  $(INCL)artifact.h $(INCL)artilist.h \
 #	  $(INCL)permonst.h
 CTAGSOPT = --language-force=c --sort=no -D"Bitfield(x,n)=unsigned x : n" --excmd=pattern
 #
-$(UTIL)sf.tags: $(CTAGDEP)
+$(UTIL)sf.tags: $(CTAGSCMD) $(CTAGDEP)
 	$(CTAGSCMD) $(CTAGSOPT) -f $@ $(INCL)align.h
 	$(CTAGSCMD) $(CTAGSOPT) -a -f $@ $(INCL)artifact.h
 	$(CTAGSCMD) $(CTAGSOPT) -a -f $@ $(SRC)artifact.c
@@ -2629,6 +2702,7 @@ $(UTIL)sf.tags: $(CTAGDEP)
 	$(CTAGSCMD) $(CTAGSOPT) -a -f $@ $(INCL)global.h
 	$(CTAGSCMD) $(CTAGSOPT) -a -f $@ $(INCL)hack.h
 	$(CTAGSCMD) $(CTAGSOPT) -a -f $@ $(INCL)mextra.h
+	$(CTAGSCMD) $(CTAGSOPT) -a -f $@ $(INCL)mcastu.h
 	$(CTAGSCMD) $(CTAGSOPT) -a -f $@ $(INCL)mkroom.h
 	$(CTAGSCMD) $(CTAGSOPT) -a -f $@ $(INCL)monst.h
 	$(CTAGSCMD) $(CTAGSOPT) -a -f $@ $(INCL)defsym.h
@@ -2649,6 +2723,7 @@ $(UTIL)sf.tags: $(CTAGDEP)
 	$(CTAGSCMD) $(CTAGSOPT) -a -f $@ $(INCL)you.h
 	$(CTAGSCMD) $(CTAGSOPT) -a -f $@ $(INCL)onames.h
 	$(CTAGSCMD) $(CTAGSOPT) -a -f $@ $(INCL)wintype.h
+!ENDIF
 
 #===============================================================================
 # Integrated sound files
@@ -2720,15 +2795,15 @@ $(SndWavDir)sa2_xplevelup.wav: $(SndWavDir)sa2_xplevelup.uu $(U)uudecode.exe
 #===============================================================================
 
 PKGFILES = nethackrc.template Guidebook.txt license NetHack.exe NetHack.txt \
-	 NetHackW.exe opthelp nhdat370 record symbols sysconf.template \
-	 sfctool.exe
+	 NetHackW.exe opthelp nhdat370 record symbols \
+	 sysconf.template $(SFCTOOLBASENAM)
 FILESTOZIP = $(BinDir)nethackrc.template $(BinDir)Guidebook.txt $(BinDir)license \
 	$(BinDir)NetHack.exe $(BinDir)NetHack.txt $(BinDir)NetHackW.exe \
 	$(BinDir)opthelp $(BinDir)nhdat370 $(BinDir)record \
-	$(BinDir)symbols $(BinDir)sysconf.template $(BinDir)sfctool.exe
+	$(BinDir)symbols $(BinDir)sysconf.template $(SFCTOOLPKG)
 
-DBGSYMS = NetHack.PDB NetHackW.PDB sfctool.PDB
-PDBTOZIP = $(BinDir)NetHack.PDB $(BinDir)NetHackW.PDB $(BinDir)sfctool.PDB
+DBGSYMS = NetHack.PDB NetHackW.PDB $(SFCTOOLPDBNAM)
+PDBTOZIP = $(BinDir)NetHack.PDB $(BinDir)NetHackW.PDB $(SFCTOOLPDBBIN)
 MAINZIP = $(PkgDir)nethack-$(NHV)-win-$(TARGET_CPU).zip
 DBGSYMZIP = $(PkgDir)nethack-$(NHV)-win-$(TARGET_CPU)-debugsymbols.zip
 
@@ -2744,12 +2819,12 @@ $(DBGSYMZIP): $(PDBTOZIP)
 binary:  envchk.tag libdir.tag ottydir$(TARGET_CPU).tag \
 		outldir$(TARGET_CPU).tag oguidir$(TARGET_CPU).tag \
 		oluadir$(TARGET_CPU).tag opdcdir$(TARGET_CPU).tag \
-		opdccdir$(TARGET_CPU).tag opdcgdir$(TARGET_CPU).tag \
+		opdctxtdir$(TARGET_CPU).tag opdcguidir$(TARGET_CPU).tag \
 		$(LUASRC)lua.h $(PDCDEP) \
 		$(INCL)nhlua.h $(OUTL)utility.tag \
 		$(DAT)data $(DAT)rumors $(DAT)oracles $(DAT)engrave \
 		$(DAT)epitaph $(DAT)bogusmon $(GAMEDIR)NetHack.exe \
-		$(GAMEDIR)NetHackW.exe $(GAMEDIR)sfctool.exe $(GAMEDIRDLLS) binary.tag
+		$(GAMEDIR)NetHackW.exe $(SFCTOOLPKG) $(GAMEDIRDLLS) binary.tag
 	@echo NetHack is up to date.
 
 #===============================================================================
@@ -2757,61 +2832,61 @@ binary:  envchk.tag libdir.tag ottydir$(TARGET_CPU).tag \
 #===============================================================================
 
 spotless: clean
-	if exist $(GAMEDIR)NetHack.exe del $(GAMEDIR)NetHack.exe
+	if exist $(GAMEDIR)NetHack.exe  del $(GAMEDIR)NetHack.exe
 	if exist $(GAMEDIR)NetHackW.exe del $(GAMEDIR)NetHackW.exe
-	if exist $(GAMEDIR)NetHack.pdb del $(GAMEDIR)NetHack.pdb
-	if exist $(GAMEDIR)nhdat$(NHV) del $(GAMEDIR)nhdat$(NHV)
-	if exist $(INCL)date.h         del $(INCL)date.h
-	if exist $(INCL)onames.h       del $(INCL)onames.h
-	if exist $(INCL)pm.h           del $(INCL)pm.h
+	if exist $(GAMEDIR)NetHack.pdb  del $(GAMEDIR)NetHack.pdb
+	if exist $(GAMEDIR)nhdat$(NHV)  del $(GAMEDIR)nhdat$(NHV)
+	if exist $(INCL)date.h          del $(INCL)date.h
+	if exist $(INCL)onames.h        del $(INCL)onames.h
+	if exist $(INCL)pm.h            del $(INCL)pm.h
 	if exist $(U)*.lnk              del $(U)*.lnk
 	if exist $(U)*.map              del $(U)*.map
-	if exist $(DAT)data            del $(DAT)data
-	if exist $(DAT)rumors          del $(DAT)rumors
-	if exist $(DAT)engrave         del $(DAT)engrave
-	if exist $(DAT)epitaph         del $(DAT)epitaph
-	if exist $(DAT)bogusmon        del $(DAT)bogusmon
-	if exist $(DAT)porthelp	del $(DAT)porthelp
+	if exist $(DAT)data             del $(DAT)data
+	if exist $(DAT)rumors           del $(DAT)rumors
+	if exist $(DAT)engrave          del $(DAT)engrave
+	if exist $(DAT)epitaph          del $(DAT)epitaph
+	if exist $(DAT)bogusmon         del $(DAT)bogusmon
+	if exist $(DAT)porthelp	        del $(DAT)porthelp
 	if exist nhdat$(NHV).	        del nhdat$(NHV).
 	if exist outldirx86.tag         del outldirx86.tag
 	if exist ottydirx86.tag         del ottydirx86.tag
 	if exist oguidirx86.tag         del oguidirx86.tag
 	if exist oluadirx86.tag         del oluadirx86.tag
 	if exist opdcdirx86.tag         del opdcdirx86.tag
-	if exist opdccdirx86.tag        del opdccdirx86.tag
-	if exist opdcgdirx86.tag        del opdcgdirx86.tag
+	if exist opdctxtdirx86.tag      del opdctxtdirx86.tag
+	if exist opdcguidirx86.tag      del opdcguidirx86.tag
 	if exist outldirx64.tag         del outldirx64.tag
 	if exist ottydirx64.tag         del ottydirx64.tag
 	if exist oguidirx64.tag         del oguidirx64.tag
 	if exist oluadirx64.tag         del oluadirx64.tag
 	if exist opdcdirx64.tag         del opdcdirx64.tag
-	if exist opdccdirx64.tag        del opdccdirx64.tag
-	if exist opdcgdirx64.tag        del opdcgdirx64.tag
+	if exist opdctxtdirx64.tag      del opdctxtdirx64.tag
+	if exist opdcguidirx64.tag      del opdcguidirx64.tag
 	if exist outldirarm64.tag       del outldirarm64.tag
 	if exist ottydirarm64.tag       del ottydirarm64.tag
 	if exist oguidirarm64.tag       del oguidirarm64.tag
 	if exist oluadirarm64.tag       del oluadirarm64.tag
 	if exist opdcdirarm64.tag       del opdcdirarm64.tag
-	if exist opdccdirarm64.tag      del opdccdirarm64.tag
-	if exist opdcgdirarm64.tag      del opdcgdirarm64.tag
+	if exist opdctxtdirarm64.tag    del opdctxtdirarm64.tag
+	if exist opdcguidirarm64.tag    del opdcguidirarm64.tag
 	if exist libdir.tag             del libdir.tag
 	if exist gamedir.tag            del gamedir.tag
-	if exist $(MSWIN)mnsel.bmp     del $(MSWIN)mnsel.bmp
-	if exist $(MSWIN)mnselcnt.bmp  del $(MSWIN)mnselcnt.bmp
-	if exist $(MSWIN)mnunsel.bmp   del $(MSWIN)mnunsel.bmp
-	if exist $(MSWIN)petmark.bmp   del $(MSWIN)petmark.bmp
-	if exist $(MSWIN)pilemark.bmp  del $(MSWIN)pilemark.bmp
-	if exist $(MSWIN)rip.bmp       del $(MSWIN)rip.bmp
-	if exist $(MSWIN)splash.bmp    del $(MSWIN)splash.bmp
-	if exist $(MSWIN)nethack.ico   del $(MSWIN)nethack.ico
-	if exist $(MSWSYS)nethack.ico  del $(MSWSYS)nethack.ico
+	if exist $(MSWIN)mnsel.bmp      del $(MSWIN)mnsel.bmp
+	if exist $(MSWIN)mnselcnt.bmp   del $(MSWIN)mnselcnt.bmp
+	if exist $(MSWIN)mnunsel.bmp    del $(MSWIN)mnunsel.bmp
+	if exist $(MSWIN)petmark.bmp    del $(MSWIN)petmark.bmp
+	if exist $(MSWIN)pilemark.bmp   del $(MSWIN)pilemark.bmp
+	if exist $(MSWIN)rip.bmp        del $(MSWIN)rip.bmp
+	if exist $(MSWIN)splash.bmp     del $(MSWIN)splash.bmp
+	if exist $(MSWIN)nethack.ico    del $(MSWIN)nethack.ico
+	if exist $(MSWSYS)nethack.ico   del $(MSWSYS)nethack.ico
 	if exist $(U)recover.exe        del $(U)recover.exe
 	if exist $(U)tile2bmp.exe       del $(U)tile2bmp.exe
 	if exist $(U)tilemap.exe        del $(U)tilemap.exe
 	if exist $(U)uudecode.exe       del $(U)uudecode.exe
 	if exist $(U)dlb.exe            del $(U)dlb.exe
 !IF "$(ADD_CURSES)" == "Y"
-	if exist $(LIBDIR)$(PDCDIST)-wincon-$(TARGET_CPU)-static.lib del $(LIBDIR)$(PDCDIST)-wincon-$(TARGET_CPU)-static.lib
+	if exist $(LIBDIR)$(PDCDIST)-$(PDCTXTFOLDER)-$(TARGET_CPU)-static.lib del $(LIBDIR)$(PDCDIST)-$(PDCTXTFOLDER)-$(TARGET_CPU)-static.lib
 	if exist $(LIBDIR)$(PDCDIST)-wingui-$(TARGET_CPU)-static.lib del $(LIBDIR)$(PDCDIST)-wingui-$(TARGET_CPU)-static.lib
 !ENDIF
         if exist $(LUALIB)              del $(LUALIB)
@@ -2822,23 +2897,23 @@ spotless: clean
 	if exist $(DAT)guioptions	del $(DAT)guioptions
 	if exist $(DAT)data		del $(DAT)data
 	if exist tilemappings.lst       del tilemappings.lst
-	if exist $(SndWavDir)*.wav     del $(SndWavDir)*.wav
+	if exist $(SndWavDir)*.wav      del $(SndWavDir)*.wav
 	if exist $(MAINZIP)             del $(MAINZIP)
 	if exist $(DBGSYMZIP)           del $(DBGSYMZIP)
-	if exist $(OBJTTY)*            rmdir $(OBJTTY) /s /Q
-	if exist $(OBJGUI)*            rmdir $(OBJGUI) /s /Q
-	if exist $(OBJUTIL)*           rmdir $(OBJUTIL) /s /Q
-	if exist $(OBJLUA)*            rmdir $(OBJLUA) /s /Q
-	if exist $(OBJPDC)*            rmdir $(OBJPDC) /s /Q
-	if exist $(OBJPDCC)*           rmdir $(OBJPDCC) /s /Q
-	if exist $(OBJPDCG)*           rmdir $(OBJPDCG) /s /Q
-	if exist $(OBJTTY_B)*          rmdir $(OBJTTY_B) /s /Q
-	if exist $(OBJGUI_B)*          rmdir $(OBJGUI_B) /s /Q
-	if exist $(OBJUTIL_B)*         rmdir $(OBJUTIL_B) /s /Q
-	if exist $(OBJLUA_B)*          rmdir $(OBJLUA_B) /s /Q
-	if exist $(OBJPDC_B)*          rmdir $(OBJPDC_B) /s /Q
-	if exist $(OBJPDCC_B)*         rmdir $(OBJPDCC_B) /s /Q
-	if exist $(OBJPDCG_B)*         rmdir $(OBJPDCG_B) /s /Q
+	if exist $(OBJTTY)*             rmdir $(OBJTTY) /s /Q
+	if exist $(OBJGUI)*             rmdir $(OBJGUI) /s /Q
+	if exist $(OBJUTIL)*            rmdir $(OBJUTIL) /s /Q
+	if exist $(OBJLUA)*             rmdir $(OBJLUA) /s /Q
+	if exist $(OBJPDC)*             rmdir $(OBJPDC) /s /Q
+	if exist $(OBJPDCTXT)*          rmdir $(OBJPDCTXT) /s /Q
+	if exist $(OBJPDCGUI)*          rmdir $(OBJPDCGUI) /s /Q
+	if exist $(OBJTTY_B)*           rmdir $(OBJTTY_B) /s /Q
+	if exist $(OBJGUI_B)*           rmdir $(OBJGUI_B) /s /Q
+	if exist $(OBJUTIL_B)*          rmdir $(OBJUTIL_B) /s /Q
+	if exist $(OBJLUA_B)*           rmdir $(OBJLUA_B) /s /Q
+	if exist $(OBJPDC_B)*           rmdir $(OBJPDC_B) /s /Q
+	if exist $(OBJPDCTXT_B)*        rmdir $(OBJPDCTXT_B) /s /Q
+	if exist $(OBJPDCGUI_B)*        rmdir $(OBJPDCGUI_B) /s /Q
 
 clean:
 	if exist binary.tag             del binary.tag
@@ -2850,28 +2925,28 @@ clean:
 	if exist $(OUTL)utility.tag     del $(OUTL)utility.tag
 	if exist $(OTTY)sp_lev.tag      del $(OTTY)sp_lev.tag
 	if exist $(OGUI)sp_lev.tag      del $(OGUI)sp_lev.tag
-	if exist $(SRC)tile.c          del $(SRC)tile.c
-	if exist $(INCL)nhlua.h        del $(INCL)nhlua.h
+	if exist $(SRC)tile.c           del $(SRC)tile.c
+	if exist $(INCL)nhlua.h         del $(INCL)nhlua.h
 	if exist $(U)makedefs.exe       del $(U)makedefs.exe
 	if exist $(U)dlb_main.exe       del $(U)dlb_main.exe
 	if exist $(U)tile2bmp.exe       del $(U)tile2bmp.exe
 	if exist $(U)tilemap.exe        del $(U)tilemap.exe
-	if exist $(SRC)*.lnk           del $(SRC)*.lnk
-	if exist $(DAT)dlb.lst         del $(DAT)dlb.lst
+	if exist $(SRC)*.lnk            del $(SRC)*.lnk
+	if exist $(DAT)dlb.lst          del $(DAT)dlb.lst
 	if exist $(OUTL)*.o             del $(OUTL)*.o
 	if exist $(OTTY)*.o             del $(OTTY)*.o
 	if exist $(OGUI)*.o             del $(OGUI)*.o
 	if exist $(OLUA)*.o             del $(OLUA)*.o
 	if exist $(OPDC)*.o             del $(OPDC)*.o
-	if exist $(OPDCC)*.o            del $(OPDCC)*.o
-	if exist $(OPDCG)*.o            del $(OPDCG)*.o
+	if exist $(OPDCTXT)*.o          del $(OPDCTXT)*.o
+	if exist $(OPDCGUI)*.o          del $(OPDCGUI)*.o
 	if exist $(OUTL)*.PDB           del $(OUTL)*.PDB
 	if exist $(OTTY)*.PDB           del $(OTTY)*.PDB
 	if exist $(OGUI)*.PDB           del $(OGUI)*.PDB
 	if exist $(OLUA)*.PDB           del $(OLUA)*.PDB
 	if exist $(OPDC)*.PDB           del $(OPDC)*.PDB
-	if exist $(OPDCC)*.PDB          del $(OPDCC)*.PDB
-	if exist $(OPDCG)*.PDB          del $(OPDCG)*.PDB
+	if exist $(OPDCTXT)*.PDB        del $(OPDCTXT)*.PDB
+	if exist $(OPDCGUI)*.PDB        del $(OPDCGUI)*.PDB
 	if exist $(OUTL)*.MAP           del $(OUTL)*.MAP
 	if exist $(OTTY)*.MAP           del $(OTTY)*.MAP
 	if exist $(OGUI)*.MAP           del $(OGUI)*.MAP
@@ -2882,16 +2957,16 @@ clean:
 	if exist $(OGUI)*.LIB           del $(OGUI)*.LIB
 	if exist $(OLUA)*.LIB           del $(OLUA)*.LIB
 	if exist $(OPDC)*.LIB           del $(OPDC)*.LIB
-	if exist $(OPDCC)*.LIB          del $(OPDCC)*.LIB
-	if exist $(OPDCG)*.LIB          del $(OPDCG)*.LIB
+	if exist $(OPDCTXT)*.LIB        del $(OPDCTXT)*.LIB
+	if exist $(OPDCGUI)*.LIB        del $(OPDCGUI)*.LIB
 	if exist $(OUTL)*.EXP           del $(OUTL)*.EXP
 	if exist $(OTTY)*.EXP           del $(OTTY)*.EXP
 	if exist $(OGUI)*.EXP           del $(OGUI)*.EXP
 	if exist $(OLUA)*.EXP           del $(OLUA)*.EXP
 	if exist $(OPDC)*.EXP           del $(OPDC)*.EXP
-	if exist $(OPDCC)*.EXP          del $(OPDCC)*.EXP
-	if exist $(OPDCG)*.EXP          del $(OPDCG)*.EXP
-	if exist $(SRC)tiles.bmp       del $(SRC)tiles.bmp
+	if exist $(OPDCTXT)*.EXP        del $(OPDCTXT)*.EXP
+	if exist $(OPDCGUI)*.EXP        del $(OPDCGUI)*.EXP
+	if exist $(SRC)tiles.bmp        del $(SRC)tiles.bmp
 	if exist $(OTTY)console.res     del $(OTTY)console.res
 	if exist $(OTTY)NetHack.res     del $(OTTY)NetHack.res
 	if exist $(OGUI)NetHackW.res    del $(OGUI)NetHackW.res
@@ -3182,6 +3257,7 @@ $(OTTY)drawing.o: drawing.c $(CONFIG_H) $(INCL)defsym.h \
 		$(INCL)sym.h $(INCL)wintype.h
 $(OTTY)dungeon.o: dungeon.c $(HACK_H) $(INCL)dgn_file.h \
 		$(INCL)dlb.h
+$(OTTY)earlyarg.o: earlyarg.c $(HACK_H)
 $(OTTY)eat.o: eat.c $(HACK_H)
 $(OTTY)end.o: end.c $(HACK_H) $(INCL)dlb.h
 $(OTTY)engrave.o: engrave.c $(HACK_H)
@@ -3195,6 +3271,7 @@ $(OTTY)getpos.o: getpos.c $(HACK_H)
 $(OTTY)glyphs.o: glyphs.c $(HACK_H)
 $(OTTY)hack.o: hack.c $(HACK_H)
 $(OTTY)hacklib.o: hacklib.c $(HACK_H)
+$(OTTY)iactions.o: iactions.c $(HACK_H)
 $(OTTY)insight.o: insight.c $(HACK_H)
 $(OTTY)invent.o: invent.c $(HACK_H)
 $(OTTY)isaac64.o: isaac64.c $(CONFIG_H) $(INCL)isaac64.h
@@ -3202,7 +3279,7 @@ $(OTTY)light.o: light.c $(HACK_H)
 $(OTTY)lock.o: lock.c $(HACK_H)
 $(OTTY)mail.o: mail.c $(HACK_H) $(INCL)mail.h
 $(OTTY)makemon.o: makemon.c $(HACK_H)
-$(OTTY)mcastu.o: mcastu.c $(HACK_H)
+$(OTTY)mcastu.o: mcastu.c $(HACK_H) $(INCL)mcastu.h
 $(OTTY)mdlib.o: mdlib.c $(CONFIG_H) $(INCL)align.h \
 		$(INCL)artilist.h $(INCL)attrib.h \
 		$(INCL)context.h $(INCL)defsym.h $(INCL)dlb.h \
@@ -3561,6 +3638,7 @@ $(OGUI)drawing.o: drawing.c $(CONFIG_H) $(INCL)defsym.h \
 		$(INCL)sym.h $(INCL)wintype.h
 $(OGUI)dungeon.o: dungeon.c $(HACK_H) $(INCL)dgn_file.h \
 		$(INCL)dlb.h
+$(OGUI)earlyarg.o: earlyarg.c $(HACK_H)
 $(OGUI)eat.o: eat.c $(HACK_H)
 $(OGUI)end.o: end.c $(HACK_H) $(INCL)dlb.h
 $(OGUI)engrave.o: engrave.c $(HACK_H)
@@ -3574,6 +3652,7 @@ $(OGUI)getpos.o: getpos.c $(HACK_H)
 $(OGUI)glyphs.o: glyphs.c $(HACK_H)
 $(OGUI)hack.o: hack.c $(HACK_H)
 $(OGUI)hacklib.o: hacklib.c $(HACK_H)
+$(OGUI)iactions.o: iactions.c $(HACK_H)
 $(OGUI)insight.o: insight.c $(HACK_H)
 $(OGUI)invent.o: invent.c $(HACK_H)
 $(OGUI)isaac64.o: isaac64.c $(CONFIG_H) $(INCL)isaac64.h

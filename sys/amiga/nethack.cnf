@@ -1,0 +1,44 @@
+# NetHack 5.0 Amiga Configuration
+#
+# For a full list of options, see the opthelp file or press '?'
+# then 'o' during gameplay.
+
+# *** DISPLAY MODE ***
+#
+# Tile mode (graphical tiles, recommended):
+OPTIONS=windowtype:amiv
+#
+# Text mode (uses hack.font line-drawing characters):
+#OPTIONS=windowtype:amii
+#OPTIONS=symset:AmigaFont
+
+# *** GENERAL OPTIONS ***
+OPTIONS=time,showexp,lit_corridor
+OPTIONS=boulder:0
+OPTIONS=autopickup,pickup_types:$"=/!?+
+OPTIONS=catname:Kaori
+
+# *** MENU COLORS ***
+# Colour-code inventory items by BUC status and value.
+OPTIONS=menucolors
+MENUCOLOR=" blessed "=green
+MENUCOLOR=" holy "=green
+MENUCOLOR=" uncursed "=cyan
+MENUCOLOR=" cursed "=red
+MENUCOLOR=" unholy "=red
+MENUCOLOR=" cursed .* (being worn)"=red&underline
+MENUCOLOR=" cursed .* (wielded)"=red&underline
+MENUCOLOR="loadstone"=red&underline
+MENUCOLOR="gold piece"=brown
+MENUCOLOR="worthless"=brown
+MENUCOLOR="wand of wishing"=magenta
+MENUCOLOR="magic lamp"=magenta
+MENUCOLOR="magic marker"=magenta
+MENUCOLOR="bag of holding"=magenta
+MENUCOLOR="amulet of life saving"=magenta
+MENUCOLOR="cloak of magic resistance"=magenta
+MENUCOLOR="silver dragon scale"=cyan
+MENUCOLOR="gray dragon scale"=cyan
+MENUCOLOR="speed boots"=magenta
+MENUCOLOR="luckstone"=green
+MENUCOLOR="unicorn horn"=green

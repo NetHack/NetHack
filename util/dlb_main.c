@@ -1,4 +1,4 @@
-/* NetHack 3.7	dlb_main.c	$NHDT-Date: 1706213798 2024/01/25 20:16:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.27 $ */
+/* NetHack 5.0	dlb_main.c	$NHDT-Date: 1706213798 2024/01/25 20:16:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.27 $ */
 /* Copyright (c) Kenneth Lorber, Bethesda, Maryland, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -9,7 +9,7 @@
 #include "dlb.h"
 #include "hacklib.h"
 
-#if !defined(O_WRONLY) && !defined(MAC) && !defined(AZTEC_C)
+#if !defined(O_WRONLY) && !defined(MACOS9) && !defined(AZTEC_C)
 #include <fcntl.h>
 #endif
 #if defined(__DJGPP__)

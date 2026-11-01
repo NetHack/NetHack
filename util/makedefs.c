@@ -1,4 +1,4 @@
-/* NetHack 3.7  makedefs.c  $NHDT-Date: 1702948590 2023/12/19 01:16:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.233 $ */
+/* NetHack 5.0  makedefs.c  $NHDT-Date: 1702948590 2023/12/19 01:16:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.233 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* Copyright (c) M. Stephenson, 1990, 1991.                       */
@@ -23,15 +23,15 @@
 #include "dlb.h"
 #include "hacklib.h"
 
-#ifdef MAC
+#ifdef MACOS9
 #if defined(__SC__) || defined(__MRC__) /* MPW compilers */
 #define MPWTOOL
 #include <CursorCtl.h>
 #include <string.h>
-#else /* MAC without MPWTOOL */
+#else /* MACOS9 without MPWTOOL */
 #define MACsansMPWTOOL
 #endif
-#endif /* MAC */
+#endif /* MACOS9 */
 
 #ifndef MPWTOOL
 #define SpinCursor(x)
@@ -78,7 +78,7 @@
 #define DGN_TEMPLATE "NH:dat/%s" /* where dungeon.pdf file goes */
 #endif /* OLD_MAKEDEFS_OPTIONS */
 #else /* not AMIGA */
-#if defined(MAC) && !defined(__MACH__)
+#if defined(MACOS9) && !defined(__MACH__)
 /* MacOS 9 or earlier */
 #define SOURCE_TEMPLATE ":src:%s"
 #if __SC__ || __MRC__
@@ -91,7 +91,7 @@
 #define INCLUDE_TEMPLATE ":include:%s"
 #define DGN_TEMPLATE ":dat:%s" /* where dungeon.pdf file goes */
 #endif /* OLD_MAKEDEFS_OPTIONS */
-#else /* neither AMIGA nor MAC */
+#else /* neither AMIGA nor MACOS9 */
 #ifdef OS2
 #define SOURCE_TEMPLATE "..\\src\\%s"
 #define DATA_TEMPLATE "..\\dat\\%s"
@@ -100,7 +100,7 @@
 #define INCLUDE_TEMPLATE "..\\include\\%s"
 #define DGN_TEMPLATE "..\\dat\\%s" /* where dungeon.pdf file goes */
 #endif /* OLD_MAKEDEFS_OPTIONS */
-#else /* not AMIGA, MAC, or OS2 */
+#else /* not AMIGA, MACOS9, or OS2 */
 #define SOURCE_TEMPLATE "../src/%s"
 #define DATA_TEMPLATE "../dat/%s"
 #define DATA_IN_TEMPLATE "../dat/%s"
@@ -109,7 +109,7 @@
 #define DGN_TEMPLATE "../dat/%s" /* where dungeon.pdf file goes */
 #endif /* OLD_MAKEDEFS_OPTIONS */
 #endif /* else !OS2 */
-#endif /* else !MAC */
+#endif /* else !MACOS9 */
 #endif /* else !AMIGA */
 
 static const char
@@ -257,7 +257,7 @@ main(void)
     return 0;
 }
 
-#else /* ! MAC */
+#else /* ! MACOS9 */
 
 DISABLE_WARNING_UNREACHABLE_CODE
 
@@ -1551,7 +1551,7 @@ do_oracles(void)
                 break;
             if (!(ok = (fscanf(ofp, "%5lx", &offset) == 1)))
                 break;
-#ifdef MAC
+#ifdef MACOS9
 #ifdef __MWERKS__
             /*
             MetroWerks CodeWarrior Pro 1's (AKA CW12) version of MSL
@@ -1590,7 +1590,7 @@ do_oracles(void)
 /* Read one line from input, up to and including the next newline
  * character.  Returns a pointer to the heap-allocated string, or a
  * null pointer if no characters were read.
- * 3.7: redone to use nethack's alloc() rather than libc's malloc()
+ * 5.0: redone to use nethack's alloc() rather than libc's malloc()
  * and realloc().
  */
 static char *

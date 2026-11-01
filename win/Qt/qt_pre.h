@@ -1,4 +1,4 @@
-/* NetHack 3.7	qt_pre.h	$NHDT-Date: 1597276835 2020/08/13 00:00:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.0 $ */
+/* NetHack 5.0	qt_pre.h	$NHDT-Date: 1597276835 2020/08/13 00:00:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.0 $ */
 
 /*
  * qt_pre.h -- undefine some nethack macros which conflict with Qt headers.

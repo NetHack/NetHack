@@ -117,7 +117,7 @@ NetHack*message*translations:	<KeyPress>: input()
 
 ! Specify the number of rows and columns of the map window.  The default
 ! is the standard 80x21 window.  Note: this _does_not_ change the size of
-! map levels, only what you see of them.
+! level maps, only what you see of them.
 !NetHack*map*rows:	21
 !NetHack*map*columns:	80
 

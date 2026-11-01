@@ -1,0 +1,107 @@
+                        NetHack 5.0 for Amiga
+                        ====================
+
+Requirements
+------------
+  - AmigaOS 3.0 or later (Kickstart 39+)
+  - 6 MB free RAM minimum (8 MB recommended)
+  - Hard drive with ~5 MB free space
+
+Recommended: RTG graphics card (Picasso96/CyberGraphX) for best
+tile rendering. Native AGA/OCS/ECS chipsets are supported.
+
+
+Installation
+------------
+Extract NH370AMI.ZIP to a directory and assign it:
+
+    assign NetHack: <path>
+
+The directory should contain:
+    nethack          - game binary
+    nhdat            - data library
+    symbols          - symbol set definitions
+    sysconf          - system configuration
+    nethack.cnf      - game options
+    hack.font        - font descriptor
+    hack/8           - font bitmap (8pt)
+    tiles/tiles16.iff - 16-color tiles (OCS/ECS)
+    tiles/tiles32.iff - 32-color tiles (AGA/RTG)
+    tomb.iff         - tombstone image
+    record           - high score file
+
+To play:
+    cd NetHack:
+    nethack
+
+
+Display Modes
+-------------
+Two display modes are available, selected in nethack.cnf:
+
+  Text mode (AMII):
+    OPTIONS=symset:AmigaFont
+
+  Tile mode (AMIV):
+    OPTIONS=windowtype:amiv
+
+Tile mode auto-selects tiles32.iff (32 colors, 5 bitplanes) when the
+screen supports 32+ colors, otherwise tiles16.iff (16 colors, 4 planes).
+
+
+Configuration
+-------------
+Edit nethack.cnf for game options.  Key settings:
+
+  OPTIONS=windowtype:amiv       - tile graphics (default)
+  OPTIONS=symset:AmigaFont      - text mode with line-drawing chars
+  OPTIONS=menucolors            - colored inventory items
+  OPTIONS=time,lit_corridor     - show turn count, lit corridors
+  OPTIONS=boulder:0             - display boulders as '0'
+
+Menu color examples (add after OPTIONS=menucolors):
+  MENUCOLOR=" blessed "=green
+  MENUCOLOR=" cursed "=red
+  MENUCOLOR=" uncursed "=cyan
+
+
+Building from Source
+--------------------
+Cross-compilation from Linux using bebbo's m68k-amigaos-gcc toolchain
+(https://franke.ms/git/bebbo/amiga-gcc):
+
+    # Install toolchain to /opt/amiga
+    # Clone NetHack 5.0 source
+    cd NetHack
+    sys/unix/setup.sh sys/unix/hints/linux.500
+    make fetch-lua
+    make CROSS_TO_AMIGA=1 fetch-regex
+    make CROSS_TO_AMIGA=1 all
+    make CROSS_TO_AMIGA=1 package
+
+The distribution ZIP is created at targets/amiga/NH370AMI.ZIP.
+
+Toolchain requirements:
+  - m68k-amigaos-gcc (bebbo's amigaos-cross-toolchain in /opt/amiga)
+  - -noixemul (libnix) for linking
+  - -m68000 for maximum compatibility (or -m68020/040/060)
+
+
+Known Issues
+------------
+  - Native Amiga compilation (SAS/C, DICE) is not supported;
+    cross-compilation with GCC is required
+
+
+Credits
+-------
+Olaf Seibert first ported NetHack 2.3 and 3.0 to the Amiga.
+Richard Addison, Andrew Church, Jochen Erwied, Mark Gooderum,
+Ken Lorber, Greg Olson, Mike Passaretti, and Gregg Wonderly
+polished and extended the 3.0 and 3.1 ports.  Andrew Church,
+Ken Lorber, and Gregg Wonderly are responsible for the 3.2 port.
+Janne Salmijärvi resurrected the Amiga port for 3.3 and
+Teemu Suikki joined before 3.4.0.
+
+Updated for NetHack 5.0, cross compile fixes and 32 color tile support by Ingo
+Paschke in 2026.

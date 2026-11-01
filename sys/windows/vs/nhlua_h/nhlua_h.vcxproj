@@ -33,6 +33,9 @@
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <VCToolsVersion />
+  </PropertyGroup>
   <Import Project="..\default.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="PropertySheets">
@@ -50,7 +53,8 @@
     <Exec Command="echo #include %22lualib.h%22 &gt;&gt; nhlua.h" WorkingDirectory="$(IncDir)" />
     <Exec Command="echo #include %22lauxlib.h%22 &gt;&gt; nhlua.h" WorkingDirectory="$(IncDir)" />
     <Exec Command="echo /*nhlua.h*/ &gt;&gt; nhlua.h" WorkingDirectory="$(IncDir)" />
-  </Target>  <Target Name="AfterBuild">
+  </Target>
+  <Target Name="AfterBuild">
   </Target>
   <Target Name="AfterClean">
   </Target>

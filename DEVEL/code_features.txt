@@ -1,4 +1,4 @@
-# NetHack 3.7  code_features.txt $NHDT-Date: 1596498264 2020/08/03 23:44:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.6 $
+# NetHack 5.0  code_features.txt $NHDT-Date: 1596498264 2020/08/03 23:44:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.6 $
 # Copyright (c) 2015 by Michael Allison
 # NetHack may be freely redistributed.  See license for details.
 
@@ -115,7 +115,7 @@ and available to all NetHack source files.
 decl.c variable definitions are generally laid out in much the same
 order as their corresponding declarations in decl.h.
 
-A new header file cstd.h was added to coincide with 3.7's switch to
+A new header file cstd.h was added to coincide with 5.0's switch to
 C99. It contains calls to some C99 standard header files.
 
 =================== NEXT FEATURE ==========================

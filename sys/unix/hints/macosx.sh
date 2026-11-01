@@ -1,5 +1,5 @@
 #!/bin/sh
-# NetHack 3.7  macosx.sh $NHDT-Date: 1597332920 2020/08/13 15:35:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.24 $
+# NetHack 5.0  macosx.sh $NHDT-Date: 1597332920 2020/08/13 15:35:20 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.24 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2007.
 # NetHack may be freely redistributed.  See license for details.
 #

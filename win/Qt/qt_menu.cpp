@@ -1133,7 +1133,7 @@ void NetHackQtTextWindow::Display(bool block UNUSED)
 void NetHackQtTextWindow::PutStr(int attr UNUSED, const QString& text)
 {
 #if 1
-    // 3.7:  Always render text windows with fixed-width font.  The majority
+    // 5.0:  Always render text windows with fixed-width font.  The majority
     // of text files we'll ever display including ('license' and 'history')
     // happen to have some lines with four spaces anyway and/or they have
     // been pre-formatted to fit within less than 80 columns.  For data.base

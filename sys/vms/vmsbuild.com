@@ -1,6 +1,6 @@
-$ ! vms/vmsbuild.com -- compile and link NetHack 3.7.*			[pr]
-$	version_number = "3.7.0"
-$ ! $NHDT-Date: 1687541093 2023/06/23 17:24:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.39 $
+$ ! vms/vmsbuild.com -- compile and link NetHack 5.0.*			[pr]
+$	version_number = "5.0.0"
+$ ! $NHDT-Date: 1687541093 2023/06/23 17:24:53 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.39 $
 $ ! Copyright (c) 2018 by Robert Patrick Rankin
 $ ! NetHack may be freely redistributed.  See license for details.
 $ !
@@ -10,7 +10,7 @@ $ !   $ @[-.sys.vms]vmsbuild  [compiler-option]  [link-option]  [cc-switches] -
 $ !			      [linker-switches]  [interface]
 $ ! options:
 $ !     compiler-option :  either "VSIC", "VAXC", "DECC",
-$ !                        "GNUC" or "" or "fetchlua" !default in 3.7 is VSIC
+$ !                        "GNUC" or "" or "fetchlua" !default in 5.0 is VSIC
 $ !	link-option	:  either "SHARE[able]" or "LIB[rary]"	!default SHARE
 $ !	cc-switches	:  optional qualifiers for CC (such as "/noOpt/Debug")
 $ !     linker-switches :  optional qualifiers for LINK (/Debug or /noTraceback)
@@ -28,9 +28,9 @@ $ !	  one, use "" in the earlier one's position, such as
 $ !	$ @[-.sys.vms]vmsbuild "" "" "" "" "TTY+CURSES"
 $ !
 $ ! Lua Version
-$ luaver = "546"
-$ luadotver = "5.4.6"
-$ luaunderver = "5_4_6"
+$ luaver = "548"
+$ luadotver = "5.4.8"
+$ luaunderver = "5_4_8"
 $
 $	  decc_dflt = f$trnlnm("DECC$CC_DEFAULT")
 $	  j = (decc_dflt.nes."") .and. 1
@@ -291,7 +291,7 @@ $	if f$search("[-.include]nhlua.h").nes."" then -
 $ milestone " (wiped existing [-.include]nhlua.h)"
 $ exit
 $!
-$! 3.7 runtime LUA level parser/loader
+$! 5.0 runtime LUA level parser/loader
 $!
 $buildlua:
 $ if f$search("[-.lib]lua.dir;").eqs."" then -
@@ -406,7 +406,7 @@ $ gosub compile_list
 $ link makedefs.obj,[-.src]panic.obj,'nethacklib'/Lib,[-.src]ident.opt/Opt,[-.src]crtl/Opt
 $ milestone "makedefs"
 $! create some build-time files
-$! 3.7 does not require these
+$! 5.0 does not require these
 $! makedefs -p	!pm.h
 $! makedefs -o	!onames.h
 $! makedefs -v	!date.h
@@ -425,13 +425,13 @@ $ c_list = "allmain,apply,artifact,attrib,ball,bones,botl,calendar,cmd" -
 	+ ",do_wear,dog,dogmove,dokick,dungeon,eat,end,engrave,exper,explode" -
 	+ ",extralev,files,fountain,getpos,glyphs"
 $ gosub compile_list
-$ c_list = "hack,hacklib,insight,invent,light,lock,mail,makemon" -
+$ c_list = "hack,hacklib,iactions,insight,invent,light,lock,mail,makemon" -
 	+ ",mcastu,mdlib,mhitm,mhitu,minion,mklev,mkmap,mkmaze" -
 	+ ",mkobj,mkroom,mon,mondata,monmove,mplayer,mthrowu,muse" -
 	+ ",music"
 $ gosub compile_list
 $!
-$! Files added in 3.7 for Lua glue
+$! Files added in 5.0 for Lua glue
 $!
 $ c_list = "nhlua,nhlobj,nhlsel"
 $ gosub compile_list
@@ -453,7 +453,7 @@ $ gosub compile_list
 $ milestone "<linking...>"
 $ link /EXECUTABLE=nethack.exe vmsmain.obj,date.obj-
         +[-.src]nethack.olb/library -
-        +sys$disk:[-.lib.lua]lua546.olb/library
+        +sys$disk:[-.lib.lua]lua548.olb/library
 $ milestone "NetHack"
 $     if c_opt.eq.o_LINK then  goto done	!"LINK" only
 $special:

@@ -13,7 +13,7 @@ Those had been removed in commit 217671e00f626e53d314757b4687950466efb360
 in May 2019, at the same time built-in speaker support was removed.
 
 Some of those original files have been converted into wav files starting
-with NetHack 3.7. The pitch variation versions offer a chance for very
+with NetHack 5.0. The pitch variation versions offer a chance for very
 simple tune playback on platforms that offer a basic play-sound function
 call, which many do. There is no need to manipulate the underlying sounds
 with those, although sound library interfaces may certainly produce

@@ -1,4 +1,4 @@
-/* NetHack 3.7	apply.c	$NHDT-Date: 1753856387 2025/07/29 22:19:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.472 $ */
+/* NetHack 5.0	apply.c	$NHDT-Date: 1769342601 2026/01/25 04:03:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.475 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -39,8 +39,8 @@ staticfn int jelly_ok(struct obj *);
 staticfn int use_royal_jelly(struct obj **);
 staticfn int use_rope(struct obj *obj);
 staticfn int use_staff_of_wonders(struct obj *obj);
-staticfn boolean display_staff_of_wonders_positions(int, int, int);
-staticfn int get_valid_staff_of_wonders_position(int, int);
+staticfn boolean get_valid_staff_of_wonders_position(coordxy, coordxy);
+staticfn void display_staff_of_wonders_positions(boolean);
 staticfn int grapple_range(void);
 staticfn boolean can_grapple_location(coordxy, coordxy);
 staticfn void display_grapple_positions(boolean);
@@ -56,7 +56,7 @@ staticfn boolean check_jump(genericptr_t, coordxy, coordxy);
 staticfn boolean is_valid_jump_pos(coordxy, coordxy, int, boolean);
 staticfn boolean get_valid_jump_position(coordxy, coordxy);
 staticfn boolean get_valid_polearm_position(coordxy, coordxy);
-staticfn boolean find_poleable_mon(coord *, int, int);
+staticfn boolean find_poleable_mon(coord *);
 
 static const char
     no_elbow_room[] = "don't have enough elbow-room to maneuver.";
@@ -504,7 +504,7 @@ use_magic_whistle(struct obj *obj)
         You("produce a %shigh-%s.", Underwater ? "very " : "",
             Deaf ? "frequency vibration" : "pitched humming noise");
         wake_nearby(TRUE);
-        if (!rn2(2))
+        if (!rn2(2) && !noteleport_level(&gy.youmonst))
             tele_to_rnd_pet();
     } else {
         /* it's magic!  it works underwater too (at a higher pitch) */
@@ -529,6 +529,10 @@ magic_whistled(struct obj *obj)
     boolean oseen, nseen,
             already_discovered = objects[obj->otyp].oc_name_known != 0;
     int omx, omy, shift = 0, appear = 0, disappear = 0, trapped = 0;
+
+    /* rod of stillness prevents magic-whistling */
+    if (svl.level.flags.stasis_until >= svm.moves)
+        return;
 
     /* need to copy (up to 3) names as they're collected rather than just
        save pointers to them, otherwise churning through every mbuf[] might
@@ -2587,6 +2591,8 @@ grease_ok(struct obj *obj)
     if (!obj)
         return GETOBJ_SUGGEST;
 
+    /* note: if changing the list of ungreasable objects, also change
+       special_throne_effect in sit.c */
     if (obj->oclass == COIN_CLASS)
         return GETOBJ_EXCLUDE;
 
@@ -3188,10 +3194,11 @@ use_whip(struct obj *obj)
                     if (!rn2(25)) {
                         /* proficient with whip, but maybe not
                            so proficient at catching weapons */
-                        int hitu, hitvalu;
+                        int dam, hitvalu, hitu;
 
+                        dam = dmgval(otmp, &gy.youmonst);
                         hitvalu = 8 + otmp->spe;
-                        hitu = thitu(hitvalu, dmgval(otmp, &gy.youmonst),
+                        hitu = thitu(hitvalu, Maybe_Half_Phys(dam),
                                      &otmp, (char *) 0);
                         if (hitu) {
                             pline_The("%s hits you as you try to snatch it!",
@@ -3278,7 +3285,7 @@ static const char
 
 /* find pos of monster in range, if only one monster */
 staticfn boolean
-find_poleable_mon(coord *pos, int min_range, int max_range)
+find_poleable_mon(coord *pos)
 {
     struct monst *mtmp;
     coord mpos = { 0, 0 }; /* no candidate location yet */
@@ -3287,13 +3294,12 @@ find_poleable_mon(coord *pos, int min_range, int max_range)
     int glyph;
 
     impaired = (Confusion || Stunned || Hallucination);
-    rt = isqrt(max_range);
+    rt = isqrt(gp.polearm_range_max);
     lo_x = max(u.ux - rt, 1), hi_x = min(u.ux + rt, COLNO - 1);
     lo_y = max(u.uy - rt, 0), hi_y = min(u.uy + rt, ROWNO - 1);
     for (x = lo_x; x <= hi_x; ++x) {
         for (y = lo_y; y <= hi_y; ++y) {
-            if (distu(x, y) < min_range || distu(x, y) > max_range
-                || !isok(x, y) || !cansee(x, y))
+            if (!get_valid_polearm_position(x, y))
                 continue;
             glyph = glyph_at(x, y);
             if (!impaired
@@ -3399,7 +3405,7 @@ could_pole_mon(void)
 
     cc.x = u.ux;
     cc.y = u.uy;
-    if (!find_poleable_mon(&cc, min_range, max_range)) {
+    if (!find_poleable_mon(&cc)) {
         if (hitm && !DEADMONSTER(hitm) && sensemon(hitm)
             && mdistu(hitm) <= max_range && mdistu(hitm) >= min_range)
             return TRUE;
@@ -3452,7 +3458,7 @@ use_pole(struct obj *obj, boolean autohit)
         pline(where_to_hit);
     cc.x = u.ux;
     cc.y = u.uy;
-    if (!find_poleable_mon(&cc, min_range, max_range) && hitm
+    if (!find_poleable_mon(&cc) && hitm
         && !DEADMONSTER(hitm) && sensemon(hitm)
         && mdistu(hitm) <= max_range && mdistu(hitm) >= min_range) {
         cc.x = hitm->mx;
@@ -3986,6 +3992,7 @@ do_break_wand(struct obj *obj)
     case WAN_PROBING:
     case WAN_ENLIGHTENMENT:
     case WAN_SECRET_DOOR_DETECTION:
+    case WAN_STILLNESS:
         pline(nothing_else_happens);
         discard_broken_wand();
         return ECMD_TIME;
@@ -4430,11 +4437,11 @@ doapply(void)
         }
         FALLTHROUGH;
         /*FALLTHRU*/
-    default:
+    default: {
         /* Pole-weapons can strike at a distance */
 
-        //Pounding is allowed for certain weapons if the rider is on
-        //a mount saddled with the blanket of the heavenly host
+        /* Pounding is allowed for certain weapons if the rider is on
+           a mount saddled with the blanket of the heavenly host */
         boolean can_pound_via_blanket = FALSE;
         if (u.usteed) {
             struct obj *saddle = u.usteed->minvent ? which_armor(u.usteed, W_SADDLE) : (struct obj *) 0;
@@ -4451,6 +4458,7 @@ doapply(void)
         }
         pline("Sorry, I don't know how to use that.");
         return ECMD_FAIL;
+    }
     }
     /* This assumes that anything that potentially destroyed obj has kept
      * track of it and set obj to null before this point. */
@@ -4604,7 +4612,7 @@ use_rope(struct obj *obj)
  * ECMD_CANCEL if the player aborts, or ECMD_FAIL on invalid targeting.
  */
 
-static int
+staticfn int
 use_staff_of_wonders(struct obj *obj)
 {
     coord cc;
@@ -4730,30 +4738,41 @@ use_staff_of_wonders(struct obj *obj)
     return ECMD_TIME;
 }
 
-/* Hilite callback: show all reachable squares in the 5x5 perimeter */
-boolean
-display_staff_of_wonders_positions(int x, int y, int glyph)
+/* Validation callback: accept only reachable, visible squares.
+   5.0 getpos_sethilite asks this for each map cell. */
+staticfn boolean
+get_valid_staff_of_wonders_position(coordxy x, coordxy y)
 {
     int dist = distu(x, y);
-    if (dist < 2 || dist > 8)  /* exclude player's square and too-far squares */
+
+    if (dist < 2 || dist > 8)
         return FALSE;
     if (!isok(x, y))
+        return FALSE;
+    if (!cansee(x, y))
         return FALSE;
     return TRUE;
 }
 
-/* Validation callback: accept only reachable, visible squares */
-int
-get_valid_staff_of_wonders_position(int x, int y)
+/* Hilite callback: show those squares. 5.0 passes on/off rather than
+   calling the predicate once per cell. */
+staticfn void
+display_staff_of_wonders_positions(boolean on_off)
 {
-    int dist = distu(x, y);
-    if (dist < 2 || dist > 8)
-        return 0;  /* invalid */
-    if (!isok(x, y))
-        return 0;
-    if (!cansee(x, y))
-        return 0;
-    return 1;  /* valid */
+    coordxy x, y, dx, dy;
+
+    if (on_off) {
+        tmp_at(DISP_BEAM, cmap_to_glyph(S_goodpos));
+        for (dx = -4; dx <= 4; dx++)
+            for (dy = -4; dy <= 4; dy++) {
+                x = dx + u.ux;
+                y = dy + u.uy;
+                if (get_valid_staff_of_wonders_position(x, y))
+                    tmp_at(x, y);
+            }
+    } else {
+        tmp_at(DISP_END, 0);
+    }
 }
 
 int

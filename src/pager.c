@@ -1,4 +1,4 @@
-/* NetHack 3.7	pager.c	$NHDT-Date: 1764044196 2025/11/24 20:16:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.292 $ */
+/* NetHack 5.0	pager.c	$NHDT-Date: 1774846177 2026/03/29 20:49:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.296 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -556,7 +556,7 @@ look_at_monster(
 
 /* describe a pool location's contents; might return a static buffer so
    caller should use it or copy it before calling waterbody_name() again
-   [3.7: moved here from mkmaze.c] */
+   [5.0: moved here from mkmaze.c] */
 const char *
 waterbody_name(coordxy x, coordxy y)
 {
@@ -742,6 +742,10 @@ lookat(coordxy x, coordxy y, char *buf, char *monbuf)
 
         switch (symidx) {
         case S_altar:
+            if (is_gibeon_altar(x, y)) {
+                Strcpy(buf, "the Altar at Gibeon");
+                break;
+            }
             amsk = altarmask_at(x, y);
             algn = Amask2align(amsk & AM_MASK);
             Sprintf(buf, "%s %saltar",
@@ -1143,7 +1147,8 @@ add_cmap_descr(
     const char **firstmatch, /* output: pointer to 1st matching description */
     char *out_str)      /* input/output: current description gets appended */
 {
-    char *mbuf = NULL, *p;
+    char *mbuf = NULL;
+    const char *p;
     int absidx = abs(idx);
 
     if (glyph == NO_GLYPH) {
@@ -1600,6 +1605,9 @@ do_screen_description(
                 *for_supplement = pm;
             if (!strcmp(look_buf, "ice"))
                 (void) ice_descr(cc.x, cc.y, look_buf);
+            if (!strcmp(look_buf, "staircase down")
+                && on_level(&u.uz, &qstart_level) && !ok_to_quest())
+                Strcpy(look_buf, "blocked staircase down");
 
             if (look_buf[0] != '\0')
                 *firstmatch = look_buf;
@@ -1721,7 +1729,7 @@ do_look(int mode, coord *click_cc)
              * introduced.
              *
              * When lootabc is set, abandon the 'y'|'n' compatibility in
-             * favor of newer '/' and '?' compatobility instead.
+             * favor of newer '/' and '?' compatibility instead.
              */
 
             any.a_char = '/';

@@ -1,4 +1,4 @@
-/* NetHack 3.7	system.h	$NHDT-Date: 1596498562 2020/08/03 23:49:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.24 $ */
+/* NetHack 3.6	system.h	$NHDT-Date: 1596498562 2020/08/03 23:49:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.24 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -21,7 +21,7 @@
 /* some old <sys/types.h> may not define off_t and size_t; if your system is
  * one of these, define them by hand below
  */
-#if (defined(VMS) && !defined(__GNUC__)) || defined(MAC)
+#if (defined(VMS) && !defined(__GNUC__)) || defined(MACOS9)
 #include <types.h>
 #else
 #ifndef AMIGA
@@ -41,7 +41,7 @@ typedef unsigned int size_t;
 #endif
 #endif /* MICRO && !TOS */
 
-#if defined(__TURBOC__) || defined(MAC)
+#if defined(__TURBOC__) || defined(MACOS9)
 #include <time.h> /* time_t is not in <sys/types.h> */
 #endif
 #if defined(ULTRIX) && !(defined(ULTRIX_PROTO) || defined(NHSTDC))
@@ -200,7 +200,7 @@ extern int unlink(const char *);
 
 #endif /* AZTEC_50 && __GNUC__ */
 
-#ifdef MAC
+#ifdef MACOS9
 #ifndef __CONDITIONALMACROS__          /* universal headers */
 extern int close(int);             /* unistd.h */
 extern int read(int, char *, int); /* unistd.h */
@@ -313,7 +313,7 @@ extern long fork(void);
 /* The POSIX string.h is required to define all the mem* and str* functions */
 #include <string.h>
 #else
-#if defined(SYSV) || defined(VMS) || defined(MAC) || defined(SUNOS4)
+#if defined(SYSV) || defined(VMS) || defined(MACOS9) || defined(SUNOS4)
 #if defined(NHSTDC) || (defined(VMS) && !defined(ANCIENT_VAXC))
 #if !defined(_AIX32) && !(defined(SUNOS4) && defined(__STDC__))
 /* Solaris unbundled cc (acc) */
@@ -423,7 +423,7 @@ extern char *strncat(char *, const char *, size_t);
 extern char *strpbrk(const char *, const char *);
 
 #ifdef NOT_C99
-#if defined(SYSV) || defined(MICRO) || defined(MAC) || defined(VMS) \
+#if defined(SYSV) || defined(MICRO) || defined(MACOS9) || defined(VMS) \
     || defined(HPUX)
 extern char *strchr(const char *, int);
 extern char *strrchr(const char *, int);
@@ -435,7 +435,7 @@ extern char *rindex(const char *, int);
 
 extern int strcmp(const char *, const char *);
 extern int strncmp(const char *, const char *, size_t);
-#if defined(MICRO) || defined(MAC) || defined(VMS)
+#if defined(MICRO) || defined(MACOS9) || defined(VMS)
 extern size_t strlen(const char *);
 #else
 #ifdef HPUX

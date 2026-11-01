@@ -1,4 +1,4 @@
-/* NetHack 3.7	timeout.c	$NHDT-Date: 1756531249 2025/08/29 21:20:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.205 $ */
+/* NetHack 5.0	timeout.c	$NHDT-Date: 1776080125 2026/04/13 03:35:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.207 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -98,7 +98,7 @@ static const struct propname {
     { FLYING, "flying" },
     { SWIMMING, "swimming" },
     { SLOW_DIGESTION, "slow digestion" },
-    { HALF_SPDAM, "half spell damage" },
+    { HALF_SPDAM, "half damage from false prophecies" },
     { HALF_PHDAM, "half physical damage" },
     { REGENERATION, "HP regeneration" },
     { ENERGY_REGENERATION, "energy regeneration" },
@@ -961,7 +961,7 @@ fall_asleep(int how_long, boolean wakeup_msg)
     if (wakeup_msg && gm.multi == how_long) {
         /* caller can follow with a direct call to Hear_again() if
            there's a need to override this when wakeup_msg is true */
-        /* 3.7: how_long is negative so wasn't actually incrementing the
+        /* 5.0: how_long is negative so wasn't actually incrementing the
            deafness timeout when it used to be passed as-is */
         incr_itimeout(&HDeaf, abs(how_long));
         disp.botl = TRUE;
@@ -1078,7 +1078,7 @@ hatch_egg(anything *arg, long timeout)
          * mind are:
          * + Create the hatched monster then place it on the migrating
          *   mons list.  This is tough because all makemon() is made
-         *   to place the monster as well.  Makemon() also doesn't lend
+         *   to place the monster as well. Makemon() also doesn't lend
          *   itself well to splitting off a "not yet placed" subroutine.
          * + Mark the egg as hatched, then place the monster when we
          *   place the migrating objects.
@@ -1232,7 +1232,7 @@ slip_or_trip(void)
     if (otmp && on_foot) { /* trip over something in particular */
         /*
           If there is only one item, it will have just been named
-          during the move, so refer to by via pronoun; otherwise,
+          during the move, so refer to it by pronoun; otherwise,
           if the top item has been or can be seen, refer to it by
           name; if not, look for rocks to trip over; trip over
           anonymous "something" if there aren't any rocks.
@@ -1532,7 +1532,7 @@ burn_object(anything *arg, long timeout)
         default:
             /*
              * Someone added fuel to the lamp while it was
-             * lit.  Just fall through and let begin burn
+             * lit. Just fall through and let begin_burn()
              * handle the new age.
              */
             break;
@@ -1659,7 +1659,7 @@ burn_object(anything *arg, long timeout)
         default:
             /*
              * Someone added fuel (candles) to the menorah while
-             * it was lit.  Just fall through and let begin burn
+             * it was lit. Just fall through and let begin_burn()
              * handle the new age.
              */
             break;
@@ -1891,7 +1891,7 @@ do_storms(void)
     }
 
     if (levl[u.ux][u.uy].typ == CLOUD) {
-        /* Inside a cloud during a thunder storm is deafening. */
+        /* Inside a cloud during a thunderstorm is deafening. */
         /* Even if already deaf, we sense the thunder's vibrations. */
         Soundeffect(se_kaboom_boom_boom, 80);
         pline("Kaboom!!!  Boom!!  Boom!!");
@@ -1941,7 +1941,7 @@ do_storms(void)
  *      Save all timers of range 'range'.  Range is either global
  *      or local.  Global timers follow game play, local timers
  *      are saved with a level.  Object and monster timers are
- *      saved using their respective id's instead of pointers.
+ *      saved using their respective ids instead of pointers.
  *
  *  void restore_timers(NHFILE *, int range, long adjust)
  *      Restore timers of range 'range'.  If from a ghost pile,
@@ -2128,6 +2128,14 @@ wiz_timeout_queue(void)
     if (any_visible_region()) {
         visible_region_summary(win);
     }
+    if (svl.level.flags.stasis_until >= svm.moves) {
+        putstr(win, 0, "");
+        Sprintf(buf, "Level is no-teleport for %ld %s.",
+                svl.level.flags.stasis_until - svm.moves + 1L,
+                (svl.level.flags.stasis_until - svm.moves > 0L)
+                  ? "turns" : "more turn");
+        putstr(win, 0, buf);
+    }
     display_nhwindow(win, FALSE);
     destroy_nhwindow(win);
 
@@ -2233,7 +2241,7 @@ run_timers(void)
 
     /*
      * Always use the first element.  Elements may be added or deleted at
-     * any time.  The list is ordered, we are done when the first element
+     * any time.  The list is ordered; we are done when the first element
      * is in the future.
      */
     while (gt.timer_base && gt.timer_base->timeout <= svm.moves) {
@@ -2669,7 +2677,7 @@ maybe_write_timer(NHFILE *nhfp, int range, boolean write_it)
  *      + timeouts that follow obj & monst that are migrating
  *
  * Level range:
- *      + timeouts that are level specific (e.g. storms)
+ *      + timeouts that are level-specific (e.g. storms)
  *      + timeouts that stay with the level (obj & monst)
  */
 void

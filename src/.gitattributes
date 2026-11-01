@@ -16,4 +16,4 @@ qt_xcmd.moc	NH_filesgentag=>qt_kde0.moc
 qt_yndlg.moc	NH_filesgentag=>qt_kde0.moc
 
 tile.c		NH_filesgentag=(file%s_optionally_generated_by_tilemap_at_compile_time)
-monstr.c	NH_filesgentag=(file%s_generated_by_makedefs_-m_but_unused_in_3.7)
+monstr.c	NH_filesgentag=(file%s_generated_by_makedefs_-m_but_unused_in_5.0)

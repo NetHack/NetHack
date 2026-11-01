@@ -172,7 +172,7 @@ void NetHackQtInvUsageWindow::paintEvent(QPaintEvent*)
     //                                      W wielded two-handed weapon
     //                                      X wielded secondary weapon
     //
-    // 3.7: use a different layout (also different legend for it, above):
+    // 5.0: use a different layout (also different legend for it, above):
     //      invert so grid is facing player, with right hand on screen left;
     //      show gloves in only one slot;
     //      move alternate weapon to former right hand glove slot;

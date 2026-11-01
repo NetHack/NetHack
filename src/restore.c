@@ -1,4 +1,4 @@
-/* NetHack 3.7	restore.c	$NHDT-Date: 1736530208 2025/01/10 09:30:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.234 $ */
+/* NetHack 5.0	restore.c	$NHDT-Date: 1736530208 2025/01/10 09:30:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.234 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -351,6 +351,9 @@ restmon(NHFILE *nhfp, struct monst *mtmp)
         if (buflen > 0) {
             newedog(mtmp);
             Sfi_edog(nhfp, EDOG(mtmp), "monst-edog");
+            /* save or bones held a relative time */
+            relative_time_to_moves(&EDOG(mtmp)->droptime);
+            relative_time_to_moves(&EDOG(mtmp)->hungrytime);
             /* sanity check to prevent rn2(0) */
            if (EDOG(mtmp)->apport <= 0) {
                EDOG(mtmp)->apport = 1;
@@ -533,6 +536,8 @@ restgamestate(NHFILE *nhfp)
 #endif
 
     Sfi_ulong(nhfp, &uid, "gamestate-uid");
+    Sfi_char(nhfp, &svn.nhuuid[0], "nhuuid", sizeof svn.nhuuid);
+    Sfi_long(nhfp, &svm.moves, "gamestate-moves");
 #ifndef SFCTOOL
     if (SYSOPT_CHECK_SAVE_UID
         && uid != (unsigned long) getuid()) { /* strange ... */
@@ -550,6 +555,8 @@ restgamestate(NHFILE *nhfp)
 #endif  /* SFCTOOL */
     newgamecontext = svc.context; /* copy statically init'd context */
     Sfi_context_info(nhfp, &svc.context, "gamestate-context");
+    relative_time_to_moves(&svc.context.seer_turn);
+    relative_time_to_moves(&svc.context.digging.lastdigtime);
     svc.context.warntype.species = (ismnum(svc.context.warntype.speciesidx))
                                   ? &mons[svc.context.warntype.speciesidx]
                                   : (struct permonst *) 0;
@@ -591,6 +598,8 @@ restgamestate(NHFILE *nhfp)
     amii_setpens(amii_numcolors); /* use colors from save file */
 #endif
 #endif /* !SFCTOOL */
+    Sfi_long(nhfp, &svw.wreserve, "wreserve");
+    Sfi_int32(nhfp, &svw.wtreserved, "wtreserved");
     Sfi_you(nhfp, &u, "gamestate-you");
     gy.youmonst.cham = u.mcham;
 
@@ -692,7 +701,6 @@ restgamestate(NHFILE *nhfp)
 
     restore_dungeon(nhfp);
     restlevchn(nhfp);
-    Sfi_long(nhfp, &svm.moves, "gamestate-moves");
     /* hero_seq isn't saved and restored because it can be recalculated */
     gh.hero_seq = svm.moves << 3; /* normally handled in moveloop() */
     Sfi_q_score(nhfp, &svq.quest_status, "gamestate-quest_status");
@@ -1097,7 +1105,7 @@ getlev(NHFILE *nhfp, int pid, xint8 lev)
     for (c = 0; c < COLNO; ++c) {
         for (r = 0; r < ROWNO; ++r) {
             Sfi_schar(nhfp, &svl.lastseentyp[c][r], "lastseentyp");
-	}
+        }
     }
     Sfi_long(nhfp, &svo.omoves, "lev-timestmp");
     elapsed = (svm.moves - svo.omoves);
@@ -1106,7 +1114,7 @@ getlev(NHFILE *nhfp, int pid, xint8 lev)
     Sfi_dest_area(nhfp, &svu.updest, "lev-updest");
     Sfi_dest_area(nhfp, &svd.dndest, "lev-dndest");
     Sfi_levelflags(nhfp, &svl.level.flags, "lev-level_flags");
-
+    rest_adjust_levelflags();
     if (svd.doors) {
         free(svd.doors);
         svd.doors = 0;
@@ -1300,6 +1308,28 @@ getlev(NHFILE *nhfp, int pid, xint8 lev)
     nhUse(lev);
 #endif /* !SFCTOOL */
     program_state.in_getlev = FALSE;
+}
+
+void
+rest_adjust_levelflags(void)
+{
+    /* adjust timestamps */
+    relative_time_to_moves(&svl.level.flags.stasis_until);
+}
+void
+moves_to_relative_time(long *timestamp)
+{
+    long prevts = *timestamp;
+
+    *timestamp = prevts - svm.moves;
+}
+
+void
+relative_time_to_moves(long *timestamp)
+{
+    long prevts = *timestamp;
+
+    *timestamp = svm.moves + prevts;
 }
 
 /* "name-role-race-gend-algn" occurs very early in a save file; sometimes we

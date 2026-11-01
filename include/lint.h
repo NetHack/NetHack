@@ -1,4 +1,4 @@
-/* NetHack 3.7	lint.h	$NHDT-Date: 1655631029 2022/06/19 09:30:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.8 $ */
+/* NetHack 5.0	lint.h	$NHDT-Date: 1655631029 2022/06/19 09:30:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.8 $ */
 /*      Copyright (c) 2016 by Robert Patrick Rankin               */
 /* NetHack may be freely redistributed.  See license for details. */
 

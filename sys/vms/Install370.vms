@@ -1,8 +1,8 @@
-               Instructions for Building and Installing NetHack 3.7.0
+               Instructions for Building and Installing NetHack 5.0.0
                      on a VSI openVMS 9.2 system
                     =========================================
 
-This contains a description of how to build NetHack-3.7.0 on VSI OpenVMS 9.2.
+This contains a description of how to build NetHack-5.0.0 on VSI OpenVMS 9.2.
 This process uses Gnu Make 4.1 (minimum) for VMS to carry out the build.
 Last tested with VSI C x86-64 V7.5-009 (GEM 50XBR) on OpenVMS x86_64 V9.2-2.
 
@@ -16,7 +16,7 @@ Last tested with VSI C x86-64 V7.5-009 (GEM 50XBR) on OpenVMS x86_64 V9.2-2.
         [.dat]           -- data files
         [.doc]           -- documentation files
         [.include]       -- C header files
-        [.lib.lua546]    -- Lua distribution from https://www.lua.org/
+        [.lib.lua548]    -- Lua distribution from https://www.lua.org/
         [.src]           -- primary source files
         [.sys]           -- parent for [.sys.*]
         [.sys.share]     -- files shared by several ports, including VMS
@@ -26,7 +26,7 @@ Last tested with VSI C x86-64 V7.5-009 (GEM 50XBR) on OpenVMS x86_64 V9.2-2.
         [.win.tty]       -- "window" routines for ordinary terminals
                             (including terminal windows on workstations)
 
-2.  From the top of the NetHack 3.7 distribution, issue the following
+2.  From the top of the NetHack 5.0 distribution, issue the following
     pair of commands to distribute the GNU make Makefile.vms files to their
     working locations for building NetHack:
         $ set def [.sys.vms]
@@ -76,7 +76,7 @@ Last tested with VSI C x86-64 V7.5-009 (GEM 50XBR) on OpenVMS x86_64 V9.2-2.
 Notes:
 
 1.  Save files and bones files from 3.6.x and earlier versions will not
-    work with 3.7.0. The scoreboard file (RECORD) from 3.6.x or 3.4.x or
+    work with 5.0.0. The scoreboard file (RECORD) from 3.6.x or 3.4.x or
     3.3.x should work.
 
 2.  To specify user-preference options in your environment, define the
@@ -360,5 +360,5 @@ Notes:
     make utility used.
 
 8-March-2024
-# NetHack 3.7  Install370.vms       $NHDT-Date: 1575245132 2019/12/02 00:05:32 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.16 $
+# NetHack 5.0  Install370.vms       $NHDT-Date: 1575245132 2019/12/02 00:05:32 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.16 $
 # NetHack may be freely redistributed.  See license for details.
