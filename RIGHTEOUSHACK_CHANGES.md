@@ -730,11 +730,11 @@ open to the old tune, and the key is not applied at the bridge
 itself. A Rock with a keyhole stands in the small courtyard
 outside the moat, west of the closed bridge. Standing on it or
 next to it and applying the Key to Babylon's Palace lowers the
-drawbridge. PLACEHOLDER for Jon: "The key turns in the rock with
-a deep groan. Across the moat, chains rattle, and the drawbridge
-of Babylon comes thundering down." If it is already down: "The
-rock is silent. The way is already open." Palace doors still
-open with the key. A lock
+drawbridge. PLACEHOLDER for Jon: "The key turns with a sound like
+a stone rolled away. Far off, chains groan, and the drawbridge
+of Babylon comes down." If it is already down: "The rock is
+silent. The way is already open." Palace doors still open with
+the key. A lock
 pick does not open those doors. Interior chests can still be
 picked. Prophet mode tags the level [babylon]. The #levelport
 menu shows babylon. The level file is still castle.
@@ -766,8 +766,11 @@ rod, a trap, or a pet. He does not turn hostile, and he cannot be
 pushed off his post. A pet will not attack Peter, King Solomon,
 Isaiah, the angel at Jacob's Ladder, or a Babel builder.
 
-Mines' End is three PETRA layouts. The puzzle room, through the
-safe row, is lit. The rest of the level is dark. The letters P, E,
+Mines' End is three puzzle layouts. The overview calls that level
+Mines' End and tags it [minesend]. The #levelport menu says
+minesend. Achievements, the livelog, and arrival text do not say
+PETRA. The scholar's scroll is the clue that does. The puzzle
+room, through the safe row, is lit. The rest of the level is dark. The letters P, E,
 T, R, A and the decoys are drawn on the map as those capitals.
 Farlook and look-here call a tile "the letter P" (or whichever
 letter it is). They are not engravings. The hint is an engraving

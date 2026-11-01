@@ -11,6 +11,12 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-01
+The bottom of the Salt Mines is shown as Mines' End, tagged
+[minesend]. The name PETRA is not shown before the scholar's
+scroll. The key in the rock says the drawbridge of Babylon
+comes down.
+
+2026-11-01
 Peter's call at Capernaum says "You sir!" to a male hero and
 "You ma'am!" to a female hero. The key in the Rock with a
 keyhole says the drawbridge of Babylon comes thundering down.

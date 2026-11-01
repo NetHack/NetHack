@@ -391,7 +391,7 @@ lower_babylon_drawbridge(void)
     for (x = 0; x < COLNO; x++)
         for (y = 0; y < ROWNO; y++)
             if (levl[x][y].typ == DRAWBRIDGE_UP) {
-                pline("The key turns in the rock with a deep groan. Across the moat, chains rattle, and the drawbridge of Babylon comes thundering down.");
+                pline("The key turns with a sound like a stone rolled away. Far off, chains groan, and the drawbridge of Babylon comes down.");
                 open_drawbridge(x, y, TRUE);
                 u.uevent.uopened_dbridge = 1;
                 return PICKLOCK_DID_SOMETHING;

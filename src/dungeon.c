@@ -2303,6 +2303,20 @@ print_branch(
     }
 }
 
+/* Tag shown in the overview and the levelport menu.
+   The puzzle level stays "Mines' End"; its real name is the scroll. */
+static const char *
+visible_level_tag(const char *proto)
+{
+    if (!proto)
+        return "";
+    if (!strcmp(proto, "castle"))
+        return "babylon";
+    if (!strcmp(proto, "minend"))
+        return "minesend";
+    return proto;
+}
+
 /* Print available dungeon information. */
 schar
 print_dungeon(boolean bymenu, schar *rlev, xint16 *rdgn)
@@ -2364,7 +2378,7 @@ print_dungeon(boolean bymenu, schar *rlev, xint16 *rdgn)
 
             Sprintf(buf, "%c %s: %d",
                     chr_u_on_lvl(&slev->dlevel),
-                    !strcmp(slev->proto, "castle") ? "babylon" : slev->proto,
+                    visible_level_tag(slev->proto),
                     depth(&slev->dlevel));
             if (Is_stronghold(&slev->dlevel))
                 Sprintf(eos(buf), " (tune %s)", svt.tune);
@@ -3586,7 +3600,7 @@ print_mapseen(
 
         if ((slev = Is_special(&mptr->lev)) != 0)
             Sprintf(eos(buf), " [%s]",
-                    !strcmp(slev->proto, "castle") ? "babylon" : slev->proto);
+                    visible_level_tag(slev->proto));
     }
     /* [perhaps print custom annotation on its own line when it's long] */
     if (mptr->custom)
@@ -3681,6 +3695,8 @@ print_mapseen(
     } else if (mptr->flags.castle) {
         Snprintf(buf, sizeof buf, "%sBabylon's Palace%s.", PREFIX,
                 tunesuffix(mptr, tmpbuf, sizeof tmpbuf));
+    } else if (on_level(&mptr->lev, &mineend_level)) {
+        Sprintf(buf, "%sMines' End.", PREFIX);
     } else if (mptr->flags.valley) {
         Sprintf(buf, "%sValley of the Dead.", PREFIX);
     } else if (mptr->flags.vibrating_square) {
