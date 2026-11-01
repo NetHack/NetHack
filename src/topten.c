@@ -530,7 +530,7 @@ encode_extended_achievements(char *buf)
             achievement = "defeated_medusa";
             break;
         case ACH_MINE_PRIZE:
-            achievement = "obtained_the_luckstone_from_the_mines";
+            achievement = "obtained_the_favor_stone_from_the_mines";
             break;
         case ACH_SOKO_PRIZE:
             achievement = "obtained_the_sokoban_prize";
@@ -542,7 +542,7 @@ encode_extended_achievements(char *buf)
             achievement = "read_a_discworld_novel";
             break;
         case ACH_MINE:
-            achievement = "entered_the_gnomish_mines";
+            achievement = "entered_the_salt_mines_of_galilee";
             break;
         case ACH_TOWN:
             achievement = "entered_mine_town";

@@ -2579,11 +2579,11 @@ fpostfx(struct obj *otmp)
             make_blinded((long) u.ucreamed, TRUE);
         break;
     case FORTUNE_COOKIE:
-        outrumor(bcsign(otmp), BY_COOKIE);
+        out_proverb();
         if (!Blind)
             if (!u.uconduct.literate++)
                 livelog_printf(LL_CONDUCT,
-                    "became literate by reading the fortune inside a cookie");
+                    "became literate by reading a proverb");
         break;
     case LUMP_OF_ROYAL_JELLY:
         if (gy.youmonst.data == &mons[PM_KILLER_BEE] && !Unchanging

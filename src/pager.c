@@ -2235,7 +2235,7 @@ static const char *suptext1[] = {
     "%s is a member of a marauding horde of orcs",
     "rumored to have brutally attacked and plundered",
     "the ordinarily sheltered town that is located ",
-    "deep within The Gnomish Mines.",
+    "deep within the Salt Mines of Galilee.",
     "",
     "The members of that vicious horde proudly and ",
     "defiantly acclaim their allegiance to their",
@@ -2249,7 +2249,7 @@ static const char *suptext2[] = {
     "from thieves and sell it off for profit.",
     "",
     "The perpetrator was last seen hanging around the",
-    "stairs leading to the Gnomish Mines.",
+    "stairs leading to the Salt Mines of Galilee.",
     (char *) 0,
 };
 

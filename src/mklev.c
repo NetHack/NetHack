@@ -2348,8 +2348,8 @@ mkaltar(struct mkroom *croom)
     if (!set_levltyp(m.x, m.y, ALTAR))
         return;
 
-    /* -1 - A_CHAOTIC, 0 - A_NEUTRAL, 1 - A_LAWFUL */
-    al = rn2((int) A_LAWFUL + 2) - 1;
+    /* Every altar follows God. */
+    al = A_LAWFUL;
     levl[m.x][m.y].altarmask = Align2amask(al);
 }
 

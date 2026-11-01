@@ -11,6 +11,29 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-01
+Favor is the word you see for luck. The gray stone from the mines
+is a Favor Stone. It works the same way. The Gnomish Mines are
+the Salt Mines of Galilee.
+
+2026-11-01
+When the Lord anoints you, the words are "I anoint thee...  The
+Hand of the Lord!" The attributes screen says "the Hand of the
+Lord" and the livelog says you were anointed. The gift that used
+to come with that moment is a placeholder and is not given yet.
+
+2026-11-01
+Crystal balls are gone, except the Champion's Orb of Fate.
+Fortune cookies are gone. In their place are four placeholder
+Prophet proverbs, exact King James wording, for Jon to review.
+Sacrificing your own kind does not summon a demon or change the
+altar. Random Moloch temples and priests are not generated.
+
+2026-11-01
+King Solomon tells you what he asked for, and quotes Mark 8:36,
+before you pray at the Altar at Gibeon. Both lines are spoken
+on #chat until the vision has happened.
+
+2026-11-01
 At the Altar at Gibeon the LORD speaks the King James text of
 1 Kings 3:5 and 1 Kings 3:11-13.
 

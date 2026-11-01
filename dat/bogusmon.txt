@@ -117,7 +117,7 @@ quest sprout
 # Quendor (Zork, &c.)
 grue
 Christmas-tree monster
-luck sucker
+favor sucker
 paskald
 brogmoid
 dornbeast

@@ -76,7 +76,7 @@ static struct ll_achieve_msg achieve_msg [] = {
     { 0, "hero was always blond, no, blind" },
     { 0, "hero never wore armor" },
      /* */
-    { LL_MINORAC | LL_DUMP, "entered the Gnomish Mines" },
+    { LL_MINORAC | LL_DUMP, "entered the Salt Mines of Galilee" },
     { LL_ACHIEVE, "reached Mine Town" }, /* probably minor, but dnh logs it */
     { LL_MINORAC, "entered a shop" },
     { LL_MINORAC, "entered a temple" },
@@ -1476,7 +1476,9 @@ attributes_enlightenment(
     enlght_out(final ? "Final Attributes:" : "Attributes:");
 
     if (u.uevent.uhand_of_elbereth) {
-        static const char *const hofe_titles[3] = { "the Hand of Elbereth",
+        /* Lawful play uses "the Hand of the Lord". The other two titles
+           are unused while only lawful can be played. */
+        static const char *const hofe_titles[3] = { "the Hand of the Lord",
                                                     "the Envoy of Balance",
                                                     "the Glory of Arioch" };
         you_are(hofe_titles[u.uevent.uhand_of_elbereth - 1], "");
@@ -1887,24 +1889,28 @@ attributes_enlightenment(
     /*** Miscellany ***/
     if (Luck) {
         ltmp = abs((int) Luck);
-        Sprintf(buf, "%s%slucky",
-                ltmp >= 10 ? "extremely " : ltmp >= 5 ? "very " : "",
-                Luck < 0 ? "un" : "");
+        /* "Favor" is the player-visible name of Luck. The number is unchanged. */
+        if (Luck < 0)
+            Sprintf(buf, "%sout of favor",
+                    ltmp >= 10 ? "extremely " : ltmp >= 5 ? "very " : "");
+        else
+            Sprintf(buf, "%sfavored",
+                    ltmp >= 10 ? "extremely " : ltmp >= 5 ? "very " : "");
         if (wizard)
             Sprintf(eos(buf), " (%d)", Luck);
         you_are(buf, "");
     } else if (wizard)
-        enl_msg("Your luck ", "is", "was", " zero", "");
+        enl_msg("Your favor ", "is", "was", " zero", "");
     if (u.moreluck > 0)
-        you_have("extra luck", "");
+        you_have("extra favor", "");
     else if (u.moreluck < 0)
-        you_have("reduced luck", "");
+        you_have("reduced favor", "");
     if (carrying(LUCKSTONE) || stone_luck(TRUE)) {
         ltmp = stone_luck(FALSE);
         if (ltmp <= 0)
-            enl_msg("Bad luck ", "does", "did", " not time out for you", "");
+            enl_msg("Bad favor ", "does", "did", " not time out for you", "");
         if (ltmp >= 0)
-            enl_msg("Good luck ", "does", "did", " not time out for you", "");
+            enl_msg("Good favor ", "does", "did", " not time out for you", "");
     }
 
     if (u.ugangr) {
@@ -2273,7 +2279,7 @@ show_achievements(
             enl_msg(You_, "have gone", "went", " without any armor", "");
             break;
         case ACH_MINE:
-            you_have_X("entered the Gnomish Mines");
+            you_have_X("entered the Salt Mines of Galilee");
             break;
         case ACH_TOWN:
             you_have_X("entered Minetown");
@@ -2297,7 +2303,7 @@ show_achievements(
             you_have_X("completed Sokoban");
             break;
         case ACH_MINE_PRIZE: /* hidden guaranteed luckstone */
-            you_have_X("completed the Gnomish Mines");
+            you_have_X("completed the Salt Mines of Galilee");
             break;
         case ACH_BGRM:
             you_have_X("entered the Big Room");

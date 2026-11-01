@@ -257,8 +257,7 @@ m_initweap(struct monst *mtmp)
             if (mm == PM_ELVEN_MONARCH) {
                 if (rn2(3) || (gi.in_mklev && Is_earthlevel(&u.uz)))
                     (void) mongets(mtmp, PICK_AXE);
-                if (!rn2(50))
-                    (void) mongets(mtmp, CRYSTAL_BALL);
+                /* Crystal balls are removed from the game. */
             }
         } else if (ptr->msound == MS_PRIEST
                    || quest_mon_represents_role(ptr, PM_CLERIC)) {
@@ -2536,10 +2535,9 @@ set_mimic_sym(struct monst *mtmp)
            fruit (no-op if a fruit of this type has actually been made) */
         flags.made_fruit = TRUE;
     } else if (ap_type == M_AP_FURNITURE && appear == S_altar) {
-        int algn = rn2(3) - 1; /* -1 (A_Cha) or 0 (A_Neu) or +1 (A_Law) */
-
         newmcorpsenm(mtmp);
-        MCORPSENM(mtmp) = (Inhell && rn2(3)) ? AM_NONE : Align2amask(algn);
+        /* A mimic altar follows God. It is not an altar of Moloch. */
+        MCORPSENM(mtmp) = Align2amask(A_LAWFUL);
     } else if (has_mcorpsenm(mtmp)) {
         /* don't retain stale value from a previously mimicked shape */
         MCORPSENM(mtmp) = NON_PM;
