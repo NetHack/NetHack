@@ -721,9 +721,9 @@ outoracle(boolean special, boolean delphi)
     }
 }
 
-/* Amount entry matches the priest's bribe(), except 0 and a bad
-   entry do nothing and carry no penalty. More than the gold carried
-   gives all of it. */
+/* Amount entry matches the priest's bribe(), except a bad entry
+   does nothing and a gift of 0 has no penalty. More than the gold
+   carried gives all of it. */
 staticfn long
 isaiah_donation(struct monst *oracl)
 {
@@ -732,8 +732,16 @@ isaiah_donation(struct monst *oracl)
     long umoney = money_cnt(gi.invent);
 
     getlin("How much will you give?", buf);
-    if (sscanf(buf, "%ld", &offer) != 1 || offer <= 0L || umoney <= 0L)
+    if (sscanf(buf, "%ld", &offer) != 1 || offer < 0L)
         return 0L;
+    /* 2 Corinthians 9:7 KJV, checked against Bible Gateway. */
+    if (offer == 0L || umoney <= 0L) {
+        SetVoice(oracl, 0, 80, 0);
+        verbalize("Every man according as he purposeth in his heart, "
+                  "so let him give; not grudgingly, or of necessity: "
+                  "for God loveth a cheerful giver.");
+        return 0L;
+    }
     if (offer >= umoney) {
         offer = umoney;
         You("give %s all your gold.", mon_nam(oracl));

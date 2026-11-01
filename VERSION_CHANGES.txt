@@ -11,6 +11,10 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-01
+A gift of 0 shekels has no penalty. Isaiah quotes 2 Corinthians
+9:7 from the King James Bible.
+
+2026-11-01
 Both words from the Lord are free. Saying no to each offers a
 donation to God's church. A small gift adds favor. A large gift
 adds experience, at most ten times, and never more than one level.

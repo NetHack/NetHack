@@ -726,8 +726,12 @@ give a word from the Lord."
 
 Saying no to both asks:
 "Would you like to make a donation to God's church?" [yn] (n)
-Yes asks "How much will you give?" Zero, or more than you are
-carrying, does not go past the gold you have. Zero does nothing.
+Yes asks "How much will you give?" More than you are carrying
+gives all the gold you have. A gift of 0 takes nothing and has
+no penalty. Isaiah quotes 2 Corinthians 9:7, King James, word
+for word: "Every man according as he purposeth in his heart, so
+let him give; not grudgingly, or of necessity: for God loveth a
+cheerful giver."
 PLACEHOLDER thank-yous, for Jon:
 - 1 to 999 shekels: "The Lord bless thee for this gift." Favor +1. Any number of times.
 - 1000 to 4999: "Thy gift lifts thee a little." A quarter of this level's experience.
