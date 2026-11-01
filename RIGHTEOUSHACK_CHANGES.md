@@ -705,8 +705,7 @@ Mark 8:36. After the vision, either line may be spoken.
 ### Prophet mode (2026-11-01)
 
 The mode started with -D is prophet mode. Help, the guidebook, the
-options screen, and the messages that used to say wizard mode or
-debug mode say prophet mode. `OPTIONS=playmode:prophet` selects it.
+options screen, and the messages that name the mode say prophet mode. `OPTIONS=playmode:prophet` selects it.
 `playmode:debug` still selects it. The Wizard of Yendor and the
 Wizard role are unchanged. The sysconf list is still named WIZARDS.
 
