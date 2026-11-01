@@ -11,6 +11,10 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-01
+The Wilderness Trial is chained to the prophet level, the same
+name the overview shows.
+
+2026-11-01
 Pride now has eight treasure rooms. Each game shuffles one lure
 into each room. A harmless mirror stands outside every door, and
 a live mirror stands inside. Stepping on that inner mirror, or

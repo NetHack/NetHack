@@ -33,7 +33,7 @@ dungeon = {
          },
          {
             name = "The Wilderness Trial",
-            chainlevel = "oracle",
+            chainlevel = "prophet",
             base = 3,
             direction = "down"
          },

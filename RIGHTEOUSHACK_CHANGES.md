@@ -930,7 +930,8 @@ level stays dark. The other Medusa maps are unused.
 ### Wilderness Trial (2026-11-01)
 
 A branch, The Wilderness Trial, joins the main dungeon three
-levels below the Prophet. Five levels: desert, greed, pride, fear,
+levels below the Prophet. It is chained to the level named prophet.
+Five levels: desert, greed, pride, fear,
 garden. The desert is two-way. From greed on, the way up is sealed
 and teleport does not work. Taking the Sword of the Spirit in the
 garden returns you to the stair you entered by and seals the branch.
