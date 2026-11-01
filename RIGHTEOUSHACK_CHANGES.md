@@ -571,14 +571,15 @@ below. Trolls still leave meat, because they come back from it.
 The ape class does too (monkey meat; ape, owlbear, yeti,
 carnivorous ape, and sasquatch steak). Lycanthropes leave meat
 in animal form and in human form, and eating either form causes
-lycanthropy. Cyclops leaves a steak. Other giants, and the other
+lycanthropy. Cyclops leaves raw Cyclops steak and cooked Cyclops
+steak, with no "the" and no possessive. Other giants, and the other
 orcs (hobgoblin, orc, hill orc, Mordor orc, Uruk-hai, orc shaman,
 orc-captain), still leave nothing.
 
 Essences are named "<monster>'s essence". They never spoil, cannot
 be cooked, and can be blessed. That set is ghosts, shades, wraiths,
 barrow wights, Nazgul, vampires, zombies, mummies, ghouls,
-skeletons, liches, nymphs, the goblin, mind flayers, the quantum
+skeletons, nymphs, the goblin, mind flayers, the quantum
 mechanic, the genetic engineer, Medusa, the Wizard of Yendor,
 Croesus, every `S_DEMON` monster, and every `M2_DEMON` monster.
 A wraith's essence still grants a level. Eating a Rider's essence
@@ -586,13 +587,17 @@ is still fatal, and they still revive from it. Eating any demon
 essence (`M2_DEMON`) is instantly fatal. The death reason is
 "ate a demon's essence". Sandestin, djinni, and the mail daemon
 are `S_DEMON` but not `M2_DEMON`, so their essences are not fatal.
-The Riders are also not `M2_DEMON`. Imps and tengu are not demons.
+The Riders are also not `M2_DEMON`. Their essences keep the old
+meal effects: sandestin polymorphs you, and djinni and mail daemon
+essences are poisonous. Imps, manes, lemures, quasits, and tengu
+are not demons. They still leave meat, with the same effects as before.
 Ghosts and other zero-nutrition essences give 50 nutrition.
 Medusa's essence still petrifies, and killing her is still
 recorded. The Wizard still comes back and still drops what he
 carried; the essence is not what revives him. Croesus still drops
 his gold. Charon would leave an essence, but this build does not
-compile him. Liches no longer crumble to dust.
+compile him. Liches, demiliches, master liches, and arch-liches
+crumble into dust and leave nothing.
 Vampire, zombie, and mummy essences are that undead, not an old
 human or elf body, and undead turning brings them back from it.
 Cannibalism is removed: no "You cannibal!" message, no Luck or

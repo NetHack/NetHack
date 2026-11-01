@@ -3195,8 +3195,13 @@ corpse_chance(
     if (!magr && gm.mswallower && attacktype(gm.mswallower->data, AT_ENGL))
         magr = gm.mswallower, was_swallowed = TRUE; /* for gas spore boom */
 
-    /* Liches used to crumble into dust. They leave an essence now,
-       so this no longer returns before the drop check. */
+    /* Liches leave nothing. The body crumbles; there is no essence. */
+    if (mdat->mlet == S_LICH) {
+        if (cansee(mon->mx, mon->my) && !was_swallowed)
+            pline_mon(mon, "%s body crumbles into dust.",
+                      s_suffix(Monnam(mon)));
+        return FALSE;
+    }
 
     /* Gas spores always explode upon death */
     for (i = 0; i < NATTK; i++) {

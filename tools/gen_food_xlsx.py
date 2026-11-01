@@ -77,7 +77,6 @@ ESSENCE_MLETS = {
     "S_VAMPIRE",
     "S_ZOMBIE",
     "S_MUMMY",
-    "S_LICH",
     "S_NYMPH",
     "S_DEMON",
 }
@@ -422,7 +421,9 @@ def classify(mon: dict, by_name: dict[str, dict], flags: dict[str, int]) -> tupl
             f"Lycanthrope, {form}. Eating it causes lycanthropy.",
         )
     if key == "cyclops":
-        return "meat", "Giant. Leaves a steak."
+        return "meat", "Giant. Named raw Cyclops steak. No \"the\" and no possessive."
+    if mon["mlet"] == "S_LICH":
+        return "other", "Crumbles into dust. Leaves nothing."
     body = mon
     undead_note = ""
     if key in UNDEAD_BODY:
@@ -470,6 +471,8 @@ def possessive(name: str) -> str:
 def formatted_meat(mon: dict, nouns: dict[str, str], flags: dict[str, int], cooked: bool) -> str:
     noun = meat_noun_for(mon, nouns)
     prep = "cooked" if cooked else "raw"
+    if mon["name"].lower() == "cyclops":
+        return f"{prep} Cyclops steak"
     name = mon["name"]
     pname = bool(mon["m2"] & flags.get("M2_PNAME", 0))
     uniq = bool(mon["geno"] & flags.get("G_UNIQ", 0)) and not pname
@@ -554,8 +557,6 @@ def essence_effects(mon: dict, flags: dict[str, int]) -> str:
         bits.append("acidic")
     if not bits:
         bits.append("nutrition only; stock had no special meal effect")
-    if key in {"lich", "demilich", "master lich", "arch-lich"}:
-        bits.append("stock crumbled to dust and left nothing to eat")
     if key in {"djinni", "sandestin", "mail daemon", "charon"}:
         bits.append("stock left no corpse")
     return "; ".join(bits)
@@ -928,7 +929,8 @@ def main() -> None:
         ("Humanoids", "M1_HUMANOID, or the human or elf race, leave no meat, except the named essences, the ape class, lycanthropes, Cyclops, and trolls."),
         ("Apes", "Monkey, ape, owlbear, yeti, carnivorous ape, and sasquatch leave meat. Monkey is meat. The large ones are steak."),
         ("Lycanthropes", "Wererat, werejackal, and werewolf leave meat in animal form and in human form. Eating either form causes lycanthropy. A wish for the shared name still produces the human form."),
-        ("Cyclops", "Leaves the Cyclops's raw steak. Other giants leave nothing."),
+        ("Cyclops", "Named raw Cyclops steak and cooked Cyclops steak. No \"the\" and no possessive. Other giants leave nothing."),
+        ("Liches", "Lich, demilich, master lich, and arch-lich crumble into dust and leave nothing. Eating them grants nothing."),
         ("Orcs", "Only the goblin leaves an essence. Hobgoblin, orc, hill orc, Mordor orc, Uruk-hai, orc shaman, and orc-captain still leave nothing. Orc zombies and orc mummies already leave an essence."),
         ("Essences", "Named \"<monster>'s essence\" (wraith's essence, Death's essence). Wishes may also say \"essence of <monster>\". Never spoil, cannot be cooked, can be blessed. No 5% raw-poison roll."),
         ("Demons", "Every M2_DEMON leaves an essence, and eating it is instantly fatal. The death reason is \"ate a demon's essence\". S_DEMON monsters that are not M2_DEMON (sandestin, djinni, mail daemon) leave an essence and are not fatal. The Riders are S_DEMON, not M2_DEMON, and keep their own fatal meal, and they still come back. Imps, manes, lemures, quasits, and tengu are not demons."),

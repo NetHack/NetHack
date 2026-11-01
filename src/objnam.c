@@ -1939,7 +1939,6 @@ leaves_essence(struct permonst *ptr)
     case S_VAMPIRE: /* vampire, vampire lord, Vlad */
     case S_ZOMBIE:  /* zombies, ghoul, skeleton */
     case S_MUMMY:
-    case S_LICH:
     case S_NYMPH:
     case S_DEMON:   /* also sandestin, djinni, mail daemon; not M2_DEMON */
         return TRUE;
@@ -2047,7 +2046,10 @@ corpse_xname(
         mnam = "thing";
     } else {
         mnam = obj_pmname(otmp);
-        if (the_unique_pm(&mons[omndx]) || type_is_pname(&mons[omndx])) {
+        /* Cyclops meat is "raw Cyclops steak", not "the Cyclops' steak". */
+        if (omndx == PM_CYCLOPS)
+            ; /* keep the plain monster name */
+        else if (the_unique_pm(&mons[omndx]) || type_is_pname(&mons[omndx])) {
             mnam = s_suffix(mnam);
             possessive = TRUE;
             /* don't precede personal name like "Medusa" with an article */

@@ -11,6 +11,10 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-01
+Liches crumble into dust and leave nothing to eat. Cyclops meat
+is named "raw Cyclops steak" and "cooked Cyclops steak".
+
+2026-11-01
 Demons leave an essence, and eating any demon's essence is fatal.
 Mind flayers, liches, nymphs, the goblin, and a few named people
 leave an essence too. Apes, were-creatures, and Cyclops leave meat.

@@ -3290,7 +3290,7 @@
      edible; some also give you special powers.  A good rule of thumb
      is "you are what you eat."
 
-          Ghosts, wraiths, vampires, zombies, mummies, liches, nymphs,
+          Ghosts, wraiths, vampires, zombies, mummies, nymphs,
      demons, and the Riders leave an essence instead of meat: a
      wraith's essence, Death's essence, and so on.  An essence never
      spoils, cannot be cooked, and can be blessed.  Eating a wraith's
