@@ -784,7 +784,8 @@ fixup_special(void)
 staticfn void
 check_ransacked(const char *s)
 {
-    /* this kludge only works as long as orctown is minetn-1 */
+    /* Orc Town was the unused file minetn-1. Capernaum is not that
+       town, so the gang does not spawn there. */
     gr.ransacked = (u.uz.dnum == mines_dnum && !strcmp(s, "minetn-1"));
 }
 

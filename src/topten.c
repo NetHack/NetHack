@@ -536,7 +536,7 @@ encode_extended_achievements(char *buf)
             achievement = "obtained_the_sokoban_prize";
             break;
         case ACH_ORCL:
-            achievement = "consulted_the_oracle";
+            achievement = "consulted_the_prophet";
             break;
         case ACH_NOVL:
             achievement = "read_a_discworld_novel";
@@ -545,7 +545,7 @@ encode_extended_achievements(char *buf)
             achievement = "entered_the_salt_mines_of_galilee";
             break;
         case ACH_TOWN:
-            achievement = "entered_mine_town";
+            achievement = "entered_capernaum";
             break;
         case ACH_SHOP:
             achievement = "entered_a_shop";

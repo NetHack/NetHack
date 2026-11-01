@@ -53,8 +53,8 @@ des.monster({ id="human", name="Peter the Fisherman", peaceful=1,
 
 des.monster({ id="dog", peaceful=1, x=4, y=9 })
 des.monster({ id="dog", peaceful=1, x=18, y=2 })
-des.monster({ id="cat", peaceful=1, x=8, y=10 })
-des.monster({ id="cat", peaceful=1, x=34, y=2 })
+des.monster({ id="housecat", peaceful=1, x=8, y=10 })
+des.monster({ id="housecat", peaceful=1, x=34, y=2 })
 des.monster({ id="human", peaceful=1, x=15, y=9 })
 des.monster({ id="human", peaceful=1, x=22, y=9 })
 des.monster({ id="human", peaceful=1, x=33, y=2 })

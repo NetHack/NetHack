@@ -719,7 +719,7 @@ static struct level_map {
                   { "juiblex", &juiblex_level },
                   { "knox", &knox_level },
                   { "medusa", &medusa_level },
-                  { "oracle", &oracle_level },
+                  { "prophet", &oracle_level },
                   { "orcus", &orcus_level },
                   { "rogue", &rogue_level },
                   { "sanctum", &sanctum_level },
@@ -1885,7 +1885,7 @@ dungeon_branch(const char *s)
     return br;
 }
 
-/* The Cave of Gibeon is a one-level branch above the Oracle. */
+/* The Cave of Gibeon is a one-level branch above the Prophet. */
 boolean
 on_gibeon_level(d_level *lev)
 {
@@ -2121,7 +2121,7 @@ lev_by_name(const char *nam)
     } else {
         /* no matching annotation, check whether they used a name we know */
 
-        /* allow strings like "the oracle level" to find "oracle" */
+        /* allow strings like "the prophet level" to find "prophet" */
         if (!strncmpi(nam, "the ", 4))
             nam += 4;
         if ((p = strstri(nam, " level")) != 0 && p == eos((char *) nam) - 6) {
@@ -2135,10 +2135,11 @@ lev_by_name(const char *nam)
                 nam = " to Vlad's tower"; /* branch to... */
             else
                 nam = "valley";
-        } else if (!strcmpi(nam, "delphi") || !strcmpi(nam, "prophet")) {
-            nam = "oracle";
-        } else if (!strcmpi(nam, "capernaum") || !strcmpi(nam, "minetown")) {
-            nam = "minetn-1";
+        } else if (!strcmpi(nam, "delphi") || !strcmpi(nam, "oracle")) {
+            nam = "prophet";
+        } else if (!strcmpi(nam, "minetown") || !strcmpi(nam, "minetn")
+                   || !strcmpi(nam, "minetn-1")) {
+            nam = "capernaum";
         } else if (!strcmpi(nam, "babylon") || !strcmpi(nam, "castle")) {
             nam = "castle";
         } else if (!strcmpi(nam, "petra") || !strcmpi(nam, "minesend")) {
@@ -3653,7 +3654,7 @@ print_mapseen(
     /* we assume that these are mutually exclusive */
     *buf = '\0';
     if (mptr->flags.oracle) {
-        Sprintf(buf, "%sThe Prophet.", PREFIX);
+        Sprintf(buf, "%sProphet of the Lord.", PREFIX);
     } else if (In_sokoban(&mptr->lev)) {
         Sprintf(buf, "%s%s.", PREFIX,
                 mptr->flags.sokosolved ? "Solved" : "Unsolved");

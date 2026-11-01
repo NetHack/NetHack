@@ -1,4 +1,4 @@
--- Cave of Gibeon. One level above the Oracle.
+-- Cave of Gibeon. One level above the Prophet.
 -- The tunnel is dark corridor. The cave is lit. No random monsters.
 des.level_init({ style = "solidfill", fg = " " })
 des.level_flags("mazelevel", "corrmaze", "nomongen", "noflip", "noteleport", "hardfloor")

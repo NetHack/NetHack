@@ -2410,7 +2410,7 @@ The extended command \(lq#chat\(rq can be used to interact with an adjacent
 monster.
 There is no actual dialog (in other words, you don't get to
 choose what you'll say), but chatting with some monsters such as a
-shopkeeper or the Oracle of Delphi can produce useful results.
+shopkeeper or the Prophet of the Lord can produce useful results.
 .hn 2
 Fighting
 .pg
@@ -3531,8 +3531,8 @@ L Lz2 L.
 Shop	\-	Entered a shop.
 Temple	\-	Entered a temple.
 Mines	\-	Entered the Gnomish Mines.
-Town	\-	Entered Mine Town.
-Oracle	\-	Consulted the Oracle of Delphi.
+Town	\-	Entered Capernaum.
+Prophet	\-	Consulted the Prophet.
 Novel	\-	Read a passage from a Discworld Novel.
 Sokoban	\-	Entered Sokoban.
 Big Room	\-	Entered the Big Room.

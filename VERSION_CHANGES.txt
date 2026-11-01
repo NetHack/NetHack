@@ -11,6 +11,13 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-01
+The dungeon overview tags the Prophet's level [prophet] and
+Capernaum [capernaum]. The feature line is "Prophet of the Lord."
+The #levelport menu uses those same names. The xlogfile records
+consulted_the_prophet and entered_capernaum. The cats in
+Capernaum are housecats, so the town loads.
+
+2026-11-01
 The Oracle is the Prophet. A minor word is one of the placeholder
 proverbs. The major word is "The treasure you seek has always
 been yours." The big room is the Valley of Dry Bones. The castle

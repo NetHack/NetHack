@@ -554,7 +554,7 @@ outrumor(
     switch (mechanism) {
     case BY_ORACLE:
         /* Oracle delivers the rumor */
-        pline("True to her word, the Oracle %ssays: ",
+        pline("True to her word, the Prophet %ssays: ",
               (!rn2(4) ? "offhandedly "
                        : (!rn2(3) ? "casually "
                                   : (rn2(2) ? "nonchalantly " : ""))));
@@ -697,8 +697,8 @@ outoracle(boolean special, boolean delphi)
         if (delphi)
             putstr(tmpwin, 0,
                    special
-                     ? "The Oracle scornfully takes all your gold and says:"
-                     : "The Oracle meditates for a moment and then intones:");
+                     ? "The Prophet scornfully takes all your gold and says:"
+                     : "The Prophet meditates for a moment and then intones:");
         else
             putstr(tmpwin, 0, "The message reads:");
         putstr(tmpwin, 0, "");

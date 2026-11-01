@@ -628,9 +628,9 @@ first food change will not load.
 
 ### Cave of Gibeon (2026-11-01)
 
-The Oracle's chamber has an up stair into a one-level branch, the
-Cave of Gibeon. Sokoban still joins one level below the Oracle; this
-stair is placed on the Oracle level itself. A dark orthogonal tunnel
+The Prophet's chamber has an up stair into a one-level branch, the
+Cave of Gibeon. Sokoban still joins one level below the Prophet; this
+stair is placed on the Prophet's level itself. A dark orthogonal tunnel
 leads into a lit cave. The cave does not generate random monsters.
 In the middle is the Altar at Gibeon, a lawful altar. Looking at it
 says "There is the Altar at Gibeon here." King Solomon stands on the
@@ -708,9 +708,12 @@ The Oracle is the Prophet. Paying for a minor consultation hears one
 of the placeholder proverbs. Paying the full price for a major
 consultation hears "The treasure you seek has always been yours."
 A short payment hears "That is not enough." That short line is a
-stand-in; Jon did not write one. The overview calls the level the
-Prophet. The big room's overview and achievements call it the Valley
-of Dry Bones. The maps of those big rooms are unchanged.
+stand-in; Jon did not write one. The overview feature line is
+exactly "Prophet of the Lord." Wizard mode tags that level
+[prophet]. The #levelport menu shows prophet. The xlogfile
+achievement is consulted_the_prophet. The big room's overview and
+achievements call it the Valley of Dry Bones. The maps of those
+big rooms are unchanged.
 
 Babylon's Palace is the old castle. The chest that held the rod of
 wishing now holds a blessed Shield of Faith. The drawbridge does not
@@ -718,7 +721,13 @@ open to the old tune. Apply the Key to Babylon's Palace at the
 drawbridge, or at a door of the palace. A lock pick does not open
 those doors. Interior chests can still be picked.
 
-Capernaum replaces every Minetown variant. It is lit, with a food
+Capernaum replaces every Minetown variant. Wizard mode tags that
+level [capernaum], and the #levelport menu shows capernaum. The
+xlogfile achievement is entered_capernaum. The old file name
+minetn-1 used to trigger the orc-town gang; Capernaum does not.
+The cats placed there are housecats; the id "cat" does not exist
+and stopped the level from loading.
+It is lit, with a food
 shop, a general store, a tool shop, a lawful temple, a pool, a
 fountain, and peaceful people, dogs, and cats. No random monsters
 are generated there. Peter the Fisherman stands south of his door.

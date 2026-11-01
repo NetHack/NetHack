@@ -93,10 +93,10 @@ enum achivements {
     /* 1 through 14 were present in 3.6.x; the rest are newer; first,
        some easier ones so less skilled players can have achievements */
     ACH_MINE = 15, /* entered Gnomish Mines */
-    ACH_TOWN = 16, /* reached Minetown */
+    ACH_TOWN = 16, /* reached Capernaum */
     ACH_SHOP = 17, /* entered a shop */
     ACH_TMPL = 18, /* entered a temple */
-    ACH_ORCL = 19, /* consulted the Oracle */
+    ACH_ORCL = 19, /* consulted the Prophet */
     ACH_NOVL = 20, /* read at least one passage from a Discworld novel */
     ACH_SOKO = 21, /* entered Sokoban */
     ACH_BGRM = 22, /* entered Bigroom (not guaranteed to be in every dgn) */

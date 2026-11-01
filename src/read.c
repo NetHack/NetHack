@@ -110,7 +110,7 @@ tshirt_text(struct obj *tshirt, char *buf)
         "Yendor Military Soldiers Do It In Large Groups",
         "I survived Yendor Military Boot Camp",
         "Ludios Accounting School Intra-Mural Lacrosse Team",
-        "Oracle(TM) Fountains 10th Annual Wet T-Shirt Contest",
+        "Capernaum Fountains 10th Annual Wet T-Shirt Contest",
         "Hey, black dragon!  Disintegrate THIS!",
         "I'm With Stupid -->",
         "Don't blame me, I voted for Izchak!",
@@ -143,8 +143,8 @@ tshirt_text(struct obj *tshirt, char *buf)
         "Lichen Park",
         "LOST IN THOUGHT - please send search party",
         "Meat is Mordor",
-        "Minetown Better Business Bureau",
-        "Minetown Watch",
+        "Capernaum Better Business Bureau",
+        "Capernaum Watch",
         /* Discworld riff; unfortunately long */
         ("Ms. Palm's House of Negotiable Affection--A Very Reputable"
             " House Of Disrepute"),
