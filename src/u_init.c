@@ -211,6 +211,10 @@ static const struct trobj Leash[] =
 static const struct trobj Towel[] =
     { { TOWEL, 0, TOOL_CLASS, 1, 1, 0 },
       { 0, 0, 0, 0, 0, 0 } };
+/* Every role starts with one. It is not used up by #cook. */
+static const struct trobj Flint_and_tinder[] =
+    { { FLINT_AND_TINDER, 0, TOOL_CLASS, 1, 1, 0 },
+      { 0, 0, 0, 0, 0, 0 } };
 static const struct trobj Wishing[] =
     { { WAN_WISHING, 3, WAND_CLASS, 1, 1, 0 },
       { 0, 0, 0, 0, 0, 0 } };
@@ -780,6 +784,10 @@ u_init_role(void)
     default: /* impossible */
         break;
     }
+
+    /* Every starting role, including ones not in the list above. */
+    ini_inv(Flint_and_tinder);
+    knows_object(FLINT_AND_TINDER, TRUE);
 
     gn.nocreate = STRANGE_OBJECT;
     gn.nocreate2 = STRANGE_OBJECT;

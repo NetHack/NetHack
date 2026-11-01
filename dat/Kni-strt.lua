@@ -41,7 +41,7 @@ des.object({ id = "doubled-edged blade", x = 27, y = 01, buc = "blessed", name =
 des.object({ id = "ancient defense", x = 31, y = 01, buc = "blessed", name = "shield of faith" });
 des.object({ id = "humble sash", x = 35, y = 01, buc = "blessed", name = "belt of truth" });
 des.object({ id = "divine covering", x = 26, y = 02, buc = "blessed", name = "cap of salvation" });
-des.object({ id = "trusty sandals", x = 28, y = 02, buc = "blessed", name = "gosple of the peace" });
+des.object({ id = "trusty sandals", x = 28, y = 02, buc = "blessed", name = "gospel of peace" });
 des.object({ id = "saddle", x = 26, y = 04, buc = "blessed", name = "riding blanket of the heavenly host" });
 
 

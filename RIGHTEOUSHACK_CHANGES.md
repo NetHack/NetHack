@@ -6,7 +6,7 @@ This file was written **before** merging tag `NetHack-5.0.0_Released`
 (`16ff591153`) so the upgrade can be checked against it.
 
 Spellings below are the owner's, including `elixer`, `exlier`,
-`doubled-edged`, `trusty sandles`, `Gosple`, `firey`, `wiggy gain ability`,
+`doubled-edged`, `trusty sandles`, `firey`, `wiggy gain ability`,
 and `PSALM 91`. They are intentional content (or at least content the
 owner shipped) and must not be "corrected" back to vanilla NetHack.
 
@@ -324,7 +324,7 @@ Helpers: `IS_STAFF_OF_WONDERS`, `IS_GOLDEN_CENSER`.
 | ID-203 | Golden Censer of Incense | thurible | `PM_CLERIC` | Prayer timeout, light radius 5 with no burnout (`src/timeout.c`), invoke engraves and teleports |
 | ID-204 | Scarlet Cord of Rahab | rope | `PM_ROGUE` | Apply climbs; invoke toggles invisibility. Climb/fall messages in `src/hack.c` |
 | ID-205 | Staff of Signs and Wonders | almond-wood walking stick | `PM_WIZARD` | Apply changes water/floor; invoke is a 5x5 column of fire (`src/apply.c`, `src/artifact.c`). Prayer recharges it (`src/pray.c`) |
-| ID-206 | Gosple of the Peace | trusty sandals | not role-bound | Water walking, haste, fire resistance; invoke tames |
+| ID-206 | Gospel of Peace | trusty sandals | not role-bound | Water walking, haste, fire resistance; invoke tames |
 | ID-207 | Breastplate of Righteousness | gleaming armor | not role-bound | Half spell damage, drain resistance, magic resistance, poison carry |
 | ID-208 | Belt of Truth | humble sash | not role-bound | Searching, see invisible, sleep/blind/hallucination resistance; invoke enlightens |
 | ID-209 | Sword of the Spirit | doubled-edged blade | not role-bound | Reflection, stun attack, warning |
@@ -394,7 +394,7 @@ Notable level strings that must survive:
 | ID-260 | `mhurtle_giant()` for the handkerchief push | `src/dothrow.c`, `include/extern.h` |
 | ID-261 | Rope use, staff-of-wonders apply, blanket apply | `src/apply.c` |
 | ID-262 | Artifact invoke implementations | `src/artifact.c` |
-| ID-263 | Ice walking for humble sandals / Gosple of the Peace; falling without a rope; Hebrews 12:6 when a jump off a wall fails | `src/hack.c` |
+| ID-263 | Ice walking for humble sandals / Gospel of Peace; falling without a rope; Hebrews 12:6 when a jump off a wall fails | `src/hack.c` |
 | ID-264 | `Is_thurible()` | `include/obj.h` |
 | ID-265 | `rndexp()` comment says elixer | `src/exper.c` |
 | ID-266 | Tribute line: `hankerchief` corrected to `handkerchief` | `dat/tribute` |
@@ -554,6 +554,117 @@ so the item is "rod of stillness" and the object enum is
 `WAN_STILLNESS`. Charges, duration, and the no-teleport effect are the
 5.0 behavior. 5.0's shield of drain resistance and shield of shock
 resistance are kept under those names, and ancient defense is kept too.
+
+### Food (2026-10-31, updated 2026-11-01)
+
+Monster bodies are shown as raw meat. The noun comes from
+`include/meatnoun.h` (one word per monster class): dragons are
+steak, sea monsters (`S_EEL`) are fillet, fungi are cap, jellies
+are jelly, puddings are pudding, and everything else is meat.
+If the monster's name already ends with that noun, it is not
+repeated (`raw blue jelly`, not `raw blue jelly jelly`). Fungus
+is still a cap (`raw yellow mold cap`), because "mold" is not
+the noun. Cooked meat is the same object with a cooked flag, so
+poison, acid, petrification, and intrinsics stay the same.
+Humanoids, humans, and elves leave no meat, with the exceptions
+below. Trolls still leave meat, because they come back from it.
+The ape class does too (monkey meat; ape, owlbear, yeti,
+carnivorous ape, and sasquatch steak). Lycanthropes leave meat
+in animal form and in human form, and eating either form causes
+lycanthropy. Cyclops leaves raw Cyclops steak and cooked Cyclops
+steak, with no "the" and no possessive. Goblins leave raw goblin
+meat and cooked goblin meat, under the normal raw-meat rules.
+Other giants, and the other orcs (hobgoblin, orc, hill orc,
+Mordor orc, Uruk-hai, orc shaman, orc-captain), still leave nothing.
+
+Essences are named "<monster>'s essence". They never spoil, cannot
+be cooked, and can be blessed. That set is ghosts, shades, wraiths,
+barrow wights, Nazgul, vampires, zombies, mummies, ghouls,
+skeletons, nymphs, mind flayers, the quantum
+mechanic, the genetic engineer, Medusa, the Wizard of Yendor,
+Croesus, every `S_DEMON` monster, and every `M2_DEMON` monster.
+A wraith's essence still grants a level. Eating a Rider's essence
+is still fatal, and they still revive from it. Eating any demon
+essence (`M2_DEMON`) is instantly fatal. The death reason is
+"ate a demon's essence". Sandestin, djinni, and the mail daemon
+are `S_DEMON` but not `M2_DEMON`, so their essences are not fatal.
+The Riders are also not `M2_DEMON`. Their essences keep the old
+meal effects: sandestin polymorphs you, and djinni and mail daemon
+essences are poisonous. Imps, manes, lemures, quasits, and tengu
+are not demons. They still leave meat, with the same effects as before.
+Ghosts and other zero-nutrition essences give 50 nutrition.
+Medusa's essence still petrifies, and killing her is still
+recorded. The Wizard still comes back and still drops what he
+carried; the essence is not what revives him. Croesus still drops
+his gold. Charon would leave an essence, but this build does not
+compile him. Liches, demiliches, master liches, and arch-liches
+crumble into dust and leave nothing.
+Vampire, zombie, and mummy essences are that undead, not an old
+human or elf body, and undead turning brings them back from it.
+Cannibalism is removed: no "You cannibal!" message, no Luck or
+aggravate penalty, no cave dweller or orc exception, and pets do
+not refuse food of their own race.
+
+Jellies and lizard meat never rot, skip the 5% raw-poison roll,
+and can be blessed while raw. They can still be cooked. Sea
+fillets (jellyfish, piranha, shark, giant eel, electric eel,
+kraken) also skip that roll, and they rot on the normal raw-meat
+schedule. A raw fillet cannot be blessed. Cooked fillet rots
+about ten times slower, and blessed cooked fillet never rots.
+Jellyfish is a fillet, not a jelly. Other raw meat cannot be
+blessed. Every role starts
+with a flint and tinder box. `#cook` uses it and does not use it
+up. Blessed cooked meat never spoils.
+An adult dragon steak weighs 4500. Stock carrying capacity never
+goes above 1000, and with an empty pack the heaviest single thing
+that can be lifted is just under 3000, so the steak cannot be
+picked up. Cook it and eat it where it lies. A baby dragon steak
+weighs 1500 and can be carried. Nothing special was added to the
+pickup code.
+The workbook `docs/RighteousHack_Food.xlsx` lists every food and
+every monster; regenerate it with `tools/gen_food_xlsx.py` when
+those tables change. `EDITLEVEL` is 1, so saves from before the
+first food change will not load.
+
+### Cave of Gibeon (2026-11-01)
+
+The Oracle's chamber has an up stair into a one-level branch, the
+Cave of Gibeon. Sokoban still joins one level below the Oracle; this
+stair is placed on the Oracle level itself. A dark orthogonal tunnel
+leads into a lit cave. The cave does not generate random monsters.
+In the middle is the Altar at Gibeon, a lawful altar. Looking at it
+says "There is the Altar at Gibeon here." King Solomon stands on the
+platform and remains there. `#chat` with him says one of two
+lines, chosen at random. One is: "When the Lord came to me in this
+place, I could have asked for gold or the lives of my enemies.
+Instead I asked for a heart to judge His people rightly." The other
+is Mark 8:36: "For what shall it profit a man, if he shall gain the
+whole world, and lose his own soul?" A chest on the platform holds one burnt offering. That food is not randomly
+generated and cannot be wished for.
+
+Praying while standing on the altar, with the burnt offering on it,
+consumes the offering even during the normal prayer wait. The LORD
+speaks the King James text of 1 Kings 3:5, with "to Solomon" changed
+to "to thee": "In Gibeon the LORD appeared to thee in a dream by
+night: and God said, Ask what I shall give thee." Asking for wisdom,
+a discerning heart, a wise and discerning heart, wisdom and
+knowledge, or knowledge (a leading "a" or "an" is ignored) is
+answered with the King James text of 1 Kings 3:11-13, from "Because
+thou hast asked this thing" through "all thy days." The gift is the
+existing Belt of Truth at
++2 enchantment, a blessed anointing oil of gain level, and Wisdom 25.
+Any other answer is an ordinary wish. The vision happens once. Later
+prayers at the altar are ordinary prayers.
+
+The Belt of Truth is the artifact that was already defined on the
+humble sash. Its base item and properties are unchanged. The +2 is
+the enchantment of this gift. While worn, that enchantment is +2
+Intelligence. The human race table still lists a Wisdom ceiling of
+18. This gift raises the ceiling for the hero who receives it, so
+the 25 is not immediately pulled back down to 18.
+
+Humans are the only race in the race table. No other race can be
+selected.
 
 ### Planned (not done)
 

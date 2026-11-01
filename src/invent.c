@@ -4074,11 +4074,17 @@ dfeature_at(coordxy x, coordxy y, char *buf)
     else if (IS_SINK(ltyp))
         cmap = S_sink; /* "sink" */
     else if (IS_ALTAR(ltyp)) {
-        Sprintf(altbuf, "%saltar to %s (%s)",
-                (lev->altarmask & AM_SANCTUM) ? "high " : "",
-                a_gname(),
-                align_str(Amask2align(lev->altarmask & ~AM_SHRINE)));
-        dfeature = altbuf;
+        if (is_gibeon_altar(x, y)) {
+            /* an() leaves a leading "the " alone, so look-here reads
+               "There is the Altar at Gibeon here." */
+            dfeature = "the Altar at Gibeon";
+        } else {
+            Sprintf(altbuf, "%saltar to %s (%s)",
+                    (lev->altarmask & AM_SANCTUM) ? "high " : "",
+                    a_gname(),
+                    align_str(Amask2align(lev->altarmask & ~AM_SHRINE)));
+            dfeature = altbuf;
+        }
     } else if (stway) {
         dfeature = stairs_description(stway, altbuf, TRUE);
     } else if (ltyp == DRAWBRIDGE_DOWN)
@@ -4420,7 +4426,8 @@ mergable(
         return FALSE;
 
     if (obj->oclass == FOOD_CLASS
-        && (obj->oeaten != otmp->oeaten || obj->orotten != otmp->orotten))
+        && (obj->oeaten != otmp->oeaten || obj->orotten != otmp->orotten
+            || obj->ocooked != otmp->ocooked))
         return FALSE;
 
     if (obj->dknown != otmp->dknown

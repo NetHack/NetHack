@@ -10,6 +10,75 @@ RighteousHack will eventually replace lawful, neutral, and chaotic
 with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
+2026-11-01
+At the Altar at Gibeon the LORD speaks the King James text of
+1 Kings 3:5 and 1 Kings 3:11-13.
+
+2026-11-01
+King Solomon also quotes Mark 8:36 when you #chat. He still
+says his line about asking for a heart to judge rightly.
+
+2026-11-01
+The boots artifact is named Gospel of Peace. The old spelling
+Gosple of the Peace is gone.
+
+2026-11-01
+The Oracle's chamber has an up stair to the Cave of Gibeon. Praying
+on the Altar at Gibeon with the burnt offering there asks for one
+wish. Asking for wisdom gives the existing Belt of Truth at +2,
+a blessed anointing oil of gain level, and Wisdom 25.
+
+2026-11-01
+An adult dragon steak weighs 4500, past what stock pickup can lift
+(the carrying cap is 1000, and the heaviest single lift is just
+under 3000). It stays on the floor, where it can be cooked and
+eaten. A baby dragon steak weighs 1500 and can be carried.
+
+2026-11-01
+The food workbook shows monster weights as numbers. A dragon
+weighs 4500, a baby dragon 1500, a human 1450, and a jelly 50.
+
+2026-11-01
+Goblins leave raw goblin meat and cooked goblin meat, with the
+normal raw-meat rules. Hobgoblins and the other orcs still leave
+nothing.
+
+2026-11-01
+Fish fillets still skip the raw-poisoning chance, and they spoil
+like other raw meat. A raw fillet cannot be blessed. Cooking slows
+that spoil, and blessed cooked fillet does not spoil. Lizard meat
+and jellies still do not spoil.
+
+2026-11-01
+Liches crumble into dust and leave nothing to eat. Cyclops meat
+is named "raw Cyclops steak" and "cooked Cyclops steak".
+
+2026-11-01
+Demons leave an essence, and eating any demon's essence is fatal.
+Mind flayers, liches, nymphs, the goblin, and a few named people
+leave an essence too. Apes, were-creatures, and Cyclops leave meat.
+Jellies, lizard meat, and fish fillets do not spoil. A jelly's
+name is no longer said twice.
+
+2026-10-31
+Spirits leave an essence, named like "wraith's essence" or
+"Death's essence". It never spoils, cannot be cooked, and can be
+blessed. Ghosts, shades, wraiths, barrow wights, Nazgul, vampires,
+zombies, mummies, ghouls, skeletons, and the three Riders do this.
+A wraith's essence still raises your level. Eating a Rider's
+essence is still fatal, and they still come back from it. Trolls
+still leave meat. Cannibalism is gone: no penalty for eating your
+own kind, and no cave dweller or orc exception.
+
+2026-10-31
+Monster bodies are raw meat now (a dragon leaves a raw dragon steak).
+Human-like monsters leave none, except trolls, who still do so
+they can come back. Eating raw meat can fatally poison
+you. #cook, with a flint and tinder box, makes cooked meat that
+spoils much more slowly. Blessed cooked meat does not spoil. The
+full list is in docs/RighteousHack_Food.xlsx. Saves from before
+this change will not load.
+
 2026-10-31
 The attributes screen no longer says your god is opposed by the
 other names in the pantheon. It only says which god you are on a

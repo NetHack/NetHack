@@ -1661,6 +1661,10 @@ H2Opotion_dip(
             glowcolor = NH_AMBER;
             costchange = COST_UNCURS;
         } else if (!targobj->blessed) {
+            if (!can_bless(targobj)) {
+                pline("You can't bless %s!", yname(targobj));
+                return TRUE; /* the holy water was used on the attempt */
+            }
             func = bless;
             glowcolor = NH_LIGHT_BLUE;
             costchange = COST_alter;

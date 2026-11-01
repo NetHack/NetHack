@@ -2993,14 +2993,29 @@ Food stored in
 ice boxes or tins (\(lqcans\(rq) will usually stay fresh, but
 ice boxes are heavy, and tins take a while to open.
 .pg
-When you kill monsters, they usually leave corpses which are also
-\(lqfood.\(rq
+Ghosts, wraiths, vampires, zombies, mummies, nymphs, demons,
+and the Riders leave an
+essence (\(lqwraith's essence\(rq, \(lqDeath's essence\(rq).
+An essence never spoils and cannot be cooked.
+Eating a demon's essence is fatal, and so is a Rider's.
+Jellies and lizard meat do not spoil.
+A fish fillet can be eaten raw without the usual chance of food poisoning,
+and it still spoils unless cooked.
+Trolls, apes, were-creatures, and goblins still leave meat.
+Eating your own kind is not punished.
+.pg
+When you kill a monster, it usually leaves raw meat (a dragon steak,
+a fish fillet, and so on).  Human-like monsters leave nothing to eat.
+Raw meat can spoil, and eating it raw sometimes causes fatal food
+poisoning.  #cook, with a flint and tinder box, makes cooked meat that
+spoils much more slowly.  Blessed cooked meat does not spoil.  This
+meat is \(lqfood.\(rq
 Many, but not all, of these are edible; some also give you
 special powers when you eat them.
 A good rule of thumb is \(lqyou are what you eat.\(rq
 .pg
 Some character roles and some monsters are vegetarian.  Vegetarian monsters
-will typically never eat animal corpses, while vegetarian players can,
+will typically never eat animal meat, while vegetarian players can,
 but with some rather unpleasant side-effects.
 .pg
 You can name one food item after something you like to eat with the

@@ -1421,8 +1421,14 @@ start_corpse_timeout(struct obj *body)
      *      of revive when its REVIVE_MON timer finishes.
      */
 
-    /* lizards and lichen don't rot or revive */
-    if (body->corpsenm == PM_LIZARD || body->corpsenm == PM_LICHEN)
+    /* lizards, lichen, and jellies don't rot or revive.
+       Sea fillets rot like other meat. Essences never rot.
+       Riders still revive from theirs. */
+    if (body->corpsenm == PM_LIZARD || body->corpsenm == PM_LICHEN
+        || mons[body->corpsenm].mlet == S_JELLY)
+        return;
+    if (leaves_essence(&mons[body->corpsenm])
+        && !is_rider(&mons[body->corpsenm]))
         return;
 
     action = ROT_CORPSE;               /* default action: rot away */
@@ -1448,6 +1454,14 @@ start_corpse_timeout(struct obj *body)
                && !body->norevive) {
         action = ZOMBIFY_MON;
         when = rn1(15, 5); /* 5..19 */
+    }
+
+    /* Cooked meat spoils about ten times slower. Blessed cooked meat
+       never rots. Revival (riders, trolls) is unchanged. */
+    if (action == ROT_CORPSE && body->ocooked) {
+        if (body->blessed)
+            return;
+        when *= 10L;
     }
 
     (void) start_timer(when, TIMER_OBJECT, action, obj_to_any(body));
@@ -1763,12 +1777,52 @@ maybe_adjust_light(struct obj *obj, int old_range)
  *      these routines to make the actual curse/bless state change.
  */
 
+/* Raw meat cannot be blessed, except lizard meat and jellies
+   (they never rot). Sea fillets skip the 5% raw-poison roll and
+   still cannot be blessed until cooked. Cooked meat and essences
+   can be blessed. Silent here; the player-facing
+   "You can't bless ..." message is printed by the attempt
+   (holy water, wishing). */
+boolean
+can_bless(struct obj *otmp)
+{
+    struct permonst *ptr;
+
+    if (!otmp || otmp->oclass == COIN_CLASS)
+        return FALSE;
+    if (otmp->otyp == CORPSE && !otmp->ocooked && ismnum(otmp->corpsenm)) {
+        ptr = &mons[otmp->corpsenm];
+        /* Lizard meat and jellies are the stable raw remains. */
+        if (ptr != &mons[PM_LIZARD] && ptr->mlet != S_JELLY
+            && !leaves_essence(ptr))
+            return FALSE;
+    }
+    return TRUE;
+}
+
+/* Blessed cooked meat does not rot. Other cooked meat rots on a
+   longer timer. Revival timers are left alone. */
+void
+refresh_meat_timer(struct obj *body)
+{
+    if (!body || body->otyp != CORPSE || !ismnum(body->corpsenm))
+        return;
+    if (obj_has_timer(body, REVIVE_MON) || obj_has_timer(body, ZOMBIFY_MON))
+        return;
+    (void) stop_timer(ROT_CORPSE, obj_to_any(body));
+    if (body->ocooked && body->blessed)
+        return; /* never rots */
+    start_corpse_timeout(body);
+}
+
 void
 bless(struct obj *otmp)
 {
     int old_light = 0;
 
     if (otmp->oclass == COIN_CLASS)
+        return;
+    if (!can_bless(otmp))
         return;
     if (otmp->lamplit)
         old_light = arti_light_radius(otmp);
@@ -1782,6 +1836,8 @@ bless(struct obj *otmp)
         (void) stop_timer(FIG_TRANSFORM, obj_to_any(otmp));
     if (otmp->lamplit)
         maybe_adjust_light(otmp, old_light);
+    if (otmp->otyp == CORPSE && otmp->ocooked)
+        refresh_meat_timer(otmp);
     return;
 }
 
@@ -1789,6 +1845,8 @@ void
 unbless(struct obj *otmp)
 {
     int old_light = 0;
+    boolean was_blessed_cooked = (otmp->otyp == CORPSE && otmp->ocooked
+                                  && otmp->blessed);
 
     if (otmp->lamplit)
         old_light = arti_light_radius(otmp);
@@ -1799,6 +1857,8 @@ unbless(struct obj *otmp)
         otmp->owt = weight(otmp);
     if (otmp->lamplit)
         maybe_adjust_light(otmp, old_light);
+    if (was_blessed_cooked)
+        refresh_meat_timer(otmp);
 }
 
 
@@ -1808,6 +1868,8 @@ curse(struct obj *otmp)
 {
     unsigned already_cursed;
     int old_light = 0;
+    boolean was_blessed_cooked = (otmp->otyp == CORPSE && otmp->ocooked
+                                  && otmp->blessed);
 
     if (is_holy_scripture(otmp))
         return;                     /* A word from God cannot be cursed */
@@ -1842,6 +1904,8 @@ curse(struct obj *otmp)
     }
     if (otmp->lamplit)
         maybe_adjust_light(otmp, old_light);
+    if (was_blessed_cooked)
+        refresh_meat_timer(otmp);
     return;
 }
 
@@ -1989,6 +2053,15 @@ weight(struct obj *obj)
                     : ((cwt + 1) / 2); /* uncursed */
 
         return wt + cwt;
+    }
+    if (obj->otyp == CORPSE && ismnum(obj->corpsenm)
+        && leaves_essence(&mons[obj->corpsenm])) {
+        /* A ghost's listed weight is a human body, for statues.
+           The essence itself is light. */
+        wt = 20 * (int) obj->quan;
+        if (obj->oeaten)
+            wt = eaten_stat(wt, obj);
+        return wt;
     }
     if (obj->otyp == CORPSE && ismnum(obj->corpsenm)) {
         long long_wt = obj->quan * (long) mons[obj->corpsenm].cwt;

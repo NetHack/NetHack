@@ -3280,13 +3280,30 @@
      stored in ice boxes or tins ("cans") will usually stay fresh, but  ice
      boxes are heavy, and tins take a while to open.
 
-          When you kill monsters, they usually leave corpses which are also
-     "food."  Many, but not all, of these are edible; some  also  give  you
-     special  powers  when  you eat them.  A good rule of thumb is "you are
-     what you eat."
+          When you kill a monster, it usually leaves raw meat.  A dragon
+     leaves a raw dragon steak, a fish or eel leaves a fillet, and most
+     other creatures leave meat.  Human-like monsters leave nothing to
+     eat.  Raw meat can spoil, and eating it raw sometimes causes fatal
+     food poisoning.  #cook, with a flint and tinder box, turns it into
+     cooked meat with the same effects; cooked meat spoils much more
+     slowly, and blessed cooked meat does not spoil.  Many kinds are
+     edible; some also give you special powers.  A good rule of thumb
+     is "you are what you eat."
+
+          Ghosts, wraiths, vampires, zombies, mummies, nymphs,
+     demons, and the Riders leave an essence instead of meat: a
+     wraith's essence, Death's essence, and so on.  An essence never
+     spoils, cannot be cooked, and can be blessed.  Eating a wraith's
+     essence can raise your experience.  Eating a Rider's essence is
+     fatal, and the Rider returns.  Eating any demon's essence is
+     fatal.  Jellies and lizard meat do not spoil.  A fish fillet
+     can be eaten raw without the usual chance of food poisoning,
+     and it still spoils unless cooked.
+     Trolls, apes, were-creatures, and goblins still leave meat.  Eating your
+     own kind is not punished.
 
           Some character roles and some monsters are vegetarian.   Vegetar-
-     ian monsters will typically never eat animal corpses, while vegetarian
+     ian monsters will typically never eat animal meat, while vegetarian
      players can, but with some rather unpleasant side-effects.
 
           You can name one food item after something you like to  eat  with
@@ -3681,7 +3698,7 @@
 
           A strict vegan diet is one which avoids  any  food  derived  from
      animals.   The  primary  source of nutrition is fruits and vegetables.
-     The corpses and tins of blobs (`b'), jellies (`j'),  and  fungi  (`F')
+     The raw meat and tins of blobs (`b'), jellies (`j'), and fungi (`F')
      are  also  considered  to  be vegetable matter.  Certain human food is
      prepared without animal products; namely, lembas wafers, cram rations,
      food  rations  (gunyoki),  K-rations, and C-rations.  Metal or another
@@ -3708,10 +3725,10 @@
      of royal jelly.  Monks are expected to observe a vegetarian diet.
 
           Eating any kind of meat violates the vegetarian, vegan, and food-
-     less conducts.  This includes tripe rations, the corpses  or  tins  of
+     less conducts.  This includes tripe rations, the raw meat or tins of
      any monsters not mentioned above, and the various other chunks of meat
      found in the dungeon.  Swallowing and digesting a monster while  poly-
-     morphed  is  treated  as  if  you  ate  the creature's corpse.  Eating
+     morphed  is  treated  as  if  you  ate  the creature's meat.  Eating
      leather, dragon hide, or bone items while polymorphed into a  creature
      that  can digest it, or eating monster brains while polymorphed into a
      mind flayer, is considered eating an animal, although wax is  only  an
@@ -3720,7 +3737,7 @@
           Regardless  of  conduct, there will be some items which are indi-
      gestible, and others which are hazardous to eat.  Using a swallow-and-
      digest  attack against a monster is equivalent to eating the monster's
-     corpse.  Please note that the term "vegan" is used here  only  in  the
+     meat.  Please note that the term "vegan" is used here  only  in  the
      context  of  diet.   You  are  still free to choose not to use or wear
      items derived from animals (e.g. leather, dragon  hide,  bone,  horns,
      coral),  but  the game will not keep track of this for you.  Also note
