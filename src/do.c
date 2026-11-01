@@ -1450,8 +1450,9 @@ capernaum_arrival(void)
 {
     winid win = create_nhwindow(NHW_TEXT);
 
-    putstr(win, 0,
-           "As you approach Capernaum, a man calls out \"Hello! You sir! My name is Peter the Fisherman, and I am in need of your aid!\"");
+    putstr(win, 0, flags.female
+           ? "As you approach Capernaum, a man calls out \"Hello! You ma'am! My name is Peter the Fisherman, and I am in need of your aid!\""
+           : "As you approach Capernaum, a man calls out \"Hello! You sir! My name is Peter the Fisherman, and I am in need of your aid!\"");
     display_nhwindow(win, TRUE);
     destroy_nhwindow(win);
 }

@@ -730,9 +730,11 @@ open to the old tune, and the key is not applied at the bridge
 itself. A Rock with a keyhole stands in the small courtyard
 outside the moat, west of the closed bridge. Standing on it or
 next to it and applying the Key to Babylon's Palace lowers the
-drawbridge. PLACEHOLDER for Jon: "The key turns in the rock. The
-drawbridge lowers." If it is already down: "The drawbridge is
-already lowered." Palace doors still open with the key. A lock
+drawbridge. PLACEHOLDER for Jon: "The key turns in the rock with
+a deep groan. Across the moat, chains rattle, and the drawbridge
+of Babylon comes thundering down." If it is already down: "The
+rock is silent. The way is already open." Palace doors still
+open with the key. A lock
 pick does not open those doors. Interior chests can still be
 picked. Prophet mode tags the level [babylon]. The #levelport
 menu shows babylon. The level file is still castle.
@@ -748,9 +750,10 @@ shop, a general store, a tool shop, a lawful temple, a pool, a
 fountain, and peaceful people, dogs, and cats. No random monsters
 are generated there. Peter the Fisherman stands south of his door.
 The first arrival opens a text window, the same kind as a quest
-introduction: "As you approach Capernaum, a man calls out \"Hello!
-You sir! My name is Peter the Fisherman, and I am in need of your
-aid!\"" The first `#chat` is the quest: "I lost my fishing net
+introduction. A male hero hears "As you approach Capernaum, a man
+calls out \"Hello! You sir! My name is Peter the Fisherman, and
+I am in need of your aid!\"" A female hero hears the same line
+with "You ma'am!" in place of "You sir!" The first `#chat` is the quest: "I lost my fishing net
 deep in the Salt Mines of Galilee, and I need you to retrieve it.
 Please take this scroll for a hint of the trials you may find
 along the way." He puts Peter's scroll in your pack. It cannot be

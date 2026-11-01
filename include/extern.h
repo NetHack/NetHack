@@ -506,7 +506,7 @@ extern int is_drawbridge_wall(coordxy, coordxy);
 extern boolean is_db_wall(coordxy, coordxy);
 extern boolean find_drawbridge(coordxy *, coordxy *) NONNULLPTRS;
 extern boolean create_drawbridge(coordxy, coordxy, int, boolean);
-extern void open_drawbridge(coordxy, coordxy);
+extern void open_drawbridge(coordxy, coordxy, boolean);
 extern void close_drawbridge(coordxy, coordxy);
 extern void destroy_drawbridge(coordxy, coordxy);
 

@@ -381,7 +381,7 @@ DISABLE_WARNING_FORMAT_NONLITERAL
 #define PICKLOCK_DID_NOTHING 0          /* no time passes */
 #define PICKLOCK_DID_SOMETHING 1
 
-/* PLACEHOLDER for Jon: "The key turns in the rock. The drawbridge lowers." */
+/* PLACEHOLDER for Jon: the two rock-and-bridge lines below. */
 staticfn int
 lower_babylon_drawbridge(void)
 {
@@ -391,15 +391,15 @@ lower_babylon_drawbridge(void)
     for (x = 0; x < COLNO; x++)
         for (y = 0; y < ROWNO; y++)
             if (levl[x][y].typ == DRAWBRIDGE_UP) {
-                pline("The key turns in the rock. The drawbridge lowers.");
-                open_drawbridge(x, y);
+                pline("The key turns in the rock with a deep groan. Across the moat, chains rattle, and the drawbridge of Babylon comes thundering down.");
+                open_drawbridge(x, y, TRUE);
                 u.uevent.uopened_dbridge = 1;
                 return PICKLOCK_DID_SOMETHING;
             } else if (levl[x][y].typ == DRAWBRIDGE_DOWN) {
                 down = TRUE;
             }
     if (down)
-        pline("The drawbridge is already lowered.");
+        pline("The rock is silent. The way is already open.");
     else
         pline("The key does not turn.");
     return PICKLOCK_LEARNED_SOMETHING;

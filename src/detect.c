@@ -1782,7 +1782,7 @@ openone(coordxy zx, coordxy zy, genericptr_t num)
             (*num_p)++;
     } else if (find_drawbridge(&zx, &zy)) {
         /* make sure it isn't an open drawbridge */
-        open_drawbridge(zx, zy);
+        open_drawbridge(zx, zy, FALSE);
         (*num_p)++;
     }
 }

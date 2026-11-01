@@ -3277,7 +3277,7 @@ zap_updown(struct obj *obj) /* wand or spell, nonnull */
         }
         /* up or down, but at closed portcullis only */
         if (is_db_wall(x, y) && find_drawbridge(&xx, &yy)) {
-            open_drawbridge(xx, yy);
+            open_drawbridge(xx, yy, FALSE);
             disclose = TRUE;
         } else if (u.dz > 0 && stway && stway->sx == x && stway->sy == y
                    /* can't use the stairs down to quest level 2 until
@@ -3700,7 +3700,7 @@ zap_map(
                 if (is_db_wall(x, y)) {
                     if (cansee(dbx, dby) || cansee(x, y))
                         learn_it = TRUE;
-                    open_drawbridge(dbx, dby);
+                    open_drawbridge(dbx, dby, FALSE);
                 }
                 break;
             case WAN_LOCKING:
