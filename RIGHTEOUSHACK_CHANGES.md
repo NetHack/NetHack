@@ -750,8 +750,20 @@ that would kill, you are left at 1 hit point. A wrong step at 1 hit
 point kills you. Diagonal steps onto a letter are wrong. The real
 door is directly north of the A. The other doors are empty closets.
 Behind the real door are Peter's net and a Favor Stone. The level
-does not generate monsters, does not allow teleport, and cannot be
-dug. Those three limits are so the puzzle cannot be skipped.
+does not generate random monsters, does not allow teleport, and
+cannot be dug. Those three limits stay, so the puzzle cannot be
+skipped. The Philistine champion is the only monster, on every
+layout. He stands on the corridor directly south of the up stair.
+That square is the only step off the arrival floor, so he is met
+before the engraved safe row. He is hostile, male, experience
+difficulty 10, monster level 8, speed 12, base armor class 10, and
+has one 2d6 weapon attack and no sorcery. He carries a +1 long sword, scale mail, a
+helmet, and a small shield. Killing him always leaves a scholar's
+scroll. The scroll is not generated anywhere else and cannot be
+wished for. Reading it shows this text and does not use it up:
+"In my research I have found the ancient Greek name for the rock
+upon which the church was built. It is written ΠΕΤΡΑ, which in our
+letters is PETRA."
 
 Give Peter the net. He says "Thank you, friend... 'Follow me, and I
 will make you fishers of men.' I have cast this net for many souls

@@ -11,6 +11,13 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-01
+Mines' End is guarded by the Philistine champion, the only monster
+there. He is a difficulty-10 warrior with a long sword, scale mail,
+a helmet, and a small shield, and he does not use sorcery. Killing
+him leaves a scholar's scroll. Reading it shows the Greek name
+ΠΕΤΡΑ and does not use the scroll up. It cannot be wished for.
+
+2026-11-01
 The Shield of Faith in the Babylon's Palace tower chest is
 blessed and +2. The oil that shares that chest is unchanged.
 

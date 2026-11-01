@@ -3109,6 +3109,20 @@ mondead(struct monst *mtmp)
     if (mtmp->data == &mons[PM_STEAM_VORTEX])
         create_gas_cloud(mtmp->mx, mtmp->my, rn2(10) + 5, 0); /* harmless */
 
+    /* The Philistine champion always leaves the scholar's scroll. */
+    if (mtmp->data == &mons[PM_PHILISTINE_CHAMPION] && isok(mtmp->mx, mtmp->my)) {
+        struct obj *scroll = mksobj(SCR_SCHOLARS_SCROLL, TRUE, FALSE);
+
+        if (scroll) {
+            scroll->dknown = 1;
+            place_object(scroll, mtmp->mx, mtmp->my);
+            stackobj(scroll);
+            newsym(mtmp->mx, mtmp->my);
+            if (cansee(mtmp->mx, mtmp->my))
+                pline("The Philistine champion drops a scholar's scroll.");
+        }
+    }
+
     /* dead vault guard is actually kept at coordinate <0,0> until
        his temporary corridor to/from the vault has been removed;
        need to do this after life-saving and before m_detach() */

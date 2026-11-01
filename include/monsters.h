@@ -3930,6 +3930,17 @@
                                        | M2_STRONG | M2_COLLECT | M2_MAGIC,
         M3_INFRAVISIBLE,
         8, HI_DOMESTIC, APPRENTICE),
+    /* PETRA's only monster. Difficulty 10: a fair fight for experience
+       level 7 or 8. One weapon attack, no sorcery. */
+    MON(NAM("Philistine champion"), S_HUMAN,
+        LVL(8, 12, 10, 0, -4), (G_NOGEN | G_UNIQ),
+        A(ATTK(AT_WEAP, AD_PHYS, 2, 6),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(WT_HUMAN, 400, MS_HUMANOID, MZ_HUMAN), 0, 0,
+        M1_HUMANOID | M1_OMNIVORE,
+        M2_NOPOLY | M2_HUMAN | M2_MALE | M2_HOSTILE | M2_STRONG | M2_COLLECT,
+        M3_INFRAVISIBLE,
+        10, HI_METAL, PHILISTINE_CHAMPION),
 
     /*
      * mons_init() in monst.c adds a terminator here, mons[NUMMONS].

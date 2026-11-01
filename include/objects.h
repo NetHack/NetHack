@@ -1343,6 +1343,13 @@ XTRA_SCROLL_LABEL("STRC PRST SKRZ KRK", SC20), /* Czech and Slovak
 SCROLL("mail",          "stamped",  0,   0,   0, SCR_MAIL),
 #endif
 SCROLL("blank paper", "unlabeled",  0,  28,  60, SCR_BLANK_PAPER),
+/* PETRA prize. Name is always known. Not randomly generated.
+   Wishes refused. Reading shows the scholar's note and does not use it up.
+   Unique so the identified name is "scholar's scroll", not "verse of ...". */
+OBJECT(OBJ("scholar's scroll", NoDes),
+       BITS(1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, P_NONE, PAPER),
+       0, SCROLL_CLASS, 0, 0, 5, 0, 0, 0, 0, 0, 6,
+       HI_PAPER, SCR_SCHOLARS_SCROLL),
 #undef SCROLL
 
 /* prophetic books ... */

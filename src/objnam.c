@@ -900,7 +900,10 @@ xname_flags(
         Strcpy(buf, "verse");
         if (!dknown)
             break;
-        if (nn) {
+        if (nn && ocl->oc_unique) {
+            /* "scholar's scroll", not "verse of scholar's scroll" */
+            Strcpy(buf, actualn);
+        } else if (nn) {
             Strcat(buf, " of ");
             Strcat(buf, actualn);
         } else if (un) {

@@ -2142,8 +2142,10 @@ lev_by_name(const char *nam)
             nam = "capernaum";
         } else if (!strcmpi(nam, "babylon") || !strcmpi(nam, "castle")) {
             nam = "castle";
-        } else if (!strcmpi(nam, "petra") || !strcmpi(nam, "minesend")) {
-            nam = "minend-1";
+        } else if (!strcmpi(nam, "petra") || !strcmpi(nam, "minesend")
+                   || !strcmpi(nam, "minend-1") || !strcmpi(nam, "minend-2")
+                   || !strcmpi(nam, "minend-3")) {
+            nam = "minend";
         }
 
         if ((slev = find_level(nam)) != 0)

@@ -17,7 +17,7 @@
  * Incrementing EDITLEVEL can be used to force invalidation of old bones
  * and save files.
  */
-#define EDITLEVEL 2 /* plot items and PETRA progress in uevent */
+#define EDITLEVEL 3 /* scholar's scroll */
 
 /*
  * Development status possibilities.

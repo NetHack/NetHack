@@ -21,6 +21,15 @@ des.map([[
 des.region(selection.area(0,0,14,10), "lit")
 des.non_diggable(selection.area(0,0,14,10))
 des.stair("up", 7, 9)
+-- The up stair is the arrival floor at (7,9). Stone blocks every way off it
+-- except south. He waits on that square, before the safe row at y=7.
+des.monster({ id = "Philistine champion", peaceful = 0, x = 7, y = 10,
+              inventory = function()
+                 des.object({ id = "long sword", spe = 1, buc = "uncursed" })
+                 des.object({ id = "scale mail", buc = "uncursed" })
+                 des.object({ id = "helmet", buc = "uncursed" })
+                 des.object({ id = "small shield", buc = "uncursed" })
+              end })
 des.engraving({ x=3, y=3, type="burn", text="O", degrade=false })
 des.engraving({ x=4, y=3, type="burn", text="O", degrade=false })
 des.engraving({ x=5, y=3, type="burn", text="E", degrade=false })
