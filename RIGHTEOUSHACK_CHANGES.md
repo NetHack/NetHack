@@ -1028,7 +1028,7 @@ of Hell is applied while standing on them. That shows Matthew
 16:18 KJV, then Psalm 107:16 KJV. Going down before that says the
 gates stay shut and names Peter's key. No Armor of God piece is
 required. Opening the gates does not pretend the Wizard is already
-dead. Wizard mode can levelport with "vibrating" or "gates".
+dead. Prophet mode can levelport with "vibrating" or "gates".
 
 The lines that are not in the plan, and the message order, are
 listed in the pull request for Jon. The plan still marks that
