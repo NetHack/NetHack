@@ -18,6 +18,7 @@ staticfn int menu_drop(int);
 staticfn boolean u_stuck_cannot_go(const char *);
 staticfn NHFILE *currentlevel_rewrite(void);
 staticfn void familiar_level_msg(void);
+staticfn void capernaum_arrival(void);
 staticfn void final_level(void);
 staticfn void temperature_change_msg(schar);
 staticfn boolean better_not_try_to_drop_that(struct obj *);
@@ -1445,6 +1446,17 @@ u_collide_m(struct monst *mtmp)
 }
 
 staticfn void
+capernaum_arrival(void)
+{
+    winid win = create_nhwindow(NHW_TEXT);
+
+    putstr(win, 0,
+           "As you approach Capernaum, a man calls out \"Hello! You sir! My name is Peter the Fisherman, and I am in need of your aid!\"");
+    display_nhwindow(win, TRUE);
+    destroy_nhwindow(win);
+}
+
+staticfn void
 familiar_level_msg(void)
 {
     static const char *const fam_msgs[4] = {
@@ -1593,7 +1605,7 @@ goto_level(
                     return;
                 }
                 pline("The Lord opens the narrow gate before you...");
-                pline("\"Enter by the narrow gate...\" (Matthew 7:13–14 ESV)");
+                pline("\"Enter by the narrow gate...\" (Matthew 7:13-14 ESV)");
             }
             else {
                 /* Normal quest continuation path */
@@ -1896,6 +1908,13 @@ goto_level(
 
     /* special levels can have a custom arrival message */
     deliver_splev_message();
+
+    if (new) {
+        s_level *slev = Is_special(&u.uz);
+
+        if (slev && !strcmp(slev->proto, "capernaum"))
+            capernaum_arrival();
+    }
 
     /* Check whether we just entered Gehennom. */
     if (!In_hell(&u.uz0) && Inhell) {

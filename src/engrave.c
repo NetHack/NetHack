@@ -363,6 +363,9 @@ read_engr_at(coordxy x, coordxy y)
                 You_see("a message scrawled in blood here.");
             }
             break;
+        case LETTER:
+            /* The map shows the letter. This is not an engraving. */
+            break;
         default:
             impossible("%s is written in a very strange way.", Something);
             sensed = 1;

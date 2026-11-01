@@ -1824,6 +1824,12 @@ hmon_hitmon(
     if (hmd.ispoisoned)
         hmon_hitmon_poison(&hmd, mon, obj);
 
+    if (is_peter(mon)) {
+        hmd.dmg = 0;
+        hmd.get_dmg_bonus = FALSE;
+        (void) peter_unhurt(mon);
+    }
+
     if (hmd.dmg < 1) {
         boolean mon_is_shade = (mon->data == &mons[PM_SHADE]);
 
@@ -1857,7 +1863,8 @@ hmon_hitmon(
                so we test for 1; 0 shouldn't be able to happen here... */
             && hmd.dmg > 0 && u.uconduct.weaphit <= 1)
             first_weapon_hit(obj);
-        mon->mhp -= hmd.dmg;
+        if (!is_peter(mon))
+            mon->mhp -= hmd.dmg;
     }
     /* adjustments might have made tmp become less than what
        a level-draining artifact has already done to max HP */
@@ -1883,6 +1890,8 @@ hmon_hitmon(
     hmon_hitmon_splitmon(&hmd, mon, obj);
 
     hmon_hitmon_msg_hit(&hmd, mon, obj);
+    if (is_peter(mon))
+        pline("%s is unharmed.", Monnam(mon));
 
     if (hmd.dryit) { /* dryit implies wet towel, so 'obj' is still intact */
         assert(obj != NULL);
@@ -2463,6 +2472,12 @@ mhitm_ad_drli(
 {
     if (magr == &gy.youmonst) {
         /* uhitm */
+        if (is_peter(mdef)) {
+            (void) peter_unhurt(mdef);
+            pline("%s is unharmed.", Monnam(mdef));
+            mhm->damage = 0;
+            return;
+        }
         if (!rn2(3) && !(resists_drli(mdef) || defended(mdef, AD_DRLI))
             && !mhitm_mgc_atk_negated(magr, mdef, TRUE)) {
             mhm->damage = d(2, 6); /* Stormbringer uses monhp_per_lvl
@@ -4872,7 +4887,11 @@ damageum(
         return mhm.hitflags;
 
     mdef->mstrategy &= ~STRAT_WAITFORU; /* in case player is very fast */
-    mdef->mhp -= mhm.damage;
+    if (peter_unhurt(mdef)) {
+        pline("%s is unharmed.", Monnam(mdef));
+        mhm.damage = 0;
+    } else
+        mdef->mhp -= mhm.damage;
     if (DEADMONSTER(mdef)) {
         /* troll killed by Trollsbane won't auto-revive; FIXME? same when
            Trollsbane is wielded as primary and two-weaponing kills with
@@ -5193,7 +5212,11 @@ gulpum(struct monst *mdef, struct attack *mattk)
                 break;
             }
             end_engulf();
-            mdef->mhp -= dam;
+            if (peter_unhurt(mdef)) {
+                pline("%s is unharmed.", Monnam(mdef));
+                dam = 0;
+            } else
+                mdef->mhp -= dam;
             if (DEADMONSTER(mdef)) {
                 killed(mdef);
                 if (DEADMONSTER(mdef)) /* not lifesaved */

@@ -420,7 +420,8 @@ unmap_object(coordxy x, coordxy y)
         struct rm *lev = &levl[x][y];
 
         if (spot_shows_engravings(x, y)
-            && (ep = engr_at(x, y)) != 0 && !covers_traps(x, y)) {
+            && (ep = engr_at(x, y)) != 0 && ep->engr_type != LETTER
+            && !covers_traps(x, y)) {
             if (cansee(x, y))
                 ep->erevealed = 1;
             map_engraving(ep, 0);
@@ -459,6 +460,7 @@ unmap_object(coordxy x, coordxy y)
             map_trap(trap, show);                                       \
         } else if (spot_shows_engravings(x, y)                          \
                  && (ml_ep = engr_at(x, y)) != 0                        \
+                 && ml_ep->engr_type != LETTER                          \
                  && ml_ep->erevealed                                    \
                  && !covers_traps(x, y)) {                              \
             map_engraving(ml_ep, show);                                 \
@@ -2651,6 +2653,15 @@ map_glyphinfo(
         glyphinfo->gm.sym.symidx = mons[glyph_to_mon(glyph)].mlet + SYM_OFF_M;
     }
     glyphinfo->ttychar = gs.showsyms[glyphinfo->gm.sym.symidx];
+    /* PETRA letters are drawn on the floor itself, in tty as well.
+       Unseen squares stay blank. */
+    if (glyph_is_cmap(glyph) && isok(x, y)
+        && (levl[x][y].seenv || cansee(x, y))) {
+        char letter = petra_map_letter(x, y);
+
+        if (letter)
+            glyphinfo->ttychar = letter;
+    }
     glyphinfo->glyph = glyph;
 }
 

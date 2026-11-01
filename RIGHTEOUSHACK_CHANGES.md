@@ -712,22 +712,30 @@ Wizard role are unchanged. The sysconf list is still named WIZARDS.
 
 ### Prophet, Capernaum, and PETRA (2026-11-01)
 
-The Oracle is the Prophet. Paying for a minor consultation hears one
-of the placeholder proverbs. Paying the full price for a major
-consultation hears "The treasure you seek has always been yours."
-A short payment hears "That is not enough." That short line is a
-stand-in; Jon did not write one. The overview feature line is
-exactly "Prophet of the Lord." Prophet mode tags that level
-[prophet]. The #levelport menu shows prophet. The xlogfile
-achievement is consulted_the_prophet. The big room's overview and
-achievements call it the Valley of Dry Bones. The maps of those
-big rooms are unchanged.
+The Oracle is Isaiah, prophet of the Lord. That is his monster
+name, and the consultation windows name him that way. Paying for a
+minor consultation hears one of the placeholder proverbs. Paying
+the full price for a major consultation hears "The treasure you
+seek has always been yours." A short payment hears "That is not
+enough." That short line is a stand-in; Jon did not write one.
+The overview feature line is exactly "Prophet of the Lord."
+Prophet mode tags that level [prophet]. The #levelport menu shows
+prophet. The xlogfile achievement is consulted_the_prophet. The
+big room's overview and achievements call it the Valley of Dry
+Bones. The maps of those big rooms are unchanged.
 
 Babylon's Palace is the old castle. The chest that held the rod of
 wishing now holds a blessed +2 Shield of Faith. The drawbridge does not
-open to the old tune. Apply the Key to Babylon's Palace at the
-drawbridge, or at a door of the palace. A lock pick does not open
-those doors. Interior chests can still be picked.
+open to the old tune, and the key is not applied at the bridge
+itself. A Rock with a keyhole stands in the small courtyard
+outside the moat, west of the closed bridge. Standing on it or
+next to it and applying the Key to Babylon's Palace lowers the
+drawbridge. PLACEHOLDER for Jon: "The key turns in the rock. The
+drawbridge lowers." If it is already down: "The drawbridge is
+already lowered." Palace doors still open with the key. A lock
+pick does not open those doors. Interior chests can still be
+picked. Prophet mode tags the level [babylon]. The #levelport
+menu shows babylon. The level file is still castle.
 
 Capernaum replaces every Minetown variant. Prophet mode tags that
 level [capernaum], and the #levelport menu shows capernaum. The
@@ -739,37 +747,60 @@ It is lit, with a food
 shop, a general store, a tool shop, a lawful temple, a pool, a
 fountain, and peaceful people, dogs, and cats. No random monsters
 are generated there. Peter the Fisherman stands south of his door.
-`#chat` before you have his net: "The Master gave me a new name, and
+The first arrival opens a text window, the same kind as a quest
+introduction: "As you approach Capernaum, a man calls out \"Hello!
+You sir! My name is Peter the Fisherman, and I am in need of your
+aid!\"" The first `#chat` is the quest: "I lost my fishing net
+deep in the Salt Mines of Galilee, and I need you to retrieve it.
+Please take this scroll for a hint of the trials you may find
+along the way." He puts Peter's scroll in your pack. It cannot be
+wished for. Reading it shows "The Master gave me a new name, and
 on it He said He would build. Remember my name, and the floor will
-hold you."
+hold you." It can be read any number of times and is not used up.
+Later chats before the net is returned repeat that same hint.
+Peter cannot be killed or hurt by a weapon, a missile, a spell, a
+rod, a trap, or a pet. He does not turn hostile, and he cannot be
+pushed off his post. A pet will not attack Peter, King Solomon,
+Isaiah, the angel at Jacob's Ladder, or a Babel builder.
 
-Mines' End is three PETRA layouts. The safe row is engraved "Upon
-this rock I will build my church. Walk upon the rock in the tongue
-of the Greeks." A wrong letter becomes lava and deals 20 damage. If
+Mines' End is three PETRA layouts. The puzzle room, through the
+safe row, is lit. The rest of the level is dark. The letters P, E,
+T, R, A and the decoys are drawn on the map as those capitals.
+Farlook and look-here call a tile "the letter P" (or whichever
+letter it is). They are not engravings. The hint is an engraving
+in the southwest corner of the safe row, so it shows the engraving
+symbol: "Upon this rock I will build my church. Walk upon the rock
+in the tongue of the Greeks." A wrong letter, including a decoy or
+a diagonal step, becomes lava under you and deals 20 damage. If
 that would kill, you are left at 1 hit point. A wrong step at 1 hit
-point kills you. Diagonal steps onto a letter are wrong. The real
-door is directly north of the A. The other doors are empty closets.
-Behind the real door are Peter's net and a Favor Stone. The level
-does not generate random monsters, does not allow teleport, and
-cannot be dug. Those three limits stay, so the puzzle cannot be
-skipped. The Philistine Champion is the only monster, on every
-layout. He waits in a dark room far from the up stair. The passage
-to that room leaves the arrival corridor and winds under the
-puzzle, around the outer edge, and back to a closed door. It does
-not cross the letter floor or the safe row, so the scroll can be
-taken before the puzzle. The passage is not visible from the
-stair. He is hostile and male. Monster level 7, speed 12, magic
-resistance 30, size large. Hit points are a fixed 90, about three
-times an ogre lord. Bare armor class is 3. He wears uncursed bronze
-plate mail and a helmet, so his armor class in the fight is -4.
-One weapon attack, listed as 2d6 with empty hands. He wields a +2
-two-handed sword: 1d12+2 against a human-sized hero, plus strength.
-No sorcery. Killing him always leaves a scholar's
+point kills you. The path is stored on each letter, so a later
+layout does not need a coordinate table. The first letter has to
+be stepped on straight north from the safe row. There is one door
+onto the letter floor, directly north of the A. The other two
+doors are closets, and each holds a loadstone. Behind the real
+door are Peter's net and a Favor Stone. The level does not
+generate random monsters, does not allow teleport, and cannot be
+dug. Those three limits stay, so the puzzle cannot be skipped.
+The Philistine Champion is the only monster, on every layout. He
+waits in a dark room far from the up stair and does not leave that
+room. He can still fight anyone who comes in. The passage to that
+room leaves the arrival corridor and winds under the puzzle,
+around the outer edge, and back to a closed door. It does not
+cross the letter floor or the safe row, so the scroll can be taken
+before the puzzle. The passage is not visible from the stair. He
+is hostile and male. Monster level 7, speed 12, magic resistance
+30, size large. Hit points are a fixed 90, about three times an
+ogre lord. Bare armor class is 3. He wears uncursed bronze plate
+mail and a helmet, so his armor class in the fight is -4. One
+weapon attack, listed as 2d6 with empty hands. He wields a +2
+two-handed sword: 1d12+2 against a human-sized hero, plus
+strength. No sorcery. Killing him always leaves a scholar's
 scroll. The scroll is not generated anywhere else and cannot be
 wished for. Reading it shows this text and does not use it up:
 "In my research I have found the ancient Greek name for the rock
-upon which the church was built. It is written ΠΕΤΡΑ, which in our
-letters is PETRA."
+upon which the church was built. It is written with the Greek
+letters Pi, Epsilon, Tau, Rho, Alpha, which in our letters is
+PETRA."
 
 Give Peter the net. He says "Thank you, friend... 'Follow me, and I
 will make you fishers of men.' I have cast this net for many souls

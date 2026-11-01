@@ -517,6 +517,10 @@ really_kick_object(coordxy x, coordxy y)
     if (!gk.kickedobj || gk.kickedobj->otyp == BOULDER
         || gk.kickedobj == uball || gk.kickedobj == uchain)
         return 0;
+    if (gk.kickedobj->otyp == ROCK_WITH_KEYHOLE) {
+        pline("The rock does not move.");
+        return 1;
+    }
 
     if ((trap = t_at(x, y)) != 0) {
         if ((is_pit(trap->ttyp) && !Passes_walls) || trap->ttyp == WEB) {

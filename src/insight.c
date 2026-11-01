@@ -80,7 +80,7 @@ static struct ll_achieve_msg achieve_msg [] = {
     { LL_ACHIEVE, "reached Capernaum" }, /* probably minor, but dnh logs it */
     { LL_MINORAC, "entered a shop" },
     { LL_MINORAC, "entered a temple" },
-    { LL_ACHIEVE, "consulted the Prophet" }, /* minor, but rare enough */
+    { LL_ACHIEVE, "consulted Isaiah, prophet of the Lord" }, /* minor, but rare enough */
     { LL_MINORAC | LL_DUMP, "read a Discworld novel" }, /* even more so */
     { LL_ACHIEVE, "entered Sokoban" }, /* keep as major for turn comparison
                                         * with completed sokoban */
@@ -2291,7 +2291,7 @@ show_achievements(
             you_have_X("entered a temple");
             break;
         case ACH_ORCL:
-            you_have_X("consulted the Prophet");
+            you_have_X("consulted Isaiah, prophet of the Lord");
             break;
         case ACH_NOVL:
             you_have_X("read from a Discworld novel");

@@ -222,12 +222,18 @@ struct monst {
 #define is_Vlad(m) ((m)->data == &mons[PM_VLAD_THE_IMPALER]  \
                     || (m)->cham == PM_VLAD_THE_IMPALER)
 
+/* Peter stays on his post. A given name, not a unique monster type. */
+#define is_peter(mon) \
+    (has_mgivenname(mon) \
+     && !strcmp(MGIVENNAME(mon), "Peter the Fisherman"))
+
 /* monsters which cannot be displaced: temple priests, shopkeepers,
-   vault guards, the Oracle, quest leader */
+   vault guards, Isaiah, Peter, quest leader */
 #define mundisplaceable(mon) \
     ((mon)->ispriest || (mon)->isshk                    \
      || (mon)->isgd || (mon)->data == &mons[PM_ORACLE]  \
-     || (mon)->m_id == svq.quest_status.leader_m_id)
+     || (mon)->m_id == svq.quest_status.leader_m_id     \
+     || is_peter(mon))
 
 /* mimic appearances that block vision/light */
 #define is_lightblocker_mappear(mon) \

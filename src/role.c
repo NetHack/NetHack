@@ -113,7 +113,7 @@ const struct Role roles[NUM_ROLES+1] = {
         { "Servant of the Hurting", 0 },    /* washes feet, tends wounds */
         { "Bearer of Kindness", 0 },    /* like the Good Samaritan (Luke 10:34) */
         { "Merciful", 0 },        /* first acts of healing in Jesus’ name */
-        { "Physician’s Apprentice", 0 },    /* learning from the Great Physician */
+        { "Physician's Apprentice", 0 },    /* learning from the Great Physician */
         { "Deliverer", 0 },                 /* casting out demons with authority */
         { "Physician", 0 },         /* proclaiming liberty to captives (Isa 61:1) */
         { "Faithful Physician", 0 },        /* mature in gifts of healing (1 Cor 12:9) */

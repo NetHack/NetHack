@@ -739,6 +739,10 @@ score_targ(struct monst *mtmp, struct monst *mtarg)
 {
     long score = 0L;
 
+    /* Pets never attack plot NPCs, even when confused or in conflict. */
+    if (is_plot_npc(mtarg))
+        return -5000L;
+
     /* If the monster is confused, normal scoring is disrupted -
      * anything may happen
      */
@@ -864,7 +868,7 @@ best_target(struct monst *mtmp, boolean forced)   /* Pet */
             temp_targ = find_targ(mtmp, dx, dy, 7);
 
             /* Nothing in this line? */
-            if (!temp_targ)
+            if (!temp_targ || is_plot_npc(temp_targ))
                 continue;
 
             /* Decide how attractive the target is */
@@ -1117,6 +1121,9 @@ dog_move(
              * they are willing to attack; note the >= used when comparing it.
              */
             int balk = mtmp->m_lev + ((5 * mtmp->mhp) / mtmp->mhpmax) - 2;
+
+            if (is_plot_npc(mtmp2))
+                continue;
 
             if ((int) mtmp2->m_lev >= balk
                 || (mtmp2->mtame && mtmp->mtame && !Conflict)

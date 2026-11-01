@@ -1350,6 +1350,12 @@ OBJECT(OBJ("scholar's scroll", NoDes),
        BITS(1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, P_NONE, PAPER),
        0, SCROLL_CLASS, 0, 0, 5, 0, 0, 0, 0, 0, 6,
        HI_PAPER, SCR_SCHOLARS_SCROLL),
+/* Peter's quest hint. Not random. Reading it does not use it up.
+   Placed here so the scroll class stays in order. */
+OBJECT(OBJ("Peter's scroll", NoDes),
+       BITS(1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, P_NONE, PAPER),
+       0, SCROLL_CLASS, 0, 0, 5, 0, 0, 0, 0, 0, 6,
+       HI_PAPER, SCR_PETERS_SCROLL),
 #undef SCROLL
 
 /* prophetic books ... */
@@ -1706,6 +1712,11 @@ OBJECT(OBJ("boulder", NoDes),
 OBJECT(OBJ("statue", NoDes),
        BITS(1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, P_NONE, MINERAL), 0,
        ROCK_CLASS, 900, 0, 2500, 0, 20, 20, 0, 0, 2500, CLR_WHITE, STATUE),
+/* Fixed courtyard marker. Not carried, kicked, or wished for. */
+OBJECT(OBJ("Rock with a keyhole", NoDes),
+       BITS(1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, P_NONE, MINERAL),
+       0, ROCK_CLASS, 0, 0, 6000, 0, 0, 0, 0, 0, 0,
+       HI_MINERAL, ROCK_WITH_KEYHOLE),
 
 OBJECT(OBJ("heavy iron ball", NoDes),
        BITS(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, WHACK, P_NONE, IRON), 0,

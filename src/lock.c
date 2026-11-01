@@ -12,6 +12,9 @@ staticfn int forcelock(void);
 staticfn const char *lock_action(void);
 staticfn boolean obstructed(coordxy, coordxy, boolean);
 staticfn void chest_shatter_msg(struct obj *);
+staticfn boolean babylon_keyhole_at(coordxy, coordxy);
+staticfn boolean hero_by_babylon_keyhole(void);
+staticfn int lower_babylon_drawbridge(void);
 
 boolean
 picking_lock(coordxy *x, coordxy *y)
@@ -31,6 +34,31 @@ picking_at(coordxy x, coordxy y)
 {
     return (boolean) (go.occupation == picklock
                       && gx.xlock.door == &levl[x][y]);
+}
+
+staticfn boolean
+babylon_keyhole_at(coordxy x, coordxy y)
+{
+    struct obj *otmp;
+
+    if (!isok(x, y))
+        return FALSE;
+    for (otmp = svl.level.objects[x][y]; otmp; otmp = otmp->nexthere)
+        if (otmp->otyp == ROCK_WITH_KEYHOLE)
+            return TRUE;
+    return FALSE;
+}
+
+staticfn boolean
+hero_by_babylon_keyhole(void)
+{
+    coordxy x, y;
+
+    for (x = u.ux - 1; x <= u.ux + 1; x++)
+        for (y = u.uy - 1; y <= u.uy + 1; y++)
+            if (babylon_keyhole_at(x, y))
+                return TRUE;
+    return FALSE;
 }
 
 /* produce an occupation string appropriate for the current activity */
@@ -353,6 +381,30 @@ DISABLE_WARNING_FORMAT_NONLITERAL
 #define PICKLOCK_DID_NOTHING 0          /* no time passes */
 #define PICKLOCK_DID_SOMETHING 1
 
+/* PLACEHOLDER for Jon: "The key turns in the rock. The drawbridge lowers." */
+staticfn int
+lower_babylon_drawbridge(void)
+{
+    coordxy x, y;
+    boolean down = FALSE;
+
+    for (x = 0; x < COLNO; x++)
+        for (y = 0; y < ROWNO; y++)
+            if (levl[x][y].typ == DRAWBRIDGE_UP) {
+                pline("The key turns in the rock. The drawbridge lowers.");
+                open_drawbridge(x, y);
+                u.uevent.uopened_dbridge = 1;
+                return PICKLOCK_DID_SOMETHING;
+            } else if (levl[x][y].typ == DRAWBRIDGE_DOWN) {
+                down = TRUE;
+            }
+    if (down)
+        pline("The drawbridge is already lowered.");
+    else
+        pline("The key does not turn.");
+    return PICKLOCK_LEARNED_SOMETHING;
+}
+
 /* player is applying a key, lock pick, or credit card */
 int
 pick_lock(
@@ -435,6 +487,12 @@ pick_lock(
         pline("The key does not turn.");
         return PICKLOCK_LEARNED_SOMETHING;
     }
+    /* The rock is outside the moat. The key lowers the bridge from
+       there. A door is still a door, so the palace locks keep working. */
+    if (picktyp == KEY_TO_BABYLON && Is_stronghold(&u.uz)
+        && hero_by_babylon_keyhole()
+        && !(isok(cc.x, cc.y) && IS_DOOR(levl[cc.x][cc.y].typ)))
+        return lower_babylon_drawbridge();
 
     if (u_at(cc.x, cc.y)) { /* pick lock on a container */
         const char *verb;
@@ -571,19 +629,6 @@ pick_lock(
                 || is_drawbridge_wall(cc.x, cc.y) >= 0)) {
             pline("The lock does not answer. The Key to Babylon's Palace is required.");
             return PICKLOCK_LEARNED_SOMETHING;
-        }
-        if (picktyp == KEY_TO_BABYLON && Is_stronghold(&u.uz)) {
-            coordxy bx = cc.x, by = cc.y;
-
-            if (find_drawbridge(&bx, &by)) {
-                if (levl[bx][by].typ == DRAWBRIDGE_DOWN)
-                    close_drawbridge(bx, by);
-                else
-                    open_drawbridge(bx, by);
-                pline("The Key to Babylon's Palace turns. The bridge answers.");
-                u.uevent.uopened_dbridge = 1;
-                return PICKLOCK_DID_SOMETHING;
-            }
         }
         mtmp = m_at(cc.x, cc.y);
         if (mtmp && canseemon(mtmp) && M_AP_TYPE(mtmp) != M_AP_FURNITURE

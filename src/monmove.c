@@ -720,10 +720,9 @@ dochug(struct monst *mtmp)
             mtmp->mhp = 200;
         }
     }
-    if (has_mgivenname(mtmp)
-        && !strcmp(MGIVENNAME(mtmp), "Peter the Fisherman")) {
+    if (is_peter(mtmp)) {
         mtmp->mstrategy |= STRAT_WAITFORU;
-        mtmp->mpeaceful = 1;
+        (void) peter_unhurt(mtmp);
     }
 
     /* update quest status flags */
@@ -2052,6 +2051,12 @@ m_move(struct monst *mtmp, int after)
         }
 
         if (!m_in_out_region(mtmp, nix, niy))
+            return MMOVE_DONE;
+
+        /* The Philistine Champion fights anyone who comes in, and
+           does not step off the floor of his room. */
+        if (ptr == &mons[PM_PHILISTINE_CHAMPION]
+            && levl[nix][niy].typ != ROOM)
             return MMOVE_DONE;
 
         if ((mfp.info[chi] & ALLOW_ROCK) && m_can_break_boulder(mtmp)) {

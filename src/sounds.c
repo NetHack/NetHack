@@ -736,9 +736,23 @@ domonnoise(struct monst *mtmp)
         return ECMD_TIME;
     }
 
-    if (has_mgivenname(mtmp)
-        && !strcmp(MGIVENNAME(mtmp), "Peter the Fisherman")) {
+    if (is_peter(mtmp)) {
         SetVoice(mtmp, 0, 80, 0);
+        if (!u.uevent.peter_quest) {
+            struct obj *scroll;
+
+            verbalize("I lost my fishing net deep in the Salt Mines of Galilee, and I need you to retrieve it. Please take this scroll for a hint of the trials you may find along the way.");
+            u.uevent.peter_quest = 1;
+            scroll = mksobj(SCR_PETERS_SCROLL, TRUE, FALSE);
+            if (scroll) {
+                scroll->dknown = scroll->known = scroll->bknown = 1;
+                (void) hold_another_object(scroll,
+                                           "Oops!  %s to the floor!",
+                                           The(aobjnam(scroll, "slip")),
+                                           (const char *) 0);
+            }
+            return ECMD_TIME;
+        }
         if (!u.uevent.peter_rewarded && carrying(PETER_NET)) {
             struct obj *net = carrying(PETER_NET);
             struct obj *key;

@@ -1809,6 +1809,11 @@ rloc(
         tele();
         return TRUE;
     }
+    /* Peter stays on his post. A deliberate step aside still uses rloc_to. */
+    if (is_peter(mtmp)) {
+        (void) peter_unhurt(mtmp);
+        return FALSE;
+    }
 
     if (mtmp->iswiz && mtmp->mx) { /* Wizard, not just arriving */
         stairway *stway;

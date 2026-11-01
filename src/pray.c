@@ -2116,12 +2116,12 @@ grant_miracle(void)
             u.uhpmax += 20;
             u.uhp += 20;
             if (u.uhp > u.uhpmax) u.uhp = u.uhpmax;
-            pline("Your vitality surges — the Lord has strengthened your body forever!");
+            pline("Your vitality surges - the Lord has strengthened your body forever!");
         } else {                                         /* 85..99 */
             u.uenmax += 20;
             u.uen += 20;
             if (u.uen > u.uenmax) u.uen = u.uenmax;
-            pline("Divine energy flows through you — your spirit is renewed forever!");
+            pline("Divine energy flows through you - your spirit is renewed forever!");
         }
     } else {
         /* First miracle tier — includes chance to receive the Gospel boots */
@@ -2152,7 +2152,7 @@ grant_miracle(void)
             u.uenmax += 20;
             u.uen += 20;
             if (u.uen > u.uenmax) u.uen = u.uenmax;
-            pline("Your spirit burns brighter — your energy is permanently increased!");
+            pline("Your spirit burns brighter - your energy is permanently increased!");
         }
     }
 

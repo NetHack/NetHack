@@ -2158,8 +2158,12 @@ domove_swap_with_pet(
                    || t_at(u.ux0, u.uy0) != NULL
                    || mundisplaceable(mtmp))) {
         /* displacing peaceful into unsafe or trapped space, or trying to
-           displace quest leader, Oracle, shk, priest, or vault guard */
+           displace quest leader, Isaiah, Peter, shk, priest, or vault guard */
         You("stop.  %s doesn't want to swap places.", YMonnam(mtmp));
+        didnt_move = TRUE;
+    } else if (mtmp->data == &mons[PM_PHILISTINE_CHAMPION]
+               && levl[u.ux0][u.uy0].typ != ROOM) {
+        You("stop.  %s will not leave the room.", YMonnam(mtmp));
         didnt_move = TRUE;
     } else {
         mtmp->mtrapped = 0;
@@ -3364,64 +3368,35 @@ pooleffects(
     return FALSE;
 }
 
-/* Mines' End. The true PETRA path for minend-1, minend-2, minend-3.
-   Coordinates match the letters engraved by those levels. */
-static const coord petra_path[3][5] = {
-    { {5,6}, {5,5}, {6,5}, {6,4}, {6,3} },
-    { {5,6}, {5,5}, {5,4}, {5,3}, {6,3} },
-    { {7,6}, {7,5}, {6,5}, {6,4}, {6,3} },
-};
-
+/* A PETRA letter tile. The step is stored on the engraving, so any
+   future layout can mark the path without a coordinate table here.
+   0 is a decoy. 1..5 are the true path, in order. */
 static int
-petra_layout(void)
+petra_step_at(coordxy x, coordxy y)
 {
-    s_level *slev = Is_special(&u.uz);
+    struct engr *ep = engr_at(x, y);
 
-    if (!slev || strncmp(slev->proto, "minend-", 7) || !slev->proto[7])
+    if (!ep || ep->engr_type != LETTER)
         return -1;
-    if (slev->proto[7] < '1' || slev->proto[7] > '3')
-        return -1;
-    return slev->proto[7] - '1';
+    return (int) ep->engr_time;
 }
 
-static char
-petra_letter_at(coordxy x, coordxy y)
+char
+petra_map_letter(coordxy x, coordxy y)
 {
     struct engr *ep = engr_at(x, y);
     const char *txt;
+    char ch;
 
-    if (!ep)
-        return 0;
+    if (!ep || ep->engr_type != LETTER)
+        return '\0';
     txt = ep->engr_txt[actual_text];
     if (!txt || !txt[0] || txt[1])
-        return 0;
-    return txt[0];
-}
-
-static void
-petra_show(void)
-{
-    char row[6];
-    int x, y;
-    struct engr *ep;
-
-    for (ep = head_engr; ep; ep = ep->nxt_engr) {
-        if (!petra_letter_at(ep->engr_x, ep->engr_y))
-            continue;
-        ep->erevealed = 1;
-        ep->eread = 1;
-        map_engraving(ep, TRUE);
-    }
-    pline("The letters read, from the top:");
-    for (y = 3; y <= 6; y++) {
-        for (x = 3; x <= 7; x++) {
-            char ch = petra_letter_at((coordxy) x, (coordxy) y);
-
-            row[x - 3] = ch ? ch : '?';
-        }
-        row[5] = '\0';
-        pline("%s", row);
-    }
+        return '\0';
+    ch = txt[0];
+    if (ch < 'A' || ch > 'Z')
+        return '\0';
+    return ch;
 }
 
 static void
@@ -3452,56 +3427,43 @@ petra_fail(coordxy x, coordxy y)
 static void
 petra_check(void)
 {
-    static d_level shown = { 0, 0 };
-    int layout, i, dx, dy;
-    char ch;
-    const coord *path;
+    int step, dx, dy;
 
-    layout = petra_layout();
-    if (layout < 0)
+    if (!petra_map_letter(u.ux, u.uy))
         return;
-    if (!on_level(&shown, &u.uz)) {
-        shown = u.uz;
-        petra_show();
-    }
     /* Standing still, or a repeated effect on the same square, is not a step. */
     if (u.ux0 == u.ux && u.uy0 == u.uy)
         return;
     if (IS_LAVA(levl[u.ux][u.uy].typ))
         return;
-    ch = petra_letter_at(u.ux, u.uy);
-    if (!ch)
-        return;
 
-    path = petra_path[layout];
+    step = petra_step_at(u.ux, u.uy);
     dx = u.ux - u.ux0;
     dy = u.uy - u.uy0;
-    for (i = 0; i < 5; i++) {
-        if (path[i].x != u.ux || path[i].y != u.uy)
-            continue;
-        if (i < (int) u.uevent.petra_step)
-            return; /* already crossed; walking back is safe */
-        if (i == (int) u.uevent.petra_step && dx && dy) {
-            petra_fail(u.ux, u.uy); /* diagonal is not a step on the path */
-            return;
-        }
-        if (i == 0) {
-            /* First letter: step straight north off the safe row. */
-            if (i == (int) u.uevent.petra_step && u.ux0 == u.ux && u.uy0 == u.uy + 1
-                && !dx) {
-                u.uevent.petra_step = 1;
-                return;
-            }
-        } else if (i == (int) u.uevent.petra_step
-                   && u.ux0 == path[i - 1].x && u.uy0 == path[i - 1].y
-                   && (abs(dx) + abs(dy) == 1)) {
-            u.uevent.petra_step = (unsigned) (i + 1);
-            return;
-        }
+    /* Already crossed. Walking back is safe, even on a diagonal. */
+    if (step >= 1 && step <= (int) u.uevent.petra_step)
+        return;
+    /* A diagonal step onto a letter is never a step on the path. */
+    if (dx && dy) {
         petra_fail(u.ux, u.uy);
         return;
     }
-    petra_fail(u.ux, u.uy);
+    if (step != (int) u.uevent.petra_step + 1) {
+        petra_fail(u.ux, u.uy);
+        return;
+    }
+    if (step == 1) {
+        /* First letter: step straight north off the safe row. */
+        if (u.ux0 == u.ux && u.uy0 == u.uy + 1)
+            u.uevent.petra_step = 1;
+        else
+            petra_fail(u.ux, u.uy);
+        return;
+    }
+    if (petra_step_at(u.ux0, u.uy0) == step - 1 && abs(dx) + abs(dy) == 1)
+        u.uevent.petra_step = (unsigned) step;
+    else
+        petra_fail(u.ux, u.uy);
 }
 
 void

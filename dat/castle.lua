@@ -77,8 +77,9 @@ des.door("locked",48,11)
 des.door("locked",32,12)
 des.door("closed",07,13)
 des.door("closed",55,13)
--- The drawbridge
+-- The drawbridge. The keyhole is in the courtyard outside the moat.
 des.drawbridge({ dir="east", state="closed", x=05,y=08})
+des.object({ id = "Rock with a keyhole", x = 2, y = 8 })
 -- Storeroom number 1
 des.object(object[1],39,05)
 des.object(object[1],40,05)

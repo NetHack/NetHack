@@ -2364,7 +2364,8 @@ print_dungeon(boolean bymenu, schar *rlev, xint16 *rdgn)
 
             Sprintf(buf, "%c %s: %d",
                     chr_u_on_lvl(&slev->dlevel),
-                    slev->proto, depth(&slev->dlevel));
+                    !strcmp(slev->proto, "castle") ? "babylon" : slev->proto,
+                    depth(&slev->dlevel));
             if (Is_stronghold(&slev->dlevel))
                 Sprintf(eos(buf), " (tune %s)", svt.tune);
             if (bymenu)
@@ -3584,7 +3585,8 @@ print_mapseen(
         s_level *slev;
 
         if ((slev = Is_special(&mptr->lev)) != 0)
-            Sprintf(eos(buf), " [%s]", slev->proto);
+            Sprintf(eos(buf), " [%s]",
+                    !strcmp(slev->proto, "castle") ? "babylon" : slev->proto);
     }
     /* [perhaps print custom annotation on its own line when it's long] */
     if (mptr->custom)

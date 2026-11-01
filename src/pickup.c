@@ -1713,6 +1713,10 @@ lift_object(
 {
     int result, old_wt, new_wt, prev_encumbr, next_encumbr;
 
+    if (obj->otyp == ROCK_WITH_KEYHOLE) {
+        pline("The rock is set into the ground.");
+        return -1;
+    }
     if (obj->otyp == BOULDER && Sokoban) {
         You("cannot get your %s around this %s.", body_part(HAND),
             xname(obj));

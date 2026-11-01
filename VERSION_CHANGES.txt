@@ -11,6 +11,21 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-01
+Isaiah, prophet of the Lord is the Prophet's name. Peter cannot
+be harmed, and a pet will not attack him or the other plot
+people. The first visit to Capernaum opens a text window, and
+the first talk with Peter gives the quest and Peter's scroll.
+PETRA letters are drawn on the map. A wrong step, including a
+decoy or a diagonal, turns that square to lava for 20 damage.
+The puzzle room is lit, with one entrance door, a loadstone in
+each false closet, and the hint engraved in a corner. The
+Philistine Champion stays in his room. The overview tags
+Babylon's Palace [babylon]. The Key to Babylon's Palace lowers
+the drawbridge from the Rock with a keyhole outside the moat.
+The scholar's scroll spells out Pi, Epsilon, Tau, Rho, Alpha.
+Old saves do not load.
+
+2026-11-01
 The Philistine Champion has 90 hit points, bronze plate mail,
 and a helmet. He wields a +2 two-handed sword. His speed is
 still the ogre lord's, and he uses no sorcery.
@@ -26,7 +41,7 @@ Mines' End is guarded by the Philistine Champion, the only monster
 there. He is a difficulty-10 warrior with a long sword, scale mail,
 a helmet, and a small shield, and he does not use sorcery. Killing
 him leaves a scholar's scroll. Reading it shows the Greek name
-ΠΕΤΡΑ and does not use the scroll up. It cannot be wished for.
+PETRA and does not use the scroll up. It cannot be wished for.
 
 2026-11-01
 The Shield of Faith in the Babylon's Palace tower chest is

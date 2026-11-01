@@ -450,7 +450,12 @@ ohitmon(
 
         /* might already be dead (if petrified) */
         if (!harmless && !DEADMONSTER(mtmp)) {
-            mtmp->mhp -= damage;
+            if (peter_unhurt(mtmp)) {
+                if (vis)
+                    pline("%s is unharmed.", Monnam(mtmp));
+                damage = 0;
+            } else
+                mtmp->mhp -= damage;
             if (DEADMONSTER(mtmp)) {
                 if (vis || (verbose && !gm.mtarget))
                     pline("%s is %s!", Monnam(mtmp),

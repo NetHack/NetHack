@@ -132,6 +132,7 @@ int lspo_corridor(lua_State *);
 int lspo_door(lua_State *);
 int lspo_drawbridge(lua_State *);
 int lspo_engraving(lua_State *);
+int lspo_petra_letter(lua_State *);
 int lspo_feature(lua_State *);
 int lspo_gold(lua_State *);
 int lspo_grave(lua_State *);
@@ -3935,6 +3936,43 @@ lspo_engraving(lua_State *L)
     return 0;
 }
 
+/* petra_letter({ x, y, text = "P", step = 1 })
+   step 0 is a decoy. step 1..5 is the true path, in order.
+   The letter is drawn on the map. It is not an engraving. */
+int
+lspo_petra_letter(lua_State *L)
+{
+    char *txt;
+    lua_Integer ex, ey, step;
+    coordxy x, y;
+    long ecoord;
+    struct engr *ep;
+
+    create_des_coder();
+    lcheck_param_table(L);
+    get_table_xy_or_coord(L, &ex, &ey);
+    x = (coordxy) ex;
+    y = (coordxy) ey;
+    txt = get_table_str(L, "text");
+    step = get_table_int_opt(L, "step", 0);
+    if (step < 0)
+        step = 0;
+    if (x == -1 && y == -1)
+        ecoord = SP_COORD_PACK_RANDOM(0);
+    else
+        ecoord = SP_COORD_PACK(x, y);
+    get_location_coord(&x, &y, DRY, gc.coder->croom, ecoord);
+    make_engr_at(x, y, txt, NULL, (long) step, LETTER);
+    Free(txt);
+    ep = engr_at(x, y);
+    if (ep) {
+        ep->nowipeout = 1;
+        ep->erevealed = 1;
+        ep->eread = 1;
+    }
+    return 0;
+}
+
 int
 lspo_mineralize(lua_State *L)
 {
@@ -6383,6 +6421,7 @@ static const struct luaL_Reg nhl_functions[] = {
     { "level_flags", lspo_level_flags },
     { "level_init", lspo_level_init },
     { "engraving", lspo_engraving },
+    { "petra_letter", lspo_petra_letter },
     { "mineralize", lspo_mineralize },
     { "door", lspo_door },
     { "stair", lspo_stair },

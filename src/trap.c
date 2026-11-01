@@ -3736,6 +3736,9 @@ mintrap(struct monst *mtmp, unsigned mintrapflags)
     struct permonst *mptr = mtmp->data;
     int trap_result = Trap_Effect_Finished;
 
+    if (peter_unhurt(mtmp))
+        return Trap_Effect_Finished;
+
     if (!trap) {
         mtmp->mtrapped = 0;      /* perhaps teleported? */
     } else if (mtmp->mtrapped) { /* is currently in the trap */

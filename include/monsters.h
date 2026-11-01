@@ -2743,14 +2743,15 @@
         M2_NOPOLY | M2_HUMAN | M2_PEACEFUL | M2_STRONG | M2_COLLECT,
         M3_INFRAVISIBLE | M3_CLOSE,
         14, HI_DOMESTIC, PRISONER),
-    /* The Prophet does not move. */
-    MON(NAM("Prophet"), S_HUMAN,
+    /* Isaiah does not move. The name is what the player sees. */
+    MON(NAM("Isaiah, prophet of the Lord"), S_HUMAN,
         LVL(12, 0, 0, 50, 0), (G_NOGEN | G_UNIQ),
         A(ATTK(AT_NONE, AD_MAGM, 0, 4),
           NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(WT_HUMAN, 400, MS_ORACLE, MZ_HUMAN), 0, 0,
         M1_HUMANOID | M1_OMNIVORE,
-        M2_NOPOLY | M2_HUMAN | M2_PEACEFUL | M2_FEMALE, M3_INFRAVISIBLE,
+        M2_NOPOLY | M2_HUMAN | M2_PEACEFUL | M2_PNAME | M2_MALE,
+        M3_INFRAVISIBLE,
         13, HI_ZAP, ORACLE),
     /* aligned priests always have the epri extension attached;
        individual instantiations should always have either ispriest

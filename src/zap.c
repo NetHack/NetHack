@@ -531,15 +531,21 @@ bhitm(struct monst *mtmp, struct obj *otmp)
             shieldeff_mon(mtmp);
         } else if (!resist(mtmp, otmp->oclass, dmg, NOTELL)
                    && !DEADMONSTER(mtmp)) {
-            mtmp->mhp -= dmg;
-            mtmp->mhpmax -= dmg;
-            /* die if already level 0, regardless of hit points */
-            if (DEADMONSTER(mtmp) || mtmp->mhpmax <= 0 || mtmp->m_lev < 1) {
-                killed(mtmp);
-            } else {
-                mtmp->m_lev--;
+            if (peter_unhurt(mtmp)) {
                 if (canseemon(mtmp))
-                    pline("%s suddenly seems weaker!", Monnam(mtmp));
+                    pline("%s is unharmed.", Monnam(mtmp));
+            } else {
+                mtmp->mhp -= dmg;
+                mtmp->mhpmax -= dmg;
+                /* die if already level 0, regardless of hit points */
+                if (DEADMONSTER(mtmp) || mtmp->mhpmax <= 0
+                    || mtmp->m_lev < 1) {
+                    killed(mtmp);
+                } else {
+                    mtmp->m_lev--;
+                    if (canseemon(mtmp))
+                        pline("%s suddenly seems weaker!", Monnam(mtmp));
+                }
             }
         }
         break;
@@ -4392,6 +4398,8 @@ zhitm(
         tmp /= 2;
     if (tmp < 0)
         tmp = 0; /* don't allow negative damage */
+    if (peter_unhurt(mon))
+        return 0;
     debugpline3("zapped monster hp = %d (= %d - %d)", mon->mhp - tmp,
                 mon->mhp, tmp);
     mon->mhp -= tmp;
@@ -6148,6 +6156,11 @@ resist(struct monst *mtmp, char oclass, int damage, int tell)
     }
 
     if (damage) {
+        if (peter_unhurt(mtmp)) {
+            if (canseemon(mtmp))
+                pline("%s is unharmed.", Monnam(mtmp));
+            return resisted;
+        }
         mtmp->mhp -= damage;
         if (DEADMONSTER(mtmp)) {
             if (gm.m_using)
@@ -6384,6 +6397,8 @@ wish_from_text(char *buf, boolean last_try)
             || otmp->otyp == KEY_TO_BABYLON
             || otmp->otyp == KEY_TO_GATES
             || otmp->otyp == SCR_SCHOLARS_SCROLL
+            || otmp->otyp == SCR_PETERS_SCROLL
+            || otmp->otyp == ROCK_WITH_KEYHOLE
             || (otmp->otyp == CRYSTAL_BALL && !otmp->oartifact))) {
         pline("You cannot wish for that.");
         obfree(otmp, (struct obj *) 0);

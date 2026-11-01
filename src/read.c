@@ -555,19 +555,22 @@ doread(void)
 
         return ECMD_TIME;
     } else if (otyp == SCR_SCHOLARS_SCROLL) {
-        /* UTF-8 for ΠΕΤΡΑ. Kept as bytes so the letters are not rewritten.
-           The Windows console tty still emits message text one byte at a
-           time through its code-page map, so this may not render there. */
         static const char scholars_text[] =
             "In my research I have found the ancient Greek name for the rock "
-            "upon which the church was built. It is written "
-            "\xCE\xA0\xCE\x95\xCE\xA4\xCE\xA1\xCE\x91"
-            ", which in our letters is PETRA.";
+            "upon which the church was built. It is written with the Greek "
+            "letters Pi, Epsilon, Tau, Rho, Alpha, which in our letters is "
+            "PETRA.";
 
         if (!u.uconduct.literate++)
             livelog_printf(LL_CONDUCT,
                            "became literate by reading a scroll");
         pline("%s", scholars_text);
+        return ECMD_TIME;
+    } else if (otyp == SCR_PETERS_SCROLL) {
+        if (!u.uconduct.literate++)
+            livelog_printf(LL_CONDUCT,
+                           "became literate by reading a scroll");
+        pline("The Master gave me a new name, and on it He said He would build. Remember my name, and the floor will hold you.");
         return ECMD_TIME;
     } else if (scroll->oclass != SCROLL_CLASS
                && scroll->oclass != SPBOOK_CLASS) {

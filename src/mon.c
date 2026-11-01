@@ -2002,6 +2002,9 @@ can_carry(struct monst *mtmp, struct obj *otmp)
     if (notake(mdat))
         return 0; /* can't carry anything */
 
+    if (otyp == ROCK_WITH_KEYHOLE)
+        return 0;
+
     if (!can_touch_safely(mtmp, otmp))
         return 0;
 
@@ -3081,6 +3084,42 @@ anger_quest_guardians(struct monst *mtmp)
         setmangry(mtmp, TRUE);
 }
 
+/* Quest people the pet must leave alone. Builders are named on a
+   later level; the check is here so it still works there. */
+boolean
+is_plot_npc(struct monst *mtmp)
+{
+    const char *nm;
+
+    if (!mtmp)
+        return FALSE;
+    if (mtmp->data == &mons[PM_ORACLE] || is_peter(mtmp))
+        return TRUE;
+    if (!has_mgivenname(mtmp))
+        return FALSE;
+    nm = MGIVENNAME(mtmp);
+    if (!strcmp(nm, "King Solomon") || !strcmp(nm, "Angel of the Ladder"))
+        return TRUE;
+    if (strstri(nm, "builder"))
+        return TRUE;
+    return FALSE;
+}
+
+/* Peter cannot be hurt. Put him back together and report that. */
+boolean
+peter_unhurt(struct monst *mtmp)
+{
+    if (!is_peter(mtmp))
+        return FALSE;
+    if (mtmp->mhpmax < 200)
+        mtmp->mhpmax = 200;
+    mtmp->mhp = mtmp->mhpmax;
+    mtmp->mpeaceful = 1;
+    mtmp->mtrapped = 0;
+    mtmp->mstrategy |= STRAT_WAITFORU;
+    return TRUE;
+}
+
 /* monster 'mtmp' has died; maybe life-save, otherwise unshapeshift and
    update vanquished stats and update map */
 void
@@ -3089,6 +3128,9 @@ mondead(struct monst *mtmp)
     struct permonst *mptr;
     boolean be_sad;
     int mndx;
+
+    if (peter_unhurt(mtmp))
+        return;
 
     /* potential pet message; always clear global flag */
     be_sad = iflags.sad_feeling;
@@ -3274,6 +3316,8 @@ corpse_chance(
 void
 mondied(struct monst *mdef)
 {
+    if (peter_unhurt(mdef))
+        return;
     mondead(mdef);
     if (!DEADMONSTER(mdef))
         return; /* lifesaved */
@@ -3309,8 +3353,13 @@ void
 monstone(struct monst *mdef)
 {
     struct obj *otmp, *obj, *oldminvent;
-    coordxy x = mdef->mx, y = mdef->my;
+    coordxy x, y;
     boolean wasinside = FALSE;
+
+    if (peter_unhurt(mdef))
+        return;
+    x = mdef->mx;
+    y = mdef->my;
 
     /* vampshifter reverts to vampire;
        3.6.3: also used to unshift shape-changed sandestin */
@@ -3401,7 +3450,11 @@ monkilled(
     const char *fltxt,
     int how)
 {
-    struct permonst *mptr = mdef->data;
+    struct permonst *mptr;
+
+    if (peter_unhurt(mdef))
+        return;
+    mptr = mdef->data;
 
     if (fltxt && (mdef->wormno ? worm_known(mdef)
                                : cansee(mdef->mx, mdef->my)))
@@ -3512,6 +3565,9 @@ xkilled(
             nomsg = (xkill_flags & XKILL_NOMSG) != 0,
             nocorpse = (xkill_flags & XKILL_NOCORPSE) != 0,
             noconduct = (xkill_flags & XKILL_NOCONDUCT) != 0;
+
+    if (peter_unhurt(mtmp))
+        return;
 
     /* potential pet message; always clear global flag */
     be_sad = iflags.sad_feeling;
@@ -4288,6 +4344,11 @@ peacefuls_respond(struct monst *mtmp)
 void
 setmangry(struct monst *mtmp, boolean via_attack)
 {
+    if (is_peter(mtmp)) {
+        mtmp->mpeaceful = 1;
+        return;
+    }
+
     if (via_attack && sengr_at("PSALM 91", u.ux, u.uy, TRUE)
         /* only hypocritical if monster is vulnerable to PSALM 91 (or
            peaceful--not vulnerable but attacking it is hypocritical) */
@@ -5311,6 +5372,9 @@ newcham(
     int hpn, hpd, mndx, tryct;
     struct permonst *olddata = mtmp->data;
     char *p, oldname[BUFSZ], l_oldname[BUFSZ];
+
+    if (is_peter(mtmp))
+        return 0;
 
     /* Riders are immune to polymorph and green slime
        (but apparent Rider might actually be a doppelganger) */

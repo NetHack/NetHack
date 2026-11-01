@@ -129,6 +129,12 @@ self_lookat(char *outbuf)
                 uball ? ansimpleoname(uball) : "nothing?");
     if (u.utrap) /* bear trap, pit, web, in-floor, in-lava, tethered */
         Sprintf(eos(outbuf), ", %s", trap_predicament(trapbuf, 0, FALSE));
+    {
+        char letter = petra_map_letter(u.ux, u.uy);
+
+        if (letter)
+            Sprintf(eos(outbuf), ", on the letter %c", letter);
+    }
     return outbuf;
 }
 
@@ -738,7 +744,13 @@ lookat(coordxy x, coordxy y, char *buf, char *monbuf)
     } else if (glyph_is_cmap(glyph)) {
         int amsk;
         aligntyp algn;
+        char letter = petra_map_letter(x, y);
         short symidx = glyph_to_cmap(glyph);
+
+        if (letter && (levl[x][y].seenv || cansee(x, y))) {
+            Sprintf(buf, "the letter %c", letter);
+            return (struct permonst *) 0;
+        }
 
         switch (symidx) {
         case S_altar:
