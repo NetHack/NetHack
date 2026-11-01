@@ -17,7 +17,7 @@
  * Incrementing EDITLEVEL can be used to force invalidation of old bones
  * and save files.
  */
-#define EDITLEVEL 1 /* food rework: cooked-meat bit on corpses */
+#define EDITLEVEL 2 /* plot items and PETRA progress in uevent */
 
 /*
  * Development status possibilities.

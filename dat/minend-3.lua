@@ -1,107 +1,50 @@
--- NetHack mines minend-3.lua	$NHDT-Date: 1652196029 2022/05/10 15:20:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.2 $
---	Copyright (c) 1989-95 by Jean-Christophe Collet
---	Copyright (c) 1991-95 by M. Stephenson
--- NetHack may be freely redistributed.  See license for details.
---
--- "Catacombs" by Kelly Bailey
--- Relies on some very specific behavior of MAZEWALK.
+-- Mines' End layout 3: the PETRA puzzle.
+-- Letter rows y=3..6, x=3..7. Safe floor is y=7. Real door is x=6,y=2, above the A.
+-- The true path is in src/hack.c. Decoy letters off that path are unsafe.
+des.level_init({ style = "solidfill", fg = " " })
+des.level_flags("mazelevel", "nomongen", "noteleport", "hardfloor", "noflip")
 
-des.level_init({ style = "solidfill", fg = "-" });
+des.map([[
+###############
+#....#...#....#
+##+#+#+####+###
+#  .....      #
+#  .....      #
+#  .....      #
+#  .....      #
+#  .....      #
+#             #
+#      .      #
+###############
+]])
 
-des.level_flags("mazelevel", "nommap")
-
-des.map({ halign = "center", valign = "bottom", map = [[
- - - - - - - - - - - -- -- - - . - - - - - - - - - -- - - -- - - - - . - - |
-------...---------.-----------...-----.-------.-------     ----------------|
- - - - - - - - - - - - . - - - . - - - - - - - - - - -- - -- - . - - - - - |
-------------.---------...-------------------------.---   ------------------|
- - - - - - - - - - - . . - - --- - . - - - - - - - - -- -- - - - - |.....| |
---.---------------.......------------------------------- ----------|.....S-|
- - - - - |.. ..| - ....... . - - - - |.........| - - - --- - - - - |.....| |
-----.----|.....|------.......--------|.........|--------------.------------|
- - - - - |..{..| - - -.... . --- - -.S.........S - - - - - - - - - - - - - |
----------|.....|--.---...------------|.........|---------------------------|
- - - - - |.. ..| - - - . - - - - - - |.........| - --- . - - - - - - - - - |
-----------------------...-------.---------------------...------------------|
----..| - - - - - - - - . --- - - - - - - - - - - - - - . - - --- - - --- - |
--.S..|----.-------.------- ---------.-----------------...----- -----.-------
----..| - - - - - - - -- - - -- . - - - - - . - - - . - . - - -- -- - - - -- 
--.S..|--------.---.---       -...---------------...{.---------   ---------  
---|. - - - - - - - -- - - - -- . - - - --- - - - . . - - - - -- - - - - - - 
-]] });
-
-local place = { {1,15},{68,6},{1,13} }
-shuffle(place)
-
-des.non_diggable(selection.area(67,3,73,7))
-des.non_diggable(selection.area(0,12,2,16))
-des.feature("fountain", {12,08})
-des.feature("fountain", {51,15})
-des.region(selection.area(0,0,75,16),"unlit")
-des.region(selection.area(38,6,46,10),"lit")
-des.door("closed",37,8)
-des.door("closed",47,8)
-des.door("closed",73,5)
-des.door("closed",2,15)
-des.mazewalk({ x=36, y=8, dir="west", stocked=false })
-des.stair("up", 42,8)
-des.wallify()
-
--- Objects
-des.object("diamond")
-des.object("*")
-des.object("diamond")
-des.object("*")
-des.object("emerald")
-des.object("*")
-des.object("emerald")
-des.object("*")
-des.object("emerald")
-des.object("*")
-des.object("ruby")
-des.object("*")
-des.object("ruby")
-des.object("amethyst")
-des.object("*")
-des.object("amethyst")
-des.object({ id="luckstone", coord=place[2], buc="not-cursed", achievement=1 })
-des.object("flint",place[1])
-des.object("?")
-des.object("?")
-des.object("?")
-des.object("?")
-des.object("?")
-des.object("+")
-des.object("+")
-des.object("+")
-des.object("+")
-des.object()
-des.object()
-des.object()
-des.trap()
-des.trap()
-des.trap()
-des.trap()
-des.trap()
-des.trap()
-des.trap()
--- One-time annoyance factor
-des.trap("level teleport",place[2])
-des.trap("level teleport",place[1])
-des.monster("M")
-des.monster("M")
-des.monster("M")
-des.monster("M")
-des.monster("M")
-des.monster("ettin mummy")
-des.monster("V")
-des.monster("Z")
-des.monster("Z")
-des.monster("Z")
-des.monster("Z")
-des.monster("Z")
-des.monster("V")
-des.monster("e")
-des.monster("e")
-des.monster("e")
-des.monster("e")
+des.region(selection.area(0,0,14,10), "lit")
+des.non_diggable(selection.area(0,0,14,10))
+des.stair("up", 7, 9)
+des.engraving({ x=3, y=3, type="burn", text="O", degrade=false })
+des.engraving({ x=4, y=3, type="burn", text="O", degrade=false })
+des.engraving({ x=5, y=3, type="burn", text="E", degrade=false })
+des.engraving({ x=6, y=3, type="burn", text="A", degrade=false })
+des.engraving({ x=7, y=3, type="burn", text="N", degrade=false })
+des.engraving({ x=3, y=4, type="burn", text="R", degrade=false })
+des.engraving({ x=4, y=4, type="burn", text="E", degrade=false })
+des.engraving({ x=5, y=4, type="burn", text="I", degrade=false })
+des.engraving({ x=6, y=4, type="burn", text="R", degrade=false })
+des.engraving({ x=7, y=4, type="burn", text="P", degrade=false })
+des.engraving({ x=3, y=5, type="burn", text="I", degrade=false })
+des.engraving({ x=4, y=5, type="burn", text="T", degrade=false })
+des.engraving({ x=5, y=5, type="burn", text="E", degrade=false })
+des.engraving({ x=6, y=5, type="burn", text="T", degrade=false })
+des.engraving({ x=7, y=5, type="burn", text="E", degrade=false })
+des.engraving({ x=3, y=6, type="burn", text="L", degrade=false })
+des.engraving({ x=4, y=6, type="burn", text="O", degrade=false })
+des.engraving({ x=5, y=6, type="burn", text="A", degrade=false })
+des.engraving({ x=6, y=6, type="burn", text="T", degrade=false })
+des.engraving({ x=7, y=6, type="burn", text="P", degrade=false })
+des.engraving({ x=5, y=7, type="burn", text="Upon this rock I will build my church. Walk upon the rock in the tongue of the Greeks.", degrade=false })
+des.door("closed", 6, 2)
+des.door("closed", 2, 2)
+des.door("closed", 4, 2)
+des.door("closed", 11, 2)
+des.object({ id="Peter's net", x=7, y=1 })
+des.object({ id="Favor Stone", x=6, y=1, buc="not-cursed", achievement=1 })

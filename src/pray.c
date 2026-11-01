@@ -1008,30 +1008,16 @@ pleased(aligntyp g_align)
             }
             break;
         case 3:
-            /* takes 2 hints to get the music to enter the stronghold;
-               skip if you've solved it via mastermind or destroyed the
-               drawbridge (both set uopened_dbridge) or if you've already
-               travelled past the Valley of the Dead (gehennom_entered) */
-            if (!u.uevent.uopened_dbridge && !u.uevent.gehennom_entered) {
-                if (u.uevent.uheard_tune < 1) {
-                    godvoice(g_align, (char *) 0);
-                    SetVoice((struct monst *) 0, 0, 80, voice_deity);
-                    verbalize("Hark, %s!", is_human(gy.youmonst.data)
-                                               ? "mortal"
-                                               : "creature");
-                    SetVoice((struct monst *) 0, 0, 80, voice_deity);
-                    verbalize(
-                       "To enter the castle, thou must play the right tune!");
-                    u.uevent.uheard_tune++;
-                    break;
-                } else if (u.uevent.uheard_tune < 2) {
-                    Soundeffect(se_divine_music, 50);
-                    You_hear("a divine music...");
-                    pline("It sounds like:  \"%s\".", svt.tune);
-                    u.uevent.uheard_tune++;
-                    record_achievement(ACH_TUNE);
-                    break;
-                }
+            /* One hint names the key to Babylon's Palace.
+               Skip it once given, or after the bridge has been opened,
+               or once Gehennom has been entered. */
+            if (!u.uevent.uopened_dbridge && !u.uevent.gehennom_entered
+                && !u.uevent.babylon_hint) {
+                godvoice(g_align, (char *) 0);
+                SetVoice((struct monst *) 0, 0, 80, voice_deity);
+                verbalize("To enter Babylon's Palace, thou must bear the Key to Babylon's Palace!");
+                u.uevent.babylon_hint = 1;
+                break;
             }
             FALLTHROUGH;
             /*FALLTHRU*/

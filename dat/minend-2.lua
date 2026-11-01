@@ -1,159 +1,50 @@
--- NetHack mines minend-2.lua	$NHDT-Date: 1652196029 2022/05/10 15:20:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.4 $
---	Copyright (c) 1989-95 by Jean-Christophe Collet
---	Copyright (c) 1991-95 by M. Stephenson
--- NetHack may be freely redistributed.  See license for details.
---
--- Mine end level variant 2
--- "Gnome King's Wine Cellar"
-
-des.level_init({ style = "solidfill", fg = " " });
-
-des.level_flags("mazelevel");
+-- Mines' End layout 2: the PETRA puzzle.
+-- Letter rows y=3..6, x=3..7. Safe floor is y=7. Real door is x=6,y=2, above the A.
+-- The true path is in src/hack.c. Decoy letters off that path are unsafe.
+des.level_init({ style = "solidfill", fg = " " })
+des.level_flags("mazelevel", "nomongen", "noteleport", "hardfloor", "noflip")
 
 des.map([[
----------------------------------------------------------------------------
-|...................................................|                     |
-|.|---------S--.--|...|--------------------------|..|                     |
-|.||---|   |.||-| |...|..........................|..|                     |
-|.||...| |-|.|.|---...|.............................|                ..   |
-|.||...|-|.....|....|-|..........................|..|.               ..   |
-|.||.....|-S|..|....|............................|..|..                   |
-|.||--|..|..|..|-|..|----------------------------|..|-.                   |
-|.|   |..|..|....|..................................|...                  |
-|.|   |..|..|----|..-----------------------------|..|....                 |
-|.|---|..|--|.......|----------------------------|..|.....                |
-|...........|----.--|......................|     |..|.......              |
-|-----------|...|.| |------------------|.|.|-----|..|.....|..             |
-|-----------|.{.|.|--------------------|.|..........|.....|....           |
-|...............|.S......................|-------------..-----...         |
-|.--------------|.|--------------------|.|.........................       |
-|.................|                    |.....................|........    |
----------------------------------------------------------------------------
-]]);
+###############
+#....#...#....#
+##+#+#+####+###
+#  .....      #
+#  .....      #
+#  .....      #
+#  .....      #
+#  .....      #
+#             #
+#      .      #
+###############
+]])
 
-if percent(50) then
-   des.terrain({55,14},"-")
-   des.terrain({56,14},"-")
-   des.terrain({61,15},"|")
-   des.terrain({52,5}, "S")
-   des.door("locked", 52,5)
-end
-if percent(50) then
-   des.terrain({18,1}, "|")
-   des.terrain(selection.area(7,12, 8,13), ".")
-end
-if percent(50) then
-   des.terrain({49,4}, "|")
-   des.terrain({21,5}, ".")
-end
-if percent(50) then
-   if percent(50) then
-      des.terrain({22,1}, "|")
-   else
-      des.terrain({50,7}, "-")
-      des.terrain({51,7}, "-")
-   end
-end
-
--- uncontrolled arrival (via trap door, level teleport) will be in the central
--- portion of level to prevent ending up stuck in the treasure area, whether
--- arriving from above or below (despite this being bottom of Mines branch,
--- hero might arrive from below by invoking Wiz role's Eye of the Aethiopica)
-des.teleport_region({ region={23,03,48,16}, region_islev=1 })
-
--- Dungeon Description
-des.feature("fountain", {14,13})
-des.region(selection.area(23,03,48,06),"lit")
-des.region(selection.area(21,06,22,06),"lit")
-des.region(selection.area(14,04,14,04),"unlit")
-des.region(selection.area(10,05,14,08),"unlit")
-des.region(selection.area(10,09,11,09),"unlit")
-des.region(selection.area(15,08,16,08),"unlit")
--- Secret doors
-des.door("locked",12,02)
-des.door("locked",11,06)
--- Stairs
-des.stair("up", 36,04)
--- Non diggable walls
-des.non_diggable(selection.area(00,00,52,17))
-des.non_diggable(selection.area(53,00,74,00))
-des.non_diggable(selection.area(53,17,74,17))
-des.non_diggable(selection.area(74,01,74,16))
-des.non_diggable(selection.area(53,07,55,07))
-des.non_diggable(selection.area(53,14,61,14))
--- The Gnome King's wine cellar.
--- the Trespassers sign is a long-running joke
-des.engraving({12,03}, "engrave",
-	      "You are now entering the Gnome King's wine cellar.")
-des.engraving({12,04}, "engrave", "Trespassers will be persecuted!")
-des.object("elixer of booze", 10, 07)
-des.object("elixer of booze", 10, 07)
-des.object("!", 10, 07)
-des.object("elixer of booze", 10, 08)
-des.object("elixer of booze", 10, 08)
-des.object("!", 10, 08)
-des.object("elixer of booze", 10, 09)
-des.object("elixer of booze", 10, 09)
-des.object("anointing oil of object detection", 10, 09)
--- Objects
--- The Treasure chamber...
-des.object("diamond", 69, 04)
-des.object("*", 69, 04)
-des.object("diamond", 69, 04)
-des.object("*", 69, 04)
-des.object("emerald", 70, 04)
-des.object("*", 70, 04)
-des.object("emerald", 70, 04)
-des.object("*", 70, 04)
-des.object("emerald", 69, 05)
-des.object("*", 69, 05)
-des.object("ruby", 69, 05)
-des.object("*", 69, 05)
-des.object("ruby", 70, 05)
-des.object("amethyst", 70, 05)
-des.object("*", 70, 05)
-des.object("amethyst", 70, 05)
-des.object({ id="luckstone", x=70, y=05,
-	     buc="not-cursed", achievement=1 });
--- Scattered gems...
-des.object("*")
-des.object("*")
-des.object("*")
-des.object("*")
-des.object("*")
-des.object("*")
-des.object("*")
-des.object("(")
-des.object("(")
-des.object()
-des.object()
-des.object()
--- Random traps
-des.trap()
-des.trap()
-des.trap()
-des.trap()
-des.trap()
-des.trap()
--- Random monsters.
-des.monster("gnome king")
-des.monster("gnome lord")
-des.monster("gnome lord")
-des.monster("gnome lord")
-des.monster("gnomish wizard")
-des.monster("gnomish wizard")
-des.monster("gnome")
-des.monster("gnome")
-des.monster("gnome")
-des.monster("gnome")
-des.monster("gnome")
-des.monster("gnome")
-des.monster("gnome")
-des.monster("gnome")
-des.monster("gnome")
-des.monster("hobbit")
-des.monster("hobbit")
-des.monster("dwarf")
-des.monster("dwarf")
-des.monster("dwarf")
-des.monster("h")
+des.region(selection.area(0,0,14,10), "lit")
+des.non_diggable(selection.area(0,0,14,10))
+des.stair("up", 7, 9)
+des.engraving({ x=3, y=3, type="burn", text="M", degrade=false })
+des.engraving({ x=4, y=3, type="burn", text="N", degrade=false })
+des.engraving({ x=5, y=3, type="burn", text="R", degrade=false })
+des.engraving({ x=6, y=3, type="burn", text="A", degrade=false })
+des.engraving({ x=7, y=3, type="burn", text="P", degrade=false })
+des.engraving({ x=3, y=4, type="burn", text="A", degrade=false })
+des.engraving({ x=4, y=4, type="burn", text="M", degrade=false })
+des.engraving({ x=5, y=4, type="burn", text="T", degrade=false })
+des.engraving({ x=6, y=4, type="burn", text="E", degrade=false })
+des.engraving({ x=7, y=4, type="burn", text="T", degrade=false })
+des.engraving({ x=3, y=5, type="burn", text="A", degrade=false })
+des.engraving({ x=4, y=5, type="burn", text="S", degrade=false })
+des.engraving({ x=5, y=5, type="burn", text="E", degrade=false })
+des.engraving({ x=6, y=5, type="burn", text="N", degrade=false })
+des.engraving({ x=7, y=5, type="burn", text="T", degrade=false })
+des.engraving({ x=3, y=6, type="burn", text="A", degrade=false })
+des.engraving({ x=4, y=6, type="burn", text="R", degrade=false })
+des.engraving({ x=5, y=6, type="burn", text="P", degrade=false })
+des.engraving({ x=6, y=6, type="burn", text="N", degrade=false })
+des.engraving({ x=7, y=6, type="burn", text="O", degrade=false })
+des.engraving({ x=5, y=7, type="burn", text="Upon this rock I will build my church. Walk upon the rock in the tongue of the Greeks.", degrade=false })
+des.door("closed", 6, 2)
+des.door("closed", 2, 2)
+des.door("closed", 4, 2)
+des.door("closed", 11, 2)
+des.object({ id="Peter's net", x=7, y=1 })
+des.object({ id="Favor Stone", x=6, y=1, buc="not-cursed", achievement=1 })

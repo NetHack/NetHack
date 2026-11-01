@@ -720,6 +720,11 @@ dochug(struct monst *mtmp)
             mtmp->mhp = 200;
         }
     }
+    if (has_mgivenname(mtmp)
+        && !strcmp(MGIVENNAME(mtmp), "Peter the Fisherman")) {
+        mtmp->mstrategy |= STRAT_WAITFORU;
+        mtmp->mpeaceful = 1;
+    }
 
     /* update quest status flags */
     quest_stat_check(mtmp);

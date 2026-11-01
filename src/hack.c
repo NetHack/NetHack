@@ -3364,6 +3364,146 @@ pooleffects(
     return FALSE;
 }
 
+/* Mines' End. The true PETRA path for minend-1, minend-2, minend-3.
+   Coordinates match the letters engraved by those levels. */
+static const coord petra_path[3][5] = {
+    { {5,6}, {5,5}, {6,5}, {6,4}, {6,3} },
+    { {5,6}, {5,5}, {5,4}, {5,3}, {6,3} },
+    { {7,6}, {7,5}, {6,5}, {6,4}, {6,3} },
+};
+
+static int
+petra_layout(void)
+{
+    s_level *slev = Is_special(&u.uz);
+
+    if (!slev || strncmp(slev->proto, "minend-", 7) || !slev->proto[7])
+        return -1;
+    if (slev->proto[7] < '1' || slev->proto[7] > '3')
+        return -1;
+    return slev->proto[7] - '1';
+}
+
+static char
+petra_letter_at(coordxy x, coordxy y)
+{
+    struct engr *ep = engr_at(x, y);
+    const char *txt;
+
+    if (!ep)
+        return 0;
+    txt = ep->engr_txt[actual_text];
+    if (!txt || !txt[0] || txt[1])
+        return 0;
+    return txt[0];
+}
+
+static void
+petra_show(void)
+{
+    char row[6];
+    int x, y;
+    struct engr *ep;
+
+    for (ep = head_engr; ep; ep = ep->nxt_engr) {
+        if (!petra_letter_at(ep->engr_x, ep->engr_y))
+            continue;
+        ep->erevealed = 1;
+        ep->eread = 1;
+        map_engraving(ep, TRUE);
+    }
+    pline("The letters read, from the top:");
+    for (y = 3; y <= 6; y++) {
+        for (x = 3; x <= 7; x++) {
+            char ch = petra_letter_at((coordxy) x, (coordxy) y);
+
+            row[x - 3] = ch ? ch : '?';
+        }
+        row[5] = '\0';
+        pline("%s", row);
+    }
+}
+
+static void
+petra_fail(coordxy x, coordxy y)
+{
+    int hp = Upolyd ? u.mh : u.uhp;
+
+    del_engr_at(x, y);
+    levl[x][y].typ = LAVAPOOL;
+    newsym(x, y);
+    pline("The letter gives way and the floor becomes lava!");
+    if (hp <= 1) {
+        losehp(hp > 0 ? hp : 1, "a false step", KILLED_BY);
+        return;
+    }
+    if (hp <= 20) {
+        if (Upolyd)
+            u.mh = 1;
+        else
+            u.uhp = 1;
+        disp.botl = TRUE;
+        You("are barely standing.");
+        return;
+    }
+    losehp(20, "a false step", KILLED_BY);
+}
+
+static void
+petra_check(void)
+{
+    static d_level shown = { 0, 0 };
+    int layout, i, dx, dy;
+    char ch;
+    const coord *path;
+
+    layout = petra_layout();
+    if (layout < 0)
+        return;
+    if (!on_level(&shown, &u.uz)) {
+        shown = u.uz;
+        petra_show();
+    }
+    /* Standing still, or a repeated effect on the same square, is not a step. */
+    if (u.ux0 == u.ux && u.uy0 == u.uy)
+        return;
+    if (IS_LAVA(levl[u.ux][u.uy].typ))
+        return;
+    ch = petra_letter_at(u.ux, u.uy);
+    if (!ch)
+        return;
+
+    path = petra_path[layout];
+    dx = u.ux - u.ux0;
+    dy = u.uy - u.uy0;
+    for (i = 0; i < 5; i++) {
+        if (path[i].x != u.ux || path[i].y != u.uy)
+            continue;
+        if (i < (int) u.uevent.petra_step)
+            return; /* already crossed; walking back is safe */
+        if (i == (int) u.uevent.petra_step && dx && dy) {
+            petra_fail(u.ux, u.uy); /* diagonal is not a step on the path */
+            return;
+        }
+        if (i == 0) {
+            /* First letter: step straight north off the safe row. */
+            if (i == (int) u.uevent.petra_step && u.ux0 == u.ux && u.uy0 == u.uy + 1
+                && !dx) {
+                u.uevent.petra_step = 1;
+                return;
+            }
+        } else if (i == (int) u.uevent.petra_step
+                   && u.ux0 == path[i - 1].x && u.uy0 == path[i - 1].y
+                   && (abs(dx) + abs(dy) == 1)) {
+            u.uevent.petra_step = (unsigned) (i + 1);
+            return;
+        }
+        petra_fail(u.ux, u.uy);
+        return;
+    }
+    petra_fail(u.ux, u.uy);
+}
+
 void
 spoteffects(boolean pick)
 {
@@ -3509,6 +3649,7 @@ spoteffects(boolean pick)
         }
         mnexto(mtmp, RLOC_NOMSG); /* have to move the monster */
     }
+    petra_check();
  spotdone:
     if (!--inspoteffects) {
         spotterrain = STONE; /* 0 */
@@ -3770,9 +3911,9 @@ check_special_room(boolean newlev)
             if (oracle) {
                 SetVoice(oracle, 0, 80, 0);
                 if (!oracle->mpeaceful)
-                    verbalize("You're in Delphi, %s.", svp.plname);
+                    verbalize("Be gone, %s.", svp.plname);
                 else
-                    verbalize("%s, %s, welcome to Delphi!",
+                    verbalize("%s, %s, welcome.",
                               Hello((struct monst *) 0), svp.plname);
             } else
                 msg_given = FALSE;

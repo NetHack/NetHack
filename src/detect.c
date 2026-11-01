@@ -1196,9 +1196,9 @@ static const struct crystalballlevels {
     const char *what;
     d_level *where;
 } level_detects[] = {
-    { "Delphi", &oracle_level },
+    { "the Prophet", &oracle_level },
     { "Medusa's lair", &medusa_level },
-    { "a castle", &stronghold_level },
+    { "Babylon's Palace", &stronghold_level },
     { "the Wizard of Yendor's tower", &wiz1_level },
 };
 

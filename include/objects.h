@@ -942,6 +942,14 @@ CONTAINER("bag of tricks",  "bag", 0, 1, 1, 20,  15, 100, CLOTH, HI_CLOTH,
 /* lock opening tools */
 TOOL("skeleton key",       "key", 0, 0, 0, 0, 80,  3, 10, IRON, HI_METAL,
                                                                 SKELETON_KEY),
+/* Quest keys and Peter's net. Probability 0. Not randomly generated.
+   Wishes for them are refused. The Gates key name is a placeholder. */
+TOOL("Key to Babylon's Palace", "key", 1, 0, 0, 0, 0, 3, 0, IRON, HI_METAL,
+                                                                KEY_TO_BABYLON),
+TOOL("Key to the Gates of Hell", "key", 1, 0, 0, 0, 0, 3, 0, IRON, HI_METAL,
+                                                                KEY_TO_GATES),
+TOOL("Peter's net", NoDes, 1, 0, 0, 0, 0, 20, 0, CLOTH, CLR_WHITE,
+                                                                PETER_NET),
 TOOL("lock pick",           NoDes, 1, 0, 0, 0, 60,  4, 20, IRON, HI_METAL,
                                                                 LOCK_PICK),
 TOOL("credit card",         NoDes, 1, 0, 0, 0, 15,  1, 10, PLASTIC, CLR_WHITE,

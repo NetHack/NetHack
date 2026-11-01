@@ -702,6 +702,48 @@ King Solomon's #chat, before the Gibeon vision, always speaks
 the hint about asking for a heart to judge rightly, then
 Mark 8:36. After the vision, either line may be spoken.
 
+### Prophet, Capernaum, and PETRA (2026-11-01)
+
+The Oracle is the Prophet. Paying for a minor consultation hears one
+of the placeholder proverbs. Paying the full price for a major
+consultation hears "The treasure you seek has always been yours."
+A short payment hears "That is not enough." That short line is a
+stand-in; Jon did not write one. The overview calls the level the
+Prophet. The big room's overview and achievements call it the Valley
+of Dry Bones. The maps of those big rooms are unchanged.
+
+Babylon's Palace is the old castle. The chest that held the rod of
+wishing now holds a blessed Shield of Faith. The drawbridge does not
+open to the old tune. Apply the Key to Babylon's Palace at the
+drawbridge, or at a door of the palace. A lock pick does not open
+those doors. Interior chests can still be picked.
+
+Capernaum replaces every Minetown variant. It is lit, with a food
+shop, a general store, a tool shop, a lawful temple, a pool, a
+fountain, and peaceful people, dogs, and cats. No random monsters
+are generated there. Peter the Fisherman stands south of his door.
+`#chat` before you have his net: "The Master gave me a new name, and
+on it He said He would build. Remember my name, and the floor will
+hold you."
+
+Mines' End is three PETRA layouts. The safe row is engraved "Upon
+this rock I will build my church. Walk upon the rock in the tongue
+of the Greeks." A wrong letter becomes lava and deals 20 damage. If
+that would kill, you are left at 1 hit point. A wrong step at 1 hit
+point kills you. Diagonal steps onto a letter are wrong. The real
+door is directly north of the A. The other doors are empty closets.
+Behind the real door are Peter's net and a Favor Stone. The level
+does not generate monsters, does not allow teleport, and cannot be
+dug. Those three limits are so the puzzle cannot be skipped.
+
+Give Peter the net. He says "Thank you, friend... 'Follow me, and I
+will make you fishers of men.' I have cast this net for many souls
+since then." He keeps the net. He then gives the Key to Babylon's
+Palace and the Key to the Gates of Hell (placeholder name) and says
+Matthew 16:18. He steps aside and the door opens. The undiggable
+closet holds a blessed +2 Breastplate of Righteousness. The net and
+both keys cannot be wished for.
+
 ### Planned (not done)
 
 Lawful, neutral, and chaotic will eventually be replaced by two

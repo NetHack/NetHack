@@ -736,6 +736,71 @@ domonnoise(struct monst *mtmp)
         return ECMD_TIME;
     }
 
+    if (has_mgivenname(mtmp)
+        && !strcmp(MGIVENNAME(mtmp), "Peter the Fisherman")) {
+        SetVoice(mtmp, 0, 80, 0);
+        if (!u.uevent.peter_rewarded && carrying(PETER_NET)) {
+            struct obj *net = carrying(PETER_NET);
+            struct obj *key;
+            int dir, nx, ny, doorx = 0, doory = 0, aside = 0;
+            boolean found_door = FALSE;
+
+            verbalize("Thank you, friend... 'Follow me, and I will make you fishers of men.' I have cast this net for many souls since then.");
+            if (net)
+                useup(net);
+            key = mksobj(KEY_TO_BABYLON, TRUE, FALSE);
+            if (key) {
+                key->dknown = key->known = key->bknown = 1;
+                (void) hold_another_object(key, "Oops!  %s to the floor!",
+                                           The(aobjnam(key, "slip")),
+                                           (const char *) 0);
+            }
+            key = mksobj(KEY_TO_GATES, TRUE, FALSE);
+            if (key) {
+                key->dknown = key->known = key->bknown = 1;
+                (void) hold_another_object(key, "Oops!  %s to the floor!",
+                                           The(aobjnam(key, "slip")),
+                                           (const char *) 0);
+            }
+            verbalize("And I say also unto thee, That thou art Peter, and upon this rock I will build my church; and the gates of hell shall not prevail against it.");
+            u.uevent.peter_rewarded = 1;
+            for (dir = 0; dir < N_DIRS; dir++) {
+                nx = mtmp->mx + xdir[dir];
+                ny = mtmp->my + ydir[dir];
+                if (!isok(nx, ny))
+                    continue;
+                if (IS_DOOR(levl[nx][ny].typ)) {
+                    doorx = nx;
+                    doory = ny;
+                    found_door = TRUE;
+                    break;
+                }
+            }
+            for (dir = 0; dir < N_DIRS; dir++) {
+                nx = mtmp->mx + xdir[dir];
+                ny = mtmp->my + ydir[dir];
+                if (!isok(nx, ny) || m_at(nx, ny))
+                    continue;
+                if (levl[nx][ny].typ != ROOM && levl[nx][ny].typ != CORR)
+                    continue;
+                rloc_to(mtmp, (coordxy) nx, (coordxy) ny);
+                aside = 1;
+                break;
+            }
+            if (found_door) {
+                if (levl[doorx][doory].doormask & (D_LOCKED | D_CLOSED))
+                    levl[doorx][doory].doormask = D_ISOPEN;
+                newsym(doorx, doory);
+                unblock_point(doorx, doory);
+            }
+            if (aside)
+                pline("%s steps aside.", Monnam(mtmp));
+            return ECMD_TIME;
+        }
+        verbalize("The Master gave me a new name, and on it He said He would build. Remember my name, and the floor will hold you.");
+        return ECMD_TIME;
+    }
+
     switch (msound) {
     case MS_ORACLE:
         return doconsult(mtmp); /* check this */

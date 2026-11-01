@@ -4303,6 +4303,8 @@ doapply(void)
     case LOCK_PICK:
     case CREDIT_CARD:
     case SKELETON_KEY:
+    case KEY_TO_BABYLON:
+    case KEY_TO_GATES:
         res = (pick_lock(obj, 0, 0, NULL) != 0) ? ECMD_TIME : ECMD_OK;
         break;
     case PICK_AXE:

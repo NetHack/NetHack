@@ -6380,6 +6380,9 @@ wish_from_text(char *buf, boolean last_try)
     if (otmp && otmp != &nothing && otmp != &hands_obj
         && (otmp->otyp == BURNT_OFFERING
             || otmp->otyp == FORTUNE_COOKIE
+            || otmp->otyp == PETER_NET
+            || otmp->otyp == KEY_TO_BABYLON
+            || otmp->otyp == KEY_TO_GATES
             || (otmp->otyp == CRYSTAL_BALL && !otmp->oartifact))) {
         pline("You cannot wish for that.");
         obfree(otmp, (struct obj *) 0);

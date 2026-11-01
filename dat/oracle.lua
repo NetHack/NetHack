@@ -20,7 +20,7 @@ des.room({ type = "ordinary", lit=1, x=3,y=3, xalign="center",yalign="center", w
                             des.feature("fountain", 1, 0);
                             des.feature("fountain", 1, 2);
                             des.feature("fountain", 2, 1);
-                            des.monster("Oracle", 1, 1);
+                            des.monster("Prophet", 1, 1);
                             des.door({ state="nodoor", wall="all" });
                          end
               });

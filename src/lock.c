@@ -412,7 +412,8 @@ pick_lock(
     }
 
     if (pick != &dummypick && picktyp != SKELETON_KEY
-        && picktyp != LOCK_PICK && picktyp != CREDIT_CARD) {
+        && picktyp != LOCK_PICK && picktyp != CREDIT_CARD
+        && picktyp != KEY_TO_BABYLON && picktyp != KEY_TO_GATES) {
         impossible("picking lock with object %d?", picktyp);
         return PICKLOCK_DID_NOTHING;
     }
@@ -424,6 +425,15 @@ pick_lock(
     } else if (!get_adjacent_loc((char *) 0, "Invalid location!",
                                  u.ux, u.uy, &cc)) {
         return PICKLOCK_DID_NOTHING;
+    }
+
+    if (picktyp == KEY_TO_GATES) {
+        pline("The key is not for any lock here.");
+        return PICKLOCK_LEARNED_SOMETHING;
+    }
+    if (picktyp == KEY_TO_BABYLON && !Is_stronghold(&u.uz)) {
+        pline("The key does not turn.");
+        return PICKLOCK_LEARNED_SOMETHING;
     }
 
     if (u_at(cc.x, cc.y)) { /* pick lock on a container */
@@ -556,6 +566,25 @@ pick_lock(
         }
 
         door = &levl[cc.x][cc.y];
+        if (Is_stronghold(&u.uz) && picktyp != KEY_TO_BABYLON
+            && (IS_DOOR(door->typ) || IS_DRAWBRIDGE(door->typ)
+                || is_drawbridge_wall(cc.x, cc.y) >= 0)) {
+            pline("The lock does not answer. The Key to Babylon's Palace is required.");
+            return PICKLOCK_LEARNED_SOMETHING;
+        }
+        if (picktyp == KEY_TO_BABYLON && Is_stronghold(&u.uz)) {
+            coordxy bx = cc.x, by = cc.y;
+
+            if (find_drawbridge(&bx, &by)) {
+                if (levl[bx][by].typ == DRAWBRIDGE_DOWN)
+                    close_drawbridge(bx, by);
+                else
+                    open_drawbridge(bx, by);
+                pline("The Key to Babylon's Palace turns. The bridge answers.");
+                u.uevent.uopened_dbridge = 1;
+                return PICKLOCK_DID_SOMETHING;
+            }
+        }
         mtmp = m_at(cc.x, cc.y);
         if (mtmp && canseemon(mtmp) && M_AP_TYPE(mtmp) != M_AP_FURNITURE
             && M_AP_TYPE(mtmp) != M_AP_OBJECT) {
@@ -638,6 +667,9 @@ pick_lock(
                 break;
             case SKELETON_KEY:
                 ch = 70 + ACURR(A_DEX);
+                break;
+            case KEY_TO_BABYLON:
+                ch = 100;
                 break;
             default:
                 ch = 0;

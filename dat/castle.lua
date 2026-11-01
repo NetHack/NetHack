@@ -143,7 +143,8 @@ des.object(object[4],55,11)
 local loc = place:rndcoord(1);
 des.object({ id = "chest", trapped = 0, locked = 1, coord = loc ,
              contents = function()
-                des.object("ask and ye shall receive");
+                des.object({ id = "ancient defense", name = "Shield of Faith",
+                             buc = "blessed" });
                 des.object("anointing oil of gain level");
              end
 });

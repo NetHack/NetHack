@@ -761,7 +761,6 @@ do_play_instrument(struct obj *instr)
     char buf[BUFSZ] = DUMMY, c = 'y';
     char *s;
     coordxy x, y;
-    boolean ok;
 
     if (Underwater) {
         You_cant("play music underwater!");
@@ -808,87 +807,19 @@ do_play_instrument(struct obj *instr)
     Hero_playnotes(obj_to_instr(instr), buf, 50);
 
 
-    /* Check if there was the Stronghold drawbridge near
-     * and if the tune conforms to what we're waiting for.
-     */
+    /* Babylon's Palace opens with the Key to Babylon's Palace, not a tune. */
     if (Is_stronghold(&u.uz)) {
-        exercise(A_WIS, TRUE); /* just for trying */
-        if (!strcmp(buf, svt.tune)) {
-            /* Search for the drawbridge */
-            for (y = u.uy - 1; y <= u.uy + 1; y++)
-                for (x = u.ux - 1; x <= u.ux + 1; x++) {
-                    if (!isok(x, y))
-                        continue;
-                    if (find_drawbridge(&x, &y)) {
-                        /* tune now fully known */
-                        u.uevent.uheard_tune = 2;
-                        record_achievement(ACH_TUNE);
-                        if (levl[x][y].typ == DRAWBRIDGE_DOWN)
-                            close_drawbridge(x, y);
-                        else
-                            open_drawbridge(x, y);
-                        return ECMD_TIME;
-                    }
-                }
-        } else if (!Deaf) {
-            if (u.uevent.uheard_tune < 1)
-                u.uevent.uheard_tune = 1;
-            /* Okay, it wasn't the right tune, but perhaps
-             * we can give the player some hints like in the
-             * Mastermind game */
-            ok = FALSE;
-            for (y = u.uy - 1; y <= u.uy + 1 && !ok; y++)
-                for (x = u.ux - 1; x <= u.ux + 1 && !ok; x++)
-                    if (isok(x, y))
-                        if (IS_DRAWBRIDGE(levl[x][y].typ)
-                            || is_drawbridge_wall(x, y) >= 0)
-                            ok = TRUE;
-            if (ok) { /* There is a drawbridge near */
-                int tumblers, gears;
-                boolean matched[5];
+        boolean near_bridge = FALSE;
 
-                tumblers = gears = 0;
-                for (x = 0; x < 5; x++)
-                    matched[x] = FALSE;
-
-                for (x = 0; x < (int) strlen(buf); x++)
-                    if (x < 5) {
-                        if (buf[x] == svt.tune[x]) {
-                            gears++;
-                            matched[x] = TRUE;
-                        } else {
-                            for (y = 0; y < 5; y++)
-                                if (!matched[y] && buf[x] == svt.tune[y]
-                                    && buf[y] != svt.tune[y]) {
-                                    tumblers++;
-                                    matched[y] = TRUE;
-                                    break;
-                                }
-                        }
-                    }
-                if (tumblers) {
-                    if (gears) {
-                        Soundeffect(se_tumbler_click, 50);
-                        Soundeffect(se_gear_turn, 50);
-                        You_hear("%d tumbler%s click and %d gear%s turn.",
-                                 tumblers, plur(tumblers), gears,
-                                 plur(gears));
-                    } else {
-                        Soundeffect(se_tumbler_click, 50);
-                        You_hear("%d tumbler%s click.", tumblers,
-                                 plur(tumblers));
-                    }
-                } else if (gears) {
-                    You_hear("%d gear%s turn.", gears, plur(gears));
-                    /* could only get `gears == 5' by playing five
-                       correct notes followed by excess; otherwise,
-                       tune would have matched above */
-                    if (gears == 5) {
-                        u.uevent.uheard_tune = 2;
-                        record_achievement(ACH_TUNE);
-                    }
-                }
-            }
+        for (y = u.uy - 1; y <= u.uy + 1; y++)
+            for (x = u.ux - 1; x <= u.ux + 1; x++)
+                if (isok(x, y)
+                    && (IS_DRAWBRIDGE(levl[x][y].typ)
+                        || is_drawbridge_wall(x, y) >= 0))
+                    near_bridge = TRUE;
+        if (near_bridge) {
+            pline("The bridge does not answer the tune. The Key to Babylon's Palace is required.");
+            return ECMD_TIME;
         }
     }
     return ECMD_TIME;

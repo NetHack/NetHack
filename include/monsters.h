@@ -2743,8 +2743,8 @@
         M2_NOPOLY | M2_HUMAN | M2_PEACEFUL | M2_STRONG | M2_COLLECT,
         M3_INFRAVISIBLE | M3_CLOSE,
         14, HI_DOMESTIC, PRISONER),
-    /* the Oracle of Delphi doesn't move */
-    MON(NAM("Oracle"), S_HUMAN,
+    /* The Prophet does not move. */
+    MON(NAM("Prophet"), S_HUMAN,
         LVL(12, 0, 0, 50, 0), (G_NOGEN | G_UNIQ),
         A(ATTK(AT_NONE, AD_MAGM, 0, 4),
           NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),

@@ -2135,9 +2135,14 @@ lev_by_name(const char *nam)
                 nam = " to Vlad's tower"; /* branch to... */
             else
                 nam = "valley";
-        } else if (!strcmpi(nam, "delphi")) {
-            /* Oracle says "welcome to Delphi" so recognize that name too */
+        } else if (!strcmpi(nam, "delphi") || !strcmpi(nam, "prophet")) {
             nam = "oracle";
+        } else if (!strcmpi(nam, "capernaum") || !strcmpi(nam, "minetown")) {
+            nam = "minetn-1";
+        } else if (!strcmpi(nam, "babylon") || !strcmpi(nam, "castle")) {
+            nam = "castle";
+        } else if (!strcmpi(nam, "petra") || !strcmpi(nam, "minesend")) {
+            nam = "minend-1";
         }
 
         if ((slev = find_level(nam)) != 0)
@@ -3648,12 +3653,12 @@ print_mapseen(
     /* we assume that these are mutually exclusive */
     *buf = '\0';
     if (mptr->flags.oracle) {
-        Sprintf(buf, "%sOracle of Delphi.", PREFIX);
+        Sprintf(buf, "%sThe Prophet.", PREFIX);
     } else if (In_sokoban(&mptr->lev)) {
         Sprintf(buf, "%s%s.", PREFIX,
                 mptr->flags.sokosolved ? "Solved" : "Unsolved");
     } else if (mptr->flags.bigroom) {
-        Sprintf(buf, "%sA very big room.", PREFIX);
+        Sprintf(buf, "%sValley of Dry Bones.", PREFIX);
     } else if (mptr->flags.roguelevel) {
         Sprintf(buf, "%sA primitive area.", PREFIX);
     } else if (on_level(&mptr->lev, &qstart_level)) {
@@ -3669,7 +3674,7 @@ print_mapseen(
            indicates that the fort's entrance has been seen (or mapped) */
         Sprintf(buf, "%sFort Ludios.", PREFIX);
     } else if (mptr->flags.castle) {
-        Snprintf(buf, sizeof buf, "%sThe castle%s.", PREFIX,
+        Snprintf(buf, sizeof buf, "%sBabylon's Palace%s.", PREFIX,
                 tunesuffix(mptr, tmpbuf, sizeof tmpbuf));
     } else if (mptr->flags.valley) {
         Sprintf(buf, "%sValley of the Dead.", PREFIX);

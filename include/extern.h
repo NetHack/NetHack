@@ -2831,6 +2831,7 @@ extern char *get_rnd_text(const char *, char *, int(*)(int),
                           unsigned) NONNULLPTRS;
 extern void outrumor(int, int);
 extern void out_proverb(void);
+extern const char *rnd_prophet_proverb(void);
 extern void outoracle(boolean, boolean);
 extern void save_oracles(NHFILE *) NONNULLARG1;
 extern void restore_oracles(NHFILE *) NONNULLARG1;

@@ -574,23 +574,29 @@ outrumor(
 }
 
 /* PLACEHOLDER Prophet proverbs (Jon 2026-10-31), exact KJV.
-   These replace fortune-cookie text. Jon may replace the list.
-   Proverbs 1:5 keeps the KJV colon at the end. */
+   These replace fortune-cookie text and are the Prophet's minor word.
+   Jon may replace the list. Proverbs 1:5 keeps the KJV colon. */
+static const char *const prophet_proverbs[] = {
+    "The fear of the LORD is the beginning of knowledge: but fools despise wisdom and instruction.",
+    "Trust in the LORD with all thine heart; and lean not unto thine own understanding.",
+    "In all thy ways acknowledge him, and he shall direct thy paths.",
+    "A wise man will hear, and will increase learning; and a man of understanding shall attain unto wise counsels:",
+};
+
+const char *
+rnd_prophet_proverb(void)
+{
+    return prophet_proverbs[rn2(SIZE(prophet_proverbs))];
+}
+
 void
 out_proverb(void)
 {
-    static const char *const proverbs[] = {
-        "The fear of the LORD is the beginning of knowledge: but fools despise wisdom and instruction.",
-        "Trust in the LORD with all thine heart; and lean not unto thine own understanding.",
-        "In all thy ways acknowledge him, and he shall direct thy paths.",
-        "A wise man will hear, and will increase learning; and a man of understanding shall attain unto wise counsels:",
-    };
-
     if (Blind) {
         pline("A proverb is there, but you cannot read it!");
         return;
     }
-    pline1(proverbs[rn2(SIZE(proverbs))]);
+    pline1(rnd_prophet_proverb());
 }
 
 staticfn void
@@ -764,7 +770,8 @@ doconsult(struct monst *oracl)
         record_achievement(ACH_ORCL);
     add_xpts = 0; /* first oracle of each type gives experience points */
     if (u_pay == minor_cost) {
-        outrumor(1, BY_ORACLE);
+        SetVoice(oracl, 0, 80, 0);
+        verbalize1(rnd_prophet_proverb());
         if (!u.uevent.minor_oracle)
             add_xpts = u_pay / (u.uevent.major_oracle ? 25 : 10);
         /* 5 pts if very 1st, or 2 pts if major already done */
@@ -772,7 +779,11 @@ doconsult(struct monst *oracl)
     } else {
         boolean cheapskate = u_pay < major_cost;
 
-        outoracle(cheapskate, TRUE);
+        SetVoice(oracl, 0, 80, 0);
+        if (cheapskate)
+            verbalize("That is not enough.");
+        else
+            verbalize("The treasure you seek has always been yours.");
         if (!cheapskate && !u.uevent.major_oracle)
             add_xpts = u_pay / (u.uevent.minor_oracle ? 25 : 10);
         /* ~100 pts if very 1st, ~40 pts if minor already done */

@@ -77,14 +77,14 @@ static struct ll_achieve_msg achieve_msg [] = {
     { 0, "hero never wore armor" },
      /* */
     { LL_MINORAC | LL_DUMP, "entered the Salt Mines of Galilee" },
-    { LL_ACHIEVE, "reached Mine Town" }, /* probably minor, but dnh logs it */
+    { LL_ACHIEVE, "reached Capernaum" }, /* probably minor, but dnh logs it */
     { LL_MINORAC, "entered a shop" },
     { LL_MINORAC, "entered a temple" },
-    { LL_ACHIEVE, "consulted the Oracle" }, /* minor, but rare enough */
+    { LL_ACHIEVE, "consulted the Prophet" }, /* minor, but rare enough */
     { LL_MINORAC | LL_DUMP, "read a Discworld novel" }, /* even more so */
     { LL_ACHIEVE, "entered Sokoban" }, /* keep as major for turn comparison
                                         * with completed sokoban */
-    { LL_ACHIEVE, "entered the Bigroom" },
+    { LL_ACHIEVE, "entered the Valley of Dry Bones" },
     /* The following 8 are for advancing through the ranks
        and messages differ by role so are created on the fly;
        rank 0 (Xp 1 and 2) isn't an achievement */
@@ -2282,7 +2282,7 @@ show_achievements(
             you_have_X("entered the Salt Mines of Galilee");
             break;
         case ACH_TOWN:
-            you_have_X("entered Minetown");
+            you_have_X("entered Capernaum");
             break;
         case ACH_SHOP:
             you_have_X("entered a shop");
@@ -2291,7 +2291,7 @@ show_achievements(
             you_have_X("entered a temple");
             break;
         case ACH_ORCL:
-            you_have_X("consulted the Oracle of Delphi");
+            you_have_X("consulted the Prophet");
             break;
         case ACH_NOVL:
             you_have_X("read from a Discworld novel");
@@ -2306,7 +2306,7 @@ show_achievements(
             you_have_X("completed the Salt Mines of Galilee");
             break;
         case ACH_BGRM:
-            you_have_X("entered the Big Room");
+            you_have_X("entered the Valley of Dry Bones");
             break;
         case ACH_MEDU:
             you_have_X("defeated Medusa");
