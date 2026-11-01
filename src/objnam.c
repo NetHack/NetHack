@@ -1945,9 +1945,9 @@ leaves_essence(struct permonst *ptr)
     default:
         break;
     }
-    /* Humanoids the owner asked for by name. Other orc-class stay foodless. */
+    /* Humanoids the owner asked for by name. Goblins leave meat.
+       Other orc-class stay foodless. */
     if (ptr == &mons[PM_MIND_FLAYER] || ptr == &mons[PM_MASTER_MIND_FLAYER]
-        || ptr == &mons[PM_GOBLIN]
         || ptr == &mons[PM_QUANTUM_MECHANIC]
         || ptr == &mons[PM_GENETIC_ENGINEER]
         || ptr == &mons[PM_MEDUSA]
@@ -1963,7 +1963,7 @@ leaves_essence(struct permonst *ptr)
 
 /* Humanoids, humans, and elves leave no meat. Exceptions:
    - Trolls still leave meat, because they revive from it.
-   - The ape class (S_YETI), both forms of lycanthrope, and Cyclops.
+   - The ape class (S_YETI), both forms of lycanthrope, Cyclops, and goblins.
    - Essences (still a CORPSE internally). */
 boolean
 monster_leaves_meat(struct permonst *ptr)
@@ -1972,7 +1972,7 @@ monster_leaves_meat(struct permonst *ptr)
         return FALSE;
     if (ptr->mlet == S_TROLL || ptr->mlet == S_YETI || leaves_essence(ptr))
         return TRUE;
-    if (is_were(ptr) || ptr == &mons[PM_CYCLOPS])
+    if (is_were(ptr) || ptr == &mons[PM_CYCLOPS] || ptr == &mons[PM_GOBLIN])
         return TRUE;
     if (humanoid(ptr) || is_human(ptr) || is_elf(ptr))
         return FALSE;

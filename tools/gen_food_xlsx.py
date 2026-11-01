@@ -86,7 +86,6 @@ ESSENCE_MLETS = {
 ESSENCE_NAMES = {
     "mind flayer",
     "master mind flayer",
-    "goblin",
     "quantum mechanic",
     "genetic engineer",
     "medusa",
@@ -423,6 +422,12 @@ def classify(mon: dict, by_name: dict[str, dict], flags: dict[str, int]) -> tupl
         return "meat", "Giant. Named raw Cyclops steak. No \"the\" and no possessive."
     if mon["mlet"] == "S_LICH":
         return "other", "Crumbles into dust. Leaves nothing."
+    if key == "goblin":
+        return (
+            "meat",
+            "Goblin. Leaves raw goblin meat. Normal raw-meat rules. "
+            "Hobgoblin and the other living orcs leave nothing.",
+        )
     if mon["mlet"] == "S_EEL":
         return (
             "meat",
@@ -938,7 +943,7 @@ def main() -> None:
         ("Lycanthropes", "Wererat, werejackal, and werewolf leave meat in animal form and in human form. Eating either form causes lycanthropy. A wish for the shared name still produces the human form."),
         ("Cyclops", "Named raw Cyclops steak and cooked Cyclops steak. No \"the\" and no possessive. Other giants leave nothing."),
         ("Liches", "Lich, demilich, master lich, and arch-lich crumble into dust and leave nothing. Eating them grants nothing."),
-        ("Orcs", "Only the goblin leaves an essence. Hobgoblin, orc, hill orc, Mordor orc, Uruk-hai, orc shaman, and orc-captain still leave nothing. Orc zombies and orc mummies already leave an essence."),
+        ("Orcs", "The goblin leaves raw goblin meat and cooked goblin meat, with normal raw-meat rules. Hobgoblin, orc, hill orc, Mordor orc, Uruk-hai, orc shaman, and orc-captain still leave nothing. Orc zombies and orc mummies leave an essence."),
         ("Essences", "Named \"<monster>'s essence\" (wraith's essence, Death's essence). Wishes may also say \"essence of <monster>\". Never spoil, cannot be cooked, can be blessed. No 5% raw-poison roll."),
         ("Demons", "Every M2_DEMON leaves an essence, and eating it is instantly fatal. The death reason is \"ate a demon's essence\". S_DEMON monsters that are not M2_DEMON (sandestin, djinni, mail daemon) leave an essence and are not fatal. The Riders are S_DEMON, not M2_DEMON, and keep their own fatal meal, and they still come back. Imps, manes, lemures, quasits, and tengu are not demons."),
         ("Riders", "Death, Pestilence, and Famine leave essence. They still revive from it. Eating it is instantly fatal, as with the old Rider corpse."),

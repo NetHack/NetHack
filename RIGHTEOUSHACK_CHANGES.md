@@ -572,14 +572,15 @@ The ape class does too (monkey meat; ape, owlbear, yeti,
 carnivorous ape, and sasquatch steak). Lycanthropes leave meat
 in animal form and in human form, and eating either form causes
 lycanthropy. Cyclops leaves raw Cyclops steak and cooked Cyclops
-steak, with no "the" and no possessive. Other giants, and the other
-orcs (hobgoblin, orc, hill orc, Mordor orc, Uruk-hai, orc shaman,
-orc-captain), still leave nothing.
+steak, with no "the" and no possessive. Goblins leave raw goblin
+meat and cooked goblin meat, under the normal raw-meat rules.
+Other giants, and the other orcs (hobgoblin, orc, hill orc,
+Mordor orc, Uruk-hai, orc shaman, orc-captain), still leave nothing.
 
 Essences are named "<monster>'s essence". They never spoil, cannot
 be cooked, and can be blessed. That set is ghosts, shades, wraiths,
 barrow wights, Nazgul, vampires, zombies, mummies, ghouls,
-skeletons, nymphs, the goblin, mind flayers, the quantum
+skeletons, nymphs, mind flayers, the quantum
 mechanic, the genetic engineer, Medusa, the Wizard of Yendor,
 Croesus, every `S_DEMON` monster, and every `M2_DEMON` monster.
 A wraith's essence still grants a level. Eating a Rider's essence

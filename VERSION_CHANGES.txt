@@ -11,6 +11,11 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-01
+Goblins leave raw goblin meat and cooked goblin meat, with the
+normal raw-meat rules. Hobgoblins and the other orcs still leave
+nothing.
+
+2026-11-01
 Fish fillets still skip the raw-poisoning chance, and they spoil
 like other raw meat. A raw fillet cannot be blessed. Cooking slows
 that spoil, and blessed cooked fillet does not spoil. Lizard meat
