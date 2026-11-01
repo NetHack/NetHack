@@ -724,7 +724,7 @@ achievements call it the Valley of Dry Bones. The maps of those
 big rooms are unchanged.
 
 Babylon's Palace is the old castle. The chest that held the rod of
-wishing now holds a blessed Shield of Faith. The drawbridge does not
+wishing now holds a blessed +2 Shield of Faith. The drawbridge does not
 open to the old tune. Apply the Key to Babylon's Palace at the
 drawbridge, or at a door of the palace. A lock pick does not open
 those doors. Interior chests can still be picked.

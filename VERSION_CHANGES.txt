@@ -11,6 +11,10 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-01
+The Shield of Faith in the Babylon's Palace tower chest is
+blessed and +2. The oil that shares that chest is unchanged.
+
+2026-11-01
 The old wizard mode is called prophet mode. Help, the guidebook,
 and the messages that name the mode say prophet mode. The
 playmode option accepts prophet. The old value debug still works.

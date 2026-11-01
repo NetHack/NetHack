@@ -144,7 +144,7 @@ local loc = place:rndcoord(1);
 des.object({ id = "chest", trapped = 0, locked = 1, coord = loc ,
              contents = function()
                 des.object({ id = "ancient defense", name = "Shield of Faith",
-                             buc = "blessed" });
+                             spe = 2, buc = "blessed" });
                 des.object("anointing oil of gain level");
              end
 });
