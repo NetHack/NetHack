@@ -834,12 +834,12 @@ if you have fire resistance. You stay on the square.
 The lava does not sink you or kill you by itself, and the next
 move can step off. Death happens only when the 20 takes you to
 0 hit points or below, and the reason is "a false step." A
-letter of the true path, P through A in order, is never turned
-to lava. Stepping on one out of order, or diagonally, does not
-count and does not hurt, so the path can still be finished.
+letter on this layout's true path, P through A, is never turned
+to lava. Order and direction do not matter, and that stays true
+after you leave the level or save, because the path step is not
+replaced by the turn count when the level is loaded.
 The path is stored on each letter, so a later
-layout does not need a coordinate table. The first letter has to
-be stepped on straight north from the safe row. There is one door
+layout does not need a coordinate table. There is one door
 onto the letter floor, directly north of the A. The other two
 doors are closets, and each holds a loadstone. Behind the real
 door are Peter's net and a Favor Stone. The level does not

@@ -11,6 +11,11 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-01
+A letter on the Mines' End path stays a letter, in any order
+and from any direction, including after you leave the level or
+save. Only a letter that is not on that path becomes lava.
+
+2026-11-01
 Mines' End and Capernaum each use one of three approved maps.
 The champion's chest holds 4 real gems, 350 gold pieces, and
 one prophetic book. Peter's closet door will not yield except

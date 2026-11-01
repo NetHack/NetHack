@@ -55,7 +55,7 @@ struct u_event {
 
     Bitfield(amulet_wish, 1);       /* has gained a wish from the Amulet */
     Bitfield(gibeon_wish, 1);       /* Cave of Gibeon vision has been given */
-    Bitfield(petra_step, 3);        /* next letter of the PETRA path, 0..5 */
+    Bitfield(petra_step, 3);        /* unused; path letters are always safe */
     Bitfield(peter_rewarded, 1);    /* Peter kept the net and gave the keys */
     Bitfield(babylon_hint, 1);      /* prayer has named the palace key */
     Bitfield(peter_quest, 1);       /* Peter has given the quest scroll */

@@ -3387,9 +3387,9 @@ pooleffects(
     return FALSE;
 }
 
-/* A PETRA letter tile. The step is stored on the engraving, so any
-   future layout can mark the path without a coordinate table here.
-   0 is a decoy. 1..5 are the true path, in order. */
+/* A PETRA letter tile. The step is stored on the engraving.
+   0 is a decoy. 1..5 is the true path for this layout.
+   Order does not matter: any of those squares is safe. */
 static int
 petra_step_at(coordxy x, coordxy y)
 {
@@ -3451,16 +3451,10 @@ petra_fail(coordxy x, coordxy y)
     losehp(Fire_resistance ? 10 : 20, "a false step", KILLED_BY);
 }
 
-static boolean
-petra_path_letter(int step)
-{
-    return step >= 1 && step <= 5;
-}
-
 static void
 petra_check(void)
 {
-    int step, dx, dy;
+    int step;
 
     if (!petra_map_letter(u.ux, u.uy))
         return;
@@ -3469,26 +3463,9 @@ petra_check(void)
         return;
 
     step = petra_step_at(u.ux, u.uy);
-    dx = u.ux - u.ux0;
-    dy = u.uy - u.uy0;
-    /* Already crossed. Walking back is safe, even on a diagonal. */
-    if (petra_path_letter(step) && step <= (int) u.uevent.petra_step)
+    /* On this layout's true path: always safe, any order, any direction. */
+    if (step >= 1 && step <= 5)
         return;
-    /* A letter of the true path is never destroyed. Stepping on it
-       out of order, or diagonally, does not count and does not hurt.
-       The path can still be walked in order. */
-    if (petra_path_letter(step)) {
-        if (!dx || !dy) {
-            if (step == (int) u.uevent.petra_step + 1 && step == 1
-                && u.ux0 == u.ux && u.uy0 == u.uy + 1)
-                u.uevent.petra_step = 1;
-            else if (step == (int) u.uevent.petra_step + 1
-                     && petra_step_at(u.ux0, u.uy0) == step - 1
-                     && abs(dx) + abs(dy) == 1)
-                u.uevent.petra_step = (unsigned) step;
-        }
-        return;
-    }
     petra_fail(u.ux, u.uy);
 }
 
