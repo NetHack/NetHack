@@ -634,10 +634,12 @@ stair is placed on the Oracle level itself. A dark orthogonal tunnel
 leads into a lit cave. The cave does not generate random monsters.
 In the middle is the Altar at Gibeon, a lawful altar. Looking at it
 says "There is the Altar at Gibeon here." King Solomon stands on the
-platform and remains there. `#chat` with him says: "When the Lord
-came to me in this place, I could have asked for gold or the lives
-of my enemies. Instead I asked for a heart to judge His people
-rightly." A chest on the platform holds one burnt offering. That food is not randomly
+platform and remains there. `#chat` with him says one of two
+lines, chosen at random. One is: "When the Lord came to me in this
+place, I could have asked for gold or the lives of my enemies.
+Instead I asked for a heart to judge His people rightly." The other
+is Mark 8:36: "For what shall it profit a man, if he shall gain the
+whole world, and lose his own soul?" A chest on the platform holds one burnt offering. That food is not randomly
 generated and cannot be wished for.
 
 Praying while standing on the altar, with the burnt offering on it,
