@@ -644,10 +644,14 @@ generated and cannot be wished for.
 
 Praying while standing on the altar, with the burnt offering on it,
 consumes the offering even during the normal prayer wait. The LORD
-appears and asks what you want. Asking for wisdom, a discerning
-heart, a wise and discerning heart, wisdom and knowledge, or
-knowledge (a leading "a" or "an" is ignored) is answered with the
-words from 2 Chronicles 1. The gift is the existing Belt of Truth at
+speaks the King James text of 1 Kings 3:5, with "to Solomon" changed
+to "to thee": "In Gibeon the LORD appeared to thee in a dream by
+night: and God said, Ask what I shall give thee." Asking for wisdom,
+a discerning heart, a wise and discerning heart, wisdom and
+knowledge, or knowledge (a leading "a" or "an" is ignored) is
+answered with the King James text of 1 Kings 3:11-13, from "Because
+thou hast asked this thing" through "all thy days." The gift is the
+existing Belt of Truth at
 +2 enchantment, a blessed anointing oil of gain level, and Wisdom 25.
 Any other answer is an ordinary wish. The vision happens once. Later
 prayers at the altar are ordinary prayers.

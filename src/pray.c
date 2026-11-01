@@ -1926,10 +1926,12 @@ gibeon_grant_wisdom(void)
 {
     struct obj *otmp;
 
-    /* One message is limited to 255 characters, so the sentence is
-       given as two lines. The words are the full verse. */
-    pline("\"Since this is your heart's desire and you have not asked for wealth, possessions or honor, nor for the death of your enemies,");
-    pline("and since you have not asked for a long life but for wisdom and knowledge, therefore wisdom and knowledge will be given you, and I will also give you wealth, possessions and honor.\"");
+    /* 1 Kings 3:11-13 KJV. A message stops at 255 characters, so the
+       verses are split at their own breaks. Read in order, the words
+       are the verses, from "Because" through "all thy days." */
+    pline("Because thou hast asked this thing, and hast not asked for thyself long life; neither hast asked riches for thyself, nor hast asked the life of thine enemies; but hast asked for thyself understanding to discern judgment;");
+    pline("Behold, I have done according to thy words: lo, I have given thee a wise and an understanding heart; so that there was none like thee before thee, neither after thee shall any arise like unto thee.");
+    pline("And I have also given thee that which thou hast not asked, both riches, and honour: so that there shall not be any among the kings like unto thee all thy days.");
 
     otmp = mksobj(BELT, FALSE, FALSE);
     if (otmp) {
@@ -1989,12 +1991,12 @@ gibeon_vision(void)
     useupf(otmp, 1L);
     u.uevent.gibeon_wish = 1;
 
-    pline("At Gibeon the LORD appears to you in a vision.");
-    pline("The LORD says, \"Ask for whatever you want me to give you.\"");
+    /* 1 Kings 3:5 KJV, with only "to Solomon" changed to "to thee". */
+    pline("In Gibeon the LORD appeared to thee in a dream by night: and God said, Ask what I shall give thee.");
 
     tries = 0;
     for (;;) {
-        getlin("Ask for whatever you want me to give you?", buf);
+        getlin("Ask what I shall give thee?", buf);
         if (iflags.term_gone)
             return 1;
         (void) mungspaces(buf);
