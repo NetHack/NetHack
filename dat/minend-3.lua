@@ -31,7 +31,7 @@ des.stair("up", 7, 9)
 -- closed door at (38,11). The passage joins the arrival corridor only
 -- at (15,10), then winds under the puzzle, around the outer edge, and
 -- back in. It does not touch the letter floor or the safe row.
-des.monster({ id = "Philistine champion", peaceful = 0, asleep = false, x = 38, y = 9,
+des.monster({ id = "Philistine Champion", peaceful = 0, asleep = false, x = 38, y = 9,
               inventory = function()
                  des.object({ id = "long sword", spe = 1, buc = "uncursed" })
                  des.object({ id = "scale mail", buc = "uncursed" })

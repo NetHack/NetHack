@@ -752,16 +752,20 @@ door is directly north of the A. The other doors are empty closets.
 Behind the real door are Peter's net and a Favor Stone. The level
 does not generate random monsters, does not allow teleport, and
 cannot be dug. Those three limits stay, so the puzzle cannot be
-skipped. The Philistine champion is the only monster, on every
+skipped. The Philistine Champion is the only monster, on every
 layout. He waits in a dark room far from the up stair. The passage
 to that room leaves the arrival corridor and winds under the
 puzzle, around the outer edge, and back to a closed door. It does
 not cross the letter floor or the safe row, so the scroll can be
 taken before the puzzle. The passage is not visible from the
-stair. He is hostile, male, experience
-difficulty 10, monster level 8, speed 12, base armor class 10, and
-has one 2d6 weapon attack and no sorcery. He carries a +1 long sword, scale mail, a
-helmet, and a small shield. Killing him always leaves a scholar's
+stair. He is hostile and male. His combat entry is the minotaur's:
+monster level 15, speed 15, base armor class 6, magic resistance 0,
+size large (weight 1500), difficulty 17, two 3d10 claw attacks and
+one 2d8 butt attack. The map symbol is H. He does not moo, and the
+game never calls him a minotaur. He still carries a +1 long sword,
+scale mail, a helmet, and a small shield; worn, that armor makes
+his armor class better than 6. These numbers are far too strong
+for an experience level 7 or 8 character. Killing him always leaves a scholar's
 scroll. The scroll is not generated anywhere else and cannot be
 wished for. Reading it shows this text and does not use it up:
 "In my research I have found the ancient Greek name for the rock

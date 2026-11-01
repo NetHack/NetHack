@@ -11,13 +11,19 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-01
-The Philistine champion waits in his own dark room on Mines' End,
+The Mines' End boss is named Philistine Champion. His attacks,
+speed, armor class, and size match the minotaur. He is shown as
+a large humanoid and does not moo. Those minotaur numbers are
+far too strong for an experience level 7 or 8 character.
+
+2026-11-01
+The Philistine Champion waits in his own dark room on Mines' End,
 far from the stairs. A winding corridor reaches that room without
 crossing the letter floor, so the scholar's scroll can be taken
 before the puzzle. He is still the only monster there.
 
 2026-11-01
-Mines' End is guarded by the Philistine champion, the only monster
+Mines' End is guarded by the Philistine Champion, the only monster
 there. He is a difficulty-10 warrior with a long sword, scale mail,
 a helmet, and a small shield, and he does not use sorcery. Killing
 him leaves a scholar's scroll. Reading it shows the Greek name

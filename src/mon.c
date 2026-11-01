@@ -3109,7 +3109,7 @@ mondead(struct monst *mtmp)
     if (mtmp->data == &mons[PM_STEAM_VORTEX])
         create_gas_cloud(mtmp->mx, mtmp->my, rn2(10) + 5, 0); /* harmless */
 
-    /* The Philistine champion always leaves the scholar's scroll. */
+    /* The Philistine Champion always leaves the scholar's scroll. */
     if (mtmp->data == &mons[PM_PHILISTINE_CHAMPION] && isok(mtmp->mx, mtmp->my)) {
         struct obj *scroll = mksobj(SCR_SCHOLARS_SCROLL, TRUE, FALSE);
 
@@ -3119,7 +3119,7 @@ mondead(struct monst *mtmp)
             stackobj(scroll);
             newsym(mtmp->mx, mtmp->my);
             if (cansee(mtmp->mx, mtmp->my))
-                pline("The Philistine champion drops a scholar's scroll.");
+                pline("The Philistine Champion drops a scholar's scroll.");
         }
     }
 
