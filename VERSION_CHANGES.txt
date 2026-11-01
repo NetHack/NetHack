@@ -11,6 +11,18 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-01
+Pride now has eight treasure rooms. Each game shuffles one lure
+into each room. A harmless mirror stands outside every door, and
+a live mirror stands inside. Stepping on that inner mirror, or
+kicking it, wakes the reflection, the same as picking up the lure.
+The garden fountains are living water: drinking restores you and
+ends hunger, and nothing harmful comes of them. The last of
+Psalm 91 is engraved around the altar. No monster can enter the
+garden. Greed is a pillared hall with side rooms. Its gems stay
+on that level. The desert still scatters four loaves and does
+not make you hungry just for arriving.
+
+2026-11-01
 The Wilderness Trial is a five-level branch below the Prophet.
 The desert bread makes you hungrier. Greed makes you leave
 everything at the gate, and only what you dropped comes back.

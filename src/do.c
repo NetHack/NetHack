@@ -1522,6 +1522,8 @@ goto_level(
         pline("The way back is sealed.");
         return;
     }
+    if (in_wilderness() && dunlev(&u.uz) == 2 && !on_level(newlevel, &u.uz))
+        greed_leave_gems();
     if (newdungeon) {
         if (In_endgame(newlevel)) { /* 1st Endgame Level !!! */
             if (!u.uhave.amulet)

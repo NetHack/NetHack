@@ -3530,26 +3530,32 @@ pride_prayer(void)
         useupall(otmp);
     }
     for (otmp = fobj; otmp; otmp = next) {
+        boolean lure = FALSE;
+
         next = otmp->nobj;
-        if (!has_oname(otmp))
-            continue;
-        for (i = 0; lures[i]; i++)
-            if (!strcmp(ONAME(otmp), lures[i])) {
-                delobj(otmp);
-                break;
-            }
+        if (otmp->otyp == GRAY_DRAGON_SCALE_MAIL && otmp->spe >= 12)
+            lure = TRUE;
+        if (has_oname(otmp)) {
+            for (i = 0; lures[i]; i++)
+                if (!strcmp(ONAME(otmp), lures[i]))
+                    lure = TRUE;
+        }
+        if (lure)
+            delobj(otmp);
     }
     for (x = 1; x < COLNO; x++)
         for (y = 0; y < ROWNO; y++)
             if (IS_DOOR(levl[x][y].typ) && y == 4) {
                 levl[x][y].typ = HWALL;
+                levl[x][y].wall_info |= (W_NONDIGGABLE | W_NONPASSWALL);
                 block_point(x, y);
                 newsym(x, y);
             }
-    if (isok(27, 8) && IS_WALL(levl[27][8].typ)) {
-        levl[27][8].typ = ROOM;
-        unblock_point(27, 8);
-        newsym(27, 8);
+    /* The hall is walled off from the down stair until this opens. */
+    if (isok(66, 1) && IS_WALL(levl[66][1].typ)) {
+        levl[66][1].typ = ROOM;
+        unblock_point(66, 1);
+        newsym(66, 1);
         pline("A hidden way opens.");
     }
     pline("The treasures crumble into dust.");
@@ -3588,6 +3594,13 @@ wilderness_check(void)
                 pline("%s", ep->engr_txt[actual_text]);
         }
     }
+    if (dunlev(&u.uz) == 3 && (u.ux != u.ux0 || u.uy != u.uy0)) {
+        struct obj *otmp;
+
+        for (otmp = svl.level.objects[u.ux][u.uy]; otmp; otmp = otmp->nexthere)
+            if (otmp->otyp == MIRROR)
+                pride_touch_mirror(otmp);
+    }
     if (dunlev(&u.uz) == 2) {
         struct obj *otmp;
 
@@ -3624,7 +3637,8 @@ wilderness_check(void)
                     struct obj *next = otmp->nobj;
 
                     if (otmp->where == OBJ_FLOOR && otmp->ox < 12
-                        && otmp->how_lost == LOST_DROPPED) {
+                        && otmp->how_lost == LOST_DROPPED
+                        && !greed_lure_gem(otmp)) {
                         coordxy ox = otmp->ox, oy = otmp->oy;
 
                         obj_extract_self(otmp);
@@ -3641,6 +3655,79 @@ wilderness_check(void)
     if (dunlev(&u.uz) == 5 && !on_level(&garden_shown, &u.uz)) {
         garden_shown = u.uz;
         pline("Light floods the chamber, warm as morning. The air is sweet, and for the first time since entering the wilderness, you are not afraid.");
+    }
+}
+
+/* A live mirror is spe 1. Waking it once clears that mark. */
+void
+pride_touch_mirror(struct obj *obj)
+{
+    struct monst *refl;
+
+    if (!obj || obj->otyp != MIRROR || obj->spe != 1)
+        return;
+    if (!in_wilderness() || dunlev(&u.uz) != 3 || u.uevent.pride_prayed)
+        return;
+    obj->spe = 2;
+    pline("Your reflection smiles, and steps out of the glass.");
+    refl = makemon(&mons[PM_HUMAN], u.ux, u.uy, MM_ADJACENTOK);
+    if (refl) {
+        (void) christen_monst(refl, "your reflection");
+        refl->mpeaceful = 0;
+        set_malign(refl);
+    }
+}
+
+boolean
+greed_lure_gem(struct obj *obj)
+{
+    const char *nm;
+
+    if (!obj || !has_oname(obj))
+        return FALSE;
+    nm = ONAME(obj);
+    return (boolean) (!strcmp(nm, "exquisite flawless diamond")
+                      || !strcmp(nm, "flawless emerald")
+                      || !strcmp(nm, "flawless ruby")
+                      || !strcmp(nm, "flawless sapphire"));
+}
+
+static void
+greed_drop_one(struct obj *obj)
+{
+    obj_extract_self(obj);
+    obj->how_lost = LOST_NONE;
+    place_object(obj, u.ux, u.uy);
+}
+
+/* Level-only gems stay on Greed, including ones inside a container. */
+void
+greed_leave_gems(void)
+{
+    struct obj *otmp, *next;
+    boolean any = FALSE;
+
+    for (otmp = gi.invent; otmp; otmp = next) {
+        next = otmp->nobj;
+        if (Has_contents(otmp)) {
+            struct obj *content, *cnext;
+
+            for (content = otmp->cobj; content; content = cnext) {
+                cnext = content->nobj;
+                if (greed_lure_gem(content)) {
+                    greed_drop_one(content);
+                    any = TRUE;
+                }
+            }
+        }
+        if (greed_lure_gem(otmp)) {
+            greed_drop_one(otmp);
+            any = TRUE;
+        }
+    }
+    if (any) {
+        newsym(u.ux, u.uy);
+        pline("The gems will not leave this place.");
     }
 }
 
@@ -3662,6 +3749,8 @@ wilderness_took(struct obj *obj)
             }
         pline("The sword is in your hand, but the way out is not yet marked.");
     }
+    if (dunlev(&u.uz) == 3 && obj->otyp == MIRROR)
+        pride_touch_mirror(obj);
     if (dunlev(&u.uz) == 3 && has_oname(obj)) {
         const char *nm = ONAME(obj);
         const char *vanity = 0;
@@ -3687,7 +3776,7 @@ wilderness_took(struct obj *obj)
 
             pline("%s", vanity);
             pline("Your reflection smiles, and steps out of the glass.");
-            refl = makemon(&mons[PM_HUMAN], u.ux + 1, u.uy, NO_MM_FLAGS);
+            refl = makemon(&mons[PM_HUMAN], u.ux, u.uy, MM_ADJACENTOK);
             if (refl) {
                 (void) christen_monst(refl, "your reflection");
                 refl->mpeaceful = 0;
