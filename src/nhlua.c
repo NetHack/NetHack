@@ -850,7 +850,7 @@ nhl_text(lua_State *L)
     return 0;
 }
 
-/* makeplural("zorkmid") */
+/* makeplural("shekel") */
 staticfn int
 nhl_makeplural(lua_State *L)
 {
@@ -864,7 +864,7 @@ nhl_makeplural(lua_State *L)
     return 1;
 }
 
-/* makesingular("zorkmids") */
+/* makesingular("shekels") */
 staticfn int
 nhl_makesingular(lua_State *L)
 {

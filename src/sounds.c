@@ -833,7 +833,7 @@ domonnoise(struct monst *mtmp)
             /* approximation of GEICO's advertising slogan (it actually
                concludes with "save you 15% or more on car insurance.") */
             Sprintf(verbuf, "15 minutes could save you 15 %s.",
-                    currency(15L)); /* "zorkmids" */
+                    currency(15L)); /* "shekels" */
             verbl_msg = verbuf;
         }
         break;

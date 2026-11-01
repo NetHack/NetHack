@@ -710,6 +710,14 @@ debug mode say prophet mode. `OPTIONS=playmode:prophet` selects it.
 `playmode:debug` still selects it. The Wizard of Yendor and the
 Wizard role are unchanged. The sysconf list is still named WIZARDS.
 
+### Shekels (2026-11-01)
+
+Prices, shop speech, the inventory gold line, death and score
+lines, and the Prophet's fees say "shekel" for one and "shekels"
+for more. The coins themselves are still called gold pieces.
+A wish for shekels or for zorkmids both yield gold pieces. The
+game does not say zorkmid.
+
 ### Prophet, Capernaum, and PETRA (2026-11-01)
 
 The Oracle is Isaiah, prophet of the Lord. That is his monster

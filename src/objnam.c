@@ -4803,6 +4803,7 @@ readobjnam_postparse1(struct _readobjnam_data *d)
      * well in the future. (TH)
      */
     if (!BSTRCMPI(d->bp, d->p - 10, "gold piece")
+        || !BSTRCMPI(d->bp, d->p - 6, "shekel")
         || !BSTRCMPI(d->bp, d->p - 7, "zorkmid")
         || !strcmpi(d->bp, "gold") || !strcmpi(d->bp, "money")
         || !strcmpi(d->bp, "coin") || *d->bp == GOLD_SYM) {

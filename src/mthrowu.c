@@ -44,7 +44,7 @@ static const char *const hallublasts[] = {
     "sadness", "salt", "sand", "scrolls", "sludge", "smileys", "snowflakes",
     "sparkles", "specularity", "spores", "stars", "steam", "tetrahedrons",
     "text", "the past", "tornadoes", "toxic waste", "ultraviolet light",
-    "viruses", "water", "waveforms", "wind", "X-rays", "zorkmids"
+    "viruses", "water", "waveforms", "wind", "X-rays", "shekels"
 };
 
 /* Return a random hallucinatory blast. */
