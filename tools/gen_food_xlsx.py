@@ -5,8 +5,10 @@ Run from the repository root:
 
     python3 tools/gen_food_xlsx.py
 
-Reads include/meatnoun.h, include/objects.h, include/monsters.h, and
-include/monflag.h. Update this script if those table formats change.
+Reads include/meatnoun.h, include/objects.h, include/monsters.h,
+include/monflag.h, and include/weight.h. Weight constants such as
+WT_DRAGON are written as numbers. Update this script if those table
+formats change.
 """
 
 from __future__ import annotations
@@ -263,7 +265,34 @@ def strip_if0(text: str) -> str:
     return "".join(out)
 
 
-def parse_monsters(text: str, flags: dict[str, int]) -> list[dict]:
+def parse_weight_constants(text: str) -> dict[str, int]:
+    """WT_* from the weight_constants enum, plus any #define WT_*."""
+    weights: dict[str, int] = {}
+    for name, raw in re.findall(
+        r"^\s*(WT_[A-Za-z0-9_]+)\s*=\s*(-?\d+)", text, re.M
+    ):
+        weights[name] = int(raw)
+    for name, raw in re.findall(
+        r"^#define\s+(WT_[A-Za-z0-9_]+)\s+(-?\d+)", text, re.M
+    ):
+        weights[name] = int(raw)
+    if "WT_DRAGON" not in weights or "WT_HUMAN" not in weights:
+        sys.exit("weight.h did not parse; expected WT_DRAGON and WT_HUMAN")
+    return weights
+
+
+def resolve_number(token: str, table: dict[str, int], what: str) -> int:
+    """Turn a numeric literal or a named constant into an int."""
+    token = token.strip()
+    token = re.sub(r"/\*.*?\*/", "", token).strip()
+    if re.fullmatch(r"-?\d+", token):
+        return int(token)
+    if token in table:
+        return table[token]
+    sys.exit(f"unresolved {what}: {token}")
+
+
+def parse_monsters(text: str, flags: dict[str, int], weights: dict[str, int]) -> list[dict]:
     text = strip_if0(text)
     mons = []
     for block in monster_blocks(text):
@@ -285,11 +314,14 @@ def parse_monsters(text: str, flags: dict[str, int]) -> list[dict]:
         if not mlet_m:
             continue
         siz = re.search(
-            r"SIZ\(\s*([^,]+)\s*,\s*(\d+)",
+            r"SIZ\(\s*([^,]+)\s*,\s*([^,]+)",
             args[5],
         )
-        weight = siz.group(1).strip() if siz else ""
-        nutrition = int(siz.group(2)) if siz else 0
+        if not siz:
+            sys.exit(f"no SIZ() weight for {display}")
+        numbers = {**weights, **flags}
+        weight = resolve_number(siz.group(1), numbers, f"{display} weight")
+        nutrition = resolve_number(siz.group(2), numbers, f"{display} nutrition")
         size_m = re.search(r"\b(MZ_[A-Z]+)\b", args[5])
         size = size_m.group(1) if size_m else ""
         attacks = " ".join(re.findall(r"\bAD_[A-Z0-9]+\b", args[4]))
@@ -633,7 +665,10 @@ def main() -> None:
             sys.exit(f"missing {needed} in monflag.h parse")
     nouns = parse_nouns(read(ROOT / "include" / "meatnoun.h"))
     foods = parse_foods(read(ROOT / "include" / "objects.h"))
-    monsters = parse_monsters(read(ROOT / "include" / "monsters.h"), flags)
+    weights = parse_weight_constants(read(ROOT / "include" / "weight.h"))
+    monsters = parse_monsters(
+        read(ROOT / "include" / "monsters.h"), flags, weights
+    )
     by_name = {m["name"].lower(): m for m in monsters}
 
     wb = Workbook()

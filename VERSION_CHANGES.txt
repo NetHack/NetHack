@@ -11,6 +11,10 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-01
+The food workbook shows monster weights as numbers. A dragon
+weighs 4500, a baby dragon 1500, a human 1450, and a jelly 50.
+
+2026-11-01
 Goblins leave raw goblin meat and cooked goblin meat, with the
 normal raw-meat rules. Hobgoblins and the other orcs still leave
 nothing.
