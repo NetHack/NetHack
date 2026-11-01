@@ -1491,14 +1491,14 @@ const allObjects = {
         artifact_base_name: "golden censer of incense",
         color: "CLR_WHITE",
     },
-    "gosple of the peace": {
-        id: "gosple of the peace",
+    "gospel of peace": {
+        id: "gospel of peace",
         symbol: "[",
         class1: "armor",
         class2: "suit or piece of armor",
         is_artifact: true,
         artifact_base_id: "trusty sandals",
-        artifact_base_name: "gosple of the peace",
+        artifact_base_name: "gospel of peace",
         color: "NO_COLOR",
     },
     "grappling hook": {

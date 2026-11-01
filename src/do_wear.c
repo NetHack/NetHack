@@ -3399,7 +3399,7 @@ adj_abon(struct obj *otmp, schar delta)
         }
         disp.botl = TRUE;
     }
-    //For Gosple of the Peace
+    //For Gospel of Peace
     if (uarmf && uarmf == otmp && otmp->otyp == SANDALS) {
         if (delta) {
             makeknown(uarmf->otyp);

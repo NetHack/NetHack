@@ -41,6 +41,7 @@ staticfn boolean destroyable(struct obj *, int);
 
 staticfn void wishcmdassist(int);
 staticfn void wish_history_menu(char *);
+staticfn void wish_give(struct obj *, const char *, long);
 
 #define ZT_MAGIC_MISSILE (AD_MAGM - 1)
 #define ZT_FIRE (AD_FIRE - 1)
@@ -6311,19 +6312,111 @@ wish_history_menu(char *buf)
 
 RESTORE_WARNING_FORMAT_NONLITERAL
 
+/* Finish a wish that already produced an object. */
+staticfn void
+wish_give(struct obj *otmp, const char *bufcpy, long oldwisharti)
+{
+    char wish[BUFSZ];
+    long maybe_LL_arti;
+    const char *verb, *oops_msg;
+
+    wish_history_add((char *) bufcpy);
+    if (otmp->oartifact) {
+        /* update artifact bookkeeping; doesn't produce a livelog event */
+        artifact_origin(otmp, ONAME_WISH | ONAME_KNOW_ARTI);
+    }
+
+    /* wisharti conduct handled in readobjnam() */
+    maybe_LL_arti = ((oldwisharti < u.uconduct.wisharti) ? LL_ARTIFACT : 0L);
+    Snprintf(wish, sizeof wish, "\"%s\", got \"%s\"", bufcpy, doname(otmp));
+    /* KMH, conduct */
+    if (!u.uconduct.wishes++)
+        livelog_printf((LL_CONDUCT | LL_WISH | maybe_LL_arti),
+                       "made %s first wish - %s", uhis(), wish);
+    else if (!oldwisharti && u.uconduct.wisharti)
+        livelog_printf((LL_CONDUCT | LL_WISH | LL_ARTIFACT),
+                       "made %s first artifact wish - %s", uhis(), wish);
+    else
+        livelog_printf((LL_WISH | maybe_LL_arti), "wished for %s", wish);
+
+    if (otmp->otyp == CORPSE && !u_safe_from_fatal_corpse(otmp, st_all))
+        otmp->wishedfor = 1;
+
+    verb = ((Is_airlevel(&u.uz) || u.uinwater)
+            ? "slip"
+            : (otmp->otyp == CORPSE && otmp->wishedfor)
+              ? "materialize" : "drop");
+    oops_msg = (u.uswallow
+                ? "Oops!  %s out of your reach!"
+                : (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz)
+                   || levl[u.ux][u.uy].typ < IRONBARS
+                   || levl[u.ux][u.uy].typ >= ICE)
+                   ? "Oops!  %s away from you!"
+                   : !(otmp->otyp == CORPSE && otmp->wishedfor)
+                     ? "Oops!  %s to the floor!"
+                     : "Careful! %s on the floor!");
+
+    /* The(aobjnam()) is safe since otmp is unidentified -dlc */
+    (void) hold_another_object(otmp, oops_msg, The(aobjnam(otmp, verb)),
+                               (const char *) 0);
+}
+
+/* Grant the object described by buf, using stock wish rules.
+   Returns 1 when the wish is finished, 0 when the caller should ask again.
+   last_try grants a random object after one more failure, as makewish does. */
+int
+wish_from_text(char *buf, boolean last_try)
+{
+    char bufcpy[BUFSZ];
+    struct obj *otmp, nothing;
+    long oldwisharti;
+    boolean refused;
+
+    nothing = cg.zeroobj; /* lint suppression; only its address matters */
+    oldwisharti = u.uconduct.wisharti;
+    refused = FALSE;
+    Strcpy(bufcpy, buf);
+    otmp = readobjnam(buf, &nothing);
+    if (otmp && otmp != &nothing && otmp != &hands_obj
+        && otmp->otyp == BURNT_OFFERING) {
+        pline("You cannot wish for that.");
+        obfree(otmp, (struct obj *) 0);
+        otmp = (struct obj *) 0;
+        refused = TRUE;
+    }
+    if (!otmp) {
+        if (!refused)
+            pline("Nothing fitting that description exists in the game.");
+        if (!last_try)
+            return 0;
+        pline1(thats_enough_tries);
+        otmp = readobjnam((char *) 0, (struct obj *) 0);
+        if (!otmp)
+            return 1;
+        wish_give(otmp, bufcpy, oldwisharti);
+        return 1;
+    } else if (otmp == &nothing) {
+        /* explicitly wished for "nothing", presumably attempting
+           to retain wishless conduct */
+        livelog_printf(LL_WISH, "declined to make a wish");
+        return 1;
+    } else if (otmp == &hands_obj) {
+        wish_history_add(bufcpy);
+        /* wizard mode terrain wish: skip livelogging, etc */
+        return 1;
+    }
+    wish_give(otmp, bufcpy, oldwisharti);
+    return 1;
+}
+
 void
 makewish(void)
 {
-    char buf[BUFSZ] = DUMMY;
-    char bufcpy[BUFSZ], wish[BUFSZ], promptbuf[QBUFSZ];
-    struct obj *otmp, nothing;
-    long maybe_LL_arti;
+    char buf[BUFSZ] = DUMMY, promptbuf[QBUFSZ];
     int tries = 0;
-    long oldwisharti = u.uconduct.wisharti;
 
     svc.context.resume_wish = 0;
     promptbuf[0] = '\0';
-    nothing = cg.zeroobj; /* lint suppression; only its address matters */
     if (flags.verbose)
         You("may wish for an object.");
  retry:
@@ -6351,75 +6444,12 @@ makewish(void)
         buf[0] = '\0'; /* for EDIT_GETLIN */
         goto retry;
     }
-    /*
-     *  Note: if they wished for and got a non-object successfully,
-     *  otmp == &hands_obj.  That includes an artifact which has been
-     *  denied. Wishing for "nothing" requires a separate value to remain
-     *  distinct.
-     */
-    strcpy(bufcpy, buf);
-    otmp = readobjnam(buf, &nothing);
-    if (!otmp) {
-        pline("Nothing fitting that description exists in the game.");
-        if (++tries < MAXWISHTRY)
-            goto retry;
-        pline1(thats_enough_tries);
-        otmp = readobjnam((char *) 0, (struct obj *) 0);
-        if (!otmp)
-            return; /* for safety; should never happen */
-    } else if (otmp == &nothing) {
-        /* explicitly wished for "nothing", presumably attempting
-           to retain wishless conduct */
-        livelog_printf(LL_WISH, "declined to make a wish");
-        return;
-    } else if (otmp == &hands_obj) {
-        wish_history_add(bufcpy);
-        /* wizard mode terrain wish: skip livelogging, etc */
-        return;
+    /* Stock rules, including the burnt-offering refusal. Five tries,
+       then a random object. */
+    if (!wish_from_text(buf, tries + 1 >= MAXWISHTRY)) {
+        tries++;
+        goto retry;
     }
-    wish_history_add(bufcpy);
-
-    if (otmp->oartifact) {
-        /* update artifact bookkeeping; doesn't produce a livelog event */
-        artifact_origin(otmp, ONAME_WISH | ONAME_KNOW_ARTI);
-    }
-
-    /* wisharti conduct handled in readobjnam() */
-    maybe_LL_arti = ((oldwisharti < u.uconduct.wisharti) ? LL_ARTIFACT : 0L);
-    Snprintf(wish, sizeof wish, "\"%s\", got \"%s\"", bufcpy, doname(otmp));
-    /* KMH, conduct */
-    if (!u.uconduct.wishes++)
-        livelog_printf((LL_CONDUCT | LL_WISH | maybe_LL_arti),
-                       "made %s first wish - %s", uhis(), wish);
-    else if (!oldwisharti && u.uconduct.wisharti)
-        livelog_printf((LL_CONDUCT | LL_WISH | LL_ARTIFACT),
-                       "made %s first artifact wish - %s", uhis(), wish);
-    else
-        livelog_printf((LL_WISH | maybe_LL_arti), "wished for %s", wish);
-    /* TODO? maybe generate a second event describing what was received since
-       these just echo player's request rather than show actual result */
-
-    if (otmp->otyp == CORPSE && !u_safe_from_fatal_corpse(otmp, st_all))
-        otmp->wishedfor = 1;
-
-    const char *verb = ((Is_airlevel(&u.uz) || u.uinwater)
-                        ? "slip"
-                        : (otmp->otyp == CORPSE && otmp->wishedfor)
-                          ? "materialize" : "drop"),
-               *oops_msg = (u.uswallow
-                            ? "Oops!  %s out of your reach!"
-                            : (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz)
-                               || levl[u.ux][u.uy].typ < IRONBARS
-                               || levl[u.ux][u.uy].typ >= ICE)
-                               ? "Oops!  %s away from you!"
-                               : !(otmp->otyp == CORPSE && otmp->wishedfor)
-                                 ? "Oops!  %s to the floor!"
-                                 : "Careful! %s on the floor!");
-
-    /* The(aobjnam()) is safe since otmp is unidentified -dlc */
-    (void) hold_another_object(otmp, oops_msg, The(aobjnam(otmp, verb)),
-                               (const char *) 0);
-    //u.ublesscnt += rn1(100, 50); /* the gods take notice */
 }
 
 /* Fills buf with the appropriate string for this ray.

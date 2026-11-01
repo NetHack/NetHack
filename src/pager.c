@@ -742,6 +742,10 @@ lookat(coordxy x, coordxy y, char *buf, char *monbuf)
 
         switch (symidx) {
         case S_altar:
+            if (is_gibeon_altar(x, y)) {
+                Strcpy(buf, "the Altar at Gibeon");
+                break;
+            }
             amsk = altarmask_at(x, y);
             algn = Amask2align(amsk & AM_MASK);
             Sprintf(buf, "%s %saltar",

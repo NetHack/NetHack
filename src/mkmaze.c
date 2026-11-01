@@ -17,6 +17,9 @@ staticfn void maze0xy(coord *);
 staticfn boolean put_lregion_here(coordxy, coordxy, coordxy, coordxy, coordxy,
                                 coordxy, xint16, boolean, d_level *);
 staticfn void baalz_fixup(void);
+staticfn boolean gibeon_stair_ok(coordxy, coordxy);
+staticfn void place_gibeon_at(branch *, coordxy, coordxy);
+staticfn void place_gibeon_stair(void);
 staticfn void setup_waterlevel(void);
 staticfn void unsetup_waterlevel(void);
 staticfn void check_ransacked(const char *);
@@ -565,6 +568,77 @@ baalz_fixup(void)
     gb.bughack.inarea.y2 = gb.bughack.delarea.y2 = 0;
 }
 
+/* Oracle already places one branch (Sokoban is the next level down).
+   Add a second up stair on the Oracle level itself, into the Cave of Gibeon.
+   place_branch() only allows one branch stair per level, so this stair is
+   added directly. It sits in a corner of the Oracle's chamber. */
+staticfn boolean
+gibeon_stair_ok(coordxy x, coordxy y)
+{
+    if (!isok(x, y))
+        return FALSE;
+    if (levl[x][y].typ != ROOM && levl[x][y].typ != CORR)
+        return FALSE;
+    if (occupied(x, y) || stairway_at(x, y) || MON_AT(x, y))
+        return FALSE;
+    return TRUE;
+}
+
+staticfn void
+place_gibeon_at(branch *br, coordxy x, coordxy y)
+{
+    stairway_add(x, y, br->end1_up, FALSE, &br->end2);
+    (void) set_levltyp(x, y, STAIRS);
+    levl[x][y].ladder = br->end1_up ? LA_UP : LA_DOWN;
+}
+
+staticfn void
+place_gibeon_stair(void)
+{
+    branch *br;
+    struct monst *mtmp;
+    int tryct, i, j;
+    coordxy x, y;
+    static const coordxy diag[4][2] = { { -1, -1 }, { 1, -1 },
+                                         { -1, 1 }, { 1, 1 } };
+
+    br = dungeon_branch("Cave of Gibeon");
+    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+        if (DEADMONSTER(mtmp) || mtmp->data != &mons[PM_ORACLE])
+            continue;
+        for (i = 0; i < 4; i++) {
+            x = mtmp->mx + diag[i][0];
+            y = mtmp->my + diag[i][1];
+            if (gibeon_stair_ok(x, y)) {
+                place_gibeon_at(br, x, y);
+                return;
+            }
+        }
+        /* Orthogonal neighbors are the chamber's fountains. Step one
+           square further if a corner itself was blocked. */
+        for (i = -2; i <= 2; i++)
+            for (j = -2; j <= 2; j++) {
+                if (!i && !j)
+                    continue;
+                x = mtmp->mx + i;
+                y = mtmp->my + j;
+                if (gibeon_stair_ok(x, y)) {
+                    place_gibeon_at(br, x, y);
+                    return;
+                }
+            }
+    }
+    for (tryct = 0; tryct < 200; tryct++) {
+        x = rn1(COLNO - 1, 1);
+        y = rn2(ROWNO);
+        if (!gibeon_stair_ok(x, y))
+            continue;
+        place_gibeon_at(br, x, y);
+        return;
+    }
+    impossible("Couldn't place the stair to the Cave of Gibeon.");
+}
+
 /* this is special stuff that the level compiler cannot (yet) handle */
 void
 fixup_special(void)
@@ -644,6 +718,10 @@ fixup_special(void)
     if (!added_branch && Is_branchlev(&u.uz)) {
         place_lregion(0, 0, 0, 0, 0, 0, 0, 0, LR_BRANCH, (d_level *) 0);
     }
+
+    /* second stair on the Oracle: up into the Cave of Gibeon */
+    if (Is_oracle_level(&u.uz))
+        place_gibeon_stair();
 
     /* Still need to add some stuff to level file */
     if (Is_medusa_level(&u.uz)) {

@@ -711,6 +711,16 @@ dochug(struct monst *mtmp)
         && (m_canseeu(mtmp) || mtmp->mhp < mtmp->mhpmax))
         mtmp->mstrategy &= ~STRAT_WAITFORU;
 
+    /* King Solomon stays on the platform at Gibeon, and stays peaceful. */
+    if (has_mgivenname(mtmp) && !strcmp(MGIVENNAME(mtmp), "King Solomon")) {
+        mtmp->mstrategy |= STRAT_WAITFORU;
+        mtmp->mpeaceful = 1;
+        if (mtmp->mhpmax < 200) {
+            mtmp->mhpmax = 200;
+            mtmp->mhp = 200;
+        }
+    }
+
     /* update quest status flags */
     quest_stat_check(mtmp);
 

@@ -714,6 +714,11 @@ def main() -> None:
             note = "Can hatch. Not part of the raw/cooked meat rules."
         elif food["name"].startswith("glob of "):
             note = "Left by puddings and oozes instead of meat. Shrinks as it ages."
+        elif food["name"] == "burnt offering":
+            note = (
+                "Quest item for the Cave of Gibeon. Not randomly generated "
+                "and not wishable."
+            )
         elif stable == "yes":
             note = "Unchanged by the meat rework."
         ws.append(
@@ -1019,6 +1024,11 @@ def main() -> None:
             "Adult dragon steaks weigh 4500, so they stay on the floor. "
             "Cook and eat them there. Baby dragon steaks weigh 1500 and can "
             "be carried. No special pickup rule was added.",
+        ),
+        (
+            "Burnt offering",
+            "Quest item for the Cave of Gibeon. Food, probability 0. "
+            "A wish for it is refused. It is carried to the Altar at Gibeon.",
         ),
         ("Regenerate", "python3 tools/gen_food_xlsx.py"),
     ]

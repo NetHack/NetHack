@@ -5,6 +5,9 @@
 #include "hack.h"
 
 staticfn int prayer_done(void);
+staticfn boolean gibeon_wisdom_request(const char *);
+staticfn void gibeon_grant_wisdom(void);
+staticfn int gibeon_vision(void);
 staticfn void maybe_turn_mon_iter(struct monst *);
 staticfn struct obj *worst_cursed_item(void);
 staticfn int in_trouble(void);
@@ -1898,10 +1901,118 @@ can_pray(boolean praying) /* false means no messages (e.g. enlightenment) */
     return TRUE; /* always allow prayer attempt; outcome handled in prayer_done() */
 }
 
-/*=====================================================================
- *  prayer_done()
- *  Called after the prayer animation. This is where grace is dispensed.
- *====================================================================*/
+/* Wisdom answers at the Altar at Gibeon. A leading "a" or "an" is ignored. */
+staticfn boolean
+gibeon_wisdom_request(const char *buf)
+{
+    const char *p = buf;
+
+    if (!strncmpi(p, "an ", 3))
+        p += 3;
+    else if (!strncmpi(p, "a ", 2))
+        p += 2;
+    return (boolean) (!strcmpi(p, "wisdom")
+                      || !strcmpi(p, "discerning heart")
+                      || !strcmpi(p, "wise and discerning heart")
+                      || !strcmpi(p, "wisdom and knowledge")
+                      || !strcmpi(p, "knowledge"));
+}
+
+/* Existing Belt of Truth, +2, plus blessed anointing oil of gain level,
+   and Wisdom 25. The race table still says 18; this hero's copy is raised
+   so adjattrib() does not immediately clamp the gift back down. */
+staticfn void
+gibeon_grant_wisdom(void)
+{
+    struct obj *otmp;
+
+    /* 1 Kings 3:11-13 KJV. A message stops at 255 characters, so the
+       verses are split at their own breaks. Read in order, the words
+       are the verses, from "Because" through "all thy days." */
+    pline("Because thou hast asked this thing, and hast not asked for thyself long life; neither hast asked riches for thyself, nor hast asked the life of thine enemies; but hast asked for thyself understanding to discern judgment;");
+    pline("Behold, I have done according to thy words: lo, I have given thee a wise and an understanding heart; so that there was none like thee before thee, neither after thee shall any arise like unto thee.");
+    pline("And I have also given thee that which thou hast not asked, both riches, and honour: so that there shall not be any among the kings like unto thee all thy days.");
+
+    otmp = mksobj(BELT, FALSE, FALSE);
+    if (otmp) {
+        otmp = oname(otmp, artiname(ART_BELT_OF_TRUTH),
+                     ONAME_GIFT | ONAME_KNOW_ARTI);
+        if (otmp) {
+            otmp->spe = 2;
+            bless(otmp);
+            otmp->bknown = 1;
+            otmp->known = 1;
+            otmp->dknown = 1;
+            if (otmp->oartifact)
+                u.ugifts++;
+            (void) hold_another_object(otmp, "Oops!  %s to the floor!",
+                                       The(aobjnam(otmp, "drop")),
+                                       (const char *) 0);
+        }
+    }
+
+    otmp = mksobj(ANO_GAIN_LEVEL, FALSE, FALSE);
+    if (otmp) {
+        bless(otmp);
+        otmp->bknown = 1;
+        otmp->dknown = 1;
+        otmp->known = 1;
+        makeknown(ANO_GAIN_LEVEL);
+        (void) hold_another_object(otmp, "Oops!  %s to the floor!",
+                                   The(aobjnam(otmp, "drop")),
+                                   (const char *) 0);
+    }
+
+    gu.urace.attrmax[A_WIS] = 25;
+    ABASE(A_WIS) = 25;
+    AMAX(A_WIS) = 25;
+    ATEMP(A_WIS) = 0;
+    disp.botl = TRUE;
+    You_feel("wise!");
+    livelog_printf(LL_DIVINEGIFT | LL_ARTIFACT,
+                   "asked for wisdom at the Altar at Gibeon");
+}
+
+/* Offering is on the altar and the vision has not happened yet.
+   Returns 1 if the vision ran. Stock wishes allow five tries. */
+staticfn int
+gibeon_vision(void)
+{
+    char buf[BUFSZ];
+    struct obj *otmp;
+    int tries;
+
+    for (otmp = svl.level.objects[u.ux][u.uy]; otmp; otmp = otmp->nexthere)
+        if (otmp->otyp == BURNT_OFFERING)
+            break;
+    if (!otmp)
+        return 0;
+
+    useupf(otmp, 1L);
+    u.uevent.gibeon_wish = 1;
+
+    /* 1 Kings 3:5 KJV, with only "to Solomon" changed to "to thee". */
+    pline("In Gibeon the LORD appeared to thee in a dream by night: and God said, Ask what I shall give thee.");
+
+    tries = 0;
+    for (;;) {
+        getlin("Ask what I shall give thee?", buf);
+        if (iflags.term_gone)
+            return 1;
+        (void) mungspaces(buf);
+        if (buf[0] == '\033')
+            buf[0] = '\0';
+        if (gibeon_wisdom_request(buf)) {
+            gibeon_grant_wisdom();
+            return 1;
+        }
+        /* Fifth failure grants a random object, the same as a normal wish. */
+        if (wish_from_text(buf, tries >= 4))
+            return 1;
+        tries++;
+    }
+}
+
 staticfn int
 prayer_done(void)
 {
@@ -1909,6 +2020,12 @@ prayer_done(void)
     boolean on_altar = on_altar();
 
     u.uinvulnerable = FALSE; /* will be re-applied only if miracle grants it */
+
+    /* The vision is available during the ordinary prayer wait, and it
+       does not also grant a miracle or bless water. */
+    if (!u.uevent.gibeon_wish && is_gibeon_altar(u.ux, u.uy)
+        && gibeon_vision())
+        return 1;
     
     /* ------------------------------------------------------------------
      *  1. Altar use: always attempt to bless water (anointing oil
@@ -2020,7 +2137,7 @@ grant_miracle(void)
 
     miracle_given_this_prayer = 1;
 
-    /* Check if player already possesses "The Gospel of the Peace" */
+    /* Check if player already possesses "Gospel of Peace" */
     for (otmp = gi.invent; otmp; otmp = otmp->nobj) {
         if (otmp->oartifact == ART_SHOES_GOSPEL_OF_PEACE) {
             has_gospel_boots = TRUE;
@@ -2053,7 +2170,7 @@ grant_miracle(void)
             You_feel("completely invulnerable!");
             u.uinvulnerable = TRUE;
         } else if (r < 80) {                              /* 50..79 */
-            /* Grant "The Gospel of the Peace" */
+            /* Grant "Gospel of Peace" */
             otmp = mksobj(WATER_WALKING_BOOTS, TRUE, FALSE);
             if (otmp) {
                 otmp = oname(otmp, artiname(ART_SHOES_GOSPEL_OF_PEACE), ONAME_WISH);

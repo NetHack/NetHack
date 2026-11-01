@@ -54,7 +54,8 @@ struct u_event {
     Bitfield(ascended, 1);          /* has offered the Amulet */
 
     Bitfield(amulet_wish, 1);       /* has gained a wish from the Amulet */
-    /* 7 free bits */
+    Bitfield(gibeon_wish, 1);       /* Cave of Gibeon vision has been given */
+    /* 6 free bits */
 };
 
 /*

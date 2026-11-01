@@ -6,7 +6,7 @@ This file was written **before** merging tag `NetHack-5.0.0_Released`
 (`16ff591153`) so the upgrade can be checked against it.
 
 Spellings below are the owner's, including `elixer`, `exlier`,
-`doubled-edged`, `trusty sandles`, `Gosple`, `firey`, `wiggy gain ability`,
+`doubled-edged`, `trusty sandles`, `firey`, `wiggy gain ability`,
 and `PSALM 91`. They are intentional content (or at least content the
 owner shipped) and must not be "corrected" back to vanilla NetHack.
 
@@ -324,7 +324,7 @@ Helpers: `IS_STAFF_OF_WONDERS`, `IS_GOLDEN_CENSER`.
 | ID-203 | Golden Censer of Incense | thurible | `PM_CLERIC` | Prayer timeout, light radius 5 with no burnout (`src/timeout.c`), invoke engraves and teleports |
 | ID-204 | Scarlet Cord of Rahab | rope | `PM_ROGUE` | Apply climbs; invoke toggles invisibility. Climb/fall messages in `src/hack.c` |
 | ID-205 | Staff of Signs and Wonders | almond-wood walking stick | `PM_WIZARD` | Apply changes water/floor; invoke is a 5x5 column of fire (`src/apply.c`, `src/artifact.c`). Prayer recharges it (`src/pray.c`) |
-| ID-206 | Gosple of the Peace | trusty sandals | not role-bound | Water walking, haste, fire resistance; invoke tames |
+| ID-206 | Gospel of Peace | trusty sandals | not role-bound | Water walking, haste, fire resistance; invoke tames |
 | ID-207 | Breastplate of Righteousness | gleaming armor | not role-bound | Half spell damage, drain resistance, magic resistance, poison carry |
 | ID-208 | Belt of Truth | humble sash | not role-bound | Searching, see invisible, sleep/blind/hallucination resistance; invoke enlightens |
 | ID-209 | Sword of the Spirit | doubled-edged blade | not role-bound | Reflection, stun attack, warning |
@@ -394,7 +394,7 @@ Notable level strings that must survive:
 | ID-260 | `mhurtle_giant()` for the handkerchief push | `src/dothrow.c`, `include/extern.h` |
 | ID-261 | Rope use, staff-of-wonders apply, blanket apply | `src/apply.c` |
 | ID-262 | Artifact invoke implementations | `src/artifact.c` |
-| ID-263 | Ice walking for humble sandals / Gosple of the Peace; falling without a rope; Hebrews 12:6 when a jump off a wall fails | `src/hack.c` |
+| ID-263 | Ice walking for humble sandals / Gospel of Peace; falling without a rope; Hebrews 12:6 when a jump off a wall fails | `src/hack.c` |
 | ID-264 | `Is_thurible()` | `include/obj.h` |
 | ID-265 | `rndexp()` comment says elixer | `src/exper.c` |
 | ID-266 | Tribute line: `hankerchief` corrected to `handkerchief` | `dat/tribute` |
@@ -625,6 +625,46 @@ The workbook `docs/RighteousHack_Food.xlsx` lists every food and
 every monster; regenerate it with `tools/gen_food_xlsx.py` when
 those tables change. `EDITLEVEL` is 1, so saves from before the
 first food change will not load.
+
+### Cave of Gibeon (2026-11-01)
+
+The Oracle's chamber has an up stair into a one-level branch, the
+Cave of Gibeon. Sokoban still joins one level below the Oracle; this
+stair is placed on the Oracle level itself. A dark orthogonal tunnel
+leads into a lit cave. The cave does not generate random monsters.
+In the middle is the Altar at Gibeon, a lawful altar. Looking at it
+says "There is the Altar at Gibeon here." King Solomon stands on the
+platform and remains there. `#chat` with him says one of two
+lines, chosen at random. One is: "When the Lord came to me in this
+place, I could have asked for gold or the lives of my enemies.
+Instead I asked for a heart to judge His people rightly." The other
+is Mark 8:36: "For what shall it profit a man, if he shall gain the
+whole world, and lose his own soul?" A chest on the platform holds one burnt offering. That food is not randomly
+generated and cannot be wished for.
+
+Praying while standing on the altar, with the burnt offering on it,
+consumes the offering even during the normal prayer wait. The LORD
+speaks the King James text of 1 Kings 3:5, with "to Solomon" changed
+to "to thee": "In Gibeon the LORD appeared to thee in a dream by
+night: and God said, Ask what I shall give thee." Asking for wisdom,
+a discerning heart, a wise and discerning heart, wisdom and
+knowledge, or knowledge (a leading "a" or "an" is ignored) is
+answered with the King James text of 1 Kings 3:11-13, from "Because
+thou hast asked this thing" through "all thy days." The gift is the
+existing Belt of Truth at
++2 enchantment, a blessed anointing oil of gain level, and Wisdom 25.
+Any other answer is an ordinary wish. The vision happens once. Later
+prayers at the altar are ordinary prayers.
+
+The Belt of Truth is the artifact that was already defined on the
+humble sash. Its base item and properties are unchanged. The +2 is
+the enchantment of this gift. While worn, that enchantment is +2
+Intelligence. The human race table still lists a Wisdom ceiling of
+18. This gift raises the ceiling for the hero who receives it, so
+the 25 is not immediately pulled back down to 18.
+
+Humans are the only race in the race table. No other race can be
+selected.
 
 ### Planned (not done)
 
