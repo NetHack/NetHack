@@ -818,8 +818,8 @@ letter it is). They are not engravings. The hint is an engraving
 in the southwest corner of the safe row, so it shows the engraving
 symbol: "Upon this rock I will build my church. Walk upon the rock
 in the tongue of the Greeks." A false letter, such as a decoy,
-becomes ordinary lava under you and deals 20 damage. Fire
-resistance does not reduce that 20. You stay on the square.
+becomes ordinary lava under you and deals 20 damage, or 10
+if you have fire resistance. You stay on the square.
 The lava does not sink you or kill you by itself, and the next
 move can step off. Death happens only when the 20 takes you to
 0 hit points or below, and the reason is "a false step." A

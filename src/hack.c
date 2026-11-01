@@ -3432,9 +3432,9 @@ petra_fail(coordxy x, coordxy y)
     petra_lava_x = x;
     petra_lava_y = y;
     pline("The letter gives way and the floor becomes lava!");
-    /* Flat 20. Fire resistance does not reduce it. Death only
-       when this takes hit points to 0 or below. */
-    losehp(20, "a false step", KILLED_BY);
+    /* 20, or 10 with fire resistance. Death only when this
+       takes hit points to 0 or below. */
+    losehp(Fire_resistance ? 10 : 20, "a false step", KILLED_BY);
 }
 
 static boolean
