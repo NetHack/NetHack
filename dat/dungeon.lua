@@ -90,8 +90,8 @@ dungeon = {
             name = "medusa",
             base = -5,
             range = 4,
-            nlevels = 4,
-            alignment = "chaotic"
+            nlevels = 1,
+            alignment = "unaligned"
          },
          {
             name = "castle",

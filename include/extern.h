@@ -4044,6 +4044,7 @@ extern int zap_over_floor(coordxy, coordxy, int, boolean *,
                           boolean, short) NONNULLARG4;
 extern void mon_spell_hits_spot(struct monst *, int, coordxy x, coordxy y);
 extern void fracture_rock(struct obj *) NONNULLARG1;
+extern boolean lots_wife_statue(struct obj *);
 extern boolean break_statue(struct obj *) NONNULLARG1;
 extern int u_adtyp_resistance_obj(int);
 extern boolean inventory_resistance_check(int);

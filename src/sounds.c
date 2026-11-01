@@ -736,6 +736,20 @@ domonnoise(struct monst *mtmp)
         return ECMD_TIME;
     }
 
+    if (has_mgivenname(mtmp)
+        && !strcmp(MGIVENNAME(mtmp), "man of Sodom")) {
+        static const char *const call[3] = {
+            "Come in, stranger, and stay the night with us.",
+            "No one will know.",
+            "Turn aside, and enjoy yourself awhile.",
+        };
+        if (mtmp->mpeaceful) {
+            SetVoice(mtmp, 0, 80, 0);
+            verbalize1(call[mtmp->m_id % 3]);
+            return ECMD_TIME;
+        }
+    }
+
     if (is_peter(mtmp)) {
         SetVoice(mtmp, 0, 80, 0);
         if (!u.uevent.peter_quest) {

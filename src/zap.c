@@ -4348,6 +4348,9 @@ zhitm(
         break;
     case ZT_LIGHTNING:
         tmp = d(nd, 6);
+        /* Sodom and Tyre: lightning deals triple damage. */
+        if (Is_medusa_level(&u.uz))
+            tmp *= 3;
         if (spellcaster)
             tmp = spell_damage_bonus(tmp);
         orig_dmg = tmp;
@@ -4518,6 +4521,9 @@ zhitu(
         return; /* lifesaved */
     case ZT_LIGHTNING:
         orig_dam = d(nd, 6);
+        /* Sodom and Tyre: lightning deals triple damage. */
+        if (Is_medusa_level(&u.uz))
+            orig_dam *= 3;
         if (Shock_resistance) {
             shieldeff(sx, sy);
             You("aren't affected.");
@@ -5596,10 +5602,23 @@ fracture_rock(struct obj *obj) /* no texts here! */
 
 /* handle statue hit by striking/force bolt/pick-axe */
 boolean
+lots_wife_statue(struct obj *obj)
+{
+    return (boolean) (obj && obj->otyp == STATUE && has_oname(obj)
+                      && !strcmp(ONAME(obj), "Lot's wife"));
+}
+
+boolean
 break_statue(struct obj *obj)
 {
     /* [obj is assumed to be on floor, so no get_obj_location() needed] */
-    struct trap *trap = t_at(obj->ox, obj->oy);
+    struct trap *trap;
+
+    if (lots_wife_statue(obj)) {
+        pline("The statue is a pillar of salt. It cannot be broken.");
+        return FALSE;
+    }
+    trap = t_at(obj->ox, obj->oy);
     struct obj *item;
     boolean by_you = !svc.context.mon_moving;
 

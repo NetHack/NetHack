@@ -878,6 +878,22 @@ dug or phased through. The undiggable
 closet holds a blessed +2 Breastplate of Righteousness. The net and
 both keys cannot be wished for.
 
+### Sodom and Tyre (2026-11-01)
+
+Medusa's level is one map, Sodom and Tyre, and it is dark. Lot's
+wife is a statue at the entrance. The engraving is Genesis 19:26,
+exact KJV. Eating the statue licks it and does not consume it.
+Breaking it fails. Six men of Sodom stand in the houses and call
+with the three lines from the plan. Stepping inside shuts that
+house's door, darkens the room, and those men turn hostile. There
+is no favor penalty. Lightning from a rod, a prophecy, or a breath,
+and the Sword of the Spirit, deal triple damage on this level.
+Shock resistance still negates lightning. Tyre's gold piles can be
+kept. Medusa's seven taunts each play once, as a single message.
+She still leaves Medusa's essence under the food rules. The level
+does not generate random monsters and cannot be dug or teleported
+across. The arrival line is the first taunt.
+
 ### Planned (not done)
 
 Lawful, neutral, and chaotic will eventually be replaced by two

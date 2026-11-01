@@ -2878,6 +2878,10 @@ doeat(void)
     }
     if (!(otmp = floorfood("eat", 0)))
         return ECMD_OK;
+    if (lots_wife_statue(otmp)) {
+        pline("You lick the statue. It tastes of salt.");
+        return ECMD_TIME;
+    }
     if (check_capacity((char *) 0))
         return ECMD_OK;
 
@@ -3572,7 +3576,7 @@ eat_ok(struct obj *obj)
     if (!obj)
         return getobj_else ? GETOBJ_EXCLUDE_NONINVENT : GETOBJ_EXCLUDE;
 
-    if (is_edible(obj))
+    if (is_edible(obj) || lots_wife_statue(obj))
         return GETOBJ_SUGGEST;
 
     /* make sure to exclude, not downplay, gold (if not is_edible) in order to

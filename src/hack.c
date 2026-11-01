@@ -3452,6 +3452,97 @@ petra_fail(coordxy x, coordxy y)
 }
 
 static void
+sodom_taunt(unsigned bit, const char *msg)
+{
+    if (!Is_medusa_level(&u.uz) || (u.uevent.sodom_taunts & bit))
+        return;
+    u.uevent.sodom_taunts |= bit;
+    pline("%s", msg);
+}
+
+static void
+sodom_check(void)
+{
+    static const struct {
+        coordxy x1, y1, x2, y2, dx, dy;
+    } houses[6] = {
+        { 3, 2, 6, 3, 4, 4 },
+        { 10, 2, 13, 3, 11, 4 },
+        { 17, 2, 20, 3, 18, 4 },
+        { 3, 12, 6, 13, 4, 11 },
+        { 10, 12, 13, 13, 11, 11 },
+        { 17, 12, 20, 13, 18, 11 },
+    };
+    struct monst *mtmp;
+    int i, x, y;
+    boolean inside;
+
+    if (!Is_medusa_level(&u.uz))
+        return;
+    sodom_taunt(1, "Another pilgrim stumbles in the dark. Come closer. Everyone looks, in the end.");
+    if (Blind)
+        sodom_taunt(64, "Clever. But you cannot hide your eyes forever.");
+    if (u.ux >= 19 && u.ux <= 22)
+        sodom_taunt(2, "Why resist? Their doors are open. Mine is too.");
+    if (u.ux >= 23 && levl[u.ux][u.uy].typ == ROOM) {
+        int xx, yy, shore = 0;
+
+        for (xx = u.ux - 1; xx <= u.ux + 1 && !shore; xx++)
+            for (yy = u.uy - 1; yy <= u.uy + 1; yy++)
+                if (isok(xx, yy) && is_pool(xx, yy))
+                    shore = 1;
+        if (shore)
+            sodom_taunt(4, "The sea did not save Tyre's merchants. It will not save you.");
+    }
+    if (u.ux == 42 || (u.ux == 43 && u.uy == 7))
+        sodom_taunt(8, "Take the gold. It is the last thing you will ever hold.");
+    if (u.ux >= 50 && u.ux <= 60 && u.uy >= 4 && u.uy <= 10)
+        sodom_taunt(16, "Do you feel the stone creeping into your bones? That is only fear... for now.");
+    if ((u.ux == 54 && u.uy == 5) || distmin(u.ux, u.uy, 54, 5) <= 1)
+        sodom_taunt(32, "Lot's wife looked back. You will look forward, at me.");
+
+    inside = FALSE;
+    for (i = 0; i < 6; i++) {
+        if (u.ux < houses[i].x1 || u.ux > houses[i].x2
+            || u.uy < houses[i].y1 || u.uy > houses[i].y2)
+            continue;
+        inside = TRUE;
+        if (isok(houses[i].dx, houses[i].dy)
+            && IS_DOOR(levl[houses[i].dx][houses[i].dy].typ)) {
+            levl[houses[i].dx][houses[i].dy].doormask = D_CLOSED;
+            block_point(houses[i].dx, houses[i].dy);
+            newsym(houses[i].dx, houses[i].dy);
+        }
+        for (x = houses[i].x1; x <= houses[i].x2; x++)
+            for (y = houses[i].y1; y <= houses[i].y2; y++) {
+                levl[x][y].lit = 0;
+                newsym(x, y);
+            }
+        gv.vision_full_recalc = 1;
+    }
+    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+        if (DEADMONSTER(mtmp) || !has_mgivenname(mtmp))
+            continue;
+        if (strcmp(MGIVENNAME(mtmp), "man of Sodom"))
+            continue;
+        if (inside && distmin(u.ux, u.uy, mtmp->mx, mtmp->my) <= 3) {
+            mtmp->mpeaceful = 0;
+            newsym(mtmp->mx, mtmp->my);
+        } else if (mtmp->mpeaceful && !mtmp->mspare1
+                   && distmin(u.ux, u.uy, mtmp->mx, mtmp->my) <= 2) {
+            static const char *const call[3] = {
+                "Come in, stranger, and stay the night with us.",
+                "No one will know.",
+                "Turn aside, and enjoy yourself awhile.",
+            };
+            mtmp->mspare1 = 1;
+            SetVoice(mtmp, 0, 80, 0);
+            verbalize1(call[mtmp->m_id % 3]);
+        }
+    }
+}
+
+static void
 petra_check(void)
 {
     int step;
@@ -3729,6 +3820,7 @@ spoteffects(boolean pick)
         }
         mnexto(mtmp, RLOC_NOMSG); /* have to move the monster */
     }
+    sodom_check();
     petra_check();
  spotdone:
     if (!--inspoteffects) {

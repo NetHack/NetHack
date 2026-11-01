@@ -17,7 +17,7 @@
  * Incrementing EDITLEVEL can be used to force invalidation of old bones
  * and save files.
  */
-#define EDITLEVEL 4 /* Peter's scroll and the Rock with a keyhole */
+#define EDITLEVEL 5 /* Sodom taunt bits; Peter's scroll shifted object numbers */
 
 /*
  * Development status possibilities.
