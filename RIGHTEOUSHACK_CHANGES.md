@@ -753,9 +753,12 @@ Behind the real door are Peter's net and a Favor Stone. The level
 does not generate random monsters, does not allow teleport, and
 cannot be dug. Those three limits stay, so the puzzle cannot be
 skipped. The Philistine champion is the only monster, on every
-layout. He stands on the corridor directly south of the up stair.
-That square is the only step off the arrival floor, so he is met
-before the engraved safe row. He is hostile, male, experience
+layout. He waits in a dark room far from the up stair. The passage
+to that room leaves the arrival corridor and winds under the
+puzzle, around the outer edge, and back to a closed door. It does
+not cross the letter floor or the safe row, so the scroll can be
+taken before the puzzle. The passage is not visible from the
+stair. He is hostile, male, experience
 difficulty 10, monster level 8, speed 12, base armor class 10, and
 has one 2d6 weapon attack and no sorcery. He carries a +1 long sword, scale mail, a
 helmet, and a small shield. Killing him always leaves a scholar's
