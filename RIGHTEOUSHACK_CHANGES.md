@@ -6,7 +6,7 @@ This file was written **before** merging tag `NetHack-5.0.0_Released`
 (`16ff591153`) so the upgrade can be checked against it.
 
 Spellings below are the owner's, including `elixer`, `exlier`,
-`doubled-edged`, `trusty sandles`, `Gosple`, `firey`, `wiggy gain ability`,
+`doubled-edged`, `trusty sandles`, `firey`, `wiggy gain ability`,
 and `PSALM 91`. They are intentional content (or at least content the
 owner shipped) and must not be "corrected" back to vanilla NetHack.
 
@@ -324,7 +324,7 @@ Helpers: `IS_STAFF_OF_WONDERS`, `IS_GOLDEN_CENSER`.
 | ID-203 | Golden Censer of Incense | thurible | `PM_CLERIC` | Prayer timeout, light radius 5 with no burnout (`src/timeout.c`), invoke engraves and teleports |
 | ID-204 | Scarlet Cord of Rahab | rope | `PM_ROGUE` | Apply climbs; invoke toggles invisibility. Climb/fall messages in `src/hack.c` |
 | ID-205 | Staff of Signs and Wonders | almond-wood walking stick | `PM_WIZARD` | Apply changes water/floor; invoke is a 5x5 column of fire (`src/apply.c`, `src/artifact.c`). Prayer recharges it (`src/pray.c`) |
-| ID-206 | Gosple of the Peace | trusty sandals | not role-bound | Water walking, haste, fire resistance; invoke tames |
+| ID-206 | Gospel of Peace | trusty sandals | not role-bound | Water walking, haste, fire resistance; invoke tames |
 | ID-207 | Breastplate of Righteousness | gleaming armor | not role-bound | Half spell damage, drain resistance, magic resistance, poison carry |
 | ID-208 | Belt of Truth | humble sash | not role-bound | Searching, see invisible, sleep/blind/hallucination resistance; invoke enlightens |
 | ID-209 | Sword of the Spirit | doubled-edged blade | not role-bound | Reflection, stun attack, warning |
@@ -394,7 +394,7 @@ Notable level strings that must survive:
 | ID-260 | `mhurtle_giant()` for the handkerchief push | `src/dothrow.c`, `include/extern.h` |
 | ID-261 | Rope use, staff-of-wonders apply, blanket apply | `src/apply.c` |
 | ID-262 | Artifact invoke implementations | `src/artifact.c` |
-| ID-263 | Ice walking for humble sandals / Gosple of the Peace; falling without a rope; Hebrews 12:6 when a jump off a wall fails | `src/hack.c` |
+| ID-263 | Ice walking for humble sandals / Gospel of Peace; falling without a rope; Hebrews 12:6 when a jump off a wall fails | `src/hack.c` |
 | ID-264 | `Is_thurible()` | `include/obj.h` |
 | ID-265 | `rndexp()` comment says elixer | `src/exper.c` |
 | ID-266 | Tribute line: `hankerchief` corrected to `handkerchief` | `dat/tribute` |

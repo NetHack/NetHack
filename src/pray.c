@@ -2135,7 +2135,7 @@ grant_miracle(void)
 
     miracle_given_this_prayer = 1;
 
-    /* Check if player already possesses "The Gospel of the Peace" */
+    /* Check if player already possesses "Gospel of Peace" */
     for (otmp = gi.invent; otmp; otmp = otmp->nobj) {
         if (otmp->oartifact == ART_SHOES_GOSPEL_OF_PEACE) {
             has_gospel_boots = TRUE;
@@ -2168,7 +2168,7 @@ grant_miracle(void)
             You_feel("completely invulnerable!");
             u.uinvulnerable = TRUE;
         } else if (r < 80) {                              /* 50..79 */
-            /* Grant "The Gospel of the Peace" */
+            /* Grant "Gospel of Peace" */
             otmp = mksobj(WATER_WALKING_BOOTS, TRUE, FALSE);
             if (otmp) {
                 otmp = oname(otmp, artiname(ART_SHOES_GOSPEL_OF_PEACE), ONAME_WISH);

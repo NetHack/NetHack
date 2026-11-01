@@ -11,6 +11,10 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-01
+The boots artifact is named Gospel of Peace. The old spelling
+Gosple of the Peace is gone.
+
+2026-11-01
 The Oracle's chamber has an up stair to the Cave of Gibeon. Praying
 on the Altar at Gibeon with the burnt offering there asks for one
 wish. Asking for wisdom gives the existing Belt of Truth at +2,
