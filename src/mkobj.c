@@ -1987,7 +1987,11 @@ set_bknown(
 int
 weight(struct obj *obj)
 {
-    int wt = (int) objects[obj->otyp].oc_weight; /* weight of 1 'otyp' */
+    int wt;
+
+    if (has_oname(obj) && !strcmp(ONAME(obj), "bag of infinite holding"))
+        return 0;
+    wt = (int) objects[obj->otyp].oc_weight; /* weight of 1 'otyp' */
 
     if (obj->quan < 1L) {
         impossible("Calculating weight of %ld %s?",

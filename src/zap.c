@@ -2645,6 +2645,34 @@ dozap(void)
     obj = getobj("zap", zap_ok, GETOBJ_NOFLAGS);
     if (!obj)
         return ECMD_CANCEL;
+    if (has_oname(obj) && !strcmp(ONAME(obj), "Rod of Frozen Power")) {
+        struct monst *mtmp, *nmon;
+
+        if (!zappable(obj)) {
+            pline1(nothing_happens);
+            return ECMD_TIME;
+        }
+        consume_obj_charge(obj, TRUE);
+        pline("Winter answers, and the cold bursts outward.");
+        for (mtmp = fmon; mtmp; mtmp = nmon) {
+            int dmg;
+
+            nmon = mtmp->nmon;
+            if (DEADMONSTER(mtmp))
+                continue;
+            if (distmin(u.ux, u.uy, mtmp->mx, mtmp->my) > 3)
+                continue;
+            if (resists_cold(mtmp))
+                continue;
+            dmg = d(8, 8);
+            mtmp->mhp -= dmg;
+            if (mtmp->mhp < 1)
+                mondied(mtmp);
+            else
+                pline("%s is frozen.", Monnam(mtmp));
+        }
+        return ECMD_TIME;
+    }
 
     check_unpaid(obj);
 
@@ -4418,6 +4446,10 @@ zhitu(
     int dam = 0, abstyp = zaptype(type);
     int orig_dam = 0;
 
+    if (pride_immune()) {
+        You("are untouched. No sorcery can reach you.");
+        return;
+    }
     switch (abstyp % 10) {
     case ZT_MAGIC_MISSILE:
         if (Antimagic) {

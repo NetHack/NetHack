@@ -1797,6 +1797,10 @@ dopray(void)
     /* set up p_type and p_alignment */
     if (!can_pray(TRUE))
         return ECMD_OK;
+    if (pride_prayer()) {
+        nomul(0);
+        return ECMD_TIME;
+    }
 
     
     nomul(-3);

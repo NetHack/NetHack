@@ -4050,6 +4050,12 @@ extern int zap_over_floor(coordxy, coordxy, int, boolean *,
                           boolean, short) NONNULLARG4;
 extern void mon_spell_hits_spot(struct monst *, int, coordxy x, coordxy y);
 extern void fracture_rock(struct obj *) NONNULLARG1;
+extern boolean in_wilderness(void);
+extern boolean fear_protected(void);
+extern boolean on_fear_path(coordxy, coordxy);
+extern void wilderness_took(struct obj *);
+extern boolean pride_immune(void);
+extern boolean pride_prayer(void);
 extern boolean lots_wife_statue(struct obj *);
 extern boolean break_statue(struct obj *) NONNULLARG1;
 extern int u_adtyp_resistance_obj(int);

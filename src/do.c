@@ -1513,6 +1513,15 @@ goto_level(
 
     if (dunlev(newlevel) > dunlevs_in_dungeon(newlevel))
         newlevel->dlevel = dunlevs_in_dungeon(newlevel);
+    if (u.uevent.wilderness_sealed
+        && !strcmp(svd.dungeons[newlevel->dnum].dname, "The Wilderness Trial")) {
+        pline("The wilderness is sealed.");
+        return;
+    }
+    if (in_wilderness() && up && dunlev(&u.uz) > 1) {
+        pline("The way back is sealed.");
+        return;
+    }
     if (newdungeon) {
         if (In_endgame(newlevel)) { /* 1st Endgame Level !!! */
             if (!u.uhave.amulet)

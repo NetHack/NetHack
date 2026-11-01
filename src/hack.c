@@ -3451,6 +3451,252 @@ petra_fail(coordxy x, coordxy y)
     losehp(Fire_resistance ? 10 : 20, "a false step", KILLED_BY);
 }
 
+boolean
+in_wilderness(void)
+{
+    return (boolean) !strcmp(svd.dungeons[u.uz.dnum].dname,
+                             "The Wilderness Trial");
+}
+
+boolean
+on_fear_path(coordxy x, coordxy y)
+{
+    struct engr *ep;
+
+    if (!in_wilderness() || dunlev(&u.uz) != 4)
+        return FALSE;
+    ep = engr_at(x, y);
+    return (boolean) (ep && ep->engr_txt[actual_text]
+                      && ep->engr_txt[actual_text][0]);
+}
+
+boolean
+pride_immune(void)
+{
+    struct obj *otmp;
+
+    if (!in_wilderness() || dunlev(&u.uz) != 3)
+        return FALSE;
+    for (otmp = gi.invent; otmp; otmp = otmp->nobj)
+        if (otmp->owornmask && has_oname(otmp)
+            && !strcmp(ONAME(otmp), "ring of complete immunity"))
+            return TRUE;
+    return FALSE;
+}
+
+boolean
+pride_prayer(void)
+{
+    struct engr *ep = engr_at(u.ux, u.uy);
+    struct obj *otmp, *next;
+    const char *lures[] = {
+        "silver long sword", "ring of complete immunity",
+        "Amulet of Immortality", "Rod of Frozen Power",
+        "prophecy book of execution", "magic lamp of unlimited wishing",
+        "bag of infinite holding", (const char *) 0
+    };
+    int x, y, i;
+
+    if (!in_wilderness() || dunlev(&u.uz) != 3 || !ep || !ep->engr_txt[actual_text]
+        || strncmp(ep->engr_txt[actual_text], "Humble yourselves", 18))
+        return FALSE;
+    pline("Pride goeth before destruction, and an haughty spirit before a fall.");
+    u.uevent.pride_prayed = 1;
+    for (otmp = gi.invent; otmp; otmp = next) {
+        boolean lure = FALSE;
+
+        next = otmp->nobj;
+        if (has_oname(otmp)) {
+            for (i = 0; lures[i]; i++)
+                if (!strcmp(ONAME(otmp), lures[i]))
+                    lure = TRUE;
+        }
+        if (otmp->otyp == GRAY_DRAGON_SCALE_MAIL && otmp->spe >= 12)
+            lure = TRUE;
+        if (!lure)
+            continue;
+        if (has_oname(otmp) && !strcmp(ONAME(otmp), "bag of infinite holding")) {
+            struct obj *content, *cnext;
+
+            for (content = otmp->cobj; content; content = cnext) {
+                cnext = content->nobj;
+                obj_extract_self(content);
+                if (content->oartifact)
+                    (void) addinv(content);
+                else
+                    obfree(content, (struct obj *) 0);
+            }
+        }
+        useupall(otmp);
+    }
+    for (otmp = fobj; otmp; otmp = next) {
+        next = otmp->nobj;
+        if (!has_oname(otmp))
+            continue;
+        for (i = 0; lures[i]; i++)
+            if (!strcmp(ONAME(otmp), lures[i])) {
+                delobj(otmp);
+                break;
+            }
+    }
+    for (x = 1; x < COLNO; x++)
+        for (y = 0; y < ROWNO; y++)
+            if (IS_DOOR(levl[x][y].typ) && y == 4) {
+                levl[x][y].typ = HWALL;
+                block_point(x, y);
+                newsym(x, y);
+            }
+    if (isok(27, 8) && IS_WALL(levl[27][8].typ)) {
+        levl[27][8].typ = ROOM;
+        unblock_point(27, 8);
+        newsym(27, 8);
+        pline("A hidden way opens.");
+    }
+    pline("The treasures crumble into dust.");
+    return TRUE;
+}
+
+boolean
+fear_protected(void)
+{
+    if (!in_wilderness() || dunlev(&u.uz) != 4 || u.uevent.fear_exposed)
+        return FALSE;
+    if (on_fear_path(u.ux, u.uy))
+        return TRUE;
+    return (boolean) (levl[u.ux][u.uy].typ == STAIRS);
+}
+
+static void
+wilderness_check(void)
+{
+    static d_level garden_shown = { 0, 0 };
+
+    if (!in_wilderness())
+        return;
+    if (dunlev(&u.uz) == 4) {
+        boolean was = on_fear_path(u.ux0, u.uy0)
+                      || (isok(u.ux0, u.uy0) && levl[u.ux0][u.uy0].typ == STAIRS);
+        boolean now = fear_protected() || on_fear_path(u.ux, u.uy)
+                      || levl[u.ux][u.uy].typ == STAIRS;
+
+        if (now && !was)
+            u.uevent.fear_exposed = 0;
+        if (on_fear_path(u.ux, u.uy) && (u.ux != u.ux0 || u.uy != u.uy0)) {
+            struct engr *ep = engr_at(u.ux, u.uy);
+
+            if (ep && ep->engr_txt[actual_text])
+                pline("%s", ep->engr_txt[actual_text]);
+        }
+    }
+    if (dunlev(&u.uz) == 2) {
+        struct obj *otmp;
+
+        if ((long) u.uspare1 < 50L)
+            u.uspare1++;
+        if (u.uspare1 == 25L && !u.uevent.greed_warned) {
+            u.uevent.greed_warned = 1;
+            pline("Your stomach twists with hunger... Your strength fails beneath the weight of all you carry. For where your treasure is, there will your heart be also");
+        }
+        if (u.uspare1 >= 50L) {
+            svk.killer.format = NO_KILLER_PREFIX;
+            Strcpy(svk.killer.name, "Starved, clinging to worldly possessions.");
+            done(STARVING);
+            return;
+        }
+        for (otmp = gi.invent; otmp; otmp = otmp->nobj)
+            if (otmp->oclass == FOOD_CLASS) {
+                pline("Your food turns to ash.");
+                useup(otmp);
+                break;
+            }
+        if (u.ux == 12 && u.uy == 3 && (u.ux != u.ux0 || u.uy != u.uy0)) {
+            if (gi.invent || money_cnt(gi.invent) > 0) {
+                static const char *const hints[3] = {
+                    "Lay not up for yourselves treasures upon earth, where moth and rust doth corrupt, and where thieves break through and steal:",
+                    "Now when Jesus heard these things, he said unto him, Yet lackest thou one thing: sell all that thou hast, and distribute unto the poor, and thou shalt have treasure in heaven: and come, follow me.",
+                    "And said, Naked came I out of my mother's womb, and naked shall I return thither: the LORD gave, and the LORD hath taken away; blessed be the name of the LORD.",
+                };
+                pline("%s", hints[u.uevent.greed_hint % 3]);
+                u.uevent.greed_hint = (u.uevent.greed_hint + 1) % 3;
+                teleds(2, 1, TELEDS_NO_FLAGS);
+            } else {
+                for (otmp = fobj; otmp; ) {
+                    struct obj *next = otmp->nobj;
+
+                    if (otmp->where == OBJ_FLOOR && otmp->ox < 12
+                        && otmp->how_lost == LOST_DROPPED) {
+                        coordxy ox = otmp->ox, oy = otmp->oy;
+
+                        obj_extract_self(otmp);
+                        place_object(otmp, 16, 3);
+                        newsym(ox, oy);
+                    }
+                    otmp = next;
+                }
+                newsym(16, 3);
+                pline("But seek ye first the kingdom of God, and his righteousness; and all these things shall be added unto you.");
+            }
+        }
+    }
+    if (dunlev(&u.uz) == 5 && !on_level(&garden_shown, &u.uz)) {
+        garden_shown = u.uz;
+        pline("Light floods the chamber, warm as morning. The air is sweet, and for the first time since entering the wilderness, you are not afraid.");
+    }
+}
+
+void
+wilderness_took(struct obj *obj)
+{
+    if (!obj || !in_wilderness())
+        return;
+    if (dunlev(&u.uz) == 5 && obj->oartifact == ART_SWORD_OF_THE_SPIRIT) {
+        branch *br;
+
+        u.uevent.wilderness_sealed = 1;
+        for (br = svb.branches; br; br = br->next)
+            if (!strcmp(svd.dungeons[br->end2.dnum].dname,
+                        "The Wilderness Trial")) {
+                schedule_goto(&br->end1, UTOTYPE_NONE, (char *) 0,
+                              "The sword is in your hand, and the wilderness is sealed behind you.");
+                return;
+            }
+        pline("The sword is in your hand, but the way out is not yet marked.");
+    }
+    if (dunlev(&u.uz) == 3 && has_oname(obj)) {
+        const char *nm = ONAME(obj);
+        const char *vanity = 0;
+
+        if (!strcmp(nm, "silver long sword"))
+            vanity = "You admire your reflection, the +12 blade blazing in your mighty hand. How magnificent you are. Armies would tremble at your name.";
+        else if (obj->otyp == GRAY_DRAGON_SCALE_MAIL && obj->spe >= 12)
+            vanity = "You gaze at yourself clad in gleaming +12 dragon scales. How splendid, how untouchable you look. Surely no hero was ever so glorious.";
+        else if (!strcmp(nm, "ring of complete immunity"))
+            vanity = "You admire the ring upon your hand. No sorcery could ever touch you now. How invincible you are, beyond the reach of every power in heaven and earth.";
+        else if (!strcmp(nm, "Amulet of Immortality"))
+            vanity = "You admire the amulet resting upon your breast. Death itself has no claim on you now. How eternal, how godlike you are.";
+        else if (!strcmp(nm, "Rod of Frozen Power"))
+            vanity = "You behold yourself raising the rod, and winter itself answers your command. Who could stand against one as mighty as you?";
+        else if (!strcmp(nm, "prophecy book of execution"))
+            vanity = "You see yourself reading the book, and wisdom shines in your eyes. With but a word, you could execute any foe. All the secrets of heaven and earth would bow to your understanding.";
+        else if (!strcmp(nm, "magic lamp of unlimited wishing"))
+            vanity = "You behold yourself holding the lamp, and you marvel. Unlimited wishes, forever. Every desire of your heart, yours for the asking. Who could be greater than you?";
+        else if (!strcmp(nm, "bag of infinite holding"))
+            vanity = "You admire yourself bearing all the riches of the world, and they weigh nothing at all. Every treasure, forever yours. How wealthy, how blessed, how great you are.";
+        if (vanity) {
+            struct monst *refl;
+
+            pline("%s", vanity);
+            pline("Your reflection smiles, and steps out of the glass.");
+            refl = makemon(&mons[PM_HUMAN], u.ux + 1, u.uy, NO_MM_FLAGS);
+            if (refl) {
+                (void) christen_monst(refl, "your reflection");
+                refl->mpeaceful = 0;
+                set_malign(refl);
+            }
+        }
+    }
+}
+
 static void
 sodom_taunt(unsigned bit, const char *msg)
 {
@@ -4045,6 +4291,7 @@ spoteffects(boolean pick)
     }
     sodom_check();
     petra_check();
+    wilderness_check();
  spotdone:
     if (!--inspoteffects) {
         spotterrain = STONE; /* 0 */

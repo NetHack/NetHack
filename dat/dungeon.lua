@@ -32,6 +32,12 @@ dungeon = {
             direction = "up"
          },
          {
+            name = "The Wilderness Trial",
+            chainlevel = "oracle",
+            base = 3,
+            direction = "down"
+         },
+         {
             name = "The Quest",
             chainlevel = "prophet",
             base = 6,
@@ -353,6 +359,21 @@ dungeon = {
       alignment = "neutral",
       levels = {
          { name = "his-treasure-1", base = 1 }
+      }
+   },
+   {
+      name = "The Wilderness Trial",
+      bonetag = "W",
+      base = 5,
+      alignment = "lawful",
+      flags = { "mazelike" },
+      entry = 1,
+      levels = {
+         { name = "wild1", base = 1 },
+         { name = "wild2", base = 2 },
+         { name = "wild3", base = 3 },
+         { name = "wild4", base = 4, nlevels = 3 },
+         { name = "wild5", base = 5 },
       }
    },
    {

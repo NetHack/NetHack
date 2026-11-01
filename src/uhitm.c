@@ -757,6 +757,8 @@ double_punch(void)
 staticfn boolean
 hitum(struct monst *mon, struct attack *uattk)
 {
+    if (in_wilderness() && dunlev(&u.uz) == 4)
+        u.uevent.fear_exposed = 1;
     boolean malive, wep_was_destroyed = FALSE;
     struct obj *wepbefore = uwep,
         *secondwep = u.twoweap ? uswapwep : (struct obj *) 0;

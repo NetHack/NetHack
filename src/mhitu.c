@@ -1930,6 +1930,8 @@ gazemu(struct monst *mtmp, struct attack *mattk)
 void
 mdamageu(struct monst *mtmp, int n)
 {
+    if (fear_protected())
+        return;
     if (n < 0) {
         impossible("mdamageu for negative damage? (%d)", n);
         n = 0;

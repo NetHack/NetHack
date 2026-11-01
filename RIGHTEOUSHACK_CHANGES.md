@@ -927,6 +927,57 @@ through (41,12). It is not a house, not the up stair, and not
 Lot's wife. The random statues are placed in that room. The
 level stays dark. The other Medusa maps are unused.
 
+### Wilderness Trial (2026-11-01)
+
+A branch, The Wilderness Trial, joins the main dungeon three
+levels below the Prophet. Five levels: desert, greed, pride, fear,
+garden. The desert is two-way. From greed on, the way up is sealed
+and teleport does not work. Taking the Sword of the Spirit in the
+garden returns you to the stair you entered by and seals the branch.
+
+Matthew 4:4 on the desert is the full KJV, including "But he
+answered and said,". The plan's engraving omitted that opening.
+Ephesians 6:17 in the garden keeps the KJV colon.
+
+Loaves are named food rations. Eating one says the dust line and
+makes you hungrier. That hunger is ordinary hunger, so it is still
+with you in greed.
+
+Greed's gate is the narrow door. Anything in your pack, gold
+included, sends you back to the start and cycles Matthew 6:19,
+Luke 18:22, and Job 1:21, full KJV. Empty-handed, only objects you
+yourself dropped are moved into the next room, with Matthew 6:33.
+Food turns to ash. After 25 turns on the level, counting through
+every reset, the hunger warning appears, including Matthew 6:21.
+After 50 turns the tombstone is "Starved, clinging to worldly
+possessions."
+
+Pride's stone is engraved with James 4:10. Praying there says
+Proverbs 16:18, crumbles the lures, turns the treasure doors into
+walls, and opens one wall in the hall. Picking up a lure says its
+vanity line and then "Your reflection smiles, and steps out of the
+glass." A reflection drains more life each turn it is near you.
+The +12 sword and +12 dragon scales are real. The ring stops
+sorcery on this level. The rod's zap is a cold blast of radius 3.
+The book is the existing death spell, now named finger of
+execution, and on this level it succeeds only 30% of the time.
+The lamp refuses with its line. The bag weighs nothing. The
+amulet, if you die wearing it, shows the vanity death and the
+tombstone "Killed by their own vanity, believing they were immortal."
+The line "The amulet seems to flare with light." and "You really
+died, a fool killed by your own vanity." were not quoted in the
+plan; the tombstone and Proverbs 16:18 were.
+
+Fear uses the three approved path maps, one per game. Each path
+tile is the next piece of Psalm 91, exact KJV, wrapping after the
+last verse. Stepping on a tile shows that text. On the path or
+either stair, monster damage does not land, and monsters cannot
+step onto the path or the stairs. Attacking a monster, or leaving
+the path, removes the protection until you step onto the path
+again. The garden's entry line is the one in the plan. No monsters
+are generated there. The fountains are ordinary fountains; they are
+not yet guaranteed to cure hunger. That is a placeholder.
+
 ### Planned (not done)
 
 Lawful, neutral, and chaotic will eventually be replaced by two

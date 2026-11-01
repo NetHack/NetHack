@@ -1941,6 +1941,7 @@ pick_obj(struct obj *otmp)
     }
 
     result = addinv(otmp);
+    wilderness_took(result);
     /* if you're taking a shop item from outside the shop, make shk notice */
     if (robshop)
         remote_burglary(ox, oy);

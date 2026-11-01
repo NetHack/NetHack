@@ -1399,7 +1399,7 @@ PBOOK("northern wind",         "dog eared",    /* Job 37:9 */
       P_ATTACK_SPELL,      10,  7, 4, 1, RAY, HI_PAPER, SPE_CONE_OF_COLD),
 PBOOK("tranquility",           "mottled",      /* Psalm 23:2, Mark 4:39 */
       P_ENCHANTMENT_SPELL, 30,  1, 3, 1, RAY, HI_PAPER, SPE_SLEEP),
-PBOOK("finger of judgement",   "stained",      /* Exodus 8:19 */
+PBOOK("finger of execution",   "stained",      /* Exodus 8:19 */
       P_ATTACK_SPELL,       5, 10, 7, 1, RAY, HI_PAPER, SPE_FINGER_OF_DEATH),
 PBOOK("light",                 "cloth",        /* Genesis 1:3, John 8:12 */
       P_DIVINATION_SPELL,  45,  1, 1, 1, NODIR, HI_CLOTH, SPE_LIGHT),

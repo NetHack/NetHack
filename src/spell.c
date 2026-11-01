@@ -2172,6 +2172,10 @@ RESTORE_WARNING_FORMAT_NONLITERAL
 staticfn int
 percent_success(int spell)
 {
+    /* The prophecy book of execution casts only 30% of the time on Pride. */
+    if (in_wilderness() && dunlev(&u.uz) == 3
+        && spellid(spell) == SPE_FINGER_OF_DEATH)
+        return 30;
     /* Intrinsic and learned ability are combined to calculate
      * the probability of player's success at casting a given spell.
      */

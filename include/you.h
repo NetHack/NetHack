@@ -61,7 +61,12 @@ struct u_event {
     Bitfield(peter_quest, 1);       /* Peter has given the quest scroll */
     Bitfield(church_gifts, 4);      /* XP donations to God's church, 0..10 */
     Bitfield(sodom_taunts, 7);      /* one-time Sodom and Tyre taunts */
-    /* 35 bits: 3 used in the following word */
+    Bitfield(wilderness_sealed, 1); /* sword taken; branch cannot be reentered */
+    Bitfield(fear_exposed, 1);      /* attacked, so the path no longer protects */
+    Bitfield(greed_hint, 2);        /* which full-verse hint the gate last gave */
+    Bitfield(pride_prayed, 1);      /* prayed at the stone; lures are gone */
+    Bitfield(greed_warned, 1);      /* the turn-25 hunger warning has been shown */
+    /* 41 bits */
 };
 
 /*
