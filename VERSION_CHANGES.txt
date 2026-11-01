@@ -11,6 +11,11 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-01
+Sodom and Tyre has one real room: the open walk on the shore
+side of Tyre, from (38,2) to (41,12). The random statues are
+placed there, and entering the level no longer crashes.
+
+2026-11-01
 Medusa's level is Sodom and Tyre. It is pitch black. Lot's wife
 is a salt statue at the entrance. Licking her tastes of salt, and
 she cannot be broken. The men of Sodom call you inside. Going in

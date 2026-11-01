@@ -892,7 +892,11 @@ Shock resistance still negates lightning. Tyre's gold piles can be
 kept. Medusa's seven taunts each play once, as a single message.
 She still leaves Medusa's essence under the food rules. The level
 does not generate random monsters and cannot be dug or teleported
-across. The arrival line is the first taunt.
+across. The arrival line is the first taunt. The first real room on the
+level is the open walk on the shore side of Tyre, map (38,2)
+through (41,12). It is not a house, not the up stair, and not
+Lot's wife. The random statues are placed in that room. The
+level stays dark. The other Medusa maps are unused.
 
 ### Planned (not done)
 

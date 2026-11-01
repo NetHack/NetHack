@@ -21,6 +21,15 @@ des.map([[
   ------ ------ ------  }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
 ]])
 
+-- First real room, so fixup_special can place its statues.
+-- Same purpose as the irregular room in medusa-2.lua (lines
+-- 35-37): an ordinary unlit region that registers as a room.
+-- This rectangle is the open walk on the shore side of Tyre,
+-- map (38,2) through (41,12). Every square is already floor.
+-- It is not a house, not the up stair, and not Lot's wife.
+-- arrival_room makes it a real room without flooding into the
+-- rest of the shore, so the statue box stays on this walk.
+des.region({ region = {38, 2, 41, 12}, lit = 0, type = "ordinary", arrival_room = true })
 des.region(selection.area(0,0,69,14), "unlit")
 des.stair("up", 1, 7)
 des.stair("down", 57, 7)
