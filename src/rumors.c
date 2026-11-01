@@ -50,6 +50,9 @@ staticfn void init_oracles(dlb *);
 staticfn void others_check(const char *ftype, const char *, winid *);
 staticfn void couldnt_open_file(const char *);
 staticfn void init_CapMons(void);
+staticfn long isaiah_donation(struct monst *);
+staticfn void isaiah_grant_xp(int, int);
+staticfn void isaiah_favor(void);
 
 /* used by CapitalMon(); set up by init_CapMons(), released by free_CapMons();
    there's no need for these to be put into 'struct instance_globals g' */
@@ -718,16 +721,80 @@ outoracle(boolean special, boolean delphi)
     }
 }
 
+/* Amount entry matches the priest's bribe(), except 0 and a bad
+   entry do nothing and carry no penalty. More than the gold carried
+   gives all of it. */
+staticfn long
+isaiah_donation(struct monst *oracl)
+{
+    char buf[BUFSZ];
+    long offer = 0L;
+    long umoney = money_cnt(gi.invent);
+
+    getlin("How much will you give?", buf);
+    if (sscanf(buf, "%ld", &offer) != 1 || offer <= 0L || umoney <= 0L)
+        return 0L;
+    if (offer >= umoney) {
+        offer = umoney;
+        You("give %s all your gold.", mon_nam(oracl));
+    } else {
+        You("give %s %ld %s.", mon_nam(oracl), offer, currency(offer));
+    }
+    (void) money2mon(oracl, offer);
+    disp.botl = TRUE;
+    return offer;
+}
+
+/* numer/denom of the XP span from this level to the next.
+   At most one level is gained; leftover XP stays inside the new level.
+   At the level cap the points are added and the level stays. */
+staticfn void
+isaiah_grant_xp(int numer, int denom)
+{
+    long base, span, gain, before, after, ceiling;
+
+    before = u.uexp;
+    base = (u.ulevel <= 1) ? 0L : newuexp((int) u.ulevel - 1);
+    span = newuexp((int) u.ulevel) - base;
+    if (span < 1L)
+        span = 1L;
+    gain = (span * (long) numer) / (long) denom;
+    if (gain < 1L)
+        gain = 1L;
+    after = before + gain;
+    if (after < before)
+        after = LONG_MAX;
+    if (u.ulevel < MAXULEV) {
+        ceiling = newuexp((int) u.ulevel + 1) - 1L;
+        if (before < ceiling && after > ceiling)
+            after = ceiling;
+    }
+    gain = after - before;
+    if (gain > 0L) {
+        more_experienced((int) gain, 0);
+        You_feel("more experienced.");
+        newexplevel();
+    }
+}
+
+staticfn void
+isaiah_favor(void)
+{
+    You("feel the Lord's favor.");
+    adjalign(1);
+}
+
 int
 doconsult(struct monst *oracl)
 {
-    long umoney;
-    int u_pay, minor_cost = 50, major_cost = 500 + 50 * u.ulevel;
+    /* Stock major-word experience, kept though the word is free.
+       minor_cost 50 is the old first-time minor bonus only. */
+    int minor_cost = 50, major_cost = 500 + 50 * (int) u.ulevel;
     int add_xpts;
+    long offer;
     char qbuf[QBUFSZ];
 
     gm.multi = 0;
-    umoney = money_cnt(gi.invent);
 
     if (!oracl) {
         There("is no one here to give a word from the Lord.");
@@ -735,64 +802,74 @@ doconsult(struct monst *oracl)
     } else if (!oracl->mpeaceful) {
         pline("%s is in no mood to give a word from the Lord.", Monnam(oracl));
         return ECMD_OK;
-    } else if (!umoney) {
-        You("have no gold.");
-        return ECMD_OK;
     }
 
-    Sprintf(qbuf, "\"Wilt thou settle for a minor word from the Lord?\" (%d %s)",
-            minor_cost, currency((long) minor_cost));
+    Strcpy(qbuf, "\"Wilt thou settle for a minor word from the Lord?\"");
     switch (ynq(qbuf)) {
     default:
     case 'q':
         return ECMD_OK;
     case 'y':
-        if (umoney < (long) minor_cost) {
-            You("don't even have enough gold for that!");
-            return ECMD_OK;
-        }
-        u_pay = minor_cost;
-        break;
-    case 'n':
-        if (umoney <= (long) minor_cost /* don't even ask */
-            || (svo.oracle_cnt == 1 || go.oracle_flg < 0))
-            return ECMD_OK;
-        Sprintf(qbuf, "\"Then dost thou desire a major word from the Lord?\" (%d %s)",
-                major_cost, currency((long) major_cost));
-        if (y_n(qbuf) != 'y')
-            return ECMD_OK;
-        u_pay = (umoney < (long) major_cost) ? (int) umoney : major_cost;
-        break;
-    }
-    money2mon(oracl, (long) u_pay);
-    disp.botl = TRUE;
-    if (!u.uevent.major_oracle && !u.uevent.minor_oracle)
-        record_achievement(ACH_ORCL);
-    add_xpts = 0; /* first oracle of each type gives experience points */
-    if (u_pay == minor_cost) {
+        if (!u.uevent.major_oracle && !u.uevent.minor_oracle)
+            record_achievement(ACH_ORCL);
         SetVoice(oracl, 0, 80, 0);
         verbalize1(rnd_prophet_proverb());
-        if (!u.uevent.minor_oracle)
-            add_xpts = u_pay / (u.uevent.major_oracle ? 25 : 10);
-        /* 5 pts if very 1st, or 2 pts if major already done */
+        if (!u.uevent.minor_oracle) {
+            add_xpts = minor_cost / (u.uevent.major_oracle ? 25 : 10);
+            /* 5 pts if very 1st, or 2 pts if major already done */
+            more_experienced(add_xpts, minor_cost / 50);
+            newexplevel();
+        }
         u.uevent.minor_oracle = TRUE;
-    } else {
-        boolean cheapskate = u_pay < major_cost;
-
-        SetVoice(oracl, 0, 80, 0);
-        if (cheapskate)
-            verbalize("That is not enough.");
-        else
-            verbalize("The treasure you seek has always been yours.");
-        if (!cheapskate && !u.uevent.major_oracle)
-            add_xpts = u_pay / (u.uevent.minor_oracle ? 25 : 10);
-        /* ~100 pts if very 1st, ~40 pts if minor already done */
-        u.uevent.major_oracle = TRUE;
-        exercise(A_WIS, !cheapskate);
+        return ECMD_TIME;
+    case 'n':
+        break;
     }
-    if (add_xpts) {
-        more_experienced(add_xpts, u_pay / 50);
-        newexplevel();
+
+    Strcpy(qbuf, "\"Then dost thou desire a major word from the Lord?\"");
+    if (y_n(qbuf) == 'y') {
+        if (!u.uevent.major_oracle && !u.uevent.minor_oracle)
+            record_achievement(ACH_ORCL);
+        SetVoice(oracl, 0, 80, 0);
+        verbalize("The treasure you seek has always been yours.");
+        if (!u.uevent.major_oracle) {
+            add_xpts = major_cost / (u.uevent.minor_oracle ? 25 : 10);
+            /* ~100 pts if very 1st, ~40 pts if minor already done */
+            more_experienced(add_xpts, major_cost / 50);
+            newexplevel();
+        }
+        u.uevent.major_oracle = TRUE;
+        exercise(A_WIS, TRUE);
+        return ECMD_TIME;
+    }
+
+    /* PLACEHOLDER prompts and thank-yous, for Jon to review. */
+    if (y_n("\"Would you like to make a donation to God's church?\"") != 'y')
+        return ECMD_OK;
+    offer = isaiah_donation(oracl);
+    if (offer <= 0L)
+        return ECMD_OK;
+
+    SetVoice(oracl, 0, 80, 0);
+    if (offer < 1000L) {
+        verbalize("The Lord bless thee for this gift.");
+        isaiah_favor();
+    } else if (u.uevent.church_gifts >= 10) {
+        /* PLACEHOLDER: after ten XP gifts, a large gift is favor only. */
+        verbalize("The Lord bless thee. The church can receive no greater increase for now.");
+        isaiah_favor();
+    } else if (offer < 5000L) {
+        verbalize("Thy gift lifts thee a little.");
+        isaiah_grant_xp(1, 4);
+        u.uevent.church_gifts++;
+    } else if (offer < 10000L) {
+        verbalize("Thy gift lifts thee further.");
+        isaiah_grant_xp(1, 2);
+        u.uevent.church_gifts++;
+    } else {
+        verbalize("Thy gift lifts thee a full step.");
+        isaiah_grant_xp(1, 1);
+        u.uevent.church_gifts++;
     }
     return ECMD_TIME;
 }

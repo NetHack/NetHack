@@ -37,8 +37,8 @@ struct u_have {
 };
 
 struct u_event {
-    Bitfield(minor_oracle, 1); /* received at least 1 cheap oracle */
-    Bitfield(major_oracle, 1); /*  "  expensive oracle */
+    Bitfield(minor_oracle, 1); /* heard the minor word from the Lord */
+    Bitfield(major_oracle, 1); /* heard the major word from the Lord */
     Bitfield(read_tribute, 1); /* read a passage from a novel */
     Bitfield(qcalled, 1);      /* called by Quest leader to do task */
     Bitfield(qexpelled, 1);    /* expelled from the Quest dungeon */
@@ -59,7 +59,8 @@ struct u_event {
     Bitfield(peter_rewarded, 1);    /* Peter kept the net and gave the keys */
     Bitfield(babylon_hint, 1);      /* prayer has named the palace key */
     Bitfield(peter_quest, 1);       /* Peter has given the quest scroll */
-    /* 0 free bits in the 24-bit group; the word still has room */
+    Bitfield(church_gifts, 4);      /* XP donations to God's church, 0..10 */
+    /* 4 free bits remain in this 32-bit word */
 };
 
 /*

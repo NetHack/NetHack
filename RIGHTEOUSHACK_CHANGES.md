@@ -712,33 +712,48 @@ Wizard role are unchanged. The sysconf list is still named WIZARDS.
 
 ### A word from the Lord (2026-11-01)
 
-#chat with Isaiah asks, price in parentheses:
-"Wilt thou settle for a minor word from the Lord?" (50 shekels) [ynq] (q)
-Answering no, when you have more than that, asks:
-"Then dost thou desire a major word from the Lord?" (550 shekels) [yn] (n)
-The major price is 500 plus 50 for each experience level. If he
-is angry: "Isaiah, prophet of the Lord is in no mood to give a
-word from the Lord." The first of either is the achievement and
-the livelog line "received a word from the Lord." Conduct says
-"You have received a word from the Lord." The xlogfile key
-stays consulted_the_prophet.
+#chat with Isaiah asks, with no price:
+"Wilt thou settle for a minor word from the Lord?" [ynq] (q)
+Answering no asks:
+"Then dost thou desire a major word from the Lord?" [yn] (n)
+Both are free. The first of either is still the achievement
+"received a word from the Lord." Each word's first-time
+experience is the old amount: a few points for the minor word,
+and the old major price divided by 10 (or by 25 if the minor
+word came first). Hearing either again does not repeat that.
+If he is angry: "Isaiah, prophet of the Lord is in no mood to
+give a word from the Lord."
+
+Saying no to both asks:
+"Would you like to make a donation to God's church?" [yn] (n)
+Yes asks "How much will you give?" Zero, or more than you are
+carrying, does not go past the gold you have. Zero does nothing.
+PLACEHOLDER thank-yous, for Jon:
+- 1 to 999 shekels: "The Lord bless thee for this gift." Favor +1. Any number of times.
+- 1000 to 4999: "Thy gift lifts thee a little." A quarter of this level's experience.
+- 5000 to 9999: "Thy gift lifts thee further." Half a level.
+- 10000 or more: "Thy gift lifts thee a full step." One level.
+Those three are capped at ten gifts in a game. After that, a gift
+of 1000 or more still takes the gold and says "The Lord bless
+thee. The church can receive no greater increase for now." Favor
++1, and no experience. That last line is a placeholder. A gift
+never raises you more than one level, including at the level cap.
 
 ### Shekels (2026-11-01)
 
-Prices, shop speech, the inventory gold line, death and score
-lines, and the Prophet's fees say "shekel" for one and "shekels"
-for more. The coins themselves are still called gold pieces.
+Prices, shop speech, the inventory gold line, and death and score
+lines say "shekel" for one and "shekels" for more. The coins
+themselves are still called gold pieces. A donation to God's
+church is counted in shekels.
 A wish for shekels or for zorkmids both yield gold pieces. The
 game does not say zorkmid.
 
 ### Prophet, Capernaum, and PETRA (2026-11-01)
 
 The Oracle is Isaiah, prophet of the Lord. That is his monster
-name, and the text windows name him that way. Paying for a
-minor word from the Lord hears one of the placeholder proverbs. Paying
-the full price for a major word from the Lord hears "The treasure you
-seek has always been yours." A short payment hears "That is not
-enough." That short line is a stand-in; Jon did not write one.
+name, and the text windows name him that way. The minor word
+hears one of the placeholder proverbs. The major word hears
+"The treasure you seek has always been yours." Neither costs gold.
 The overview feature line is exactly "Prophet of the Lord."
 Prophet mode tags that level [prophet]. The #levelport menu shows
 prophet. The xlogfile achievement is consulted_the_prophet. The
