@@ -860,8 +860,12 @@ doconsult(struct monst *oracl)
 
     SetVoice(oracl, 0, 80, 0);
     if (offer < 1000L) {
-        verbalize("The Lord bless thee for this gift.");
-        isaiah_favor();
+        /* Proverbs 11:25 KJV, checked against Bible Gateway. */
+        verbalize("The liberal soul shall be made fat: "
+                  "and he that watereth shall be watered also himself.");
+        /* PLACEHOLDER: tells the player the small gift did some good. */
+        You("feel the Lord's favor upon your gift.");
+        adjalign(1);
     } else if (u.uevent.church_gifts >= 10) {
         /* PLACEHOLDER: after ten XP gifts, a large gift is favor only. */
         verbalize("The Lord bless thee. The church can receive no greater increase for now.");

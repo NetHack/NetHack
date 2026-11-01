@@ -11,6 +11,11 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-01
+A gift of 1 to 999 shekels still adds favor. Isaiah quotes
+Proverbs 11:25 from the King James Bible, and you are told the
+gift did some good.
+
+2026-11-01
 A gift of 0 shekels has no penalty. Isaiah quotes 2 Corinthians
 9:7 from the King James Bible.
 

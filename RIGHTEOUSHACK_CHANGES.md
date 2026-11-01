@@ -733,7 +733,7 @@ for word: "Every man according as he purposeth in his heart, so
 let him give; not grudgingly, or of necessity: for God loveth a
 cheerful giver."
 PLACEHOLDER thank-yous, for Jon:
-- 1 to 999 shekels: "The Lord bless thee for this gift." Favor +1. Any number of times.
+- 1 to 999 shekels: Isaiah quotes Proverbs 11:25, King James, word for word: "The liberal soul shall be made fat: and he that watereth shall be watered also himself." Then the placeholder "You feel the Lord's favor upon your gift." Favor +1. Any number of times.
 - 1000 to 4999: "Thy gift lifts thee a little." A quarter of this level's experience.
 - 5000 to 9999: "Thy gift lifts thee further." Half a level.
 - 10000 or more: "Thy gift lifts thee a full step." One level.
