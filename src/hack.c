@@ -5495,5 +5495,183 @@ rounddiv(long x, int y)
     return divsgn * r;
 }
 
+/* The hosts do not attack while they are still moving, or after the
+   light freezes them. Movement during the grace turns is allowed. */
+boolean
+sanctum_no_hostility(void)
+{
+    return (boolean) (Is_sanctum(&u.uz)
+                      && (u.uevent.sanctum_frozen || u.uevent.sanctum_grace));
+}
+
+static boolean
+box_holds_soul(struct obj *box)
+{
+    struct obj *otmp;
+
+    if (!box || !Has_contents(box))
+        return FALSE;
+    for (otmp = box->cobj; otmp; otmp = otmp->nobj)
+        if (otmp->otyp == PLAYER_SOUL)
+            return TRUE;
+    return FALSE;
+}
+
+/* One chest, on the high altar, holding the player's own soul. */
+static void
+place_soul_chest(void)
+{
+    coordxy x, y, ax, ay;
+    struct obj *chest, *soul;
+    struct monst *mtmp;
+    char buf[BUFSZ];
+    boolean found = FALSE;
+
+    if (u.uevent.soul_placed || !Is_sanctum(&u.uz))
+        return;
+    ax = u.ux;
+    ay = u.uy;
+    for (x = 1; x < COLNO && !found; x++)
+        for (y = 0; y < ROWNO; y++)
+            if (IS_ALTAR(levl[x][y].typ)
+                && (levl[x][y].altarmask & AM_SANCTUM)) {
+                ax = x;
+                ay = y;
+                found = TRUE;
+                break;
+            }
+    chest = mksobj_at(CHEST, ax, ay, FALSE, FALSE);
+    if (!chest)
+        return;
+    chest->olocked = 0;
+    chest->otrapped = 0;
+    soul = mksobj(PLAYER_SOUL, FALSE, FALSE);
+    if (soul) {
+        if (svp.plname[0])
+            Sprintf(buf, "%s's soul", svp.plname);
+        else
+            Strcpy(buf, "your soul");
+        soul = oname(soul, buf, ONAME_NO_FLAGS);
+        if (soul) {
+            soul->dknown = 1;
+            add_to_container(chest, soul);
+        }
+    }
+    chest->owt = weight(chest);
+    if ((mtmp = m_at(ax, ay)) != 0 && mtmp != &gy.youmonst)
+        (void) rloc(mtmp, RLOC_NOMSG);
+    newsym(ax, ay);
+    pline("A chest sits on the altar.");
+    u.uevent.soul_placed = 1;
+}
+
+static void
+spawn_hosts(void)
+{
+    static const int hosts[] = {
+        PM_HORNED_DEVIL, PM_BARBED_DEVIL, PM_VROCK,
+        PM_HEZROU, PM_MARILITH, PM_PIT_FIEND
+    };
+    int i;
+
+    for (i = 0; i < (int) (sizeof hosts / sizeof hosts[0]); i++) {
+        struct monst *mtmp;
+
+        mtmp = makemon(&mons[hosts[i]], u.ux, u.uy, MM_ADJACENTOK);
+        if (!mtmp)
+            continue;
+        mtmp->mpeaceful = 0;
+        set_malign(mtmp);
+    }
+}
+
+static void
+give_cap_of_salvation(void)
+{
+    struct obj *otmp;
+
+    otmp = mksobj(DIVINE_COVERING, FALSE, FALSE);
+    if (!otmp)
+        return;
+    otmp = oname(otmp, artiname(ART_HELMET_OF_SALVATION),
+                 ONAME_GIFT | ONAME_KNOW_ARTI);
+    if (!otmp)
+        return;
+    otmp->spe = 2;
+    bless(otmp);
+    otmp->bknown = otmp->known = otmp->dknown = 1;
+    if (otmp->oartifact)
+        u.ugifts++;
+    (void) hold_another_object(otmp, "Oops!  %s to the floor!",
+                               The(aobjnam(otmp, "drop")),
+                               (const char *) 0);
+}
+
+static void
+sanctum_yes_end(void)
+{
+    u.uevent.sanctum_frozen = 1;
+    pline("Then a blinding explosion of light bursts forth from on high. The hosts of darkness are frozen where they stand. The Lord has given you a way of escape.");
+    give_cap_of_salvation();
+    /* The climb is the Road to Salvation, designed later. */
+    pline("The way back up is the Road to Salvation. It has not been opened.");
+}
+
+static void
+sanctum_no_end(void)
+{
+    u.uevent.sanctum_doom = 0;
+    pline("The hosts of darkness fall upon you... I set before you life and death. You have chosen... the darkness keeps what is its own.");
+    svk.killer.format = NO_KILLER_PREFIX;
+    Strcpy(svk.killer.name,
+           "Killed by the hosts of darkness, having refused redemption.");
+    done(DIED);
+}
+
+/* Called once each turn, after monsters have moved. */
+void
+sanctum_tick(void)
+{
+    if (!Is_sanctum(&u.uz))
+        return;
+    place_soul_chest();
+    if (u.uevent.sanctum_grace) {
+        u.uevent.sanctum_grace--;
+        if (!u.uevent.sanctum_grace)
+            sanctum_yes_end();
+    } else if (u.uevent.sanctum_doom) {
+        u.uevent.sanctum_doom--;
+        if (!u.uevent.sanctum_doom)
+            sanctum_no_end();
+    }
+}
+
+/* Opening the chest that holds the soul. Returns 1 when this open
+   is the reveal rather than ordinary looting. */
+int
+soul_opening(struct obj *box)
+{
+    char ans;
+
+    if (u.uevent.soul_opened || !box_holds_soul(box))
+        return 0;
+
+    pline("You peer inside, and horror grips you. There, bound in chains within Moloch's Sanctum, is your own soul. At last it all makes sense.");
+    pline("You have walked a path of evil your whole life, and the treasure you sought was the liberation of your very soul. Now the chance for redemption stands before you. But redemption is a choice.");
+    pline("God speaks in a thunderous voice: 'You must choose the path of good, not evil. Do you choose that path?'");
+    ans = ynq("Do you choose that path?");
+    if (ans == 'q')
+        return 1; /* asked, not answered; the next open asks again */
+
+    u.uevent.soul_opened = 1;
+    pline("From the shadows of the Sanctum, the hosts of darkness rise to claim what they believe is theirs.");
+    spawn_hosts();
+    if (ans == 'y')
+        u.uevent.sanctum_grace = 2;
+    else
+        u.uevent.sanctum_doom = 3;
+    return 1;
+}
+
 
 /*hack.c*/

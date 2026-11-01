@@ -256,11 +256,8 @@ priestini(
         priest->msleeping = 0;
         set_malign(priest); /* mpeaceful may have changed */
 
-        /* now his/her goodies... */
-        if (sanctum && EPRI(priest)->shralign == A_NONE
-            && on_level(&sanctum_level, &u.uz)) {
-            (void) mongets(priest, AMULET_OF_YENDOR);
-        }
+        /* The Amulet of Yendor is no longer the quest object.
+           The player's soul is in the chest on this altar. */
         /* 2 to 4 prophetic books */
         for (cnt = rn1(3, 2); cnt > 0; --cnt) {
             (void) mpickobj(priest, mkobj(SPBOOK_no_NOVEL, FALSE));

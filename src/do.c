@@ -1322,6 +1322,15 @@ doup(void)
         You_cant("go up here.");
         return ECMD_OK;
     }
+    if (Is_sanctum(&u.uz) && u.uevent.sanctum_frozen) {
+        pline("The Road to Salvation is not yet open.");
+        return ECMD_OK;
+    }
+    if (Is_sanctum(&u.uz)
+        && (u.uevent.sanctum_grace || u.uevent.sanctum_doom)) {
+        pline("The hosts of darkness bar the way.");
+        return ECMD_OK;
+    }
     if (stucksteed(TRUE)) {
         return ECMD_OK;
     }
@@ -1524,6 +1533,16 @@ goto_level(
         && !strcmp(svd.dungeons[newlevel->dnum].dname, "The Wilderness Trial")) {
         pline("The wilderness is sealed.");
         return;
+    }
+    if (Is_sanctum(&u.uz) && !on_level(newlevel, &u.uz)) {
+        if (u.uevent.sanctum_frozen) {
+            pline("The Road to Salvation is not yet open.");
+            return;
+        }
+        if (u.uevent.sanctum_grace || u.uevent.sanctum_doom) {
+            pline("The hosts of darkness bar the way.");
+            return;
+        }
     }
     if (in_wilderness() && up && dunlev(&u.uz) > 1) {
         pline("The way back is sealed.");

@@ -701,6 +701,10 @@ dochug(struct monst *mtmp)
 
     mdat = mtmp->data;
 
+    /* Frozen hosts stay where they are. They can still be killed. */
+    if (Is_sanctum(&u.uz) && u.uevent.sanctum_frozen)
+        return 0;
+
     if (mtmp->mstrategy & STRAT_ARRIVE) {
         res = m_arrival(mtmp);
         if (res >= 0)
@@ -916,7 +920,7 @@ dochug(struct monst *mtmp)
         /* arbitrary distance restriction to keep monster far away
            from you from having cast dozens of sticks-to-snakes
            or similar spells by the time you reach it */
-        if (!mtmp->mspec_used
+        if (!sanctum_no_hostility() && !mtmp->mspec_used
             && dist2(mtmp->mx, mtmp->my, u.ux, u.uy) <= 49) {
             struct attack *a;
 

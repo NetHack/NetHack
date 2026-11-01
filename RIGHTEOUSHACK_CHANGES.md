@@ -1001,6 +1001,40 @@ It restores you." Hit points return to full and hunger is cured.
 Dipping says "The living water does no harm." There is no snake,
 no demon, and no curse.
 
+### The soul in Moloch's Sanctum (2026-11-01)
+
+The Amulet of Yendor is not given to the high priest. A chest on
+the Sanctum altar holds one object, named from the player's name
+as "Elisha's soul" (always with 's, even if the name already ends
+in s). Until it is identified it looks like a chained relic called
+by that name. Opening the chest prints the reveal in three
+pieces, only because one message stops near 255 characters. Read
+in order, the words are the paragraph from the plan, unchanged.
+The game then asks "Do you choose that path?" so y, n, or q can
+be answered. q asks again on the next open. The first open does
+not also take the soul out. A second open is ordinary looting.
+
+Both answers say the shadows line, then six hostile demons appear
+beside you: horned devil, barbed devil, vrock, hezrou, marilith,
+pit fiend. That roster is a placeholder for "the hosts".
+
+Yes leaves them free to move for two turns. They do not attack,
+cast, or throw. Then the light line, the whole Sanctum freezes
+for the rest of the game, and a blessed +2 Cap of Salvation is
+given. The artifact is not renamed. Frozen monsters never move or
+fight. You can still kill them. The stairs up, and any other way
+off the level, say the Road to Salvation is not yet open.
+
+No lets them attack for three turns. Then God's spoken line is
+shown exactly as written, not as Deuteronomy, and the tombstone
+is "Killed by the hosts of darkness, having refused redemption."
+During those turns, and during the two quiet turns, you cannot
+leave the level.
+
+The elemental planes still look for the Amulet if one exists.
+None is placed. The soul is the quest object. Wishes for it are
+refused.
+
 ### Entering Moloch's Sanctum (2026-11-01)
 
 The Bell of Opening, the Candelabrum of Invocation, and the Book

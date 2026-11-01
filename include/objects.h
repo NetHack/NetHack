@@ -969,6 +969,10 @@ TOOL("magic lamp",        "lamp", 0, 0, 1, 0, 15, 20, 50, COPPER, CLR_YELLOW,
    Wishes for it are refused. Applying it points at the vibrating square. */
 TOOL("Lamp of God's Word", "lamp", 1, 0, 0, 0, 0, 20, 0, GOLD, HI_GOLD,
                                                                 LAMP_OF_GODS_WORD),
+/* The quest object. One is placed in the altar chest. The call name
+   is the player's own, such as "Elisha's soul". Not wished for. */
+TOOL("bound soul", "chained relic", 0, 0, 0, 0, 0, 30, 0, GEMSTONE, CLR_WHITE,
+                                                                PLAYER_SOUL),
 TOOL("thurible",          "thurible", 0, 0, 0, 0, 45, 20, 10, GOLD, CLR_YELLOW,
                                                                 THURIBLE),
 /* other tools */

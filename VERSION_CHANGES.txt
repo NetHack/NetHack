@@ -11,6 +11,19 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-01
+The quest object is your own soul, in a chest on the Sanctum
+altar. It is named for you, such as "Elisha's soul". Opening
+that chest is the reveal and God's question. Either answer, the
+hosts of darkness rise. Yes: they move for two turns and cannot
+fight, then the light freezes the whole level and you receive a
++2 Cap of Salvation. The code name is still Cap of Salvation.
+The climb back up is only a placeholder, the Road to Salvation.
+No: they really attack for three turns, then the game ends.
+The tombstone is "Killed by the hosts of darkness, having
+refused redemption." The closing line is God's spoken line, not
+a quoted verse. The high priest no longer carries the Amulet.
+
+2026-11-01
 The Bell, the Candelabrum, and the Book of the Dead are gone.
 Finishing a class quest puts the Lamp of God's Word in your pack.
 Applying it, the flame leans toward the vibrating square, and the
