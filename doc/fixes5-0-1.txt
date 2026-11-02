@@ -108,6 +108,7 @@ fix accessing deleted magic trap destroyed by ice turning into water
 fix chameleon shape change working on petrified monster
 fix checking if dungeon has too many dungeons or levels
 fix long key name overflowing unlock prompt buffer
+fix exploding named box buffer overflow
 
 
 Platform- and/or Interface-Specific Fixes
