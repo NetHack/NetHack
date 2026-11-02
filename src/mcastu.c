@@ -137,6 +137,9 @@ castmu(
     int ret;
     int spellnum = 0;
 
+    if (fear_protected())
+        return 0;
+
     /* Three cases:
      * -- monster is attacking you.  Search for a useful spell.
      * -- monster thinks it's attacking you.  Search for a useful spell,
@@ -994,6 +997,8 @@ buzzmu(struct monst *mtmp, struct attack *mattk)
     /* don't print constant stream of curse messages for 'normal'
        spellcasting monsters at range */
     if (!BZ_VALID_ADTYP(mattk->adtyp))
+        return M_ATTK_MISS;
+    if (fear_protected())
         return M_ATTK_MISS;
 
     if (mtmp->mcan || m_seenres(mtmp, cvt_adtyp_to_mseenres(mattk->adtyp))) {

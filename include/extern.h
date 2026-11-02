@@ -4062,6 +4062,7 @@ extern boolean pride_prayer(void);
 extern void pride_touch_mirror(struct obj *);
 extern boolean pride_door_blocks(coordxy, coordxy);
 extern void pride_leave_lures(void);
+extern boolean is_pride_reflection(struct monst *);
 extern boolean greed_lure_gem(struct obj *);
 extern void greed_leave_gems(void);
 extern void greed_snapshot_gold(void);

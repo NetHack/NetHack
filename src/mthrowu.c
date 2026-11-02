@@ -98,6 +98,9 @@ thitu(
             || !strncmpi(name, "a ", 2))
             kprefix = KILLED_BY;
     }
+    if (svc.context.mon_moving && fear_protected())
+        return 0;
+
     onm = (obj && obj_is_pname(obj)) ? the(name)
           : (obj && obj->quan > 1L) ? name
             : an(name);
@@ -1185,6 +1188,9 @@ thrwmu(struct monst *mtmp)
     const struct throw_and_return_weapon *arw;
     boolean always_toss = FALSE;
 
+    if (fear_protected())
+        return;
+
     /* Rearranged beginning so monsters can use polearms not in a line */
     if (mtmp->weapon_check == NEED_WEAPON || !MON_WEP(mtmp)) {
         mtmp->weapon_check = NEED_RANGED_WEAPON;
@@ -1272,6 +1278,8 @@ thrwmu(struct monst *mtmp)
 int
 spitmu(struct monst *mtmp, struct attack *mattk)
 {
+    if (fear_protected())
+        return M_ATTK_MISS;
     return spitmm(mtmp, mattk, &gy.youmonst);
 }
 
@@ -1279,6 +1287,8 @@ spitmu(struct monst *mtmp, struct attack *mattk)
 int
 breamu(struct monst *mtmp, struct attack *mattk)
 {
+    if (fear_protected())
+        return M_ATTK_MISS;
     return breamm(mtmp, mattk, &gy.youmonst);
 }
 

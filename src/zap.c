@@ -2629,6 +2629,42 @@ zap_ok(struct obj *obj)
     return GETOBJ_EXCLUDE;
 }
 
+/* Column first, row second, matching explode()'s explosion[]. */
+static const int frozen_expl[3][3] = {
+    { S_expl_tl, S_expl_ml, S_expl_bl },
+    { S_expl_tc, S_expl_mc, S_expl_bc },
+    { S_expl_tr, S_expl_mr, S_expl_br }
+};
+
+/* Frost glyphs on every square the rod's 3-square burst covers. */
+static void
+frozen_power_show(void)
+{
+    coordxy dx, dy;
+    boolean starting = TRUE;
+
+    for (dx = -3; dx <= 3; dx++)
+        for (dy = -3; dy <= 3; dy++) {
+            coordxy xx = u.ux + dx, yy = u.uy + dy;
+            int col, row;
+
+            if (!isok(xx, yy))
+                continue;
+            col = (dx < 0) ? 0 : (dx > 0) ? 2 : 1;
+            row = (dy < 0) ? 0 : (dy > 0) ? 2 : 1;
+            tmp_at(starting ? DISP_BEAM : DISP_CHANGE,
+                   explosion_to_glyph(EXPL_FROSTY, frozen_expl[col][row]));
+            tmp_at(xx, yy);
+            starting = FALSE;
+        }
+    if (!starting) {
+        curs_on_u();
+        nh_delay_output();
+        nh_delay_output();
+        tmp_at(DISP_END, 0);
+    }
+}
+
 /* #zap command, 'z' (or 'y' if numbed_pad==-1) */
 int
 dozap(void)
@@ -2648,12 +2684,9 @@ dozap(void)
     if (has_oname(obj) && !strcmp(ONAME(obj), "Rod of Frozen Power")) {
         struct monst *mtmp, *nmon;
 
-        if (!zappable(obj)) {
-            pline1(nothing_happens);
-            return ECMD_TIME;
-        }
-        consume_obj_charge(obj, TRUE);
+        /* Unlimited. Never consult charges, and never wrest or fizzle. */
         pline("Winter answers, and the cold bursts outward.");
+        frozen_power_show();
         for (mtmp = fmon; mtmp; mtmp = nmon) {
             int dmg;
 
@@ -4450,6 +4483,9 @@ zhitu(
         You("are untouched. No sorcery can reach you.");
         return;
     }
+    /* A monster's ray or breath. The hero's own zap is not mon_moving. */
+    if (svc.context.mon_moving && fear_protected())
+        return;
     switch (abstyp % 10) {
     case ZT_MAGIC_MISSILE:
         if (Antimagic) {
