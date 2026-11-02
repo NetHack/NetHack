@@ -712,6 +712,9 @@ mattacku(struct monst *mtmp)
     /*  Work out the armor class differential   */
     tmp = AC_VALUE(u.uac) + 10; /* tmp ~= 0 - 20 */
     tmp += mtmp->m_lev;
+    /* The drain uses m_lev, which starts at 0. The blow does not. */
+    if (has_mgivenname(mtmp) && !strcmp(MGIVENNAME(mtmp), "your reflection"))
+        tmp += 10;
     if (gm.multi < 0)
         tmp += 4;
     if ((Invis && !perceives(mdat)) || !mtmp->mcansee)
@@ -1155,6 +1158,9 @@ hitmu(struct monst *mtmp, struct attack *mattk)
     mhm.permdmg = 0;
     mhm.specialdmg = 0;
     mhm.done = FALSE;
+
+    if (fear_protected())
+        return M_ATTK_MISS;
 
     if (!canspotmon(mtmp))
         map_invisible(mtmp->mx, mtmp->my);
@@ -1706,6 +1712,8 @@ gazemu(struct monst *mtmp, struct attack *mattk)
             mcanseeu = (canseemon(mtmp) && couldsee(mtmp->mx, mtmp->my)
                         && mtmp->mcansee);
 
+    if (fear_protected())
+        return M_ATTK_MISS;
     if (m_seenres(mtmp, cvt_adtyp_to_mseenres(mattk->adtyp)))
         return M_ATTK_MISS;
 

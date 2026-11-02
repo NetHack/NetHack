@@ -2173,6 +2173,9 @@ mkstairs(
         impossible("mkstairs:  bogus stair attempt at <%d,%d>", x, y);
         return;
     }
+    /* Pride grows its down stair only after the altar prayer. */
+    if (!up && in_wilderness() && dunlev(&u.uz) == 3 && !u.uevent.pride_prayed)
+        return;
     if (force)
         levl[x][y].typ = ROOM;
     ltyp = levl[x][y].typ; /* somexyspace() allows ice */

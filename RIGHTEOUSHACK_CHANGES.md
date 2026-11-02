@@ -935,7 +935,78 @@ through (41,12). It is not a house, not the up stair, and not
 Lot's wife. The random statues are placed in that room. The
 level stays dark. The other Medusa maps are unused.
 
+### Wilderness Trial fixes (2026-11-02)
+
+Desert, Greed, Pride, and the Garden use real horizontal and
+vertical walls. Fear already did.
+
+Every engraving on the five Wilderness levels is a verse. Stepping
+on one shows only that text. It does not say the writing was burned
+or engraved, it does not ask for --More-- or Enter, and it does not
+stop you if you are running. A blind hero reads the same line.
+The verse cannot be scuffed, overwritten, cancelled, or zapped away.
+Look-here and farlook quote it. The read command still reads a
+scroll or a prophetic book.
+
+Greed is the Cave of Wonders, 79 by 21. The up stair is at the west
+end of the three-wide hall, with Matthew 16:26 beside it. Four side
+rooms open off that hall. The pillared great room is packed with
+flawless gems of every color and with gold. Most piles are 1,000 to
+5,000 gold, and about one in five is 10,000 to 20,000. The narrow
+gate is the door at the far east. Job 1:21 is on the square before
+it. Past the gate is the restore square, Matthew 6:33, then the down
+stair. Stepping on the gate while carrying anything, gold included,
+sends you back to the entrance stair and cycles Matthew 6:19, Luke
+18:22, and Job 1:21. Empty-handed, only objects you yourself dropped,
+and not a flawless gem, are moved to the restore square. On entering
+Greed the game records how much gold you are carrying, in hand and in
+bags. On leaving, your gold is set back to exactly that amount. The
+gold counter can show amounts into the tens of millions. The weight
+of a coin stack is computed in a long and then clamped to a 32-bit
+int, which is enough for the piles on this level. Food still turns
+to ash. The hunger clock counts one step each time you actually move,
+including through a bounce, and not while you wait. At 25 the old
+warning appears, and the line "25 turns until you starve." From there
+each move counts down, through "1 turn until you starve." The next
+move is the tombstone "Starved, clinging to worldly possessions."
+
+Pride is 76 by 19. The hall is five rows. The up stair is at the west
+end. James 4:10 is engraved at the center. Four treasure rooms are
+north of the hall and four are south, each with a door, a harmless
+mirror in the hall outside the door, and a live mirror toward the
+back. One lure is shuffled into each room. The cold lure is the rod
+named Rod of Frozen Power, created as "rod of northern wind", so it
+is the cold rod and not the prophetic book of the same name. At the
+east end of the hall, just west of the secret door, is an altar of
+your own alignment. Praying there works as a normal prayer, and the
+first time it also locks the eight treasure doors so they will not
+open, kick, unlock, or be dug, opens the secret door with "A hidden
+way opens.", and creates the down stair beyond it. Until that prayer
+the level has no down stair, and nothing else is allowed to add one.
+Praying anywhere else on Pride does not change the doors or the stair.
+The lures, including one inside a nested bag, are destroyed by that
+prayer and again when you take the stairs down to Fear. The bag of
+infinite holding is one of them. A reflection is a doppelganger with
+130 hit points, armor eight points better than a doppelganger's, and
+a firmer blow, and it does not change shape. The life drain is
+unchanged: within five squares it takes one more point each of its
+turns, up to 30.
+
+On Fear, standing on a path tile or either stair stops damage from
+melee, missiles, rays, breath, explosions, gaze, life drain, and the
+touch of death. Attacking does not remove that protection. Monsters
+will not step onto a path tile or a stair. A boulder will not land
+or be generated there.
+
+Picking up the Sword of the Spirit opens a portal to the main-dungeon
+level that holds the Wilderness stair. The branch stays sealed.
+Finger of execution on Pride uses the lesser of your normal chance
+and 30. The garden fountains are unchanged.
+
 ### Wilderness Trial (2026-11-01)
+
+The 2026-11-02 section above is the current Greed, Pride, Fear,
+verse, and sword behavior. This section is the first build.
 
 A branch, The Wilderness Trial, joins the main dungeon three
 levels below the Prophet. It is chained to the level named prophet.
