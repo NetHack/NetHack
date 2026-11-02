@@ -950,6 +950,8 @@ nh_timeout(void)
 void
 fall_asleep(int how_long, boolean wakeup_msg)
 {
+    if (how_long < 0 && svc.context.mon_moving && fear_protected())
+        return;
     stop_occupation();
     nomul(how_long);
     gm.multi_reason = "sleeping";

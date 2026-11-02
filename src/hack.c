@@ -3825,12 +3825,29 @@ pride_waken_reflection(void)
     refl = makemon(&mons[PM_DOPPELGANGER], u.ux, u.uy, MM_ADJACENTOK);
     if (!refl)
         return;
+    /* makemon() has already called newcham() unless shape-changing
+       is blocked, so this may already be a slime or some other form.
+       Put the doppelganger body back before cham is cleared. Clearing
+       cham first would freeze the random shape. */
+    if (refl->data != &mons[PM_DOPPELGANGER]) {
+        refl->cham = PM_DOPPELGANGER;
+        (void) newcham(refl, &mons[PM_DOPPELGANGER], NO_NC_FLAGS);
+    }
     (void) christen_monst(refl, "your reflection");
     refl->mpeaceful = 0;
     set_malign(refl);
+    /* NON_PM: not a shapechanger, so it does not take a new form later.
+       Protection from shape changers must not turn that back on. */
     refl->cham = NON_PM;
     refl->m_lev = 0;
     refl->mhp = refl->mhpmax = 130;
+}
+
+boolean
+is_pride_reflection(struct monst *mtmp)
+{
+    return (boolean) (mtmp && has_mgivenname(mtmp)
+                      && !strcmp(MGIVENNAME(mtmp), "your reflection"));
 }
 
 boolean
@@ -3962,7 +3979,9 @@ wilderness_took(struct obj *obj)
         for (br = svb.branches; br; br = br->next)
             if (!strcmp(svd.dungeons[br->end2.dnum].dname,
                         "The Wilderness Trial")) {
-                schedule_goto(&br->end1, UTOTYPE_PORTAL, (char *) 0,
+                /* Not a magic portal: nothing on the far side to arrive
+                   through. Land on the branch stair instead. */
+                schedule_goto(&br->end1, UTOTYPE_WILDHOME, (char *) 0,
                               "The sword is in your hand, and the wilderness is sealed behind you.");
                 return;
             }
@@ -5299,6 +5318,10 @@ end_running(boolean and_travel)
 void
 nomul(int nval)
 {
+    /* A monster cannot freeze or slow the hero on the Fear path.
+       The hero's own nomul, and a Psalm 91 elsewhere, are unchanged. */
+    if (nval < 0 && svc.context.mon_moving && fear_protected())
+        return;
     if (gm.multi < nval)
         return;              /* This is a bug fix by ab@unido */
     disp.botl |= (gm.multi >= 0);

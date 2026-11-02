@@ -1827,6 +1827,9 @@ use_offensive(struct monst *mtmp)
     struct obj *otmp = gm.m.offensive;
     boolean oseen;
 
+    if (fear_protected())
+        return 0;
+
     /* if a monster has never used an attack wand before, it takes them some
        time to get used to holding that much power, so the first shot always
        misses */

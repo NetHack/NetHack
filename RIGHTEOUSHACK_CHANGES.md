@@ -988,20 +988,45 @@ The lures, including one inside a nested bag, are destroyed by that
 prayer and again when you take the stairs down to Fear. The bag of
 infinite holding is one of them. A reflection is a doppelganger with
 130 hit points, armor eight points better than a doppelganger's, and
-a firmer blow, and it does not change shape. The life drain is
-unchanged: within five squares it takes one more point each of its
-turns, up to 30.
+a firmer blow. It is created as a doppelganger and stays one: it
+does not take a random shape when it steps out, and it does not
+change shape later, including when protection from shape changers
+wears off. Within five squares the drain still grows by one each of
+its turns, up to 30, but one turn never takes more than 5 hit points.
 
-On Fear, standing on a path tile or either stair stops damage from
-melee, missiles, rays, breath, explosions, gaze, life drain, and the
-touch of death. Attacking does not remove that protection. Monsters
-will not step onto a path tile or a stair. A boulder will not land
-or be generated there.
+On Fear, standing on a path tile or either stair stops every
+monster affliction, not only damage. That includes stun, confusion,
+blindness, paralysis, sleep, slowing, hallucination, deafness,
+drain, poison, stoning, sliming, sickness, lycanthropy, teleport,
+polymorph, theft, seduction, item destruction, grabs, engulfing,
+knockback, and being moved off the tile. Melee, spells, gaze,
+sounds, breath, spit, missiles, monster wands and potions,
+explosions, and passive effects are all stopped at the start of
+the attack. A purple worm does not swallow you, and if you were
+already swallowed it spits you out. A Psalm 91 you engrave on any
+other level still only scares monsters, exactly as before.
+Attacking does not remove the Fear protection. Monsters will not
+step onto a path tile or a stair. A boulder will not land or be
+generated there.
 
-Picking up the Sword of the Spirit opens a portal to the main-dungeon
-level that holds the Wilderness stair. The branch stays sealed.
+Picking up the Sword of the Spirit returns you to the main-dungeon
+level that holds the Wilderness stair, standing on that stair.
+There is no portal trap and no "no corresponding portal" error.
+The branch stays sealed, and the stair will not let you back in.
 Finger of execution on Pride uses the lesser of your normal chance
-and 30. The garden fountains are unchanged.
+and 30. Reading the finger of execution book always succeeds. Level,
+intelligence, role, the book's level, and curse status do not
+matter, and it does not ask whether to continue or punish a failed
+reading. Other prophetic books are unchanged. The Rod of Frozen
+Power does not use charges and does not wrest or fizzle. Zapping
+it draws a cold explosion, the frosty explosion glyphs, on every
+square of its 3-square burst, then clears them. The burst still
+does 8d8 cold damage to monsters in that radius and does not hurt
+you. The Amulet of Immortality is matched by that name. Dying
+while wearing it on Pride prints the three vanity lines and does
+not life-save, so the tombstone is reached. An ordinary amulet of
+life saving, with no such name, still saves you on Pride and on
+every other level. The garden fountains are unchanged.
 
 ### Wilderness Trial (2026-11-01)
 
