@@ -150,6 +150,32 @@ $(LUALIB):
 luabin:
 	$(MAKE) -C $(LUATOP) $(LUAMAKEFLAGS) LUA_T=nhlua all
 
+# Parse-check all Lua scripts under dat/, test/, and sys/ with a luac built
+# from the bundled Lua sources.
+# USE_SYSTEM_LUA links the system library and GITSUBMODULES may use the
+# submodules/lua headers, so the bundled lua can differ from the one the game
+# actually runs.  Cross-compiling still builds this luac with the host
+# compiler (hints/include/cross-post.501), so it remains runnable; point LUAC
+# at a matching luac to override it.
+# Not part of 'all'; run 'make check-lua-syntax' explicitly.
+LUAC_BIN ?= $(LUATOP)/luac
+LUAC ?= $(LUAC_BIN)
+# Build the bundled luac only when LUAC still refers to it; an overridden
+# LUAC may name any runnable luac.
+ifeq ($(LUAC),$(LUAC_BIN))
+LUAC_DEP = $(LUAC_BIN)
+else
+LUAC_DEP =
+endif
+
+$(LUAC_BIN):
+	$(MAKE) -C $(LUATOP) $(LUAMAKEFLAGS) LUA_A=$(LUABASELIB) luac
+
+.PHONY: check-lua-syntax
+check-lua-syntax: $(PRECHECK) $(LUAC_DEP)
+	@set -e; find dat test sys -name '*.lua' -exec "$(LUAC)" -p {} +
+	@echo "Lua scripts syntax check: OK"
+
 # hints file could set LUATESTTARGET to this if GITSUBMODULES is defined
 #submodules/lua/lua.h:
 #	git submodule init submodules/lua
