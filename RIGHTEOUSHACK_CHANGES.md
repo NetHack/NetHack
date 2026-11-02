@@ -906,7 +906,11 @@ The door will not yield to kicking, lock tools, knock, a wand
 or spell of opening, digging, phasing, or teleporting in, the
 same way Peter's closet will not. #force does not open doors.
 When every occupant of that house is dead, the door opens. There
-is no favor penalty. A reflected gaze that turns Medusa to
+is no favor penalty. Killing one is not murder: no "You murderer!",
+no loss of Favor, and no loss of telepathy. They are marked
+always hostile for that check. The level still places them
+peaceful, so before you enter they farlook as peaceful and
+meditating. A reflected gaze that turns Medusa to
 stone says she meets her own gaze in the reflecting item as
 the hero knows it, and shrieks as her flesh turns to stone,
 whether or not she is seen. With no worn or wielded item, the

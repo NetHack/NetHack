@@ -11,6 +11,11 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-01
+Killing a man of Sodom or a woman of Gomorrah is not murder.
+There is no "You murderer!", no loss of Favor, and no loss of
+telepathy. They still wait peacefully until you enter.
+
+2026-11-01
 Each house in Sodom and Tyre holds one occupant, a man of Sodom
 or a woman of Gomorrah, a separate even chance for each house.
 Both are the same fighter: base level 6, speed 12, AC 4, one
