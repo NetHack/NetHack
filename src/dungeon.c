@@ -809,6 +809,11 @@ init_dungeon_levels(
     nlevels = (int) lua_tointeger(L, -1);
     pd->tmpdungeon[dngidx].levels = nlevels;
     lua_pop(L, 1);
+    /* bound the count before the fill loop writes
+       pd->tmplevel[pd->n_levs + f]; a post-loop check would let an
+       oversized dungeon.lua corrupt proto_dungeon first */
+    if (pd->n_levs + nlevels > LEV_LIMIT)
+        panic("init_dungeon: too many special levels");
     for (f = 0; f < nlevels; f++) {
         lua_pushinteger(L, f + 1);
         lua_gettable(L, -2);
@@ -859,8 +864,6 @@ init_dungeon_levels(
         lua_pop(L, 1);
     }
     pd->n_levs += nlevels;
-    if (pd->n_levs > LEV_LIMIT)
-        panic("init_dungeon: too many special levels");
 }
 
 staticfn void
@@ -886,6 +889,10 @@ init_dungeon_branches(
     nbranches = (int) lua_tointeger(L, -1);
     pd->tmpdungeon[dngidx].branches = nbranches;
     lua_pop(L, 1);
+    /* same ordering rule as init_dungeon_levels(): bound the count
+       before the loop writes pd->tmpbranch[pd->n_brs + f] */
+    if (pd->n_brs + nbranches > BRANCH_LIMIT)
+        panic("init_dungeon: too many branches");
     for (f = 0; f < nbranches; f++) {
         lua_pushinteger(L, f + 1);
         lua_gettable(L, -2);
@@ -925,8 +932,6 @@ init_dungeon_branches(
         lua_pop(L, 1);
     }
     pd->n_brs += nbranches;
-    if (pd->n_brs > BRANCH_LIMIT)
-        panic("init_dungeon: too many branches");
 }
 
 staticfn void

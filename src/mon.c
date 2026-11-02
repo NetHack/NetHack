@@ -4445,6 +4445,9 @@ normal_shape(struct monst *mon)
         unsigned mcan = mon->mcan;
 
         (void) newcham(mon, &mons[mcham], NC_SHOW_MSG);
+        /* reverting might have killed it */
+        if (DEADMONSTER(mon))
+            return;
         mon->cham = NON_PM;
         /* newcham() may uncancel a polymorphing monster; override that */
         if (mcan)
@@ -5495,6 +5498,9 @@ newcham(
     if (!(mtmp->misc_worn_check & W_ARMG))
         mselftouch(mtmp, "No longer petrify-resistant, ",
                    !svc.context.mon_moving);
+    /* a wielded cockatrice corpse petrifies the new form outright */
+    if (DEADMONSTER(mtmp))
+        return 1; /* polymorph itself succeeded */
     (void) maybe_set_terrain_effects(mtmp, olddata);
     check_gear_next_turn(mtmp);
 
