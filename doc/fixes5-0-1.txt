@@ -1,4 +1,4 @@
-$NHDT-Header: NetHack 5.0 fixes5-0-1.txt 1970/01/01_00:00:00 NetHack-5.0:1.93 $
+$NHDT-Header: NetHack 5.0 fixes5-0-1.txt 2026/11/02_21:05:17 NetHack-5.0:1.105 $
 	
 General Fixes and Modified Features
 -----------------------------------

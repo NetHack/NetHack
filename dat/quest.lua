@@ -1,4 +1,4 @@
--- $NHDT-Header: NetHack 5.0 quest.lua 1970/01/01_00:00:00 NetHack-5.0:1.21 $
+-- $NHDT-Header: NetHack 5.0 quest.lua 2026/11/02_21:05:17 NetHack-5.0:1.23 $
 -- Copyright (c) 2021 by Pasi Kallinen
 -- NetHack may be freely redistributed.  See license for details.
 -- TODO:

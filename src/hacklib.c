@@ -1,4 +1,4 @@
-/* $NHDT-Header: NetHack 5.0 hacklib.c 2026/06/20_22:26:43 NetHack-5.0:1.135 $ */
+/* $NHDT-Header: NetHack 5.0 hacklib.c 2026/11/02_21:05:17 NetHack-5.0:1.137 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
 /* Copyright (c) Robert Patrick Rankin, 1991                      */

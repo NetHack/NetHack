@@ -1,4 +1,4 @@
--- $NHDT-Header: NetHack 5.0 Tou-loca.lua 1970/01/01_00:00:00 NetHack-5.0:1.9 $
+-- $NHDT-Header: NetHack 5.0 Tou-loca.lua 2026/11/02_21:05:17 NetHack-5.0:1.11 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1991,92 by M. Stephenson, P. Winner
 -- NetHack may be freely redistributed.  See license for details.
