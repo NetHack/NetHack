@@ -327,7 +327,7 @@ Helpers: `IS_STAFF_OF_WONDERS`, `IS_GOLDEN_CENSER`.
 | ID-206 | Gospel of Peace | trusty sandals | not role-bound | Water walking, haste, fire resistance; invoke tames |
 | ID-207 | Breastplate of Righteousness | gleaming armor | not role-bound | Half spell damage, drain resistance, magic resistance, poison carry |
 | ID-208 | Belt of Truth | humble sash | not role-bound | Searching, see invisible, sleep/blind/hallucination resistance; invoke enlightens |
-| ID-209 | Sword of the Spirit | doubled-edged blade | not role-bound | Reflection, stun attack, warning |
+| ID-209 | Sword of the Spirit | doubled-edged blade | not role-bound | Reflection, stun attack, warning. When the stun lands and the hero can see it, one line: "The Sword of the Spirit blazes with holy light. <monster> is overwhelmed by divine truth!" or "seems" when the stun is 5 or less |
 | ID-210 | Cap of Salvation | divine covering | not role-bound | Half physical damage, regeneration, disintegration carry, healing invoke |
 | ID-211 | Shield of Faith | ancient defense | not role-bound | Stoning resistance, fire defense, magic missile carry, healing invoke |
 
@@ -769,11 +769,14 @@ wishing now holds a blessed +2 Shield of Faith. The drawbridge does not
 open to the old tune, and the key is not applied at the bridge
 itself. A Rock with a keyhole stands in the small courtyard
 outside the moat, west of the closed bridge. Standing on it or
-next to it and applying the Key to Babylon's Palace lowers the
-drawbridge. PLACEHOLDER for Jon: "The key turns with a sound like
+next to it and applying the Key to Babylon's Palace toggles the
+drawbridge. When it is up: "The key turns with a sound like
 a stone rolled away. Far off, chains groan, and the drawbridge
-of Babylon comes down." If it is already down: "The rock is
-silent. The way is already open." Palace doors still open with
+of Babylon comes down." When it is down: "The key turns again.
+Far off, chains groan, and the drawbridge of Babylon rises."
+Whoever is standing on the span is handled the way closing
+a drawbridge always handles them. Force bolt, striking, and
+the passtune are unchanged. Palace doors still open with
 the key. A lock
 pick does not open those doors. Interior chests can still be
 picked. Prophet mode tags the level [babylon]. The #levelport
@@ -884,9 +887,20 @@ Medusa's level is one map, Sodom and Tyre, and it is dark. Lot's
 wife is a statue at the entrance. The engraving is Genesis 19:26,
 exact KJV. Eating the statue licks it and does not consume it.
 Breaking it fails. Six men of Sodom stand in the houses and call
-with the three lines from the plan. Stepping inside shuts that
-house's door, darkens the room, and those men turn hostile. There
-is no favor penalty. Lightning from a rod, a prophecy, or a breath,
+with the three lines from the plan. They stay on their squares.
+The first step from outside a house onto its floor bars that
+door and prints, once: "The Man of Sodom looks at you with a
+crooked smile... \"No one leaves this house, stranger.\" The
+door bars itself." Only the men in that house turn hostile.
+The door will not yield to kicking, lock tools, knock, a wand
+or spell of opening, digging, phasing, or teleporting in, the
+same way Peter's closet will not. #force does not open doors.
+When every man in that house is dead, the door opens. There
+is no favor penalty. A reflected gaze that turns Medusa to
+stone, when she is seen, says she meets her own gaze in the
+reflecting item as the hero knows it, and shrieks as her flesh
+turns to stone. With no worn or wielded item, the line names
+no item. The kill and the experience are unchanged. Lightning from a rod, a prophecy, or a breath,
 and the Sword of the Spirit, deal triple damage on this level.
 Shock resistance still negates lightning. Tyre's gold piles can be
 kept. Medusa's seven taunts each play once, as a single message.

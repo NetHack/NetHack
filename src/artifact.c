@@ -1532,9 +1532,7 @@ sos_hit(struct monst *magr,   /* attacker – will always be &youmonst */
 
 
         if (vis) {
-            pline("The Sword of the Spirit blazes with holy light as it strikes %s!",
-                  hittee);
-            pline("%s %s overwhelmed by divine truth!",
+            pline("The Sword of the Spirit blazes with holy light. %s %s overwhelmed by divine truth!",
                   Monnam(mdef), mdef->mstun > 5 ? "is" : "seems");
         }
     } 

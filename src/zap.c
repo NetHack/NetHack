@@ -3307,7 +3307,7 @@ zap_updown(struct obj *obj) /* wand or spell, nonnull */
                  : (is_drawbridge_wall(x, y) >= 0 && !is_db_wall(x, y)))
             && find_drawbridge(&xx, &yy)) {
             if (!striking)
-                close_drawbridge(xx, yy);
+                close_drawbridge(xx, yy, FALSE);
             else
                 destroy_drawbridge(xx, yy);
             disclose = TRUE;
@@ -3709,7 +3709,7 @@ zap_map(
                 if ((cansee(dbx, dby) || cansee(x, y))
                     && levl[dbx][dby].typ == DRAWBRIDGE_DOWN)
                     learn_it = TRUE;
-                close_drawbridge(dbx, dby);
+                close_drawbridge(dbx, dby, FALSE);
                 break;
             case WAN_STRIKING:
             case SPE_FORCE_BOLT:
@@ -5479,7 +5479,7 @@ zap_over_floor(
             break;
         }
         if (new_doormask >= 0) { /* door gets broken */
-            if (peters_closet_door(x, y)) {
+            if (peters_closet_door(x, y) || sodom_house_barred(x, y)) {
                 if (see_it)
                     pline("This door will not yield.");
                 new_doormask = -1;

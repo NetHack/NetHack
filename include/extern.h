@@ -507,7 +507,7 @@ extern boolean is_db_wall(coordxy, coordxy);
 extern boolean find_drawbridge(coordxy *, coordxy *) NONNULLPTRS;
 extern boolean create_drawbridge(coordxy, coordxy, int, boolean);
 extern void open_drawbridge(coordxy, coordxy, boolean);
-extern void close_drawbridge(coordxy, coordxy);
+extern void close_drawbridge(coordxy, coordxy, boolean);
 extern void destroy_drawbridge(coordxy, coordxy);
 
 /* ### decl.c ### */
@@ -1241,6 +1241,10 @@ extern boolean petra_lava_safe_here(void);
 extern boolean peters_closet_door(coordxy, coordxy);
 extern boolean peters_closet_floor(coordxy, coordxy);
 extern boolean peters_door_blocks(coordxy, coordxy);
+extern boolean sodom_house_door(coordxy, coordxy);
+extern boolean sodom_house_floor(coordxy, coordxy);
+extern boolean sodom_house_barred(coordxy, coordxy);
+extern boolean sodom_door_blocks(coordxy, coordxy);
 extern char *in_rooms(coordxy, coordxy, int);
 extern boolean in_town(coordxy, coordxy);
 extern void check_special_room(boolean);

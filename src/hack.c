@@ -795,7 +795,7 @@ still_chewing(coordxy x, coordxy y)
         lev->typ = DOOR;
 
     } else if (IS_DOOR(lev->typ)) {
-        if (peters_closet_door(x, y)) {
+        if (peters_closet_door(x, y) || sodom_house_barred(x, y)) {
             pline("This door will not yield.");
             nomul(0);
             return 1;
@@ -1083,7 +1083,7 @@ test_move(
             if (Blind && mode == DO_MOVE)
                 feel_location(x, y);
             /* Phasing, oozing, and chewing do not enter Peter's closet. */
-            if (peters_closet_door(x, y)
+            if ((peters_closet_door(x, y) || sodom_house_barred(x, y))
                 && (Passes_walls || can_ooze(&gy.youmonst)
                     || (tunnels(gy.youmonst.data)
                         && !needspick(gy.youmonst.data)))) {
@@ -3460,22 +3460,223 @@ sodom_taunt(unsigned bit, const char *msg)
     pline("%s", msg);
 }
 
+static boolean
+is_man_of_sodom(struct monst *mtmp)
+{
+    return (boolean) (mtmp && !DEADMONSTER(mtmp) && has_mgivenname(mtmp)
+                      && !strcmp(MGIVENNAME(mtmp), "man of Sodom"));
+}
+
+/* Flood ROOM/CORR from (sx,sy) without crossing a door.
+   A Sodom house is 8 floors. Returns the count, or 9 if larger.
+   When the count is 8, xs/ys receive those squares.
+   When doorx is non-null, one door touching the area is recorded. */
+static int
+sodom_flood(coordxy sx, coordxy sy, coordxy *xs, coordxy *ys,
+            coordxy *doorx, coordxy *doory)
+{
+    static char seen[COLNO][ROWNO];
+    coordxy qx[48], qy[48];
+    int qh = 0, qt = 0, n = 0, d;
+    const schar dxs[4] = { 1, -1, 0, 0 };
+    const schar dys[4] = { 0, 0, 1, -1 };
+
+    if (doorx)
+        *doorx = *doory = 0;
+    if (!isok(sx, sy))
+        return 0;
+    if (levl[sx][sy].typ != ROOM && levl[sx][sy].typ != CORR)
+        return 0;
+    (void) memset(seen, 0, sizeof seen);
+    qx[0] = sx;
+    qy[0] = sy;
+    qt = 1;
+    seen[sx][sy] = 1;
+    while (qh < qt) {
+        coordxy x = qx[qh], y = qy[qh];
+
+        qh++;
+        if (n >= 8)
+            return 9;
+        if (xs) {
+            xs[n] = x;
+            ys[n] = y;
+        }
+        n++;
+        for (d = 0; d < 4; d++) {
+            coordxy nx = x + dxs[d], ny = y + dys[d];
+
+            if (!isok(nx, ny) || seen[nx][ny])
+                continue;
+            if (levl[nx][ny].typ == ROOM || levl[nx][ny].typ == CORR) {
+                if (qt >= SIZE(qx))
+                    return 9;
+                qx[qt] = nx;
+                qy[qt] = ny;
+                qt++;
+                seen[nx][ny] = 1;
+            } else if (doorx && !*doorx && IS_DOOR(levl[nx][ny].typ)) {
+                *doorx = nx;
+                *doory = ny;
+            }
+        }
+    }
+    return n;
+}
+
+/* The 8 floor squares on the house side of this door. */
+static int
+sodom_interior(coordxy doorx, coordxy doory, coordxy *xs, coordxy *ys)
+{
+    int d;
+    const schar dxs[4] = { 1, -1, 0, 0 };
+    const schar dys[4] = { 0, 0, 1, -1 };
+
+    for (d = 0; d < 4; d++) {
+        coordxy nx = doorx + dxs[d], ny = doory + dys[d];
+        int n;
+
+        if (!isok(nx, ny))
+            continue;
+        if (levl[nx][ny].typ != ROOM && levl[nx][ny].typ != CORR)
+            continue;
+        n = sodom_flood(nx, ny, xs, ys, (coordxy *) 0, (coordxy *) 0);
+        if (n == 8)
+            return 8;
+    }
+    return 0;
+}
+
+static int
+sodom_men_inside(coordxy doorx, coordxy doory)
+{
+    coordxy xs[8], ys[8];
+    struct monst *mtmp;
+    int i, count = 0;
+
+    if (sodom_interior(doorx, doory, xs, ys) != 8)
+        return 0;
+    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+        if (!is_man_of_sodom(mtmp))
+            continue;
+        for (i = 0; i < 8; i++)
+            if (mtmp->mx == xs[i] && mtmp->my == ys[i])
+                count++;
+    }
+    return count;
+}
+
+/* A door on Sodom with one 8-floor house and the street on the other side.
+   Uses the placed squares, not the map file's indexes. */
+boolean
+sodom_house_door(coordxy x, coordxy y)
+{
+    int d, small = 0, large = 0;
+    const schar dxs[4] = { 1, -1, 0, 0 };
+    const schar dys[4] = { 0, 0, 1, -1 };
+
+    if (!Is_medusa_level(&u.uz) || !isok(x, y) || !IS_DOOR(levl[x][y].typ))
+        return FALSE;
+    for (d = 0; d < 4; d++) {
+        coordxy nx = x + dxs[d], ny = y + dys[d];
+        int sz;
+
+        if (!isok(nx, ny))
+            continue;
+        if (levl[nx][ny].typ != ROOM && levl[nx][ny].typ != CORR)
+            continue;
+        sz = sodom_flood(nx, ny, (coordxy *) 0, (coordxy *) 0,
+                         (coordxy *) 0, (coordxy *) 0);
+        if (sz == 8)
+            small++;
+        else if (sz >= 9)
+            large++;
+    }
+    return (boolean) (small == 1 && large >= 1);
+}
+
+boolean
+sodom_house_barred(coordxy x, coordxy y)
+{
+    if (!sodom_house_door(x, y))
+        return FALSE;
+    return (boolean) ((levl[x][y].doormask & (D_LOCKED | D_CLOSED)) != 0);
+}
+
+/* Floor of a barred house, so teleport cannot skip the door. */
+boolean
+sodom_house_floor(coordxy x, coordxy y)
+{
+    coordxy dx = 0, dy = 0;
+
+    if (sodom_flood(x, y, (coordxy *) 0, (coordxy *) 0, &dx, &dy) != 8)
+        return FALSE;
+    if (!dx || !sodom_house_door(dx, dy))
+        return FALSE;
+    return sodom_house_barred(dx, dy);
+}
+
+boolean
+sodom_door_blocks(coordxy x, coordxy y)
+{
+    if (!sodom_house_barred(x, y))
+        return FALSE;
+    pline("This door will not yield.");
+    return TRUE;
+}
+
+static void
+sodom_bar_door(coordxy dx, coordxy dy)
+{
+    coordxy xs[8], ys[8];
+    struct monst *mtmp;
+    int i;
+    static const char msg[] =
+        "The Man of Sodom looks at you with a crooked smile... \"No one leaves this house, stranger.\" The door bars itself.";
+
+    levl[dx][dy].doormask = D_LOCKED;
+    block_point(dx, dy);
+    newsym(dx, dy);
+    gv.vision_full_recalc = 1;
+    if (sodom_interior(dx, dy, xs, ys) == 8) {
+        for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+            if (!is_man_of_sodom(mtmp))
+                continue;
+            for (i = 0; i < 8; i++)
+                if (mtmp->mx == xs[i] && mtmp->my == ys[i]) {
+                    mtmp->mpeaceful = 0;
+                    set_malign(mtmp);
+                    newsym(mtmp->mx, mtmp->my);
+                    break;
+                }
+        }
+    }
+    pline("%s", msg);
+}
+
+static void
+sodom_open_empty_houses(void)
+{
+    coordxy x, y;
+
+    for (x = 1; x < COLNO; x++)
+        for (y = 0; y < ROWNO; y++) {
+            if (!sodom_house_barred(x, y))
+                continue;
+            if (sodom_men_inside(x, y) > 0)
+                continue;
+            levl[x][y].doormask = D_ISOPEN;
+            unblock_point(x, y);
+            newsym(x, y);
+            gv.vision_full_recalc = 1;
+        }
+}
+
 static void
 sodom_check(void)
 {
-    static const struct {
-        coordxy x1, y1, x2, y2, dx, dy;
-    } houses[6] = {
-        { 3, 2, 6, 3, 4, 4 },
-        { 10, 2, 13, 3, 11, 4 },
-        { 17, 2, 20, 3, 18, 4 },
-        { 3, 12, 6, 13, 4, 11 },
-        { 10, 12, 13, 13, 11, 11 },
-        { 17, 12, 20, 13, 18, 11 },
-    };
     struct monst *mtmp;
-    int i, x, y;
-    boolean inside;
+    coordxy doorx = 0, doory = 0;
 
     if (!Is_medusa_level(&u.uz))
         return;
@@ -3501,35 +3702,23 @@ sodom_check(void)
     if ((u.ux == 54 && u.uy == 5) || distmin(u.ux, u.uy, 54, 5) <= 1)
         sodom_taunt(32, "Lot's wife looked back. You will look forward, at me.");
 
-    inside = FALSE;
-    for (i = 0; i < 6; i++) {
-        if (u.ux < houses[i].x1 || u.ux > houses[i].x2
-            || u.uy < houses[i].y1 || u.uy > houses[i].y2)
-            continue;
-        inside = TRUE;
-        if (isok(houses[i].dx, houses[i].dy)
-            && IS_DOOR(levl[houses[i].dx][houses[i].dy].typ)) {
-            levl[houses[i].dx][houses[i].dy].doormask = D_CLOSED;
-            block_point(houses[i].dx, houses[i].dy);
-            newsym(houses[i].dx, houses[i].dy);
-        }
-        for (x = houses[i].x1; x <= houses[i].x2; x++)
-            for (y = houses[i].y1; y <= houses[i].y2; y++) {
-                levl[x][y].lit = 0;
-                newsym(x, y);
-            }
-        gv.vision_full_recalc = 1;
-    }
+    /* First step from outside a house onto its floor bars that door. */
+    if ((u.ux != u.ux0 || u.uy != u.uy0)
+        && sodom_flood(u.ux, u.uy, (coordxy *) 0, (coordxy *) 0,
+                       &doorx, &doory) == 8
+        && sodom_flood(u.ux0, u.uy0, (coordxy *) 0, (coordxy *) 0,
+                       (coordxy *) 0, (coordxy *) 0) != 8
+        && doorx && sodom_house_door(doorx, doory)
+        && !(levl[doorx][doory].doormask & (D_LOCKED | D_CLOSED))
+        && sodom_men_inside(doorx, doory) > 0)
+        sodom_bar_door(doorx, doory);
+    sodom_open_empty_houses();
+
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
-        if (DEADMONSTER(mtmp) || !has_mgivenname(mtmp))
+        if (!is_man_of_sodom(mtmp))
             continue;
-        if (strcmp(MGIVENNAME(mtmp), "man of Sodom"))
-            continue;
-        if (inside && distmin(u.ux, u.uy, mtmp->mx, mtmp->my) <= 3) {
-            mtmp->mpeaceful = 0;
-            newsym(mtmp->mx, mtmp->my);
-        } else if (mtmp->mpeaceful && !mtmp->mspare1
-                   && distmin(u.ux, u.uy, mtmp->mx, mtmp->my) <= 2) {
+        if (mtmp->mpeaceful && !mtmp->mspare1
+            && distmin(u.ux, u.uy, mtmp->mx, mtmp->my) <= 2) {
             static const char *const call[3] = {
                 "Come in, stranger, and stay the night with us.",
                 "No one will know.",

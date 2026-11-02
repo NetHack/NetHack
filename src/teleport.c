@@ -435,7 +435,7 @@ teleok(coordxy x, coordxy y, boolean trapok)
         if (!trapok)
             return FALSE;
     }
-    if (peters_closet_floor(x, y))
+    if (peters_closet_floor(x, y) || sodom_house_floor(x, y))
         return FALSE;
     if (!goodpos(x, y, &gy.youmonst, 0))
         return FALSE;

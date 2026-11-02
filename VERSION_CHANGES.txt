@@ -11,6 +11,20 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-01
+When Medusa's gaze reflects and she is seen, one line is
+shown: she meets her own gaze in the item you know is
+reflecting, and shrieks as her flesh turns to stone. With no
+worn or wielded item, that line names no item. The kill and
+the experience are unchanged. Stepping into a house in Sodom
+bars that door. It will not yield, and only the men in that
+house turn hostile. They stay inside. When the last of them
+is dead, the door opens. The Key to Babylon's Palace lowers
+the drawbridge and, used again, raises it. When the Sword
+of the Spirit overwhelms a monster you can see, one line says
+it blazes with holy light and that monster is, or seems,
+overwhelmed by divine truth.
+
+2026-11-01
 Sodom and Tyre has one real room: the open walk on the shore
 side of Tyre, from (38,2) to (41,12). The random statues are
 placed there, and entering the level no longer crashes.
