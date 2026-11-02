@@ -3882,10 +3882,10 @@ int
 lspo_engraving(lua_State *L)
 {
     static const char *const engrtypes[] = {
-        "dust", "engrave", "burn", "mark", "blood", NULL
+        "dust", "engrave", "burn", "mark", "blood", "verse", NULL
     };
     static const int engrtypes2i[] = {
-        DUST, ENGRAVE, BURN, MARK, ENGR_BLOOD, 0
+        DUST, ENGRAVE, BURN, MARK, ENGR_BLOOD, VERSE, 0
     };
     int etyp = DUST;
     char *txt = (char *) 0;

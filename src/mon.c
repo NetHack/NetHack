@@ -2217,6 +2217,10 @@ mfndpos(
         for (ny = max(0, y - 1); ny <= maxy; ny++) {
             if (nx == x && ny == y)
                 continue;
+            /* Fear: never step onto the path or either stair. */
+            if (in_wilderness() && dunlev(&u.uz) == 4
+                && (on_fear_path(nx, ny) || levl[nx][ny].typ == STAIRS))
+                continue;
             ntyp = levl[nx][ny].typ;
             if (IS_OBSTRUCTED(ntyp)
                 && !((flag & ALLOW_WALL) && may_passwall(nx, ny))

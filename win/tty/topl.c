@@ -135,9 +135,13 @@ redotoplin(const char *str)
     }
     putsyms(str);
     cl_end();
-    ttyDisplay->toplin = TOPLINE_NEED_MORE;
-    if (ttyDisplay->cury && otoplin != TOPLINE_SPECIAL_PROMPT)
-        more();
+    if (wins[WIN_MESSAGE] && (wins[WIN_MESSAGE]->flags & WIN_NOMORE)) {
+        ttyDisplay->toplin = TOPLINE_NON_EMPTY;
+    } else {
+        ttyDisplay->toplin = TOPLINE_NEED_MORE;
+        if (ttyDisplay->cury && otoplin != TOPLINE_SPECIAL_PROMPT)
+            more();
+    }
 }
 
 /* for use by tty_putstr() */
@@ -255,6 +259,10 @@ update_topl(const char *bp)
     int notdied = 1;
     struct WinDesc *cw = wins[WIN_MESSAGE];
     boolean skip = (cw->flags & (WIN_STOP | WIN_NOSTOP)) == WIN_STOP;
+
+    /* A verse replaces whatever is already showing and does not wait. */
+    if ((cw->flags & WIN_NOMORE) && ttyDisplay->toplin == TOPLINE_NEED_MORE)
+        ttyDisplay->toplin = TOPLINE_NON_EMPTY;
 
     /* If there is room on the line, print message on same line */
     /* But messages like "You die..." deserve their own line */

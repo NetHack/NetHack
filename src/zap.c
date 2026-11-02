@@ -3682,7 +3682,7 @@ zap_map(
         struct engr *e = engr_at(x, y);
 
         /* subset of engraving effects; none sets `disclose' */
-        if (e && e->engr_type != HEADSTONE) {
+        if (e && e->engr_type != HEADSTONE && e->engr_type != VERSE) {
             switch (obj->otyp) {
             case WAN_POLYMORPH:
             case SPE_POLYMORPH:

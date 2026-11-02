@@ -64,12 +64,13 @@ struct u_event {
     Bitfield(wilderness_sealed, 1); /* sword taken; branch cannot be reentered */
     Bitfield(fear_exposed, 1);      /* attacked, so the path no longer protects */
     Bitfield(greed_hint, 2);        /* which full-verse hint the gate last gave */
-    Bitfield(pride_prayed, 1);      /* prayed at the stone; lures are gone */
+    Bitfield(pride_prayed, 1);      /* prayed on the Pride altar; the way is open */
     Bitfield(greed_warned, 1);      /* the turn-25 hunger warning has been shown */
+    Bitfield(greed_snapped, 1);     /* gold on entering Greed has been recorded */
     Bitfield(gates_revealed, 1);    /* prayer opened the walled square */
     Bitfield(lamp_verse, 1);        /* Psalm 119:105 has been shown */
     Bitfield(lamp_given, 1);        /* quest completion gave the lamp */
-    /* 44 bits */
+    /* 45 bits */
 };
 
 /*
@@ -499,6 +500,7 @@ struct you {
     int ublessed, ublesscnt; /* blessing/duration from #pray */
     long umoney0;
     long uspare1;
+    long ugreed_gold;            /* gold carried on entering Greed */
     long uexp, urexp;        /* exper pts for gaining levels and for score */
     long ucleansed;          /* to record moves when player was cleansed */
     long usleep;             /* sleeping; monstermove you last started */

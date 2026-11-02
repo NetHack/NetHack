@@ -164,7 +164,8 @@ picklock(void)
     }
 
     if (gx.xlock.door && (peters_door_blocks(u.ux + u.dx, u.uy + u.dy)
-                          || sodom_door_blocks(u.ux + u.dx, u.uy + u.dy)))
+                          || sodom_door_blocks(u.ux + u.dx, u.uy + u.dy)
+                          || pride_door_blocks(u.ux + u.dx, u.uy + u.dy)))
         return (gx.xlock.usedtime = 0);
 
     You("succeed in %s.", lock_action());
@@ -726,7 +727,8 @@ pick_lock(
             }
 
             if (peters_door_blocks(cc.x, cc.y)
-                || sodom_door_blocks(cc.x, cc.y))
+                || sodom_door_blocks(cc.x, cc.y)
+                || pride_door_blocks(cc.x, cc.y))
                 return PICKLOCK_LEARNED_SOMETHING;
 
             Sprintf(qbuf, "%s it%s%s?",
@@ -972,7 +974,7 @@ doopen_indir(coordxy x, coordxy y)
         pline("This door will not yield.");
         return res;
     }
-    if (sodom_door_blocks(cc.x, cc.y))
+    if (sodom_door_blocks(cc.x, cc.y) || pride_door_blocks(cc.x, cc.y))
         return res;
 
     if (!(door->doormask & D_CLOSED)) {
@@ -1234,6 +1236,9 @@ doorlock(struct obj *otmp, coordxy x, coordxy y)
     boolean mysterywand = (otmp->oclass == WAND_CLASS && !otmp->dknown);
 
     if (door->typ == SDOOR) {
+        if (in_wilderness() && dunlev(&u.uz) == 3 && x == 66 && y == 9
+            && !u.uevent.pride_prayed)
+            return FALSE;
         switch (otmp->otyp) {
         case WAN_OPENING:
         case SPE_KNOCK:
@@ -1254,7 +1259,8 @@ doorlock(struct obj *otmp, coordxy x, coordxy y)
         }
     }
 
-    if (peters_door_blocks(x, y) || sodom_door_blocks(x, y))
+    if (peters_door_blocks(x, y) || sodom_door_blocks(x, y)
+        || pride_door_blocks(x, y))
         return FALSE;
 
     switch (otmp->otyp) {

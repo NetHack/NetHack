@@ -433,6 +433,7 @@ moverock_core(coordxy sx, coordxy sy)
         }
         if (isok(rx, ry) && !IS_OBSTRUCTED(levl[rx][ry].typ)
             && levl[rx][ry].typ != IRONBARS
+            && !fear_forbids_boulder(rx, ry)
             && (!IS_DOOR(levl[rx][ry].typ) || !(u.dx && u.dy)
                 || doorless_door(rx, ry)) && !sobj_at(BOULDER, rx, ry)) {
             ttmp = t_at(rx, ry);
@@ -3096,10 +3097,12 @@ maybe_smudge_engr(coordxy x1, coordxy y1, coordxy x2, coordxy y2)
     struct engr *ep;
 
     if (can_reach_floor(TRUE)) {
-        if ((ep = engr_at(x1, y1)) && ep->engr_type != HEADSTONE)
+        if ((ep = engr_at(x1, y1)) && ep->engr_type != HEADSTONE
+            && ep->engr_type != VERSE)
             wipe_engr_at(x1, y1, rnd(5), FALSE);
         if ((x2 != x1 || y2 != y1)
-                && (ep = engr_at(x2, y2)) && ep->engr_type != HEADSTONE)
+                && (ep = engr_at(x2, y2)) && ep->engr_type != HEADSTONE
+                && ep->engr_type != VERSE)
             wipe_engr_at(x2, y2, rnd(5), FALSE);
     }
 }
@@ -3462,8 +3465,19 @@ on_fear_path(coordxy x, coordxy y)
     if (!in_wilderness() || dunlev(&u.uz) != 4)
         return FALSE;
     ep = engr_at(x, y);
-    return (boolean) (ep && ep->engr_txt[actual_text]
+    return (boolean) (ep && ep->engr_type == VERSE
+                      && ep->engr_txt[actual_text]
                       && ep->engr_txt[actual_text][0]);
+}
+
+boolean
+fear_forbids_boulder(coordxy x, coordxy y)
+{
+    if (!in_wilderness() || dunlev(&u.uz) != 4)
+        return FALSE;
+    if (on_fear_path(x, y))
+        return TRUE;
+    return (boolean) (levl[x][y].typ == STAIRS);
 }
 
 boolean
@@ -3480,88 +3494,161 @@ pride_immune(void)
     return FALSE;
 }
 
-boolean
-pride_prayer(void)
+static boolean
+is_pride_lure(struct obj *otmp)
 {
-    struct engr *ep = engr_at(u.ux, u.uy);
-    struct obj *otmp, *next;
-    const char *lures[] = {
+    static const char *const lures[] = {
         "silver long sword", "ring of complete immunity",
         "Amulet of Immortality", "Rod of Frozen Power",
         "prophecy book of execution", "magic lamp of unlimited wishing",
         "bag of infinite holding", (const char *) 0
     };
-    int x, y, i;
+    int i;
 
-    if (!in_wilderness() || dunlev(&u.uz) != 3 || !ep || !ep->engr_txt[actual_text]
-        || strncmp(ep->engr_txt[actual_text], "Humble yourselves", 18))
+    if (!otmp)
         return FALSE;
-    pline("Pride goeth before destruction, and an haughty spirit before a fall.");
-    u.uevent.pride_prayed = 1;
-    for (otmp = gi.invent; otmp; otmp = next) {
-        boolean lure = FALSE;
+    if (otmp->otyp == GRAY_DRAGON_SCALE_MAIL && otmp->spe >= 12)
+        return TRUE;
+    if (!has_oname(otmp))
+        return FALSE;
+    for (i = 0; lures[i]; i++)
+        if (!strcmp(ONAME(otmp), lures[i]))
+            return TRUE;
+    return FALSE;
+}
 
-        next = otmp->nobj;
-        if (has_oname(otmp)) {
-            for (i = 0; lures[i]; i++)
-                if (!strcmp(ONAME(otmp), lures[i]))
-                    lure = TRUE;
-        }
-        if (otmp->otyp == GRAY_DRAGON_SCALE_MAIL && otmp->spe >= 12)
-            lure = TRUE;
-        if (!lure)
-            continue;
-        if (has_oname(otmp) && !strcmp(ONAME(otmp), "bag of infinite holding")) {
-            struct obj *content, *cnext;
+/* Destroy one lure, including a lure nested inside a container.
+   A bag of infinite holding gives artifacts back and destroys the rest. */
+static boolean
+pride_purge_one(struct obj *otmp)
+{
+    boolean any = FALSE;
 
-            for (content = otmp->cobj; content; content = cnext) {
-                cnext = content->nobj;
-                obj_extract_self(content);
-                if (content->oartifact)
-                    (void) addinv(content);
-                else
-                    obfree(content, (struct obj *) 0);
-            }
+    if (!otmp)
+        return FALSE;
+    if (Has_contents(otmp)) {
+        struct obj *content, *cnext;
+
+        for (content = otmp->cobj; content; content = cnext) {
+            cnext = content->nobj;
+            if (pride_purge_one(content))
+                any = TRUE;
         }
+    }
+    if (!is_pride_lure(otmp))
+        return any;
+    if (has_oname(otmp) && !strcmp(ONAME(otmp), "bag of infinite holding")) {
+        struct obj *content, *cnext;
+
+        for (content = otmp->cobj; content; content = cnext) {
+            cnext = content->nobj;
+            obj_extract_self(content);
+            if (content->oartifact)
+                (void) addinv(content);
+            else
+                obfree(content, (struct obj *) 0);
+        }
+    }
+    if (otmp->where == OBJ_INVENT || otmp->owornmask)
         useupall(otmp);
+    else
+        delobj(otmp);
+    return TRUE;
+}
+
+void
+pride_leave_lures(void)
+{
+    struct obj *otmp, *next;
+    boolean any = FALSE;
+
+    for (otmp = gi.invent; otmp; otmp = next) {
+        next = otmp->nobj;
+        if (pride_purge_one(otmp))
+            any = TRUE;
     }
     for (otmp = fobj; otmp; otmp = next) {
-        boolean lure = FALSE;
-
         next = otmp->nobj;
-        if (otmp->otyp == GRAY_DRAGON_SCALE_MAIL && otmp->spe >= 12)
-            lure = TRUE;
-        if (has_oname(otmp)) {
-            for (i = 0; lures[i]; i++)
-                if (!strcmp(ONAME(otmp), lures[i]))
-                    lure = TRUE;
+        if (otmp->where != OBJ_FLOOR)
+            continue;
+        if (pride_purge_one(otmp))
+            any = TRUE;
+    }
+    if (any)
+        pline("The treasures crumble into dust.");
+}
+
+static const coordxy pride_door_x[8] = { 8, 25, 41, 58, 8, 25, 41, 58 };
+static const coordxy pride_door_y[8] = { 6, 6, 6, 6, 12, 12, 12, 12 };
+
+boolean
+pride_door_blocks(coordxy x, coordxy y)
+{
+    int i;
+
+    if (!in_wilderness() || dunlev(&u.uz) != 3)
+        return FALSE;
+    if (!u.uevent.pride_prayed && x == 66 && y == 9) {
+        pline("This door will not yield.");
+        return TRUE;
+    }
+    if (!u.uevent.pride_prayed)
+        return FALSE;
+    for (i = 0; i < 8; i++)
+        if (x == pride_door_x[i] && y == pride_door_y[i]) {
+            pline("This door will not yield.");
+            return TRUE;
         }
-        if (lure)
-            delobj(otmp);
+    return FALSE;
+}
+
+static void
+pride_seal_doors(void)
+{
+    int i;
+
+    for (i = 0; i < 8; i++) {
+        coordxy x = pride_door_x[i], y = pride_door_y[i];
+
+        if (!isok(x, y) || !IS_DOOR(levl[x][y].typ))
+            continue;
+        levl[x][y].doormask = D_LOCKED;
+        block_point(x, y);
+        newsym(x, y);
     }
-    for (x = 1; x < COLNO; x++)
-        for (y = 0; y < ROWNO; y++)
-            if (IS_DOOR(levl[x][y].typ) && y == 4) {
-                levl[x][y].typ = HWALL;
-                levl[x][y].wall_info |= (W_NONDIGGABLE | W_NONPASSWALL);
-                block_point(x, y);
-                newsym(x, y);
-            }
-    /* The hall is walled off from the down stair until this opens. */
-    if (isok(66, 1) && IS_WALL(levl[66][1].typ)) {
-        levl[66][1].typ = ROOM;
-        unblock_point(66, 1);
-        newsym(66, 1);
-        pline("A hidden way opens.");
+}
+
+/* Prayer on the coaligned altar at the east end of the hall.
+   Returns FALSE so the ordinary prayer still runs. */
+boolean
+pride_prayer(void)
+{
+    if (!in_wilderness() || dunlev(&u.uz) != 3)
+        return FALSE;
+    if (u.ux != 64 || u.uy != 9 || !IS_ALTAR(levl[u.ux][u.uy].typ))
+        return FALSE;
+    if (u.uevent.pride_prayed)
+        return FALSE;
+    pride_seal_doors();
+    if (isok(66, 9)
+        && (levl[66][9].typ == SDOOR || IS_DOOR(levl[66][9].typ))) {
+        levl[66][9].typ = DOOR;
+        levl[66][9].doormask = D_ISOPEN;
+        unblock_point(66, 9);
+        newsym(66, 9);
     }
-    pline("The treasures crumble into dust.");
-    return TRUE;
+    u.uevent.pride_prayed = 1;
+    mkstairs(72, 9, 0, (struct mkroom *) 0, TRUE);
+    newsym(72, 9);
+    pline("A hidden way opens.");
+    pride_leave_lures();
+    return FALSE;
 }
 
 boolean
 fear_protected(void)
 {
-    if (!in_wilderness() || dunlev(&u.uz) != 4 || u.uevent.fear_exposed)
+    if (!in_wilderness() || dunlev(&u.uz) != 4)
         return FALSE;
     if (on_fear_path(u.ux, u.uy))
         return TRUE;
@@ -3583,12 +3670,6 @@ wilderness_check(void)
 
         if (now && !was)
             u.uevent.fear_exposed = 0;
-        if (on_fear_path(u.ux, u.uy) && (u.ux != u.ux0 || u.uy != u.uy0)) {
-            struct engr *ep = engr_at(u.ux, u.uy);
-
-            if (ep && ep->engr_txt[actual_text])
-                pline("%s", ep->engr_txt[actual_text]);
-        }
     }
     if (dunlev(&u.uz) == 3 && (u.ux != u.ux0 || u.uy != u.uy0)) {
         struct obj *otmp;
@@ -3599,12 +3680,13 @@ wilderness_check(void)
     }
     if (dunlev(&u.uz) == 2) {
         struct obj *otmp;
+        static long greed_counted_move = -1L;
 
-        if ((long) u.uspare1 < 50L)
-            u.uspare1++;
-        if (u.uspare1 == 25L && !u.uevent.greed_warned) {
-            u.uevent.greed_warned = 1;
-            pline("Your stomach twists with hunger... Your strength fails beneath the weight of all you carry. For where your treasure is, there will your heart be also");
+        /* One tick per hero move. The gate's teleport must not count again. */
+        if (greed_counted_move != svm.moves) {
+            greed_counted_move = svm.moves;
+            if ((long) u.uspare1 < 50L)
+                u.uspare1++;
         }
         if (u.uspare1 >= 50L) {
             svk.killer.format = NO_KILLER_PREFIX;
@@ -3612,13 +3694,25 @@ wilderness_check(void)
             done(STARVING);
             return;
         }
+        if (u.uspare1 == 25L && !u.uevent.greed_warned) {
+            u.uevent.greed_warned = 1;
+            pline("Your stomach twists with hunger... Your strength fails beneath the weight of all you carry. For where your treasure is, there will your heart be also");
+        }
+        if (u.uspare1 >= 25L) {
+            long left = 50L - (long) u.uspare1;
+
+            if (left == 1L)
+                pline("1 turn until you starve.");
+            else
+                pline("%ld turns until you starve.", left);
+        }
         for (otmp = gi.invent; otmp; otmp = otmp->nobj)
             if (otmp->oclass == FOOD_CLASS) {
                 pline("Your food turns to ash.");
                 useup(otmp);
                 break;
             }
-        if (u.ux == 12 && u.uy == 3 && (u.ux != u.ux0 || u.uy != u.uy0)) {
+        if (u.ux == 55 && u.uy == 10 && (u.ux != u.ux0 || u.uy != u.uy0)) {
             if (gi.invent || money_cnt(gi.invent) > 0) {
                 static const char *const hints[3] = {
                     "Lay not up for yourselves treasures upon earth, where moth and rust doth corrupt, and where thieves break through and steal:",
@@ -3627,23 +3721,23 @@ wilderness_check(void)
                 };
                 pline("%s", hints[u.uevent.greed_hint % 3]);
                 u.uevent.greed_hint = (u.uevent.greed_hint + 1) % 3;
-                teleds(2, 1, TELEDS_NO_FLAGS);
+                teleds(1, 10, TELEDS_NO_FLAGS);
             } else {
                 for (otmp = fobj; otmp; ) {
                     struct obj *next = otmp->nobj;
 
-                    if (otmp->where == OBJ_FLOOR && otmp->ox < 12
+                    if (otmp->where == OBJ_FLOOR && otmp->ox < 55
                         && otmp->how_lost == LOST_DROPPED
                         && !greed_lure_gem(otmp)) {
                         coordxy ox = otmp->ox, oy = otmp->oy;
 
                         obj_extract_self(otmp);
-                        place_object(otmp, 16, 3);
+                        place_object(otmp, 58, 10);
                         newsym(ox, oy);
                     }
                     otmp = next;
                 }
-                newsym(16, 3);
+                newsym(58, 10);
                 pline("But seek ye first the kingdom of God, and his righteousness; and all these things shall be added unto you.");
             }
         }
@@ -3652,26 +3746,57 @@ wilderness_check(void)
         garden_shown = u.uz;
         pline("Light floods the chamber, warm as morning. The air is sweet, and for the first time since entering the wilderness, you are not afraid.");
     }
+    {
+        struct engr *ep = engr_at(u.ux, u.uy);
+        static coordxy vx = -1, vy = -1;
+        static d_level vz = { 0, 0 };
+
+        if (ep && ep->engr_type == VERSE && ep->engr_txt[actual_text]
+            && ep->engr_txt[actual_text][0]
+            && (vx != u.ux || vy != u.uy || !on_level(&vz, &u.uz))) {
+            vx = u.ux;
+            vy = u.uy;
+            vz = u.uz;
+            custompline(PLINE_NOSTOP, "%s", ep->engr_txt[actual_text]);
+            Strcpy(ep->engr_txt[remembered_text], ep->engr_txt[actual_text]);
+            ep->eread = 1;
+            ep->erevealed = 1;
+        }
+    }
 }
+
+static void pride_waken_reflection(void);
 
 /* A live mirror is spe 1. Waking it once clears that mark. */
 void
 pride_touch_mirror(struct obj *obj)
 {
-    struct monst *refl;
-
     if (!obj || obj->otyp != MIRROR || obj->spe != 1)
         return;
     if (!in_wilderness() || dunlev(&u.uz) != 3 || u.uevent.pride_prayed)
         return;
     obj->spe = 2;
+    pride_waken_reflection();
+}
+
+/* A reflection keeps the growing life drain (m_lev starts at 0 and
+   climbs to 30). The body is a doppelganger so the blows matter,
+   with the hit points and armor of a mid-level fight. */
+static void
+pride_waken_reflection(void)
+{
+    struct monst *refl;
+
     pline("Your reflection smiles, and steps out of the glass.");
-    refl = makemon(&mons[PM_HUMAN], u.ux, u.uy, MM_ADJACENTOK);
-    if (refl) {
-        (void) christen_monst(refl, "your reflection");
-        refl->mpeaceful = 0;
-        set_malign(refl);
-    }
+    refl = makemon(&mons[PM_DOPPELGANGER], u.ux, u.uy, MM_ADJACENTOK);
+    if (!refl)
+        return;
+    (void) christen_monst(refl, "your reflection");
+    refl->mpeaceful = 0;
+    set_malign(refl);
+    refl->cham = NON_PM;
+    refl->m_lev = 0;
+    refl->mhp = refl->mhpmax = 130;
 }
 
 boolean
@@ -3682,10 +3807,7 @@ greed_lure_gem(struct obj *obj)
     if (!obj || !has_oname(obj))
         return FALSE;
     nm = ONAME(obj);
-    return (boolean) (!strcmp(nm, "exquisite flawless diamond")
-                      || !strcmp(nm, "flawless emerald")
-                      || !strcmp(nm, "flawless ruby")
-                      || !strcmp(nm, "flawless sapphire"));
+    return (boolean) (strstri(nm, "flawless") != 0);
 }
 
 static void
@@ -3694,6 +3816,29 @@ greed_drop_one(struct obj *obj)
     obj_extract_self(obj);
     obj->how_lost = LOST_NONE;
     place_object(obj, u.ux, u.uy);
+}
+
+static boolean
+greed_drop_gems_in(struct obj *otmp)
+{
+    boolean any = FALSE;
+
+    if (!otmp)
+        return FALSE;
+    if (Has_contents(otmp)) {
+        struct obj *content, *cnext;
+
+        for (content = otmp->cobj; content; content = cnext) {
+            cnext = content->nobj;
+            if (greed_drop_gems_in(content))
+                any = TRUE;
+        }
+    }
+    if (greed_lure_gem(otmp)) {
+        greed_drop_one(otmp);
+        any = TRUE;
+    }
+    return any;
 }
 
 /* Level-only gems stay on Greed, including ones inside a container. */
@@ -3705,26 +3850,70 @@ greed_leave_gems(void)
 
     for (otmp = gi.invent; otmp; otmp = next) {
         next = otmp->nobj;
-        if (Has_contents(otmp)) {
-            struct obj *content, *cnext;
-
-            for (content = otmp->cobj; content; content = cnext) {
-                cnext = content->nobj;
-                if (greed_lure_gem(content)) {
-                    greed_drop_one(content);
-                    any = TRUE;
-                }
-            }
-        }
-        if (greed_lure_gem(otmp)) {
-            greed_drop_one(otmp);
+        if (greed_drop_gems_in(otmp))
             any = TRUE;
-        }
     }
     if (any) {
         newsym(u.ux, u.uy);
         pline("The gems will not leave this place.");
     }
+}
+
+static long
+carried_gold(void)
+{
+    return money_cnt(gi.invent) + hidden_gold(TRUE);
+}
+
+static void
+greed_strip_gold(struct obj *otmp)
+{
+    struct obj *content, *cnext;
+
+    if (!otmp)
+        return;
+    if (Has_contents(otmp)) {
+        for (content = otmp->cobj; content; content = cnext) {
+            cnext = content->nobj;
+            greed_strip_gold(content);
+        }
+    }
+    if (otmp->oclass == COIN_CLASS) {
+        obj_extract_self(otmp);
+        obfree(otmp, (struct obj *) 0);
+    }
+}
+
+void
+greed_snapshot_gold(void)
+{
+    if (u.uevent.greed_snapped)
+        return;
+    u.ugreed_gold = carried_gold();
+    u.uevent.greed_snapped = 1;
+}
+
+void
+greed_restore_gold(void)
+{
+    struct obj *otmp, *next, *gold;
+    long want;
+
+    if (!u.uevent.greed_snapped)
+        return;
+    want = u.ugreed_gold;
+    for (otmp = gi.invent; otmp; otmp = next) {
+        next = otmp->nobj;
+        greed_strip_gold(otmp);
+    }
+    if (want > 0L) {
+        gold = mksobj(GOLD_PIECE, FALSE, FALSE);
+        gold->quan = want;
+        gold->owt = weight(gold);
+        (void) addinv(gold);
+    }
+    u.ugreed_gold = 0L;
+    u.uevent.greed_snapped = 0;
 }
 
 void
@@ -3739,7 +3928,7 @@ wilderness_took(struct obj *obj)
         for (br = svb.branches; br; br = br->next)
             if (!strcmp(svd.dungeons[br->end2.dnum].dname,
                         "The Wilderness Trial")) {
-                schedule_goto(&br->end1, UTOTYPE_NONE, (char *) 0,
+                schedule_goto(&br->end1, UTOTYPE_PORTAL, (char *) 0,
                               "The sword is in your hand, and the wilderness is sealed behind you.");
                 return;
             }
@@ -3768,16 +3957,8 @@ wilderness_took(struct obj *obj)
         else if (!strcmp(nm, "bag of infinite holding"))
             vanity = "You admire yourself bearing all the riches of the world, and they weigh nothing at all. Every treasure, forever yours. How wealthy, how blessed, how great you are.";
         if (vanity) {
-            struct monst *refl;
-
             pline("%s", vanity);
-            pline("Your reflection smiles, and steps out of the glass.");
-            refl = makemon(&mons[PM_HUMAN], u.ux, u.uy, MM_ADJACENTOK);
-            if (refl) {
-                (void) christen_monst(refl, "your reflection");
-                refl->mpeaceful = 0;
-                set_malign(refl);
-            }
+            pride_waken_reflection();
         }
     }
 }
@@ -5186,6 +5367,8 @@ losehp(int n, const char *knam, schar k_format)
         return;
     }
 #endif
+    if (n > 0 && fear_protected())
+        return;
     disp.botl = TRUE; /* u.uhp or u.mh is changing */
     end_running(TRUE);
     if (Upolyd) {
@@ -5278,8 +5461,13 @@ inv_weight(void)
     int wt = 0;
 
     while (otmp) {
-        if (otmp->oclass == COIN_CLASS)
-            wt += (int) (((long) otmp->quan + 50L) / 100L);
+        if (otmp->oclass == COIN_CLASS) {
+            long cwt = ((long) otmp->quan + 50L) / 100L;
+
+            if (cwt > 0x7fffffffL)
+                cwt = 0x7fffffffL;
+            wt += (int) cwt;
+        }
         else if (otmp->otyp != BOULDER || !throws_rocks(gy.youmonst.data))
             wt += otmp->owt;
         otmp = otmp->nobj;

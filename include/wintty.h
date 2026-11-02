@@ -80,6 +80,7 @@ struct WinDesc {
                            * prevents WIN_STOP from becoming set if current
                            * message triggers --More-- and user types ESC
                            * (current message won't have been seen yet) */
+#define WIN_NOMORE 8      /* this message must not wait for --More-- */
 
 /* topline states */
 #define TOPLINE_EMPTY          0 /* empty */

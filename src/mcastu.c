@@ -326,6 +326,9 @@ touch_of_death(struct monst *mtmp)
     int dmg = 50 + d(8, 6);
     int drain = dmg / 2;
 
+    if (fear_protected())
+        return;
+
     /* if we get here, we know that hero isn't magic resistant and isn't
        poly'd into an undead or demon */
     You_feel("drained...");
