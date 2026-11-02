@@ -150,6 +150,20 @@ $(LUALIB):
 luabin:
 	$(MAKE) -C $(LUATOP) $(LUAMAKEFLAGS) LUA_T=nhlua all
 
+# Parse-check the Lua scripts with the compiler built from the bundled Lua
+# sources.  That is not necessarily the exact library the game links against:
+# USE_SYSTEM_LUA links the system library and GITSUBMODULES may use the
+# submodules/lua headers.  Not part of 'all'; run 'make checklua' explicitly.
+LUAC := $(LUATOP)/luac
+
+$(LUAC):
+	$(MAKE) -C $(LUATOP) $(LUAMAKEFLAGS) LUA_A=$(LUABASELIB) luac
+
+.PHONY: checklua
+checklua: $(LUAC)
+	@set -e; for f in dat/*.lua test/*.lua; do "$(LUAC)" -p "$$f"; done
+	@echo "Lua scripts syntax check: OK"
+
 # hints file could set LUATESTTARGET to this if GITSUBMODULES is defined
 #submodules/lua/lua.h:
 #	git submodule init submodules/lua
