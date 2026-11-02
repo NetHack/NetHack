@@ -11,6 +11,11 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-02
+A Wilderness verse shows its text every time you step on that
+square. Waiting there does not repeat it. Ordinary engravings
+are unchanged.
+
+2026-11-02
 A Pride reflection is always a doppelganger and does not change
 shape. Its life drain still grows, but one turn never takes more
 than 5 hit points. Reading the finger of execution book always
