@@ -1,0 +1,70 @@
+name: build
+
+# Run on every branch (including the default branch), on pull requests,
+# on merge-queue checks, and allow manual runs.
+on:
+  push:
+  pull_request:
+  merge_group:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Cancel superseded runs of the same ref, but not for merge queue checks:
+# an aborted merge_group run is hard to diagnose and may stall the queue.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  compile:
+    name: Compilation
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+
+      # Run-id suffix so the cache is re-saved on every run; restore-keys
+      # falls back to the most recent entry with the same prefix.
+      - name: Restore ccache
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ccache
+          key: ccache-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            ccache-${{ runner.os }}-
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential bison flex ccache groff libncurses-dev
+
+      - name: Generate makefiles
+        run: sh sys/unix/setup.sh sys/unix/hints/linux.501
+
+      - name: Compile and install
+        run: make CC="ccache gcc" WANT_WIN_TTY=1 WANT_WIN_CURSES=1 install
+
+      - name: Smoke test (installed)
+        working-directory: playground
+        run: ./nethack --version
+
+  check-lua-syntax:
+    name: Lua scripts syntax check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends build-essential
+
+      - name: Generate makefiles
+        run: sh sys/unix/setup.sh sys/unix/hints/linux.501
+
+      - name: Check Lua scripts
+        run: make check-lua-syntax
