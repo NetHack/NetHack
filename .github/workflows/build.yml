@@ -1,0 +1,47 @@
+name: build
+
+# Run on every branch (including the default branch), on pull requests,
+# on merge-queue checks, and allow manual runs.
+on:
+  push:
+  pull_request:
+  merge_group:
+  workflow_dispatch:
+
+jobs:
+  compile:
+    name: Compilation
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential bison flex groff libncurses-dev
+
+      - name: Generate makefiles
+        run: sh sys/unix/setup.sh sys/unix/hints/linux.501
+
+      - name: Compile
+        run: make WANT_WIN_TTY=1 WANT_WIN_CURSES=1
+
+  checklua:
+    name: Lua scripts syntax check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends build-essential
+
+      - name: Generate makefiles
+        run: sh sys/unix/setup.sh sys/unix/hints/linux.501
+
+      - name: Check Lua scripts
+        run: make checklua
