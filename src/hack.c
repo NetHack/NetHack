@@ -3582,24 +3582,51 @@ pride_leave_lures(void)
         pline("The treasures crumble into dust.");
 }
 
-static const coordxy pride_door_x[8] = { 8, 25, 41, 58, 8, 25, 41, 58 };
-static const coordxy pride_door_y[8] = { 6, 6, 6, 6, 12, 12, 12, 12 };
+/* Offsets from the altar. des.map() does not leave the level at (0,0),
+   so the altar is not at the map-file coordinate (64,9). The secret
+   door is two steps east, the alcove stair eight steps east, and the
+   eight treasure doors keep their places relative to that altar. */
+static const coordxy pride_door_dx[8] = {
+    -56, -39, -23, -6, -56, -39, -23, -6
+};
+static const coordxy pride_door_dy[8] = {
+    -3, -3, -3, -3, 3, 3, 3, 3
+};
+
+static boolean
+pride_find_altar(coordxy *ax, coordxy *ay)
+{
+    coordxy x, y;
+
+    if (!in_wilderness() || dunlev(&u.uz) != 3)
+        return FALSE;
+    for (x = 1; x < COLNO; x++)
+        for (y = 0; y < ROWNO; y++)
+            if (IS_ALTAR(levl[x][y].typ)) {
+                *ax = x;
+                *ay = y;
+                return TRUE;
+            }
+    return FALSE;
+}
 
 boolean
 pride_door_blocks(coordxy x, coordxy y)
 {
+    coordxy ax, ay;
     int i;
 
-    if (!in_wilderness() || dunlev(&u.uz) != 3)
+    if (!pride_find_altar(&ax, &ay))
         return FALSE;
-    if (!u.uevent.pride_prayed && x == 66 && y == 9) {
+    /* The secret door stays shut until the altar prayer. */
+    if (!u.uevent.pride_prayed && x == ax + 2 && y == ay) {
         pline("This door will not yield.");
         return TRUE;
     }
     if (!u.uevent.pride_prayed)
         return FALSE;
     for (i = 0; i < 8; i++)
-        if (x == pride_door_x[i] && y == pride_door_y[i]) {
+        if (x == ax + pride_door_dx[i] && y == ay + pride_door_dy[i]) {
             pline("This door will not yield.");
             return TRUE;
         }
@@ -3607,12 +3634,12 @@ pride_door_blocks(coordxy x, coordxy y)
 }
 
 static void
-pride_seal_doors(void)
+pride_seal_doors(coordxy ax, coordxy ay)
 {
     int i;
 
     for (i = 0; i < 8; i++) {
-        coordxy x = pride_door_x[i], y = pride_door_y[i];
+        coordxy x = ax + pride_door_dx[i], y = ay + pride_door_dy[i];
 
         if (!isok(x, y) || !IS_DOOR(levl[x][y].typ))
             continue;
@@ -3627,23 +3654,29 @@ pride_seal_doors(void)
 boolean
 pride_prayer(void)
 {
+    coordxy sx, sy, stairx, stairy;
+
     if (!in_wilderness() || dunlev(&u.uz) != 3)
         return FALSE;
-    if (u.ux != 64 || u.uy != 9 || !IS_ALTAR(levl[u.ux][u.uy].typ))
+    if (!IS_ALTAR(levl[u.ux][u.uy].typ))
         return FALSE;
     if (u.uevent.pride_prayed)
         return FALSE;
-    pride_seal_doors();
-    if (isok(66, 9)
-        && (levl[66][9].typ == SDOOR || IS_DOOR(levl[66][9].typ))) {
-        levl[66][9].typ = DOOR;
-        levl[66][9].doormask = D_ISOPEN;
-        unblock_point(66, 9);
-        newsym(66, 9);
+    pride_seal_doors(u.ux, u.uy);
+    sx = u.ux + 2;
+    sy = u.uy;
+    if (isok(sx, sy)
+        && (levl[sx][sy].typ == SDOOR || IS_DOOR(levl[sx][sy].typ))) {
+        levl[sx][sy].typ = DOOR;
+        levl[sx][sy].doormask = D_ISOPEN;
+        unblock_point(sx, sy);
+        newsym(sx, sy);
     }
     u.uevent.pride_prayed = 1;
-    mkstairs(72, 9, 0, (struct mkroom *) 0, TRUE);
-    newsym(72, 9);
+    stairx = u.ux + 8;
+    stairy = u.uy;
+    mkstairs(stairx, stairy, 0, (struct mkroom *) 0, TRUE);
+    newsym(stairx, stairy);
     pline("A hidden way opens.");
     pride_leave_lures();
     return FALSE;
@@ -3716,7 +3749,8 @@ wilderness_check(void)
                 useup(otmp);
                 break;
             }
-        if (u.ux == 55 && u.uy == 10 && (u.ux != u.ux0 || u.uy != u.uy0)) {
+        /* Lua (55,10) lands at (56,10): the 79-wide map starts at x=1. */
+        if (u.ux == 56 && u.uy == 10 && (u.ux != u.ux0 || u.uy != u.uy0)) {
             if (gi.invent || money_cnt(gi.invent) > 0) {
                 static const char *const hints[3] = {
                     "Lay not up for yourselves treasures upon earth, where moth and rust doth corrupt, and where thieves break through and steal:",
@@ -3725,23 +3759,23 @@ wilderness_check(void)
                 };
                 pline("%s", hints[u.uevent.greed_hint % 3]);
                 u.uevent.greed_hint = (u.uevent.greed_hint + 1) % 3;
-                teleds(1, 10, TELEDS_NO_FLAGS);
+                teleds(2, 10, TELEDS_NO_FLAGS);
             } else {
                 for (otmp = fobj; otmp; ) {
                     struct obj *next = otmp->nobj;
 
-                    if (otmp->where == OBJ_FLOOR && otmp->ox < 55
+                    if (otmp->where == OBJ_FLOOR && otmp->ox < 56
                         && otmp->how_lost == LOST_DROPPED
                         && !greed_lure_gem(otmp)) {
                         coordxy ox = otmp->ox, oy = otmp->oy;
 
                         obj_extract_self(otmp);
-                        place_object(otmp, 58, 10);
+                        place_object(otmp, 59, 10);
                         newsym(ox, oy);
                     }
                     otmp = next;
                 }
-                newsym(58, 10);
+                newsym(59, 10);
                 pline("But seek ye first the kingdom of God, and his righteousness; and all these things shall be added unto you.");
             }
         }
