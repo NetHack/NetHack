@@ -2259,7 +2259,8 @@ tty_putstr(winid window, int attr, const char *str)
     switch (cw->type) {
     case NHW_MESSAGE: {
         int suppress_history = (attr & ATR_NOHISTORY),
-            urgent_message = (attr & ATR_URGENT);
+            urgent_message = (attr & ATR_URGENT),
+            nostop_message = (attr & ATR_NOSTOP);
 
 #if defined(ASCIIGRAPH) && !defined(NO_TERMS)
         /* if ^C occurs, player is prompted with "Really quit?" and that
@@ -2281,6 +2282,8 @@ tty_putstr(winid window, int attr, const char *str)
             }
             cw->flags |= WIN_NOSTOP;
         }
+        if (nostop_message)
+            cw->flags |= WIN_NOMORE;
 
         /* in case we ever support display attributes for topline
            messages, clear flag mask leaving only display attr */
@@ -2297,7 +2300,7 @@ tty_putstr(winid window, int attr, const char *str)
             show_topl(str);
         }
 
-        cw->flags &= ~WIN_NOSTOP; /* NOSTOP is a one-shot operation */
+        cw->flags &= ~(WIN_NOSTOP | WIN_NOMORE);
         break;
     }
 #ifndef STATUS_HILITES

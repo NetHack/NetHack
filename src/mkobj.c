@@ -2077,9 +2077,16 @@ weight(struct obj *obj)
     } else if (obj->oclass == FOOD_CLASS && obj->oeaten) {
         return eaten_stat((int) obj->quan * wt, obj);
     } else if (obj->oclass == COIN_CLASS) {
-        /* 5.0: always weigh at least 1 unit; used to yield 0 for 1..49 */
-        wt = (int) ((obj->quan + 50L) / 100L);
-        return max(wt, 1);
+        /* 5.0: always weigh at least 1 unit; used to yield 0 for 1..49.
+           Quantity is a long. Millions of coins stay inside a 32-bit int
+           after dividing by 100; clamp only past that. */
+        long cwt = (obj->quan + 50L) / 100L;
+
+        if (cwt < 1L)
+            return 1;
+        if (cwt > 0x7fffffffL)
+            return 0x7fffffff;
+        return (int) cwt;
     } else if (obj->otyp == HEAVY_IRON_BALL && obj->owt != 0) {
         return (int) obj->owt; /* kludge for "very" heavy iron ball */
     } else if (obj->otyp == CANDELABRUM_OF_INVOCATION && obj->spe) {
@@ -2436,6 +2443,34 @@ place_object(struct obj *otmp, coordxy x, coordxy y)
     if (otmp->where != OBJ_FREE)
         panic("place_object: obj \"%s\" [%d] not free",
               safe_typename(otmp->otyp), otmp->where);
+
+    /* A boulder never comes to rest on the Fear path or a stair. */
+    if (otmp->otyp == BOULDER && fear_forbids_boulder(x, y)) {
+        coordxy nx, ny, bx = -1, by = -1;
+        int bestd = 99, dist;
+
+        for (nx = x - 4; nx <= x + 4; nx++)
+            for (ny = y - 4; ny <= y + 4; ny++) {
+                if (!isok(nx, ny) || fear_forbids_boulder(nx, ny))
+                    continue;
+                if (IS_OBSTRUCTED(levl[nx][ny].typ) || IS_DOOR(levl[nx][ny].typ))
+                    continue;
+                if (sobj_at(BOULDER, nx, ny))
+                    continue;
+                dist = distmin(x, y, nx, ny);
+                if (dist > 0 && dist < bestd) {
+                    bestd = dist;
+                    bx = nx;
+                    by = ny;
+                }
+            }
+        if (bx < 0) {
+            obfree(otmp, (struct obj *) 0);
+            return;
+        }
+        x = bx;
+        y = by;
+    }
 
     assert(x >= 0 && x < COLNO && y >= 0 && y < ROWNO);
     otmp2 = svl.level.objects[x][y];

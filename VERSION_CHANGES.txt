@@ -10,6 +10,20 @@ RighteousHack will eventually replace lawful, neutral, and chaotic
 with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
+2026-11-02
+The Wilderness maps for the desert, greed, pride, and the garden
+use real walls. Greed is the Cave of Wonders: the gate is at the
+far east, gold you carry in is the gold you carry out, and from
+the halfway point of the hunger clock each move says how many
+turns are left. Pride's way down appears only after you pray on
+the altar at the east end of the hall. Lures are destroyed then
+and again on the stairs to Fear. On the Fear path or either stair,
+nothing damages you, and monsters and boulders stay off it.
+Stepping on a Wilderness verse shows only the verse. The Sword of
+the Spirit opens a portal home. The rod of frozen power is the
+cold rod. Finger of execution on Pride is never easier than it is
+elsewhere, and never better than 30 percent.
+
 2026-11-01
 A pet will not step onto a Mines' End letter, on the path or
 a decoy. If it is already on one, it steps off. On Capernaum,

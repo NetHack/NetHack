@@ -2172,10 +2172,6 @@ RESTORE_WARNING_FORMAT_NONLITERAL
 staticfn int
 percent_success(int spell)
 {
-    /* The prophecy book of execution casts only 30% of the time on Pride. */
-    if (in_wilderness() && dunlev(&u.uz) == 3
-        && spellid(spell) == SPE_FINGER_OF_DEATH)
-        return 30;
     /* Intrinsic and learned ability are combined to calculate
      * the probability of player's success at casting a given spell.
      */
@@ -2291,6 +2287,11 @@ percent_success(int spell)
         chance = 100;
     if (chance < 0)
         chance = 0;
+    /* On Pride, finger of execution is never easier than elsewhere,
+       and never better than 30. */
+    if (in_wilderness() && dunlev(&u.uz) == 3
+        && spellid(spell) == SPE_FINGER_OF_DEATH && chance > 30)
+        chance = 30;
 
     return chance;
 }

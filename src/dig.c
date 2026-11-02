@@ -500,12 +500,18 @@ dig(void)
             }
             digtxt = "You make an opening in the wall.";
         } else if (lev->typ == SDOOR) {
+            if (in_wilderness() && dunlev(&u.uz) == 3 && dpx == 66 && dpy == 9
+                && !u.uevent.pride_prayed) {
+                pline("The wall will not yield.");
+                return 0;
+            }
             cvt_sdoor_to_door(lev); /* ->typ = DOOR */
             digtxt = "You break through a secret door!";
             if (!(lev->doormask & D_TRAPPED))
                 lev->doormask = D_BROKEN;
         } else if (closed_door(dpx, dpy)) {
-            if (peters_door_blocks(dpx, dpy) || sodom_door_blocks(dpx, dpy))
+            if (peters_door_blocks(dpx, dpy) || sodom_door_blocks(dpx, dpy)
+                || pride_door_blocks(dpx, dpy))
                 return 0;
             Sprintf(digbuf, "You break through the door with your %s.",
                     simpleonames(uwep));

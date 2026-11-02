@@ -32,6 +32,8 @@ struct engr {
 #define N_ENGRAVE 6
 /* Drawn on the map as the letter itself. Not part of the random range. */
 #define LETTER 7
+/* Wilderness scripture. Not part of the random range. Never degrades. */
+#define VERSE 8
     Bitfield(guardobjects, 1); /* if engr_txt is "Elbereth", it is effective
                                 * against monsters when an object is present
                                 * even when hero isn't (so behaves similarly
