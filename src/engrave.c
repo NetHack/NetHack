@@ -252,7 +252,8 @@ sengr_at(const char *s, coordxy x, coordxy y, boolean strict)
 {
     struct engr *ep = engr_at(x, y);
 
-    if (ep && ep->engr_type != HEADSTONE && ep->engr_time <= svm.moves) {
+    if (ep && ep->engr_type != HEADSTONE && ep->engr_type != VERSE
+        && ep->engr_time <= svm.moves) {
         if (strict ? !strcmpi(ep->engr_txt[actual_text], s)
                    : (strstri(ep->engr_txt[actual_text], s) != 0))
             return ep;
@@ -273,7 +274,8 @@ wipe_engr_at(coordxy x, coordxy y, xint16 cnt, boolean magical)
     struct engr *ep = engr_at(x, y);
 
     /* Headstones and some specially marked engravings are indelible */
-    if (ep && ep->engr_type != HEADSTONE && !ep->nowipeout) {
+    if (ep && ep->engr_type != HEADSTONE && ep->engr_type != VERSE
+        && !ep->nowipeout) {
         debugpline1("asked to erode %d characters", cnt);
         if (ep->engr_type != BURN || is_ice(x, y) || (magical && !rn2(2))) {
             if (ep->engr_type != DUST && ep->engr_type != ENGR_BLOOD) {
@@ -366,6 +368,9 @@ read_engr_at(coordxy x, coordxy y)
         case LETTER:
             /* The map shows the letter. This is not an engraving. */
             break;
+        case VERSE:
+            /* Shown by wilderness_check, with no preamble and no --More--. */
+            break;
         default:
             impossible("%s is written in a very strange way.", Something);
             sensed = 1;
@@ -453,6 +458,8 @@ make_engr_at(
     }
     ep->engr_time = e_time;
     ep->engr_type = (xint8) ((e_type > 0) ? e_type : rnd(N_ENGRAVE - 1));
+    if (ep->engr_type == VERSE)
+        ep->nowipeout = 1;
     ep->engr_szeach = smem;
     ep->engr_alloc = smem * 3;
     /* we do not set ep->eread or ep->erevealed;
@@ -1012,6 +1019,10 @@ doengrave(void)
                 surface(u.ux, u.uy));
             initial_msg_given = TRUE;
         }
+    }
+    if (engr_at(u.ux, u.uy) && engr_at(u.ux, u.uy)->engr_type == VERSE) {
+        pline("The words will not be altered.");
+        goto doengr_exit;
     }
     if (IS_ALTAR(levl[u.ux][u.uy].typ)) {
         if (!initial_msg_given)

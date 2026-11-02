@@ -1544,12 +1544,17 @@ goto_level(
             return;
         }
     }
-    if (in_wilderness() && up && dunlev(&u.uz) > 1) {
+    if (in_wilderness() && up && dunlev(&u.uz) > 1 && !portal) {
         pline("The way back is sealed.");
         return;
     }
-    if (in_wilderness() && dunlev(&u.uz) == 2 && !on_level(newlevel, &u.uz))
+    if (in_wilderness() && dunlev(&u.uz) == 2 && !on_level(newlevel, &u.uz)) {
         greed_leave_gems();
+        greed_restore_gold();
+    }
+    if (in_wilderness() && dunlev(&u.uz) == 3 && !up
+        && !on_level(newlevel, &u.uz))
+        pride_leave_lures();
     if (newdungeon) {
         if (In_endgame(newlevel)) { /* 1st Endgame Level !!! */
             if (!u.uhave.amulet)
@@ -2030,6 +2035,8 @@ goto_level(
     }
 
     temperature_change_msg(prev_temperature);
+    if (in_wilderness() && dunlev(&u.uz) == 2)
+        greed_snapshot_gold();
 
     /* this was originally done earlier; moved here to be logged after
        any achievement related to entering a dungeon branch

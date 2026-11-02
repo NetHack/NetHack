@@ -720,6 +720,10 @@ find_mac(struct monst *mon)
     int base = mon->data->ac;
     long mwflags = mon->misc_worn_check;
 
+    /* A Pride reflection wears the armor of a harder fight. */
+    if (has_mgivenname(mon) && !strcmp(MGIVENNAME(mon), "your reflection"))
+        base -= 8;
+
     for (obj = mon->minvent; obj; obj = obj->nobj) {
         if (obj->owornmask & mwflags) {
             if (obj->otyp == AMULET_OF_GUARDING)

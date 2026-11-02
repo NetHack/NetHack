@@ -610,9 +610,10 @@ explode(
         /* do property damage first, in case we end up leaving bones */
         if (adtyp == AD_FIRE)
             burn_away_slime();
-        if (Invulnerable) {
+        if (Invulnerable || fear_protected()) {
             damu = 0;
-            You("are unharmed!");
+            if (Invulnerable)
+                You("are unharmed!");
         } else if (adtyp == AD_PHYS || adtyp == AD_ACID)
             damu = Maybe_Half_Phys(damu);
         if (adtyp == AD_FIRE) {

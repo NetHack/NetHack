@@ -75,6 +75,8 @@ putmesg(const char *line)
     if ((gp.pline_flags & SUPPRESS_HISTORY) != 0
         && (windowprocs.wincap2 & WC2_SUPPRESS_HIST) != 0)
         attr |= ATR_NOHISTORY;
+    if ((gp.pline_flags & PLINE_NOSTOP) != 0)
+        attr |= ATR_NOSTOP;
     putstr(WIN_MESSAGE, attr, line);
     SoundSpeak(line);
 }
