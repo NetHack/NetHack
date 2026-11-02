@@ -1754,7 +1754,7 @@ gazemu(struct monst *mtmp, struct attack *mattk)
                           Monnam(mtmp), mhis(mtmp));
                 break;
             }
-            if (useeit) {
+            {
                 const char *item = hero_reflect_item();
                 char iname[BUFSZ];
 

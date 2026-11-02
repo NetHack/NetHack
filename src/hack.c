@@ -3460,11 +3460,13 @@ sodom_taunt(unsigned bit, const char *msg)
     pline("%s", msg);
 }
 
-static boolean
-is_man_of_sodom(struct monst *mtmp)
+boolean
+is_sodom_dweller(struct monst *mtmp)
 {
-    return (boolean) (mtmp && !DEADMONSTER(mtmp) && has_mgivenname(mtmp)
-                      && !strcmp(MGIVENNAME(mtmp), "man of Sodom"));
+    if (!mtmp || DEADMONSTER(mtmp))
+        return FALSE;
+    return (boolean) (mtmp->data == &mons[PM_MAN_OF_SODOM]
+                      || mtmp->data == &mons[PM_WOMAN_OF_GOMORRAH]);
 }
 
 /* Flood ROOM/CORR from (sx,sy) without crossing a door.
@@ -3557,7 +3559,7 @@ sodom_men_inside(coordxy doorx, coordxy doory)
     if (sodom_interior(doorx, doory, xs, ys) != 8)
         return 0;
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
-        if (!is_man_of_sodom(mtmp))
+        if (!is_sodom_dweller(mtmp))
             continue;
         for (i = 0; i < 8; i++)
             if (mtmp->mx == xs[i] && mtmp->my == ys[i])
@@ -3565,6 +3567,8 @@ sodom_men_inside(coordxy doorx, coordxy doory)
     }
     return count;
 }
+
+static void sodom_open_empty_houses(void);
 
 /* A door on Sodom with one 8-floor house and the street on the other side.
    Uses the placed squares, not the map file's indexes. */
@@ -3621,6 +3625,12 @@ sodom_door_blocks(coordxy x, coordxy y)
 {
     if (!sodom_house_barred(x, y))
         return FALSE;
+    /* Death opens an empty house. If this door is still locked
+       and nobody is inside, open it instead of refusing. */
+    if (sodom_men_inside(x, y) <= 0) {
+        sodom_open_empty_houses();
+        return FALSE;
+    }
     pline("This door will not yield.");
     return TRUE;
 }
@@ -3629,10 +3639,9 @@ static void
 sodom_bar_door(coordxy dx, coordxy dy)
 {
     coordxy xs[8], ys[8];
-    struct monst *mtmp;
-    int i;
-    static const char msg[] =
-        "The Man of Sodom looks at you with a crooked smile... \"No one leaves this house, stranger.\" The door bars itself.";
+    struct monst *mtmp, *nearest = (struct monst *) 0;
+    int i, bestd = 0;
+    const char *who = "The Man of Sodom";
 
     levl[dx][dy].doormask = D_LOCKED;
     block_point(dx, dy);
@@ -3640,20 +3649,33 @@ sodom_bar_door(coordxy dx, coordxy dy)
     gv.vision_full_recalc = 1;
     if (sodom_interior(dx, dy, xs, ys) == 8) {
         for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
-            if (!is_man_of_sodom(mtmp))
+            int dist;
+
+            if (!is_sodom_dweller(mtmp))
                 continue;
             for (i = 0; i < 8; i++)
                 if (mtmp->mx == xs[i] && mtmp->my == ys[i]) {
                     mtmp->mpeaceful = 0;
                     set_malign(mtmp);
+                    mtmp->mstrategy &= ~STRAT_WAITMASK;
                     newsym(mtmp->mx, mtmp->my);
+                    dist = distmin(mtmp->mx, mtmp->my, u.ux, u.uy);
+                    if (!nearest || dist < bestd) {
+                        nearest = mtmp;
+                        bestd = dist;
+                    }
                     break;
                 }
         }
     }
-    pline("%s", msg);
+    if (nearest && nearest->data == &mons[PM_WOMAN_OF_GOMORRAH])
+        who = "The Woman of Gomorrah";
+    pline("%s looks at you with a crooked smile... \"No one leaves this house, stranger.\" The door bars itself.",
+          who);
 }
 
+/* An empty barred house is opened here. Called when a dweller dies,
+   and again from the door itself if that opening was missed. */
 static void
 sodom_open_empty_houses(void)
 {
@@ -3670,6 +3692,18 @@ sodom_open_empty_houses(void)
             newsym(x, y);
             gv.vision_full_recalc = 1;
         }
+}
+
+/* The dweller is already dead (mhp < 1), so the house count skips it. */
+void
+sodom_note_death(struct permonst *mdat)
+{
+    if (!mdat || !Is_medusa_level(&u.uz))
+        return;
+    if (mdat != &mons[PM_MAN_OF_SODOM]
+        && mdat != &mons[PM_WOMAN_OF_GOMORRAH])
+        return;
+    sodom_open_empty_houses();
 }
 
 static void
@@ -3715,7 +3749,7 @@ sodom_check(void)
     sodom_open_empty_houses();
 
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
-        if (!is_man_of_sodom(mtmp))
+        if (!is_sodom_dweller(mtmp))
             continue;
         if (mtmp->mpeaceful && !mtmp->mspare1
             && distmin(u.ux, u.uy, mtmp->mx, mtmp->my) <= 2) {

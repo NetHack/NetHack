@@ -36,12 +36,21 @@ des.stair("down", 57, 7)
 des.object({ id="statue", x=2, y=7, montype="human", female=1, historic=1, name="Lot's wife" })
 des.engraving({ x=2, y=7, type="burn", text="But his wife looked back from behind him, and she became a pillar of salt.", degrade=false })
 des.monster({ id="Medusa", x=55, y=7, peaceful=0 })
-des.monster({ id="human", name="man of Sodom", peaceful=1, waiting=1, female=0, x=4, y=2 })
-des.monster({ id="human", name="man of Sodom", peaceful=1, waiting=1, female=0, x=11, y=2 })
-des.monster({ id="human", name="man of Sodom", peaceful=1, waiting=1, female=0, x=18, y=2 })
-des.monster({ id="human", name="man of Sodom", peaceful=1, waiting=1, female=0, x=4, y=13 })
-des.monster({ id="human", name="man of Sodom", peaceful=1, waiting=1, female=0, x=11, y=13 })
-des.monster({ id="human", name="man of Sodom", peaceful=1, waiting=1, female=0, x=18, y=13 })
+-- Each house rolls its own occupant. percent(50) is an independent
+-- coin flip; nothing forces a mix of the two.
+local function sodom_occupant(x, y)
+   local id = "woman of Gomorrah"
+   if percent(50) then
+      id = "man of Sodom"
+   end
+   des.monster({ id = id, peaceful = 1, waiting = 1, x = x, y = y })
+end
+sodom_occupant(4, 2)
+sodom_occupant(11, 2)
+sodom_occupant(18, 2)
+sodom_occupant(4, 13)
+sodom_occupant(11, 13)
+sodom_occupant(18, 13)
 des.gold({ x=45, y=4, amount=200 })
 des.gold({ x=55, y=4, amount=200 })
 des.gold({ x=49, y=6, amount=200 })

@@ -736,8 +736,7 @@ domonnoise(struct monst *mtmp)
         return ECMD_TIME;
     }
 
-    if (has_mgivenname(mtmp)
-        && !strcmp(MGIVENNAME(mtmp), "man of Sodom")) {
+    if (is_sodom_dweller(mtmp)) {
         static const char *const call[3] = {
             "Come in, stranger, and stay the night with us.",
             "No one will know.",

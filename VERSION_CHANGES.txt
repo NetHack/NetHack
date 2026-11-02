@@ -11,6 +11,18 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-01
+Each house in Sodom and Tyre holds one occupant, a man of Sodom
+or a woman of Gomorrah, a separate even chance for each house.
+Both are the same fighter: base level 6, speed 12, AC 4, one
+2d4 weapon blow, and no armor. They wait peacefully until
+you enter. Then that house's occupants turn hostile, stop
+meditating, and attack, and they stay inside. The door still
+opens when the last of them is dead. The bar line names the
+Man of Sodom or the Woman of Gomorrah, whichever is nearest.
+Medusa's reflected gaze says the shriek whether or not you can
+see her, and the kill says "You defeat Medusa!"
+
+2026-11-01
 When Medusa's gaze reflects and she is seen, one line is
 shown: she meets her own gaze in the item you know is
 reflecting, and shrieks as her flesh turns to stone. With no

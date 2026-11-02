@@ -886,21 +886,32 @@ both keys cannot be wished for.
 Medusa's level is one map, Sodom and Tyre, and it is dark. Lot's
 wife is a statue at the entrance. The engraving is Genesis 19:26,
 exact KJV. Eating the statue licks it and does not consume it.
-Breaking it fails. Six men of Sodom stand in the houses and call
-with the three lines from the plan. They stay on their squares.
-The first step from outside a house onto its floor bars that
-door and prints, once: "The Man of Sodom looks at you with a
+Breaking it fails. Each of the six houses holds one occupant. The level rolls
+percent(50) separately for each house: man of Sodom, or woman
+of Gomorrah. Nothing forces a mix. Farlook names them "man of
+Sodom" and "woman of Gomorrah". She is female. Both use the
+same numbers: base level 6, speed 12, armor class 4, magic
+resistance 0, and one weapon attack of 2d4. They carry no armor.
+Hit points are the usual dice for that level after the depth
+adjustment, and the experience uses that same level. They call
+with the three lines from the plan while peaceful, and they
+meditate until you enter. The first step from outside a house
+onto its floor bars that door and prints, once, naming the
+nearest occupant: "The Man of Sodom looks at you with a
 crooked smile... \"No one leaves this house, stranger.\" The
-door bars itself." Only the men in that house turn hostile.
+door bars itself." or the same sentence with "The Woman of
+Gomorrah". Only that house's occupants turn hostile. They stop
+meditating and attack, and the locked door keeps them inside.
 The door will not yield to kicking, lock tools, knock, a wand
 or spell of opening, digging, phasing, or teleporting in, the
 same way Peter's closet will not. #force does not open doors.
-When every man in that house is dead, the door opens. There
+When every occupant of that house is dead, the door opens. There
 is no favor penalty. A reflected gaze that turns Medusa to
-stone, when she is seen, says she meets her own gaze in the
-reflecting item as the hero knows it, and shrieks as her flesh
-turns to stone. With no worn or wielded item, the line names
-no item. The kill and the experience are unchanged. Lightning from a rod, a prophecy, or a breath,
+stone says she meets her own gaze in the reflecting item as
+the hero knows it, and shrieks as her flesh turns to stone,
+whether or not she is seen. With no worn or wielded item, the
+line names no item. The kill says "You defeat Medusa!" The
+experience is unchanged. Lightning from a rod, a prophecy, or a breath,
 and the Sword of the Spirit, deal triple damage on this level.
 Shock resistance still negates lightning. Tyre's gold piles can be
 kept. Medusa's seven taunts each play once, as a single message.

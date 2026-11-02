@@ -1241,6 +1241,8 @@ extern boolean petra_lava_safe_here(void);
 extern boolean peters_closet_door(coordxy, coordxy);
 extern boolean peters_closet_floor(coordxy, coordxy);
 extern boolean peters_door_blocks(coordxy, coordxy);
+extern boolean is_sodom_dweller(struct monst *);
+extern void sodom_note_death(struct permonst *);
 extern boolean sodom_house_door(coordxy, coordxy);
 extern boolean sodom_house_floor(coordxy, coordxy);
 extern boolean sodom_house_barred(coordxy, coordxy);

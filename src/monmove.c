@@ -724,9 +724,9 @@ dochug(struct monst *mtmp)
         mtmp->mstrategy |= STRAT_WAITFORU;
         (void) peter_unhurt(mtmp);
     }
-    /* Men of Sodom stay in their houses. Re-assert after the clear
-       above, the same way King Solomon stays on the platform. */
-    if (has_mgivenname(mtmp) && !strcmp(MGIVENNAME(mtmp), "man of Sodom"))
+    /* Peaceful dwellers keep waiting. A hostile one, after the house
+       is entered, is left awake so it can attack inside. */
+    if (is_sodom_dweller(mtmp) && mtmp->mpeaceful)
         mtmp->mstrategy |= STRAT_WAITFORU;
 
     /* update quest status flags */
