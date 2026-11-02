@@ -60,7 +60,8 @@ struct u_event {
     Bitfield(babylon_hint, 1);      /* prayer has named the palace key */
     Bitfield(peter_quest, 1);       /* Peter has given the quest scroll */
     Bitfield(church_gifts, 4);      /* XP donations to God's church, 0..10 */
-    /* 4 free bits remain in this 32-bit word */
+    Bitfield(sodom_taunts, 7);      /* one-time Sodom and Tyre taunts */
+    /* 35 bits: 3 used in the following word */
 };
 
 /*

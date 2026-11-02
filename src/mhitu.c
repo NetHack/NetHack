@@ -21,6 +21,7 @@ staticfn void mayberem(struct monst *, const char *, struct obj *,
                        const char *);
 staticfn int assess_dmg(struct monst *, int);
 staticfn int passiveum(struct permonst *, struct monst *, struct attack *);
+static const char *hero_reflect_item(void);
 
 #define ld() ((yyyymmdd((time_t) 0) - (getyear() * 10000L)) == 0xe5)
 
@@ -1663,6 +1664,27 @@ explmu(
     return (!DEADMONSTER(mtmp)) ? M_ATTK_MISS : M_ATTK_AGR_DIED;
 }
 
+/* Worn or wielded object granting reflection, named as the hero
+   knows it. Same source order as ureflects(). No such object
+   (intrinsic, or a polymorph with no worn armor) returns null. */
+static const char *
+hero_reflect_item(void)
+{
+    struct obj *obj = (struct obj *) 0;
+
+    if (EReflecting & W_ARMS)
+        obj = uarms;
+    else if (EReflecting & W_WEP)
+        obj = uwep;
+    else if (EReflecting & W_AMUL)
+        obj = uamul;
+    else if ((EReflecting & W_ARM) && uarm && uarm != uskin)
+        obj = uarm;
+    if (!obj)
+        return (const char *) 0;
+    return cxname_singular(obj);
+}
+
 /* monster gazes at you */
 int
 gazemu(struct monst *mtmp, struct attack *mattk)
@@ -1722,9 +1744,6 @@ gazemu(struct monst *mtmp, struct attack *mattk)
             /* hero has line of sight to Medusa and she's not blind */
             boolean useeit = canseemon(mtmp);
 
-            if (useeit)
-                (void) ureflects("%s gaze is reflected by your %s.",
-                                 s_suffix(Monnam(mtmp)));
             if (mon_reflects(mtmp, !useeit ? (char *) 0
                                   : "The gaze is reflected away by %s %s!"))
                 break;
@@ -1735,8 +1754,18 @@ gazemu(struct monst *mtmp, struct attack *mattk)
                           Monnam(mtmp), mhis(mtmp));
                 break;
             }
-            if (useeit)
-                pline_mon(mtmp, "%s is turned to stone!", Monnam(mtmp));
+            {
+                const char *item = hero_reflect_item();
+                char iname[BUFSZ];
+
+                if (item) {
+                    Strcpy(iname, item);
+                    pline("Medusa meets her own gaze in your %s. She shrieks as her flesh turns to stone!",
+                          iname);
+                } else {
+                    pline("Medusa meets her own gaze. She shrieks as her flesh turns to stone!");
+                }
+            }
             gs.stoned = TRUE;
             killed(mtmp);
 

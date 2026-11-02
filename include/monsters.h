@@ -3944,6 +3944,27 @@
         M3_INFRAVISIBLE | M3_INFRAVISION,
         9, CLR_RED, PHILISTINE_CHAMPION),
 
+    /* Sodom and Tyre. One per house, chosen in medusa-1.lua.
+       Same numbers for both. G_NOGEN so nothing else spawns them. */
+    MON(NAM("man of Sodom"), S_HUMAN,
+        LVL(6, 12, 4, 0, 0), G_NOGEN,
+        A(ATTK(AT_WEAP, AD_PHYS, 2, 4),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(WT_HUMAN, 400, MS_HUMANOID, MZ_HUMAN), 0, 0,
+        M1_HUMANOID | M1_OMNIVORE,
+        M2_NOPOLY | M2_HUMAN | M2_HOSTILE | M2_STRONG | M2_MALE | M2_STALK,
+        M3_INFRAVISIBLE,
+        9, HI_DOMESTIC, MAN_OF_SODOM),
+    MON(NAM("woman of Gomorrah"), S_HUMAN,
+        LVL(6, 12, 4, 0, 0), G_NOGEN,
+        A(ATTK(AT_WEAP, AD_PHYS, 2, 4),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(WT_HUMAN, 400, MS_HUMANOID, MZ_HUMAN), 0, 0,
+        M1_HUMANOID | M1_OMNIVORE,
+        M2_NOPOLY | M2_HUMAN | M2_HOSTILE | M2_STRONG | M2_FEMALE | M2_STALK,
+        M3_INFRAVISIBLE,
+        9, CLR_BRIGHT_MAGENTA, WOMAN_OF_GOMORRAH),
+
     /*
      * mons_init() in monst.c adds a terminator here, mons[NUMMONS].
      * It is part of the mons[] array without introducing another type

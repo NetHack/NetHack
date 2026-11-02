@@ -3235,6 +3235,9 @@ mondead(struct monst *mtmp)
     /* remove 'mtmp' from play; it will stay on the fmon list until end of
        current move, then dmonsfree() will get rid of it */
     m_detach(mtmp, mptr, TRUE);
+    /* mhp is already 0, so this house no longer counts a dweller.
+       Open its door now, before the hero's next step. */
+    sodom_note_death(mptr);
     return;
 }
 
@@ -3585,7 +3588,8 @@ xkilled(
 
         You("%s %s!",
             nonliving(mtmp->data) ? "destroy" : "defeat",//"kill",
-            !(wasinside || canspotmon(mtmp)) ? "it"
+            !(wasinside || canspotmon(mtmp))
+              ? (mtmp->data == &mons[PM_MEDUSA] ? "Medusa" : "it")
               : !mtmp->mtame ? mon_nam(mtmp)
                 : x_monnam(mtmp, namedpet ? ARTICLE_NONE : ARTICLE_THE,
                            "poor", namedpet ? SUPPRESS_SADDLE : 0, FALSE));

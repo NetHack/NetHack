@@ -163,7 +163,8 @@ picklock(void)
         return ((gx.xlock.usedtime = 0));
     }
 
-    if (gx.xlock.door && peters_door_blocks(u.ux + u.dx, u.uy + u.dy))
+    if (gx.xlock.door && (peters_door_blocks(u.ux + u.dx, u.uy + u.dy)
+                          || sodom_door_blocks(u.ux + u.dx, u.uy + u.dy)))
         return (gx.xlock.usedtime = 0);
 
     You("succeed in %s.", lock_action());
@@ -384,27 +385,29 @@ DISABLE_WARNING_FORMAT_NONLITERAL
 #define PICKLOCK_DID_NOTHING 0          /* no time passes */
 #define PICKLOCK_DID_SOMETHING 1
 
-/* PLACEHOLDER for Jon: the two rock-and-bridge lines below. */
+/* The key toggles the bridge. Up lowers it. Down raises it.
+   quiet so the key's own line is the only bridge sentence.
+   close_drawbridge still deals with whoever is standing on the span. */
 staticfn int
 lower_babylon_drawbridge(void)
 {
     coordxy x, y;
-    boolean down = FALSE;
 
     for (x = 0; x < COLNO; x++)
-        for (y = 0; y < ROWNO; y++)
+        for (y = 0; y < ROWNO; y++) {
             if (levl[x][y].typ == DRAWBRIDGE_UP) {
                 pline("The key turns with a sound like a stone rolled away. Far off, chains groan, and the drawbridge of Babylon comes down.");
                 open_drawbridge(x, y, TRUE);
                 u.uevent.uopened_dbridge = 1;
                 return PICKLOCK_DID_SOMETHING;
-            } else if (levl[x][y].typ == DRAWBRIDGE_DOWN) {
-                down = TRUE;
             }
-    if (down)
-        pline("The rock is silent. The way is already open.");
-    else
-        pline("The key does not turn.");
+            if (levl[x][y].typ == DRAWBRIDGE_DOWN) {
+                pline("The key turns again. Far off, chains groan, and the drawbridge of Babylon rises.");
+                close_drawbridge(x, y, TRUE);
+                return PICKLOCK_DID_SOMETHING;
+            }
+        }
+    pline("The key does not turn.");
     return PICKLOCK_LEARNED_SOMETHING;
 }
 
@@ -694,7 +697,8 @@ pick_lock(
                 return PICKLOCK_LEARNED_SOMETHING;
             }
 
-            if (peters_door_blocks(cc.x, cc.y))
+            if (peters_door_blocks(cc.x, cc.y)
+                || sodom_door_blocks(cc.x, cc.y))
                 return PICKLOCK_LEARNED_SOMETHING;
 
             Sprintf(qbuf, "%s it%s%s?",
@@ -940,6 +944,8 @@ doopen_indir(coordxy x, coordxy y)
         pline("This door will not yield.");
         return res;
     }
+    if (sodom_door_blocks(cc.x, cc.y))
+        return res;
 
     if (!(door->doormask & D_CLOSED)) {
         const char *mesg;
@@ -1220,7 +1226,7 @@ doorlock(struct obj *otmp, coordxy x, coordxy y)
         }
     }
 
-    if (peters_door_blocks(x, y))
+    if (peters_door_blocks(x, y) || sodom_door_blocks(x, y))
         return FALSE;
 
     switch (otmp->otyp) {

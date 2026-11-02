@@ -456,7 +456,7 @@ do_earthquake(int force)
                 FALLTHROUGH;
                 /*FALLTHRU*/
             case DOOR: /* make the door collapse */
-                if (peters_closet_door(x, y)) {
+                if (peters_closet_door(x, y) || sodom_house_barred(x, y)) {
                     if (cansee(x, y))
                         pline("This door will not yield.");
                     break;

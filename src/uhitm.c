@@ -1519,6 +1519,10 @@ hmon_hitmon_dmg_recalc(struct _hitmon_data *hmd, struct obj *obj)
     /* don't let penalty, if bonus is negative, turn a hit into a miss */
     if (hmd->dmg < 1)
         hmd->dmg = 1;
+    /* Sodom and Tyre: the Sword of the Spirit deals triple damage. */
+    if (Is_medusa_level(&u.uz) && obj
+        && obj->oartifact == ART_SWORD_OF_THE_SPIRIT)
+        hmd->dmg *= 3;
 }
 
 staticfn void

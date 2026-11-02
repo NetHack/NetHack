@@ -2146,6 +2146,9 @@ lev_by_name(const char *nam)
                    || !strcmpi(nam, "minend-1") || !strcmpi(nam, "minend-2")
                    || !strcmpi(nam, "minend-3")) {
             nam = "minend";
+        } else if (!strcmpi(nam, "sodom") || !strcmpi(nam, "tyre")
+                   || !strcmpi(nam, "sodom and tyre")) {
+            nam = "medusa-1";
         }
 
         if ((slev = find_level(nam)) != 0)
@@ -3697,6 +3700,8 @@ print_mapseen(
                 tunesuffix(mptr, tmpbuf, sizeof tmpbuf));
     } else if (on_level(&mptr->lev, &mineend_level)) {
         Sprintf(buf, "%sMines' End.", PREFIX);
+    } else if (on_level(&mptr->lev, &medusa_level)) {
+        Sprintf(buf, "%sSodom and Tyre.", PREFIX);
     } else if (mptr->flags.valley) {
         Sprintf(buf, "%sValley of the Dead.", PREFIX);
     } else if (mptr->flags.vibrating_square) {

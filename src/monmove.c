@@ -724,6 +724,10 @@ dochug(struct monst *mtmp)
         mtmp->mstrategy |= STRAT_WAITFORU;
         (void) peter_unhurt(mtmp);
     }
+    /* Peaceful dwellers keep waiting. A hostile one, after the house
+       is entered, is left awake so it can attack inside. */
+    if (is_sodom_dweller(mtmp) && mtmp->mpeaceful)
+        mtmp->mstrategy |= STRAT_WAITFORU;
 
     /* update quest status flags */
     quest_stat_check(mtmp);
@@ -1534,7 +1538,8 @@ postmov(
         if (IS_DOOR(levl[mtmp->mx][mtmp->my].typ)
             && !passes_walls(ptr) /* doesn't need to open doors */
             && !can_tunnel /* taken care of below */
-            && !peters_closet_door(mtmp->mx, mtmp->my)) {
+            && !peters_closet_door(mtmp->mx, mtmp->my)
+            && !sodom_house_barred(mtmp->mx, mtmp->my)) {
             struct rm *here = &levl[mtmp->mx][mtmp->my];
             boolean btrapped = (here->doormask & D_TRAPPED) != 0;
 

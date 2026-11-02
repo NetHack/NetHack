@@ -507,7 +507,7 @@ extern boolean is_db_wall(coordxy, coordxy);
 extern boolean find_drawbridge(coordxy *, coordxy *) NONNULLPTRS;
 extern boolean create_drawbridge(coordxy, coordxy, int, boolean);
 extern void open_drawbridge(coordxy, coordxy, boolean);
-extern void close_drawbridge(coordxy, coordxy);
+extern void close_drawbridge(coordxy, coordxy, boolean);
 extern void destroy_drawbridge(coordxy, coordxy);
 
 /* ### decl.c ### */
@@ -1241,6 +1241,12 @@ extern boolean petra_lava_safe_here(void);
 extern boolean peters_closet_door(coordxy, coordxy);
 extern boolean peters_closet_floor(coordxy, coordxy);
 extern boolean peters_door_blocks(coordxy, coordxy);
+extern boolean is_sodom_dweller(struct monst *);
+extern void sodom_note_death(struct permonst *);
+extern boolean sodom_house_door(coordxy, coordxy);
+extern boolean sodom_house_floor(coordxy, coordxy);
+extern boolean sodom_house_barred(coordxy, coordxy);
+extern boolean sodom_door_blocks(coordxy, coordxy);
 extern char *in_rooms(coordxy, coordxy, int);
 extern boolean in_town(coordxy, coordxy);
 extern void check_special_room(boolean);
@@ -4044,6 +4050,7 @@ extern int zap_over_floor(coordxy, coordxy, int, boolean *,
                           boolean, short) NONNULLARG4;
 extern void mon_spell_hits_spot(struct monst *, int, coordxy x, coordxy y);
 extern void fracture_rock(struct obj *) NONNULLARG1;
+extern boolean lots_wife_statue(struct obj *);
 extern boolean break_statue(struct obj *) NONNULLARG1;
 extern int u_adtyp_resistance_obj(int);
 extern boolean inventory_resistance_check(int);

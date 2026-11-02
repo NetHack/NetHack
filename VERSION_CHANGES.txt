@@ -11,6 +11,50 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-01
+Killing a man of Sodom or a woman of Gomorrah is not murder.
+There is no "You murderer!", no loss of Favor, and no loss of
+telepathy. They still wait peacefully until you enter.
+
+2026-11-01
+Each house in Sodom and Tyre holds one occupant, a man of Sodom
+or a woman of Gomorrah, a separate even chance for each house.
+Both are the same fighter: base level 6, speed 12, AC 4, one
+2d4 weapon blow, and no armor. They wait peacefully until
+you enter. Then that house's occupants turn hostile, stop
+meditating, and attack, and they stay inside. The door still
+opens when the last of them is dead. The bar line names the
+Man of Sodom or the Woman of Gomorrah, whichever is nearest.
+Medusa's reflected gaze says the shriek whether or not you can
+see her, and the kill says "You defeat Medusa!"
+
+2026-11-01
+When Medusa's gaze reflects and she is seen, one line is
+shown: she meets her own gaze in the item you know is
+reflecting, and shrieks as her flesh turns to stone. With no
+worn or wielded item, that line names no item. The kill and
+the experience are unchanged. Stepping into a house in Sodom
+bars that door. It will not yield, and only the men in that
+house turn hostile. They stay inside. When the last of them
+is dead, the door opens. The Key to Babylon's Palace lowers
+the drawbridge and, used again, raises it. When the Sword
+of the Spirit overwhelms a monster you can see, one line says
+it blazes with holy light and that monster is, or seems,
+overwhelmed by divine truth.
+
+2026-11-01
+Sodom and Tyre has one real room: the open walk on the shore
+side of Tyre, from (38,2) to (41,12). The random statues are
+placed there, and entering the level no longer crashes.
+
+2026-11-01
+Medusa's level is Sodom and Tyre. It is pitch black. Lot's wife
+is a salt statue at the entrance. Licking her tastes of salt, and
+she cannot be broken. The men of Sodom call you inside. Going in
+shuts the door, darkens the room, and they turn hostile. Lightning
+and the Sword of the Spirit deal triple damage here. Medusa speaks
+seven lines, each once. Tyre's gold is real.
+
+2026-11-01
 A letter on the Mines' End path stays a letter, in any order
 and from any direction, including after you leave the level or
 save. Only a letter that is not on that path becomes lava.

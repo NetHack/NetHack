@@ -327,7 +327,7 @@ Helpers: `IS_STAFF_OF_WONDERS`, `IS_GOLDEN_CENSER`.
 | ID-206 | Gospel of Peace | trusty sandals | not role-bound | Water walking, haste, fire resistance; invoke tames |
 | ID-207 | Breastplate of Righteousness | gleaming armor | not role-bound | Half spell damage, drain resistance, magic resistance, poison carry |
 | ID-208 | Belt of Truth | humble sash | not role-bound | Searching, see invisible, sleep/blind/hallucination resistance; invoke enlightens |
-| ID-209 | Sword of the Spirit | doubled-edged blade | not role-bound | Reflection, stun attack, warning |
+| ID-209 | Sword of the Spirit | doubled-edged blade | not role-bound | Reflection, stun attack, warning. When the stun lands and the hero can see it, one line: "The Sword of the Spirit blazes with holy light. <monster> is overwhelmed by divine truth!" or "seems" when the stun is 5 or less |
 | ID-210 | Cap of Salvation | divine covering | not role-bound | Half physical damage, regeneration, disintegration carry, healing invoke |
 | ID-211 | Shield of Faith | ancient defense | not role-bound | Stoning resistance, fire defense, magic missile carry, healing invoke |
 
@@ -769,11 +769,14 @@ wishing now holds a blessed +2 Shield of Faith. The drawbridge does not
 open to the old tune, and the key is not applied at the bridge
 itself. A Rock with a keyhole stands in the small courtyard
 outside the moat, west of the closed bridge. Standing on it or
-next to it and applying the Key to Babylon's Palace lowers the
-drawbridge. PLACEHOLDER for Jon: "The key turns with a sound like
+next to it and applying the Key to Babylon's Palace toggles the
+drawbridge. When it is up: "The key turns with a sound like
 a stone rolled away. Far off, chains groan, and the drawbridge
-of Babylon comes down." If it is already down: "The rock is
-silent. The way is already open." Palace doors still open with
+of Babylon comes down." When it is down: "The key turns again.
+Far off, chains groan, and the drawbridge of Babylon rises."
+Whoever is standing on the span is handled the way closing
+a drawbridge always handles them. Force bolt, striking, and
+the passtune are unchanged. Palace doors still open with
 the key. A lock
 pick does not open those doors. Interior chests can still be
 picked. Prophet mode tags the level [babylon]. The #levelport
@@ -877,6 +880,52 @@ door will not yield." The closet floor and its walls cannot be
 dug or phased through. The undiggable
 closet holds a blessed +2 Breastplate of Righteousness. The net and
 both keys cannot be wished for.
+
+### Sodom and Tyre (2026-11-01)
+
+Medusa's level is one map, Sodom and Tyre, and it is dark. Lot's
+wife is a statue at the entrance. The engraving is Genesis 19:26,
+exact KJV. Eating the statue licks it and does not consume it.
+Breaking it fails. Each of the six houses holds one occupant. The level rolls
+percent(50) separately for each house: man of Sodom, or woman
+of Gomorrah. Nothing forces a mix. Farlook names them "man of
+Sodom" and "woman of Gomorrah". She is female. Both use the
+same numbers: base level 6, speed 12, armor class 4, magic
+resistance 0, and one weapon attack of 2d4. They carry no armor.
+Hit points are the usual dice for that level after the depth
+adjustment, and the experience uses that same level. They call
+with the three lines from the plan while peaceful, and they
+meditate until you enter. The first step from outside a house
+onto its floor bars that door and prints, once, naming the
+nearest occupant: "The Man of Sodom looks at you with a
+crooked smile... \"No one leaves this house, stranger.\" The
+door bars itself." or the same sentence with "The Woman of
+Gomorrah". Only that house's occupants turn hostile. They stop
+meditating and attack, and the locked door keeps them inside.
+The door will not yield to kicking, lock tools, knock, a wand
+or spell of opening, digging, phasing, or teleporting in, the
+same way Peter's closet will not. #force does not open doors.
+When every occupant of that house is dead, the door opens. There
+is no favor penalty. Killing one is not murder: no "You murderer!",
+no loss of Favor, and no loss of telepathy. They are marked
+always hostile for that check. The level still places them
+peaceful, so before you enter they farlook as peaceful and
+meditating. A reflected gaze that turns Medusa to
+stone says she meets her own gaze in the reflecting item as
+the hero knows it, and shrieks as her flesh turns to stone,
+whether or not she is seen. With no worn or wielded item, the
+line names no item. The kill says "You defeat Medusa!" The
+experience is unchanged. Lightning from a rod, a prophecy, or a breath,
+and the Sword of the Spirit, deal triple damage on this level.
+Shock resistance still negates lightning. Tyre's gold piles can be
+kept. Medusa's seven taunts each play once, as a single message.
+She still leaves Medusa's essence under the food rules. The level
+does not generate random monsters and cannot be dug or teleported
+across. The arrival line is the first taunt. The first real room on the
+level is the open walk on the shore side of Tyre, map (38,2)
+through (41,12). It is not a house, not the up stair, and not
+Lot's wife. The random statues are placed in that room. The
+level stays dark. The other Medusa maps are unused.
 
 ### Planned (not done)
 

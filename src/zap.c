@@ -3307,7 +3307,7 @@ zap_updown(struct obj *obj) /* wand or spell, nonnull */
                  : (is_drawbridge_wall(x, y) >= 0 && !is_db_wall(x, y)))
             && find_drawbridge(&xx, &yy)) {
             if (!striking)
-                close_drawbridge(xx, yy);
+                close_drawbridge(xx, yy, FALSE);
             else
                 destroy_drawbridge(xx, yy);
             disclose = TRUE;
@@ -3709,7 +3709,7 @@ zap_map(
                 if ((cansee(dbx, dby) || cansee(x, y))
                     && levl[dbx][dby].typ == DRAWBRIDGE_DOWN)
                     learn_it = TRUE;
-                close_drawbridge(dbx, dby);
+                close_drawbridge(dbx, dby, FALSE);
                 break;
             case WAN_STRIKING:
             case SPE_FORCE_BOLT:
@@ -4348,6 +4348,9 @@ zhitm(
         break;
     case ZT_LIGHTNING:
         tmp = d(nd, 6);
+        /* Sodom and Tyre: lightning deals triple damage. */
+        if (Is_medusa_level(&u.uz))
+            tmp *= 3;
         if (spellcaster)
             tmp = spell_damage_bonus(tmp);
         orig_dmg = tmp;
@@ -4518,6 +4521,9 @@ zhitu(
         return; /* lifesaved */
     case ZT_LIGHTNING:
         orig_dam = d(nd, 6);
+        /* Sodom and Tyre: lightning deals triple damage. */
+        if (Is_medusa_level(&u.uz))
+            orig_dam *= 3;
         if (Shock_resistance) {
             shieldeff(sx, sy);
             You("aren't affected.");
@@ -5473,7 +5479,7 @@ zap_over_floor(
             break;
         }
         if (new_doormask >= 0) { /* door gets broken */
-            if (peters_closet_door(x, y)) {
+            if (peters_closet_door(x, y) || sodom_house_barred(x, y)) {
                 if (see_it)
                     pline("This door will not yield.");
                 new_doormask = -1;
@@ -5596,10 +5602,23 @@ fracture_rock(struct obj *obj) /* no texts here! */
 
 /* handle statue hit by striking/force bolt/pick-axe */
 boolean
+lots_wife_statue(struct obj *obj)
+{
+    return (boolean) (obj && obj->otyp == STATUE && has_oname(obj)
+                      && !strcmp(ONAME(obj), "Lot's wife"));
+}
+
+boolean
 break_statue(struct obj *obj)
 {
     /* [obj is assumed to be on floor, so no get_obj_location() needed] */
-    struct trap *trap = t_at(obj->ox, obj->oy);
+    struct trap *trap;
+
+    if (lots_wife_statue(obj)) {
+        pline("The statue is a pillar of salt. It cannot be broken.");
+        return FALSE;
+    }
+    trap = t_at(obj->ox, obj->oy);
     struct obj *item;
     boolean by_you = !svc.context.mon_moving;
 
