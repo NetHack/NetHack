@@ -616,11 +616,13 @@ explode(
                 You("are unharmed!");
         } else if (adtyp == AD_PHYS || adtyp == AD_ACID)
             damu = Maybe_Half_Phys(damu);
-        if (adtyp == AD_FIRE) {
-            (void) burnarmor(&gy.youmonst);
-            ignite_items(gi.invent);
+        if (!fear_protected()) {
+            if (adtyp == AD_FIRE) {
+                (void) burnarmor(&gy.youmonst);
+                ignite_items(gi.invent);
+            }
+            (void) destroy_items(&gy.youmonst, (int) adtyp, dam);
         }
-        (void) destroy_items(&gy.youmonst, (int) adtyp, dam);
 
         ugolemeffects((int) adtyp, damu);
         if (uhurt == 2) {

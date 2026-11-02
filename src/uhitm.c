@@ -5917,6 +5917,10 @@ passive(
     int mhit = mhitb ? M_ATTK_HIT : M_ATTK_MISS;
     int malive = maliveb ? M_ATTK_HIT : M_ATTK_MISS;
 
+    /* A monster's passive must not afflict a hero on the Fear path. */
+    if (fear_protected())
+        return (malive | mhit);
+
     for (i = 0;; i++) {
         if (i >= NATTK)
             return (malive | mhit); /* no passive attacks */

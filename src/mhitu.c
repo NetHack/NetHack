@@ -510,8 +510,6 @@ mattacku(struct monst *mtmp)
 
     calc_mattacku_vars(mtmp, &ranged, &range2, &foundyou, &youseeit);
 
-    if (!ranged)
-        nomul(0);
     if (DEADMONSTER(mtmp))
         return 1;
     /* Sanctum: the hosts move, then freeze. Neither phase fights. */
@@ -519,6 +517,17 @@ mattacku(struct monst *mtmp)
         return 0;
     if (Underwater && !is_swimmer(mtmp->data))
         return 0;
+
+    /* The Fear path and its stairs stop every attack before it lands.
+       A Psalm 91 engraved anywhere else is not this check. */
+    if (fear_protected()) {
+        if (u.uswallow && mtmp == u.ustuck)
+            expels(mtmp, mtmp->data, TRUE);
+        return 0;
+    }
+
+    if (!ranged)
+        nomul(0);
 
     /* If swallowed, can only be affected by u.ustuck */
     if (u.uswallow) {
@@ -1305,6 +1314,14 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
     int i;
     boolean physical_damage = FALSE;
 
+    /* Miss before the monster steps onto the hero. If already swallowed
+       on a path tile or stair, spit the hero out instead of digesting. */
+    if (fear_protected()) {
+        if (u.uswallow && u.ustuck == mtmp)
+            expels(mtmp, mtmp->data, TRUE);
+        return M_ATTK_MISS;
+    }
+
     if (!u.uswallow) { /* swallows you */
         int omx = mtmp->mx, omy = mtmp->my;
 
@@ -1608,6 +1625,8 @@ explmu(
     int tmp;
 
     if (mtmp->mcan)
+        return M_ATTK_MISS;
+    if (fear_protected())
         return M_ATTK_MISS;
 
     tmp = d((int) mattk->damn, (int) mattk->damd);
@@ -2033,6 +2052,8 @@ doseduce(struct monst *mon)
     int attr_tot, tried_gloves = 0;
     char qbuf[QBUFSZ], Who[QBUFSZ];
 
+    if (fear_protected())
+        return 0;
     if (mon->mcan || mon->mspec_used) {
         pline_mon(mon, "%s acts as though %s has got a %sheadache.",
                   Monnam(mon), mhe(mon), mon->mcan ? "severe " : "");

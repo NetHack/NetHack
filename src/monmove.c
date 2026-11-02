@@ -736,7 +736,9 @@ dochug(struct monst *mtmp)
         && distmin(mtmp->mx, mtmp->my, u.ux, u.uy) <= 5) {
         if (mtmp->m_lev < 30)
             mtmp->m_lev++;
-        losehp(mtmp->m_lev, "a reflection", KILLED_BY);
+        /* The counter still climbs, but one turn never takes more than 5. */
+        losehp(mtmp->m_lev > 5 ? 5 : (int) mtmp->m_lev,
+               "a reflection", KILLED_BY);
     }
 
     /* update quest status flags */

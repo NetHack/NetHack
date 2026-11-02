@@ -63,6 +63,9 @@ stealgold(struct monst *mtmp)
     struct monst *who;
     const char *whose, *what;
 
+    if (fear_protected())
+        return;
+
     /* skip lesser coins on the floor */
     while (fgold && fgold->otyp != GOLD_PIECE)
         fgold = fgold->nexthere;
@@ -352,6 +355,8 @@ steal(struct monst *mtmp, char *objnambuf)
 
     if (objnambuf)
         *objnambuf = '\0';
+    if (fear_protected())
+        return 0;
     /* the following is true if successful on first of two attacks. */
     if (!monnear(mtmp, u.ux, u.uy))
         return 0;
