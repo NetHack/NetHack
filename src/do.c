@@ -1508,7 +1508,7 @@ goto_level(
     struct monst *mtmp;
     char whynot[BUFSZ];
     int dist = depth(newlevel) - depth(&u.uz);
-    boolean do_fall_dmg = FALSE;
+    boolean do_fall_dmg = FALSE, wildhome;
     schar prev_temperature = svl.level.flags.temperature;
 
     if (dunlev(newlevel) > dunlevs_in_dungeon(newlevel))
@@ -1518,7 +1518,9 @@ goto_level(
         pline("The wilderness is sealed.");
         return;
     }
-    if (in_wilderness() && up && dunlev(&u.uz) > 1 && !portal) {
+    /* The sword's return is not a portal and is not the sealed way up. */
+    wildhome = (u.utotype & UTOTYPE_WILDHOME) != 0;
+    if (in_wilderness() && up && dunlev(&u.uz) > 1 && !portal && !wildhome) {
         pline("The way back is sealed.");
         return;
     }
@@ -1788,7 +1790,19 @@ goto_level(
     gv.vision_full_recalc = 0; /* don't let that reenable vision yet */
     flush_screen(-1);       /* ensure all map flushes are postponed */
 
-    if (portal && !In_endgame(&u.uz)) {
+    if (wildhome) {
+        stairway *stway;
+
+        for (stway = gs.stairs; stway; stway = stway->next)
+            if (stway->tolev.dnum != u.uz.dnum
+                && !strcmp(svd.dungeons[stway->tolev.dnum].dname,
+                           "The Wilderness Trial"))
+                break;
+        if (stway)
+            u_on_newpos(stway->sx, stway->sy);
+        else
+            u_on_rndspot(0);
+    } else if (portal && !In_endgame(&u.uz)) {
         /* find the portal on the new level */
         struct trap *ttrap;
 

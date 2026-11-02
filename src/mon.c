@@ -4719,7 +4719,8 @@ rescham(void)
 staticfn void
 m_restartcham(struct monst *mtmp)
 {
-    if (!mtmp->mcan)
+    /* A reflection is not a shapechanger, even after the ring comes off. */
+    if (!mtmp->mcan && !is_pride_reflection(mtmp))
         mtmp->cham = pm_to_cham(monsndx(mtmp->data));
     if (mtmp->data->mlet == S_MIMIC && mtmp->msleeping) {
         set_mimic_sym(mtmp);
@@ -4741,6 +4742,10 @@ restartcham(void)
 void
 restore_cham(struct monst *mon)
 {
+    if (is_pride_reflection(mon)) {
+        mon->cham = NON_PM;
+        return;
+    }
     if (Protection_from_shape_changers || mon->mcan) {
         /* force chameleon or mimic to revert to its natural shape */
         normal_shape(mon);
@@ -5382,6 +5387,9 @@ newcham(
     char *p, oldname[BUFSZ], l_oldname[BUFSZ];
 
     if (is_peter(mtmp))
+        return 0;
+    /* A Pride reflection stays a doppelganger. */
+    if (is_pride_reflection(mtmp))
         return 0;
 
     /* Riders are immune to polymorph and green slime

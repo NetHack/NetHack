@@ -85,11 +85,22 @@ incr_itimeout(long *which, int incr)
     set_itimeout(which, itimeout_incr(*which, incr));
 }
 
+/* A monster must not lay a new affliction on the Fear path.
+   Clearing one (xtime == 0) still works. The hero's own actions
+   are not mon_moving, and a Psalm 91 elsewhere is not this path. */
+static boolean
+fear_blocks_affliction(long xtime)
+{
+    return (boolean) (xtime && svc.context.mon_moving && fear_protected());
+}
+
 void
 make_confused(long xtime, boolean talk)
 {
     long old = HConfusion;
 
+    if (fear_blocks_affliction(xtime))
+        return;
     if (Unaware)
         talk = FALSE;
 
@@ -108,6 +119,8 @@ make_stunned(long xtime, boolean talk)
 {
     long old = HStun;
 
+    if (fear_blocks_affliction(xtime))
+        return;
     if (Unaware)
         talk = FALSE;
 
@@ -142,6 +155,8 @@ make_sick(long xtime,
     struct kinfo *kptr;
     long old = Sick;
 
+    if (fear_blocks_affliction(xtime))
+        return;
 #if 0   /* tell player even if hero is unconscious */
     if (Unaware)
         talk = FALSE;
@@ -196,6 +211,8 @@ make_slimed(long xtime, const char *msg)
 {
     long old = Slimed;
 
+    if (fear_blocks_affliction(xtime))
+        return;
 #if 0   /* tell player even if hero is unconscious */
     if (Unaware)
         msg = 0;
@@ -223,6 +240,8 @@ make_stoned(long xtime, const char *msg, int killedby, const char *killername)
 {
     long old = Stoned;
 
+    if (fear_blocks_affliction(xtime))
+        return;
 #if 0   /* tell player even if hero is unconscious */
     if (Unaware)
         msg = 0;
@@ -244,6 +263,8 @@ make_vomiting(long xtime, boolean talk)
 {
     long old = Vomiting;
 
+    if (fear_blocks_affliction(xtime))
+        return;
     if (Unaware)
         talk = FALSE;
 
@@ -264,6 +285,8 @@ make_blinded(long xtime, boolean talk)
     boolean u_could_see, can_see_now;
     const char *eyes;
 
+    if (fear_blocks_affliction(xtime))
+        return;
     /* we probe ahead in case the Eyes of the Overworld
        are or will be overriding blindness */
     u_could_see = !Blind;
@@ -375,6 +398,8 @@ make_hallucinated(
     boolean changed = 0;
     const char *message, *verb;
 
+    if (fear_blocks_affliction(xtime))
+        return FALSE;
     if (Unaware)
         talk = FALSE;
 
@@ -444,6 +469,8 @@ make_deaf(long xtime, boolean talk)
 {
     long old = HDeaf;
 
+    if (fear_blocks_affliction(xtime))
+        return;
     if (Unaware)
         talk = FALSE;
 

@@ -365,7 +365,8 @@ learn(void)
     if (svc.context.spbook.delay && ublindf
         && ublindf->otyp == LENSES && rn2(2))
         svc.context.spbook.delay++;
-    if (Confusion) { /* became confused while learning */
+    /* The finger of execution book is not ruined by confusion. */
+    if (Confusion && book->otyp != SPE_FINGER_OF_DEATH) { /* became confused while learning */
         (void) confused_book(book);
         svc.context.spbook.book = 0; /* no longer studying */
         svc.context.spbook.o_id = 0;
@@ -447,7 +448,8 @@ learn(void)
             update_inventory();
     }
 
-    if (book->cursed) { /* maybe a demon cursed it */
+    /* A cursed finger of execution book still only teaches the spell. */
+    if (book->cursed && booktype != SPE_FINGER_OF_DEATH) { /* maybe a demon cursed it */
         if (cursed_book(book)) {
             useup(book);
             svc.context.spbook.book = 0;
@@ -574,7 +576,10 @@ study_book(struct obj *spellbook)
 
         /* Books are often wiser than their readers (Rus.) */
         spellbook->in_use = TRUE;
-        if (!spellbook->blessed && spellbook->otyp != SPE_BOOK_OF_THE_DEAD) {
+        /* The finger of execution book always teaches its spell. */
+        if (booktype != SPE_FINGER_OF_DEATH
+            && !spellbook->blessed
+            && spellbook->otyp != SPE_BOOK_OF_THE_DEAD) {
             if (spellbook->cursed) {
                 too_hard = TRUE;
             } else {
@@ -602,7 +607,7 @@ study_book(struct obj *spellbook)
             }
         }
 
-        if (too_hard) {
+        if (booktype != SPE_FINGER_OF_DEATH && too_hard) {
             boolean gone = cursed_book(spellbook);
 
             nomul(svc.context.spbook.delay); /* study time */
@@ -617,7 +622,7 @@ study_book(struct obj *spellbook)
             } else
                 spellbook->in_use = FALSE;
             return 1;
-        } else if (confused) {
+        } else if (booktype != SPE_FINGER_OF_DEATH && confused) {
             if (!confused_book(spellbook)) {
                 spellbook->in_use = FALSE;
             }

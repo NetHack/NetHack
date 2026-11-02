@@ -11,6 +11,19 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-02
+A Pride reflection is always a doppelganger and does not change
+shape. Its life drain still grows, but one turn never takes more
+than 5 hit points. Reading the finger of execution book always
+teaches the spell. Casting it is unchanged. The Rod of Frozen
+Power never runs out, and its burst is drawn as a cold explosion.
+The Amulet of Immortality does not save you. An ordinary amulet
+of life saving still does, on Pride and everywhere else. On the
+Fear path or either stair, no monster can harm or afflict you.
+A Psalm 91 you engrave yourself is unchanged. The Sword of
+the Spirit returns you to the Wilderness stair. There is no
+portal error, and the branch stays sealed.
+
+2026-11-02
 The Wilderness maps for the desert, greed, pride, and the garden
 use real walls. Greed is the Cave of Wonders: the gate is at the
 far east, gold you carry in is the gold you carry out, and from

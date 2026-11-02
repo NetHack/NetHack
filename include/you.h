@@ -370,6 +370,7 @@ enum utotypes {
     UTOTYPE_ATSTAIRS = 0x01,
     UTOTYPE_FALLING  = 0x02,
     UTOTYPE_PORTAL   = 0x04,
+    UTOTYPE_WILDHOME = 0x08,  /* sword return to the Wilderness stair */
     UTOTYPE_RMPORTAL = 0x10,  /* remove portal */
     UTOTYPE_DEFERRED = 0x20   /* deferred_goto */
 };
