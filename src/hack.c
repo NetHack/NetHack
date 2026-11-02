@@ -3785,9 +3785,14 @@ wilderness_check(void)
         static coordxy vx = -1, vy = -1;
         static d_level vz = { 0, 0 };
 
-        if (ep && ep->engr_type == VERSE && ep->engr_txt[actual_text]
-            && ep->engr_txt[actual_text][0]
-            && (vx != u.ux || vy != u.uy || !on_level(&vz, &u.uz))) {
+        /* Remember the square only while the hero is still on it, so a
+           later step onto the same verse shows the text again. Waiting
+           there does not. eread does not suppress this. */
+        if (!ep || ep->engr_type != VERSE || !ep->engr_txt[actual_text]
+            || !ep->engr_txt[actual_text][0]) {
+            vx = -1;
+            vy = -1;
+        } else if (vx != u.ux || vy != u.uy || !on_level(&vz, &u.uz)) {
             vx = u.ux;
             vy = u.uy;
             vz = u.uz;

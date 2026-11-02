@@ -941,7 +941,8 @@ Desert, Greed, Pride, and the Garden use real horizontal and
 vertical walls. Fear already did.
 
 Every engraving on the five Wilderness levels is a verse. Stepping
-on one shows only that text. It does not say the writing was burned
+on one shows only that text, and it shows again every time you
+step onto that same square. Waiting there does not repeat it. It does not say the writing was burned
 or engraved, it does not ask for --More-- or Enter, and it does not
 stop you if you are running. A blind hero reads the same line.
 The verse cannot be scuffed, overwritten, cancelled, or zapped away.
