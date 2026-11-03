@@ -3873,13 +3873,15 @@ wilderness_check(void)
         /* Lua (55,10) lands at (56,10): the 79-wide map starts at x=1. */
         if (u.ux == 56 && u.uy == 10 && (u.ux != u.ux0 || u.uy != u.uy0)) {
             if (gi.invent || money_cnt(gi.invent) > 0) {
-                static const char *const hints[3] = {
-                    "Lay not up for yourselves treasures upon earth, where moth and rust doth corrupt, and where thieves break through and steal:",
-                    "Now when Jesus heard these things, he said unto him, Yet lackest thou one thing: sell all that thou hast, and distribute unto the poor, and thou shalt have treasure in heaven: and come, follow me.",
-                    "And said, Naked came I out of my mother's womb, and naked shall I return thither: the LORD gave, and the LORD hath taken away; blessed be the name of the LORD.",
-                };
-                pline("%s", hints[u.uevent.greed_hint % 3]);
-                u.uevent.greed_hint = (u.uevent.greed_hint + 1) % 3;
+                /* greed_hint is 0 until the first bounce. It stays 1
+                   after that. A 2-bit field would wrap if it kept
+                   climbing, and the first line would return. */
+                if (!u.uevent.greed_hint) {
+                    pline("But when the young man heard that saying, he went away sorrowful: for he had great possessions.");
+                    u.uevent.greed_hint = 1;
+                } else {
+                    pline("Thou must leave all behind to pass this way.");
+                }
                 teleds(2, 10, TELEDS_NO_FLAGS);
             } else {
                 for (otmp = fobj; otmp; ) {
