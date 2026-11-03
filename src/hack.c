@@ -6091,17 +6091,21 @@ soul_opening(struct obj *box)
         return 0;
 
     /* One text window, the same kind a Wilderness floor intro uses.
-       A single putstr is cut near 255 characters, so the sentences
-       are separate lines of that one screen. The words are unchanged. */
+       Each paragraph is its own line. A blank line separates them.
+       A single putstr is cut near 255 characters, and each of these
+       is shorter than that. */
     win = create_nhwindow(NHW_TEXT);
     putstr(win, 0, "You peer inside, and horror grips you. There, bound in chains within Moloch's Sanctum, is your own soul. At last it all makes sense.");
+    putstr(win, 0, "");
     putstr(win, 0, "You have walked a path of evil your whole life, and the treasure you sought was the liberation of your very soul. Now the chance for redemption stands before you. But redemption is a choice.");
-    putstr(win, 0, "God speaks in a thunderous voice: 'You must choose the path of good, not evil. Do you choose that path?'");
+    putstr(win, 0, "");
+    putstr(win, 0, "God speaks in a thunderous voice: 'You must choose the path of good, not evil.'");
+    putstr(win, 0, "");
+    putstr(win, 0, "A soft voice speaks into your heart: 'That if thou shalt confess with thy mouth the Lord Jesus, and shalt believe in thine heart that God hath raised him from the dead, thou shalt be saved.'");
     display_nhwindow(win, TRUE);
     destroy_nhwindow(win);
-    ans = ynq("Do you choose that path?");
-    if (ans == 'q')
-        return 1; /* asked, not answered; the next open asks again */
+    /* y_n() is yn_function() with only y and n. Escape is n. */
+    ans = y_n("Dost thou confess with thy mouth the Lord Jesus, and believe in thine heart that God hath raised him from the dead?");
 
     u.uevent.soul_opened = 1;
     pline("From the shadows of the Sanctum, the hosts of darkness rise to claim what they believe is theirs.");
