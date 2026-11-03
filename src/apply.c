@@ -4314,6 +4314,8 @@ doapply(void)
     case SKELETON_KEY:
     case KEY_TO_BABYLON:
     case KEY_TO_GATES:
+    case KEY_TO_HINNOM_GATE:
+    case KEY_TO_SANCTUM:
         res = (pick_lock(obj, 0, 0, NULL) != 0) ? ECMD_TIME : ECMD_OK;
         break;
     case PICK_AXE:

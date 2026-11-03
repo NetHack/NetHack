@@ -1378,11 +1378,62 @@ player's own deity names as opposing each other.
 | ID-070 | Anointing oil of gain ability is still named "wiggy gain ability". |
 | ID-212 | Handkerchief of the Apostle Paul is the Healer quest artifact in `src/role.c`, and `include/artilist.h` still gates it to `PM_KNIGHT`. |
 | ID-213 | Champion's quest artifact is still the Orb of Fate. |
-| ID-223 | `desecrate_altar` is gone. `src/dig.c` and `src/music.c` print `placeholder for desecrate_altar`. |
+| ID-223 | Resolved: a broken rod or the drum of earthquake no longer prints the placeholder. A lawful altar stands. An evil altar is razed. |
 | ID-224 | Resolved: anointing says "the Servant of the Lord". The gift is a placeholder. |
 | (new) | Resolved: the owner named the 5.0 stasis rod "stillness" (`WAN_STILLNESS`, "rod of stillness", Psalm 46:10). |
 | ID-084 | Healer's oil rows are tagged `POTION_CLASS` even though the objects are `ANOINTING_CLASS`. Creation uses `trotyp`, so the game start still works. |
 | ID-017 | Only human is playable. `src/u_init.c` still has tables for the removed roles. |
+
+### The Battle of Hinnom and the Valley of Berachah (2026-11-03)
+
+EDITLEVEL is 10. New monsters: Michael, Moloch, child, fortress
+guard, doctor. New objects: High Priest of Moloch's cloak, Key to
+Hinnom's Gate, Key to the Sanctum, Tears of the Children. New trap:
+power lever. New event bits: hinnom_cloak, hinnom_alarm,
+hinnom_razed, berachah, berachah_tears. Files: dat/hinnom.lua,
+dat/berachah.lua, src/hinnom.c. The level is chained under baalz.
+The overview name is The Battle of Hinnom, then The Valley of
+Berachah after the swap.
+
+#raze (M-z) is a five-turn occupation on an altar that is not
+lawful and not a high altar. Success is +5 alignment, +1 Favor,
+the raze line, and Deuteronomy 7:5. A lawful altar and a high
+altar are refused and take no time. Prayer on an altar that is
+not lawful is refused and does not start a prayer. A priest
+created on such an altar starts hostile. A broken rod of digging
+and the drum of earthquake leave a lawful altar and a high altar
+standing, and raze an evil altar.
+
+Peter's Key to the Gates of Hell is required at the Valley down
+stair. Other ways into Gehennom before that stair are sent to the
+Valley. The revealed stairs are the Gate of the Sanctum and open
+with the Key to the Sanctum. Peter's key does not fit that gate.
+The verses on that use are unchanged.
+
+Hinnom: Michael gives the cloak once. Wearing it, the fortress
+inside the field stays peaceful until the cloak comes off, you
+attack, the field falls, or the gate key is used. The two gate
+guards open the field gate and lower the drawbridge if the cloak
+holds. Without it, only those two turn hostile. Five power levers
+must be thrown in a random order. A wrong pull is 4d6 shock,
+blocked by shock resistance, and resets the levers. The right
+order drops the iron bars. Razing the altar of Moloch stops
+random monsters on the level, unlocks the back room, and cuts
+Moloch's current hit points to a quarter if he is on the level.
+Leaving with Moloch dead and the altar razed replaces the level
+with Berachah. Living children on the way out give +1 Favor and
++1 alignment each. A child who dies on Hinnom costs 5 alignment
+and 2 Favor.
+
+Berachah has no random monsters. Three shops: the Scribes of Ezra
+(Baruch), the Library of the Prophets (Nathan), the Sheep Gate
+Market (Lydia). The first #chat with a child gives the Tears of
+the Children, once. Quaffing them grants a level. They do not
+break, dilute, dip, or curse. The two fountains, and the
+Wilderness garden fountains, are living water.
+
+Lines Jon has not written are marked PLACEHOLDER in the source.
+The list is in the pull request.
 
 ### Not lost
 

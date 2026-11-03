@@ -371,6 +371,7 @@ struct dgn_topology { /* special dungeon levels for speed */
     d_level d_asmodeus_level;  /* unused */
     d_level d_portal_level;    /* only in goto_level() [do.c] */
     d_level d_sanctum_level;
+    d_level d_hinnom_level;
     d_level d_earth_level;
     d_level d_water_level;
     d_level d_fire_level;
@@ -403,6 +404,9 @@ struct dgn_topology { /* special dungeon levels for speed */
 #define asmodeus_level          (svd.dungeon_topology.d_asmodeus_level)
 #define portal_level            (svd.dungeon_topology.d_portal_level)
 #define sanctum_level           (svd.dungeon_topology.d_sanctum_level)
+#define hinnom_level            (svd.dungeon_topology.d_hinnom_level)
+#define Is_hinnom_level(x)      (Lcheck(x, &hinnom_level))
+#define Is_berachah_level(x)    (Is_hinnom_level(x) && u.uevent.berachah)
 #define earth_level             (svd.dungeon_topology.d_earth_level)
 #define water_level             (svd.dungeon_topology.d_water_level)
 #define fire_level              (svd.dungeon_topology.d_fire_level)

@@ -250,7 +250,8 @@ priestini(
         EPRI(priest)->shrpos.y = sy;
         assign_level(&(EPRI(priest)->shrlevel), lvl);
         mon_learns_traps(priest, ALL_TRAPS); /* traps are known */
-        priest->mpeaceful = 1;
+        /* A priest of an altar that is not lawful starts hostile. */
+        priest->mpeaceful = altar_is_good(sx, sy) ? 1 : 0;
         priest->ispriest = 1;
         priest->isminion = 0;
         priest->msleeping = 0;

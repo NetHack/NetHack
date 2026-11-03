@@ -144,6 +144,12 @@ dungeon = {
             range = 4
          },
          {
+            name = "hinnom",
+            bonetag = "M",
+            chainlevel = "baalz",
+            base = 1
+         },
+         {
             name = "asmodeus",
             bonetag = "A",
             base = 2,

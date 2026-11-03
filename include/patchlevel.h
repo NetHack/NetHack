@@ -17,7 +17,7 @@
  * Incrementing EDITLEVEL can be used to force invalidation of old bones
  * and save files.
  */
-#define EDITLEVEL 9 /* the player's soul and the Sanctum choice; church donations shifted the event flags */
+#define EDITLEVEL 10 /* the Battle of Hinnom: new monsters, power lever trap, Hinnom event flags */
 
 /*
  * Development status possibilities.

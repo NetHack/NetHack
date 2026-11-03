@@ -1167,6 +1167,7 @@ rndtrap(void)
         case HOLE: /* no random holes on special levels */
         case VIBRATING_SQUARE:
         case MAGIC_PORTAL:
+        case POWER_LEVER:
             rtrap = NO_TRAP;
             break;
         case TRAPDOOR:
@@ -4383,6 +4384,7 @@ static const struct {
                    { "anti magic", ANTI_MAGIC },
                    { "polymorph", POLY_TRAP },
                    { "vibrating square", VIBRATING_SQUARE },
+                   { "power lever", POWER_LEVER },
                    { "random", -1 },
                    { 0, NO_TRAP } };
 

@@ -520,6 +520,12 @@ do_attack(struct monst *mtmp)
     gn.notonhead = (gb.bhitpos.x != mtmp->mx || gb.bhitpos.y != mtmp->my);
     if (attack_checks(mtmp, uwep))
         return TRUE;
+    if (mtmp->data == &mons[PM_MICHAEL]) {
+        pline("You cannot bring yourself to strike the archangel."); /* PLACEHOLDER */
+        return TRUE;
+    }
+    if (fortress_monster(mtmp))
+        hinnom_alarm_fortress();
 
     if (Upolyd && noattacks(gy.youmonst.data)) {
         /* certain "pacifist" monsters don't attack */

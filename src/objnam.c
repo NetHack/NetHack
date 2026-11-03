@@ -875,6 +875,10 @@ xname_flags(
         }
         break;
     case POTION_CLASS:
+        if (typ == POT_TEARS_OF_CHILDREN) {
+            Strcpy(buf, "Tears of the Children");
+            break;
+        }
         if (dknown && obj->odiluted)
             Strcpy(buf, "diluted ");
         if (nn || un || !dknown) {

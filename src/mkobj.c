@@ -1877,6 +1877,8 @@ curse(struct obj *otmp)
 
     if (is_holy_scripture(otmp))
         return;                     /* A word from God cannot be cursed */
+    if (otmp->otyp == POT_TEARS_OF_CHILDREN)
+        return;
 
     if (otmp->oclass == COIN_CLASS)
         return;

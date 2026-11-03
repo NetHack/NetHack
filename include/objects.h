@@ -655,6 +655,10 @@ CLOAK("alchemy smock", "apron",
 CLOAK("leather cloak", NoDes,
       1, 0,          0,  8, 0, 15, 40,  9, 1,  LEATHER, CLR_BROWN,
                                                         LEATHER_CLOAK),
+/* The disguise Michael gives. Always known. Not random. Unwishable. */
+CLOAK("High Priest of Moloch's cloak", NoDes,
+      1, 0,          0,  0, 0, 10,  0,  9, 1,  CLOTH, CLR_BLACK,
+                                                        HIGH_PRIEST_CLOAK),
 /* with shuffled appearances... */
 CLOAK("cloak of protection", "tattered cape",
       0, 1, PROTECTION, 11, 0, 10, 50,  7, 3,  CLOTH, HI_CLOTH,
@@ -948,6 +952,10 @@ TOOL("Key to Babylon's Palace", "key", 1, 0, 0, 0, 0, 3, 0, IRON, HI_METAL,
                                                                 KEY_TO_BABYLON),
 TOOL("Key to the Gates of Hell", "key", 1, 0, 0, 0, 0, 3, 0, IRON, HI_METAL,
                                                                 KEY_TO_GATES),
+TOOL("Key to Hinnom's Gate", "key", 1, 0, 0, 0, 0, 3, 0, IRON, HI_METAL,
+                                                                KEY_TO_HINNOM_GATE),
+TOOL("Key to the Sanctum", "key", 1, 0, 0, 0, 0, 3, 0, IRON, HI_METAL,
+                                                                KEY_TO_SANCTUM),
 TOOL("Peter's net", NoDes, 1, 0, 0, 0, 0, 20, 0, CLOTH, CLR_WHITE,
                                                                 PETER_NET),
 TOOL("lock pick",           NoDes, 1, 0, 0, 0, 60,  4, 20, IRON, HI_METAL,
@@ -1241,6 +1249,12 @@ POTION("oil",                   "murky",  0, 0, 30, 250, CLR_BROWN,
  */
 POTION("water",                 "clear",  0, 0, 80, 100, CLR_CYAN,
                                                         POT_WATER),
+/* After water so the description shuffle stops at POT_WATER - 1.
+   Name is forced in objnam.c. Not random. Unwishable. */
+OBJECT(OBJ("Tears of the Children", NoDes),
+       BITS(1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, P_NONE, GLASS),
+       0, POTION_CLASS, 0, 0, 20, 0, 0, 0, 0, 0, 10, CLR_BRIGHT_BLUE,
+       POT_TEARS_OF_CHILDREN),
 #undef POTION
 
 /* scrolls ... */

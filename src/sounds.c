@@ -719,6 +719,9 @@ domonnoise(struct monst *mtmp)
     if (!canspotmon(mtmp))
         map_invisible(mtmp->mx, mtmp->my);
 
+    if (hinnom_chat(mtmp))
+        return ECMD_TIME;
+
     if (has_mgivenname(mtmp)
         && !strcmp(MGIVENNAME(mtmp), "Angel of the Ladder")) {
         struct obj *boots;
@@ -847,6 +850,7 @@ domonnoise(struct monst *mtmp)
                                            The(aobjnam(key, "slip")),
                                            (const char *) 0);
             }
+            verbalize("This key opens the gate to Gehennom in the Valley of the Dead."); /* PLACEHOLDER */
             verbalize("And I say also unto thee, That thou art Peter, and upon this rock I will build my church; and the gates of hell shall not prevail against it.");
             u.uevent.peter_rewarded = 1;
             for (dir = 0; dir < N_DIRS; dir++) {

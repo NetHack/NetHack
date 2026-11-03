@@ -499,16 +499,22 @@ pick_lock(
 
     if (pick != &dummypick && picktyp != SKELETON_KEY
         && picktyp != LOCK_PICK && picktyp != CREDIT_CARD
-        && picktyp != KEY_TO_BABYLON && picktyp != KEY_TO_GATES) {
+        && picktyp != KEY_TO_BABYLON && picktyp != KEY_TO_GATES
+        && picktyp != KEY_TO_HINNOM_GATE && picktyp != KEY_TO_SANCTUM) {
         impossible("picking lock with object %d?", picktyp);
         return PICKLOCK_DID_NOTHING;
     }
     ch = 0; /* lint suppression */
 
     /* The gates key is not aimed. Do this before asking for a direction. */
-    if (picktyp == KEY_TO_GATES)
+    if (picktyp == KEY_TO_SANCTUM)
         return (use_gates_key() == ECMD_TIME) ? PICKLOCK_LEARNED_SOMETHING
                                               : PICKLOCK_DID_NOTHING;
+    if (picktyp == KEY_TO_GATES && invocation_pos(u.ux, u.uy)
+        && u.uevent.gates_revealed) {
+        pline("This key does not fit this gate."); /* PLACEHOLDER */
+        return PICKLOCK_LEARNED_SOMETHING;
+    }
 
     if (rx != 0) { /* autounlock; caller has provided coordinates */
         cc.x = rx;
@@ -726,7 +732,19 @@ pick_lock(
                 return PICKLOCK_LEARNED_SOMETHING;
             }
 
-            if (peters_door_blocks(cc.x, cc.y)
+            if (picktyp == KEY_TO_HINNOM_GATE) {
+                if (hinnom_gate_square(cc.x, cc.y)) {
+                    door->doormask = D_ISOPEN;
+                    newsym(cc.x, cc.y);
+                    unblock_point(cc.x, cc.y);
+                    hinnom_forced_entry();
+                    return PICKLOCK_DID_SOMETHING;
+                }
+                pline("This key does not fit.");
+                return PICKLOCK_LEARNED_SOMETHING;
+            }
+            if (hinnom_blocks(cc.x, cc.y)
+                || peters_door_blocks(cc.x, cc.y)
                 || sodom_door_blocks(cc.x, cc.y)
                 || pride_door_blocks(cc.x, cc.y))
                 return PICKLOCK_LEARNED_SOMETHING;
@@ -926,6 +944,8 @@ doopen_indir(coordxy x, coordxy y)
        door here (possible with Passes_walls) and direction isn't 'down' */
     if (u_at(cc.x, cc.y) && (u.dz > 0 || !closed_door(u.ux, u.uy)))
         return doloot();
+    if (hinnom_blocks(cc.x, cc.y))
+        return ECMD_TIME;
 
     /* this used to be done prior to get_adjacent_loc() but doing so was
        incorrect once open at hero's spot became an alternate way to loot */
@@ -974,6 +994,8 @@ doopen_indir(coordxy x, coordxy y)
         pline("This door will not yield.");
         return res;
     }
+    if (hinnom_blocks(cc.x, cc.y))
+        return res;
     if (sodom_door_blocks(cc.x, cc.y) || pride_door_blocks(cc.x, cc.y))
         return res;
 

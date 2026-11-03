@@ -515,6 +515,8 @@ mattacku(struct monst *mtmp)
     /* Sanctum: the hosts move, then freeze. Neither phase fights. */
     if (sanctum_no_hostility())
         return 0;
+    if (moloch_disguise_holds() && fortress_monster(mtmp))
+        return 0;
     if (Underwater && !is_swimmer(mtmp->data))
         return 0;
 

@@ -602,7 +602,8 @@ HOBJ = $(TARGETPFX)allmain.o $(TARGETPFX)alloc.o \
 	$(TARGETPFX)end.o $(TARGETPFX)engrave.o $(TARGETPFX)exper.o \
 	$(TARGETPFX)explode.o $(TARGETPFX)extralev.o $(TARGETPFX)files.o \
 	$(TARGETPFX)fountain.o $(TARGETPFX)getpos.o $(TARGETPFX)glyphs.o \
-	$(TARGETPFX)hack.o $(TARGETPFX)iactions.o $(TARGETPFX)insight.o \
+	$(TARGETPFX)hack.o $(TARGETPFX)hinnom.o $(TARGETPFX)iactions.o \
+	$(TARGETPFX)insight.o \
 	$(TARGETPFX)invent.o $(TARGETPFX)isaac64.o $(TARGETPFX)light.o \
 	$(TARGETPFX)lock.o $(TARGETPFX)mail.o $(TARGETPFX)makemon.o \
 	$(TARGETPFX)mcastu.o $(TARGETPFX)mdlib.o $(TARGETPFX)mhitm.o \
@@ -1180,6 +1181,7 @@ $(TARGETPFX)fountain.o: fountain.c $(HACK_H)
 $(TARGETPFX)getpos.o: getpos.c $(HACK_H)
 $(TARGETPFX)glyphs.o: glyphs.c $(HACK_H)
 $(TARGETPFX)hack.o: hack.c $(HACK_H)
+$(TARGETPFX)hinnom.o: hinnom.c $(HACK_H)
 $(TARGETPFX)hacklib.o: hacklib.c $(HACK_H)
 $(TARGETPFX)iactions.o: iactions.c $(HACK_H)
 $(TARGETPFX)insight.o: insight.c $(HACK_H)

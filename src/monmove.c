@@ -709,6 +709,15 @@ dochug(struct monst *mtmp)
     /* Frozen hosts stay where they are. They can still be killed. */
     if (Is_sanctum(&u.uz) && u.uevent.sanctum_frozen)
         return 0;
+    if (mtmp->data == &mons[PM_CHILD]) {
+        mtmp->mstrategy |= STRAT_WAITFORU;
+        mtmp->mpeaceful = 1;
+        return 0;
+    }
+    if (mtmp->data == &mons[PM_DOCTOR] && mtmp->mhp * 2 < mtmp->mhpmax)
+        mtmp->mflee = 1;
+    if (moloch_disguise_holds() && fortress_monster(mtmp))
+        mtmp->mpeaceful = 1;
 
     if (mtmp->mstrategy & STRAT_ARRIVE) {
         res = m_arrival(mtmp);
@@ -1606,6 +1615,8 @@ postmov(
                 here->doormask &= ~D_TRAPPED;
                 btrapped = FALSE;
             }
+            if (hinnom_impassable_door(nix, niy))
+                return MMOVE_NOTHING;
             if ((here->doormask & (D_LOCKED | D_CLOSED)) != 0
                 && amorphous(ptr)) {
                 if (flags.verbose && canseemon(mtmp))
@@ -2242,6 +2253,8 @@ can_hide_under_obj(struct obj *obj)
 void
 dissolve_bars(coordxy x, coordxy y)
 {
+    if (hinnom_field_up())
+        return;
     levl[x][y].typ = (levl[x][y].edge == 1) ? DOOR
         : (Is_special(&u.uz) || *in_rooms(x, y, 0)) ? ROOM : CORR;
     levl[x][y].flags = 0; /* doormask = D_NODOOR */

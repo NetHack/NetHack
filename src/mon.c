@@ -2110,7 +2110,7 @@ mon_allowflags(struct monst *mtmp)
         allowflags |= OPENDOOR;
     if (can_unlock)
         allowflags |= UNLOCKDOOR;
-    if (passes_bars(mtmp->data)
+    if (passes_bars(mtmp->data) && !hinnom_field_up()
         /* restrict engulfer or holder who might try to pass iron bars while
            carrying hero; accept small subset for poly'd hero passes_bars() */
         && (mtmp != u.ustuck || (unsolid(gy.youmonst.data)
@@ -2447,6 +2447,21 @@ mm_aggression(
     /* don't allow pets to fight each other */
     if (magr->mtame && mdef->mtame)
         return 0L;
+    if (magr->data == &mons[PM_CHILD] || mdef->data == &mons[PM_CHILD])
+        return 0L;
+    if (Is_hinnom_level(&u.uz) && u.uevent.hinnom_alarm) {
+        boolean agr_host = (magr->data == &mons[PM_MICHAEL]
+                            || (magr->data == &mons[PM_ANGEL]
+                                && magr->isminion));
+        boolean def_host = (mdef->data == &mons[PM_MICHAEL]
+                            || (mdef->data == &mons[PM_ANGEL]
+                                && mdef->isminion));
+        boolean agr_fort = fortress_monster(magr);
+        boolean def_fort = fortress_monster(mdef);
+
+        if ((agr_host && def_fort) || (agr_fort && def_host))
+            return ALLOW_M | ALLOW_TM;
+    }
 
     /* supposedly purple worms are attracted to shrieking because they
        like to eat shriekers, so attack the latter when feasible */
@@ -3135,6 +3150,8 @@ mondead(struct monst *mtmp)
 
     if (peter_unhurt(mtmp))
         return;
+    if (michael_stands(mtmp))
+        return;
 
     /* potential pet message; always clear global flag */
     be_sad = iflags.sad_feeling;
@@ -3144,6 +3161,7 @@ mondead(struct monst *mtmp)
     lifesaved_monster(mtmp);
     if (!DEADMONSTER(mtmp))
         return;
+    hinnom_child_died(mtmp);
 
     /* vampire in bat/fog/wolf form reverts to vampire instead of dying */
     if (is_vampshifter(mtmp) && vamprises(mtmp))

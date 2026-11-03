@@ -5580,9 +5580,12 @@ zap_over_floor(
             break;
         }
         if (new_doormask >= 0) { /* door gets broken */
-            if (peters_closet_door(x, y) || sodom_house_barred(x, y)) {
-                if (see_it)
+            if (peters_closet_door(x, y) || sodom_house_barred(x, y)
+                || hinnom_impassable_door(x, y)) {
+                if (see_it && !hinnom_impassable_door(x, y))
                     pline("This door will not yield.");
+                else if (hinnom_impassable_door(x, y) && see_it)
+                    (void) hinnom_blocks(x, y);
                 new_doormask = -1;
             }
         }
@@ -6177,6 +6180,8 @@ destroy_items(
     while ((obj = nxt_unbypassed_obj(*objchn)) != 0) {
         if (!destroyable(obj, dmgtyp))
             continue; /* this dmg type can't destroy this obj */
+        if (obj->otyp == POT_TEARS_OF_CHILDREN)
+            continue;
 
         /* obj is eligible; maybe add it to items_to_destroy */
         i = (elig_stacks < limit) ? elig_stacks : rn2(elig_stacks);
@@ -6532,6 +6537,10 @@ wish_from_text(char *buf, boolean last_try)
             || otmp->otyp == PETER_NET
             || otmp->otyp == KEY_TO_BABYLON
             || otmp->otyp == KEY_TO_GATES
+            || otmp->otyp == KEY_TO_HINNOM_GATE
+            || otmp->otyp == KEY_TO_SANCTUM
+            || otmp->otyp == HIGH_PRIEST_CLOAK
+            || otmp->otyp == POT_TEARS_OF_CHILDREN
             || otmp->otyp == SCR_SCHOLARS_SCROLL
             || otmp->otyp == SCR_PETERS_SCROLL
             || otmp->otyp == ROCK_WITH_KEYHOLE

@@ -925,7 +925,7 @@ kick_door(coordxy x, coordxy y, int avrg_attrib)
     }
 
     if (peters_door_blocks(x, y) || sodom_door_blocks(x, y)
-        || pride_door_blocks(x, y))
+        || pride_door_blocks(x, y) || hinnom_blocks(x, y))
         return;
 
     /* not enough leverage to kick open doors while levitating */

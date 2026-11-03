@@ -624,6 +624,9 @@ m_initinv(struct monst *mtmp)
             case PM_WATCH_CAPTAIN:
                 mac = -2;
                 break;
+            case PM_FORTRESS_GUARD:
+                mac = 0;
+                break;
             default:
                 impossible("odd mercenary %d?", monsndx(ptr));
                 mac = 0;
@@ -1091,6 +1094,8 @@ makemon_rnd_goodpos(
         ny = rn2(ROWNO);
         good = (!gi.in_mklev && cansee(nx,ny)) ? FALSE
                                               : goodpos(nx, ny, mon, gpflags);
+        if (good && Is_hinnom_level(&u.uz) && hinnom_portal_room(nx, ny))
+            good = FALSE;
     } while ((++tryct < 50) && !good);
 
     if (!good) {
@@ -1111,7 +1116,9 @@ makemon_rnd_goodpos(
                     ny = ((dy + yofs) % (ROWNO - 1)) + 1;
                     if (bl == 0 && cansee(nx,ny))
                         continue;
-                    if (goodpos(nx, ny, mon, gpflags))
+                    if (goodpos(nx, ny, mon, gpflags)
+                        && !(Is_hinnom_level(&u.uz)
+                             && hinnom_portal_room(nx, ny)))
                         goto gotgood;
                 }
             if (bl == 0 && (!mon || mon->data->mmove)) {

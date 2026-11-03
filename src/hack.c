@@ -1037,7 +1037,8 @@ test_move(
                 && still_chewing(x, y)) {
                 return FALSE;
             }
-            if (!(Passes_walls || passes_bars(gy.youmonst.data))) {
+            if (!(Passes_walls || (passes_bars(gy.youmonst.data)
+                                    && !hinnom_field_up()))) {
                 if (mode == DO_MOVE && flags.mention_walls)
                     You("cannot pass through the bars.");
                 return FALSE;

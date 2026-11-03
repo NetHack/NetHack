@@ -658,6 +658,7 @@ digactualhole(coordxy x, coordxy y, struct monst *madeby, int ttyp)
             heros_fault = (madeby_u || madeby_obj);
     boolean shopdoor, at_u = u_at(x, y), wont_fall = Levitation || Flying;
     int old_typ, old_aligntyp = A_NONE;
+    unsigned old_mask = 0;
 
     if (at_u && u.utrap) {
         if (u.utraptype == TT_BURIEDBALL)
@@ -684,6 +685,7 @@ digactualhole(coordxy x, coordxy y, struct monst *madeby, int ttyp)
         surface_type = (IS_ROOM(lev->typ) && !Is_earthlevel(&u.uz)
                          ? "floor" : "ground");
         if (IS_ALTAR(lev->typ)) {
+            old_mask = levl[x][y].altarmask;
             old_aligntyp = Amask2align(levl[x][y].altarmask & AM_MASK);
             Strcpy(furniture, align_str(old_aligntyp));
             Strcat(furniture, " ");
@@ -725,8 +727,26 @@ digactualhole(coordxy x, coordxy y, struct monst *madeby, int ttyp)
     if (IS_FURNITURE(old_typ) && cansee(x, y))
         pline_The("%s falls into the %s!", furniture, tname);
     /* wrath should immediately follow altar destruction message */
-    if (heros_fault && old_typ == ALTAR)
-        pline("placeholder for desecrate_altar");
+    if (heros_fault && old_typ == ALTAR) {
+        if (ttmp) {
+            deltrap(ttmp);
+            ttmp = (struct trap *) 0;
+        }
+        ttyp = NO_TRAP;
+        if ((old_mask & AM_SANCTUM) || old_aligntyp == A_LAWFUL) {
+            levl[x][y].typ = ALTAR;
+            levl[x][y].altarmask = old_mask;
+            newsym(x, y);
+            if (old_aligntyp == A_LAWFUL)
+                pline("The altar of the Lord stands firm."); /* PLACEHOLDER */
+            else
+                pline("This altar is beyond your strength to raze."); /* PLACEHOLDER */
+        } else {
+            levl[x][y].typ = ALTAR;
+            levl[x][y].altarmask = old_mask;
+            raze_altar(x, y, FALSE);
+        }
+    }
 
     /* now deal with actual post-trap creation effects */
     if (ttyp == PIT) {
@@ -1680,6 +1700,8 @@ zap_dig(void)
                     pline("This door will not yield.");
                 break;
             }
+            if (hinnom_blocks(zx, zy))
+                break;
             if (*in_rooms(zx, zy, SHOPBASE)) {
                 add_damage(zx, zy, SHOP_DOOR_COST);
                 shopdoor = TRUE;

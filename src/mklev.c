@@ -732,8 +732,8 @@ static NEARDATA const char *trap_engravings[TRAPNUM] = {
     /* 14..16: trap door, teleport, level-teleport */
     "Vlad was here", "ad aerarium", "ad aerarium", (char *) 0, (char *) 0,
     (char *) 0,      (char *) 0,    (char *) 0,    (char *) 0, (char *) 0,
-    /* 24..25 */
-    (char *) 0, (char *) 0,
+    /* 24..26: trapped door, trapped chest, power lever */
+    (char *) 0, (char *) 0, (char *) 0,
 };
 
 staticfn void
@@ -1267,7 +1267,15 @@ makelevel(void)
     slev = Is_special(&u.uz);
     /* check for special levels */
     if (slev && !Is_rogue_level(&u.uz)) {
-        makemaz(slev->proto);
+        if (Is_hinnom_level(&u.uz) && u.uevent.berachah) {
+            svm.mvitals[PM_MICHAEL].mvflags &= ~(G_EXTINCT | G_GENOD);
+            makemaz("berachah");
+            berachah_setup();
+        } else {
+            makemaz(slev->proto);
+            if (Is_hinnom_level(&u.uz))
+                hinnom_setup();
+        }
     } else if (svd.dungeons[u.uz.dnum].proto[0]) {
         makemaz("");
     } else if (svd.dungeons[u.uz.dnum].fill_lvl[0]) {
@@ -1955,6 +1963,7 @@ traptype_rnd(unsigned mktrapflags)
            randomly */
     case MAGIC_PORTAL:
     case VIBRATING_SQUARE:
+    case POWER_LEVER:
         kind = NO_TRAP;
         break;
     case ROLLING_BOULDER_TRAP:
@@ -2537,7 +2546,7 @@ reveal_gates(void)
         pline("The gates do not appear.");
         return;
     }
-    pline("The Gates of Hell stand before you.");
+    pline("The Gate of the Sanctum stands before you.");
     u.uevent.gates_revealed = 1;
 }
 

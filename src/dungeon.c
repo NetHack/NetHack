@@ -723,6 +723,7 @@ static struct level_map {
                   { "orcus", &orcus_level },
                   { "rogue", &rogue_level },
                   { "sanctum", &sanctum_level },
+                  { "hinnom", &hinnom_level },
                   { "valley", &valley_level },
                   { "water", &water_level },
                   { "wizard1", &wiz1_level },
@@ -2332,6 +2333,9 @@ visible_level_tag(const char *proto)
         return "minesend";
     if (!strcmp(proto, "sanctum"))
         return "Sanctum of the Great Dragon";
+    if (!strcmp(proto, "hinnom"))
+        return u.uevent.berachah ? "The Valley of Berachah"
+                                 : "The Battle of Hinnom";
     return proto;
 }
 
@@ -3646,7 +3650,11 @@ print_mapseen(
          * how important they are.
          */
         if (mptr->feat.nshop > 0) {
-            if (mptr->feat.nshop > 1)
+            if (u.uevent.berachah && on_level(&mptr->lev, &hinnom_level))
+                Sprintf(eos(buf),
+                        "%sthe Scribes of Ezra, the Library of the Prophets, the Sheep Gate Market",
+                        COMMA);
+            else if (mptr->feat.nshop > 1)
                 ADDNTOBUF("shop", mptr->feat.nshop);
             else
                 Sprintf(eos(buf), "%s%s", COMMA,
@@ -3717,6 +3725,10 @@ print_mapseen(
         Sprintf(buf, "%sMines' End.", PREFIX);
     } else if (on_level(&mptr->lev, &medusa_level)) {
         Sprintf(buf, "%sSodom and Tyre.", PREFIX);
+    } else if (on_level(&mptr->lev, &hinnom_level)) {
+        Sprintf(buf, "%s%s.", PREFIX,
+                u.uevent.berachah ? "The Valley of Berachah"
+                                  : "The Battle of Hinnom");
     } else if (mptr->flags.valley) {
         Sprintf(buf, "%sValley of the Dead.", PREFIX);
     } else if (mptr->flags.vibrating_square) {

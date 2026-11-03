@@ -11,6 +11,28 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-03
+The Battle of Hinnom is the level under Baalzebub. Michael meets
+you there. The altar of Moloch can be razed with #raze. When
+Moloch is dead and that altar is razed, leaving the level turns
+it into the Valley of Berachah.
+
+2026-11-03
+#raze takes five turns on an altar that is not lawful and not a
+high altar. A lawful altar is refused. Prayer on an altar that
+is not lawful is refused. A priest of such an altar starts
+hostile.
+
+2026-11-03
+Peter's key opens the Valley stair into Gehennom. The Key to
+the Sanctum opens the revealed stairs, now called the Gate of
+the Sanctum.
+
+2026-11-03
+The fountains in the Valley of Berachah, and the Wilderness
+garden fountains, are living water. They restore you and do not
+dry up. A child in Berachah gives the Tears of the Children.
+
+2026-11-03
 Killing a priest of the Great Dragon is not murder. There is no
 "You murderer!", and Favor is not lost for it.
 

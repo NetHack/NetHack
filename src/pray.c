@@ -1831,14 +1831,14 @@ can_pray(boolean praying) /* false means no messages (e.g. enlightenment) */
     gp.p_aligntyp = on_altar() ? a_align(u.ux, u.uy) : u.ualign.type;
     gp.p_trouble = in_trouble(); /* uses existing in_trouble() logic */
 
-    if (praying) {
-        You("kneel and begin praying to %s.", align_gname(gp.p_aligntyp));
+    if (on_altar() && gp.p_aligntyp != A_LAWFUL) {
+        if (praying)
+            pline("You will not pray at an altar of evil."); /* PLACEHOLDER */
+        return FALSE;
     }
 
-    /* All altars in RighteousHack are lawful */
-    if (gp.p_aligntyp != A_LAWFUL) {
-        impossible("can_pray: non-lawful altar detected! (bug)");
-        gp.p_aligntyp = A_LAWFUL;
+    if (praying) {
+        You("kneel and begin praying to %s.", align_gname(gp.p_aligntyp));
     }
 
      /* Too soon — God teaches patience*/

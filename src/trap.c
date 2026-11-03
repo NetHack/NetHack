@@ -1178,6 +1178,8 @@ m_harmless_trap(struct monst *mtmp, struct trap *ttmp)
         break;
     case VIBRATING_SQUARE:
         return TRUE;
+    case POWER_LEVER:
+        return TRUE; /* monsters ignore it */
     default:
         impossible("m_harmless_trap: unknown trap %i", ttmp->ttyp);
         break;
@@ -2984,6 +2986,10 @@ trapeffect_selector(
         return trapeffect_rolling_boulder_trap(mtmp, trap, trflags);
     case VIBRATING_SQUARE:
         return trapeffect_vibrating_square(mtmp, trap, trflags);
+    case POWER_LEVER:
+        if (mtmp != &gy.youmonst)
+            return Trap_Effect_Finished;
+        return hinnom_pull_lever(trap);
     default:
         impossible("%s encountered a strange trap of type %d.",
                    (mtmp == &gy.youmonst) ? "You" : "Some monster",
@@ -4825,6 +4831,8 @@ water_damage(
             update_inventory();
         return ER_DAMAGED;
     } else if (obj->oclass == POTION_CLASS) {
+        if (obj->otyp == POT_TEARS_OF_CHILDREN)
+            return ER_NOTHING;
         if (obj->otyp == POT_ACID) {
             pot_acid_damage(obj, in_invent, described);
             return ER_DESTROYED;

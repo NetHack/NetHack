@@ -806,6 +806,11 @@ lookat(coordxy x, coordxy y, char *buf, char *monbuf)
             }
             amsk = altarmask_at(x, y);
             algn = Amask2align(amsk & AM_MASK);
+            if (Is_hinnom_level(&u.uz) && !u.uevent.berachah
+                && algn == A_NONE) {
+                Strcpy(buf, "altar of Moloch");
+                break;
+            }
             Sprintf(buf, "%s %saltar",
                     /* like endgame high priests, endgame high altars
                        are only recognizable when immediately adjacent */
