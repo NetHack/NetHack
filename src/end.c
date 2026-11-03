@@ -1035,6 +1035,9 @@ done(int how)
     if (how != QUIT && how != ASCENDED && in_wilderness() && dunlev(&u.uz) == 3) {
         struct obj *otmp;
 
+        /* Death and life-saving both leave the spell behind. */
+        pride_unlearn_execution();
+
         for (otmp = gi.invent; otmp; otmp = otmp->nobj)
             if (otmp->owornmask && has_oname(otmp)
                 && !strcmp(ONAME(otmp), "Amulet of Immortality")) {
