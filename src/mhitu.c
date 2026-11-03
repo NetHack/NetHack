@@ -512,6 +512,9 @@ mattacku(struct monst *mtmp)
 
     if (DEADMONSTER(mtmp))
         return 1;
+    /* Sanctum: the hosts move, then freeze. Neither phase fights. */
+    if (sanctum_no_hostility())
+        return 0;
     if (Underwater && !is_swimmer(mtmp->data))
         return 0;
 

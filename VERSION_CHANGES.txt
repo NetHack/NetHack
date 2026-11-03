@@ -11,14 +11,66 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-03
+Offering the real Amulet of Yendor on the Sanctum high altar
+prints "You feel ashamed." The Amulet is not used up, you live,
+and the alignment record is not touched. It takes a turn. An
+offering on the Astral Plane is unchanged.
+
+2026-11-03
 On Sodom and Tyre, the Sword of the Spirit deals double damage.
 Lightning the hero deals a monster there is triple: a rod, a
 prophecy, or breath. Lightning that hits you, and lightning
 between monsters, is unchanged. The flash is unchanged.
 
 2026-11-03
+The first time you arrive on the Sanctum carrying the Sword of
+the Spirit, one black screen says it glows, then the verse about
+the helmet of salvation and the sword of the Spirit. Arriving
+without the sword shows nothing.
+
+2026-11-03
+On the Sanctum, the Sword of the Spirit's hit total is five
+fourths, rounded down. The level
+dice and the holy light are in that total.
+
+2026-11-03
+Where play named the unaligned god Moloch, the name is the Great
+Dragon. A sentence that starts with it is capitalized. The
+historian's amulet text no longer says "the Wizard and." The
+priest quest and the oracle say the Great Dragon too.
+
+2026-11-03
+The Sanctum high priest stays peaceful through the welcome, and
+turns hostile only if you attack.
+
+2026-11-03
 Wearing an artifact that resists blindness, such as the Belt of
 Truth, is recognized when a flash is resisted.
+
+2026-11-03
+On the Sanctum, the Sword of the Spirit does double damage to
+every monster. There is no message. The level dice and the holy
+light are in that total, the same way Sodom and Tyre triples it.
+
+2026-11-03
+The Sanctum level is called the Sanctum of the Great Dragon.
+A smite from its unaligned shrine names the Great Dragon, not
+Moloch. The bolt and the odds are unchanged.
+
+2026-11-03
+Entering the Sanctum temple, the high priest says "Welcome, we
+have long awaited thee. Look thou within the chest, and receive
+thy reward." After the yes path, an attack that would smite you
+for striking that priest is turned aside, and the priest is
+consumed. Before that, the smite is unchanged.
+
+2026-11-03
+Opening the chest that holds your soul shows four paragraphs on
+one black screen, the same kind of screen as a Wilderness floor
+intro. The last is Romans 10:9, with no citation added. After
+that screen, the only question is "Dost thou confess with thy
+mouth the Lord Jesus, and believe in thine heart that God hath
+raised him from the dead?" Yes and no are the only answers.
 
 2026-11-03
 Every melee hit with the Sword of the Spirit adds dice equal to
@@ -116,6 +168,19 @@ Stepping on a Wilderness verse shows only the verse. The Sword of
 the Spirit opens a portal home. The rod of frozen power is the
 cold rod. Finger of execution on Pride is never easier than it is
 elsewhere, and never better than 30 percent.
+
+2026-11-01
+The quest object is your own soul, in a chest on the Sanctum
+altar. It is named for you, such as "Elisha's soul". Opening
+that chest is the reveal and God's question. Either answer, the
+hosts of darkness rise. Yes: they move for two turns and cannot
+fight, then the light freezes the whole level and you receive a
++2 Cap of Salvation. The code name is still Cap of Salvation.
+The climb back up is only a placeholder, the Road to Salvation.
+No: they really attack for three turns, then the game ends.
+The tombstone is "Killed by the hosts of darkness, having
+refused redemption." The closing line is God's spoken line, not
+a quoted verse. The high priest no longer carries the Amulet.
 
 2026-11-01
 The Bell, the Candelabrum, and the Book of the Dead are gone.

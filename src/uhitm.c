@@ -826,7 +826,13 @@ hmon(struct monst *mon,
     anger_guards = (mon->mpeaceful
                     && (mon->ispriest || mon->isshk || is_watch(mon->data)));
     result = hmon_hitmon(mon, obj, thrown, dieroll);
-    if (mon->ispriest && !rn2(2))
+    /* Stock: half of these hits smite the hero. After salvation,
+       every hit on the Sanctum high priest takes that same path,
+       and ghod_hitsu() turns the bolt aside. */
+    if (mon->ispriest
+        && ((u.uevent.sanctum_frozen && Is_sanctum(&u.uz)
+             && mon->data == &mons[PM_HIGH_CLERIC])
+            || !rn2(2)))
         ghod_hitsu(mon);
     if (anger_guards)
         (void) angry_guards(!!Deaf);
@@ -1529,6 +1535,12 @@ hmon_hitmon_dmg_recalc(struct _hitmon_data *hmd, struct obj *obj)
     if (Is_medusa_level(&u.uz) && obj
         && obj->oartifact == ART_SWORD_OF_THE_SPIRIT)
         hmd->dmg *= 2;
+    /* Sanctum of the Great Dragon: the same total, times 5/4,
+       rounded down. The level dice and the holy light are already
+       in hmd->dmg. */
+    if (Is_sanctum(&u.uz) && obj
+        && obj->oartifact == ART_SWORD_OF_THE_SPIRIT)
+        hmd->dmg = hmd->dmg * 5 / 4;
 }
 
 staticfn void

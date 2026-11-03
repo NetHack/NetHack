@@ -70,8 +70,15 @@ struct u_event {
     Bitfield(gates_revealed, 1);    /* prayer opened the walled square */
     Bitfield(lamp_verse, 1);        /* Psalm 119:105 has been shown */
     Bitfield(lamp_given, 1);        /* quest completion gave the lamp */
+    Bitfield(soul_placed, 1);       /* altar chest holds the soul */
+    Bitfield(soul_opened, 1);       /* the reveal has been answered */
+    Bitfield(sanctum_frozen, 1);    /* hosts of darkness never fight */
+    Bitfield(sanctum_grace, 2);     /* YES: turns of movement still to come */
+    Bitfield(sanctum_doom, 2);      /* NO: attack turns still to come */
     Bitfield(wilderness_intro, 5);  /* which Wilderness floors have shown the intro */
-    /* 50 bits */
+    Bitfield(sanctum_sword, 1);     /* Sanctum glow screen has been shown */
+    /* 58 bits; this one fits in the spare bits of the last word,
+       so the earlier flags do not move and EDITLEVEL stays 9 */
 };
 
 /*

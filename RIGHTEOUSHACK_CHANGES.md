@@ -698,7 +698,7 @@ summon a demon or convert the altar. That refusal stays.
 Random altars and temples follow God. The Gehennom filler no
 longer places an unaligned shrine. A mimic that looks like an
 altar follows God. The fixed Valley of the Dead shrine and
-Moloch's Sanctum are unchanged. Class-quest altars are unchanged.
+the altar in the Sanctum of the Great Dragon are unchanged. Class-quest altars are unchanged.
 
 King Solomon's #chat, before the Gibeon vision, always speaks
 the hint about asking for a heart to judge rightly, then
@@ -1182,9 +1182,10 @@ Every melee hit adds d(experience level, 2) on top of the blade's
 own dice, its +2, and the holy light's 2d4. That 2d4 still happens
 only when the to-hit roll is 8 or less. The paralyze chance is
 unchanged. On Sodom and Tyre that whole hit total is doubled, so
-the double covers this bonus. When the holy light does not print
-its own line, the ordinary
-hit message is shown.
+the double covers this bonus. On the Sanctum the same total is
+five fourths, rounded down, with no message, so the level dice
+and the holy light are scaled the same way. When the holy light
+does not print its own line, the ordinary hit message is shown.
 
 ### Long sword for every playable role (2026-11-03)
 
@@ -1212,7 +1213,84 @@ already shown for a prophecy's category: spiritual warfare,
 healing, discernment, blessing, prayer, deliverance, and creation.
 They stay lowercase, with no "spells" suffix.
 
-### Entering Moloch's Sanctum (2026-11-01)
+### The soul in the Sanctum of the Great Dragon (2026-11-01)
+
+The Amulet of Yendor is not given to the high priest. A chest on
+the Sanctum altar holds one object, named from the player's name
+as "Elisha's soul" (always with 's, even if the name already ends
+in s). Until it is identified it looks like a chained relic called
+by that name. Opening the chest shows four paragraphs on one
+black screen, the same window a Wilderness floor intro uses.
+The last paragraph is Romans 10:9 KJV, with no citation line.
+After that screen is dismissed, the only question is "Dost thou
+confess with thy mouth the Lord Jesus, and believe in thine
+heart that God hath raised him from the dead?" The answer is
+yes or no. There is no quit that asks again later. The first
+open does not also take the soul out. A second open is ordinary
+looting.
+
+Stepping into the Sanctum temple, while the high priest can
+speak and you are not deaf, that priest says "Welcome, we have
+long awaited thee. Look thou within the chest, and receive thy
+reward." The welcome leaves the priest peaceful. Attacking
+still asks the ordinary question, then she turns hostile and the
+smite is unchanged. The
+lead-in "The high priest intones:" still appears on its old
+timer, and on the Sanctum it names the priest of the Great Dragon.
+An endgame temple still does not name the altar's owner. Other
+temples are unchanged.
+
+The first arrival on the Sanctum while the Sword of the Spirit is
+carried, wielded or not, shows one black screen: "As you enter
+the Sanctum of the Great Dragon, the Sword of the Spirit glows
+with power. For it is written: 'And take the helmet of salvation,
+and the sword of the Spirit, which is the word of God.'" It is
+once per game. Arriving without the sword shows nothing, and a
+later arrival with the sword still shows it if it has not been
+seen. The flag sits in the spare bits of the event word, so the
+save format is unchanged.
+
+Where the unaligned god was named Moloch in play, the name is
+"the Great Dragon", capitalized when it starts a sentence. That
+is the priest, the high altar, the #turn line
+in Gehennom while the random god is that name, the historian's
+amulet speech (without "the Wizard and"), the priest quest's
+nemesis death, and the oracle paragraph. The encyclopedia, the
+backup quest file, and comments are unchanged.
+
+Offering the real Amulet of Yendor on the Sanctum high altar
+prints "You feel ashamed." The Amulet is not used up, you live,
+and the alignment record is not touched. It takes a turn. An
+offering on the Astral Plane is unchanged.
+
+After the yes path has frozen the Sanctum, a blow that would
+have called down the smite on that high priest does not. Lucifer's
+wrath is turned aside, and the LORD's fire consumes the priest.
+A priestess is "she"; a priest is "he". You take none of that
+bolt. Before the freeze, the smite is the stock lightning.
+
+Both answers say the shadows line, then six hostile demons appear
+beside you: horned devil, barbed devil, vrock, hezrou, marilith,
+pit fiend. That roster is a placeholder for "the hosts".
+
+Yes leaves them free to move for two turns. They do not attack,
+cast, or throw. Then the light line, the whole Sanctum freezes
+for the rest of the game, and a blessed +2 Cap of Salvation is
+given. The artifact is not renamed. Frozen monsters never move or
+fight. You can still kill them. The stairs up, and any other way
+off the level, say the Road to Salvation is not yet open.
+
+No lets them attack for three turns. Then God's spoken line is
+shown exactly as written, not as Deuteronomy, and the tombstone
+is "Killed by the hosts of darkness, having refused redemption."
+During those turns, and during the two quiet turns, you cannot
+leave the level.
+
+The elemental planes still look for the Amulet if one exists.
+None is placed. The soul is the quest object. Wishes for it are
+refused.
+
+### Entering the Sanctum of the Great Dragon (2026-11-01)
 
 The Bell of Opening, the Candelabrum of Invocation, and the Book
 of the Dead are not placed, cannot be wished for, and crumble if

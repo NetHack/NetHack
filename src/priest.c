@@ -256,11 +256,8 @@ priestini(
         priest->msleeping = 0;
         set_malign(priest); /* mpeaceful may have changed */
 
-        /* now his/her goodies... */
-        if (sanctum && EPRI(priest)->shralign == A_NONE
-            && on_level(&sanctum_level, &u.uz)) {
-            (void) mongets(priest, AMULET_OF_YENDOR);
-        }
+        /* The Amulet of Yendor is no longer the quest object.
+           The player's soul is in the chest on this altar. */
         /* 2 to 4 prophetic books */
         for (cnt = rn1(3, 2); cnt > 0; --cnt) {
             (void) mpickobj(priest, mkobj(SPBOOK_no_NOVEL, FALSE));
@@ -432,10 +429,10 @@ intemple(int roomno)
         if (can_speak && !Deaf && svm.moves >= epri_p->intone_time) {
             unsigned save_priest = priest->ispriest;
 
-            /* don't reveal the altar's owner upon temple entry in
-               the endgame; for the Sanctum, the next message names
-               Moloch so suppress the "of Moloch" for him here too */
-            if (sanctum && !Hallucination)
+            /* Stock: an endgame temple's intones line does not name
+               the altar's owner. The Sanctum welcome does not name a
+               god, so that priest is named in the usual way. */
+            if (In_endgame(&u.uz) && !Hallucination)
                 priest->ispriest = 0;
             pline("%s intones:",
                   canseemon(priest) ? Monnam(priest) : "A nearby voice");
@@ -447,17 +444,10 @@ intemple(int roomno)
         }
         msg1 = msg2 = 0;
         if (sanctum && Is_sanctum(&u.uz)) {
-            if (priest->mpeaceful) {
-                /* first time inside */
-                msg1 = "Infidel, you have entered Moloch's Sanctum!";
-                msg2 = "Be gone!";
-                priest->mpeaceful = 0;
-                /* became angry voluntarily; no penalty for attacking him */
-                set_malign(priest);
-            } else {
-                /* repeat visit, or attacked priest before entering */
-                msg1 = "You desecrate this place by your presence!";
-            }
+            /* Same moments as the old Moloch greeting: the first
+               entry, and each later entry while the priest can speak.
+               The words are the welcome. The priest stays peaceful. */
+            msg1 = "Welcome, we have long awaited thee. Look thou within the chest, and receive thy reward.";
         } else if (svm.moves >= epri_p->enter_time) {
             Sprintf(buf, "Pilgrim, you enter a %s place!",
                     !shrined ? "desecrated" : "sacred");
@@ -804,6 +794,20 @@ ghod_hitsu(struct monst *priest)
     if (!roomno || !has_shrine(priest))
         return;
 
+    /* After the yes path, the bolt that would smite the hero is
+       turned aside and the Sanctum high priest dies instead. */
+    if (u.uevent.sanctum_frozen && Is_sanctum(&u.uz)
+        && priest->data == &mons[PM_HIGH_CLERIC] && priest->ispriest) {
+        pline("Lucifer's wrath strikes down from above, but the hand of God turns it aside!");
+        if (priest->female)
+            pline("The LORD's fire falls upon the high priestess of the Great Dragon, and she is consumed where she stands!");
+        else
+            pline("The LORD's fire falls upon the high priest of the Great Dragon, and he is consumed where he stands!");
+        if (!DEADMONSTER(priest))
+            xkilled(priest, XKILL_NOMSG | XKILL_NOCORPSE);
+        return;
+    }
+
     ax = x = EPRI(priest)->shrpos.x;
     ay = y = EPRI(priest)->shrpos.y;
     troom = &svr.rooms[roomno - ROOMOFFSET];
@@ -847,19 +851,26 @@ ghod_hitsu(struct monst *priest)
             return;
     }
 
-    switch (rn2(3)) {
-    case 0:
-        pline("%s roars in anger:  \"Thou shalt suffer!\"",
-              a_gname_at(ax, ay));
-        break;
-    case 1:
-        pline("%s voice booms:  \"How darest thou harm my servant!\"",
-              s_suffix(a_gname_at(ax, ay)));
-        break;
-    default:
-        pline("%s roars:  \"Thou dost profane my shrine!\"",
-              a_gname_at(ax, ay));
-        break;
+    {
+        const char *gname = a_gname_at(ax, ay);
+
+        /* Moloch is the unaligned god. Name him in these three
+           lines only; prayer and altar text stay as they are. */
+        if (IS_ALTAR(levl[ax][ay].typ)
+            && Amask2align(levl[ax][ay].altarmask & AM_MASK) == A_NONE)
+            gname = "The Great Dragon";
+        switch (rn2(3)) {
+        case 0:
+            pline("%s roars in anger:  \"Thou shalt suffer!\"", gname);
+            break;
+        case 1:
+            pline("%s voice booms:  \"How darest thou harm my servant!\"",
+                  s_suffix(gname));
+            break;
+        default:
+            pline("%s roars:  \"Thou dost profane my shrine!\"", gname);
+            break;
+        }
     }
 
     /* bolt of lightning cast by unspecified monster */

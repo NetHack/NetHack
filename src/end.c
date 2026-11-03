@@ -1557,6 +1557,8 @@ really_done(int how)
 
             if (Is_astralevel(&u.uz))
                 where = "The Astral Plane";
+            else if (Is_sanctum(&u.uz))
+                where = "the Sanctum of the Great Dragon";
             Sprintf(pbuf, "You %s in %s", ends[how], where);
             if (!In_endgame(&u.uz) && !single_level_branch(&u.uz))
                 Sprintf(eos(pbuf), " on dungeon level %d",

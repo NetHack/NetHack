@@ -3030,6 +3030,11 @@ use_container(
     }
 
     gc.current_container = obj; /* for use by in/out_container */
+    /* Opening the soul's chest is the reveal, not a loot menu. */
+    if (soul_opening(obj)) {
+        ga.abort_looting = TRUE;
+        return ECMD_TIME;
+    }
     /*
      * From here on out, all early returns go through 'containerdone:'.
      */

@@ -20,6 +20,7 @@ staticfn NHFILE *currentlevel_rewrite(void);
 staticfn void familiar_level_msg(void);
 staticfn void capernaum_arrival(void);
 staticfn void wilderness_arrival(void);
+staticfn void sanctum_sword_arrival(void);
 staticfn void final_level(void);
 staticfn void temperature_change_msg(schar);
 staticfn boolean better_not_try_to_drop_that(struct obj *);
@@ -1323,6 +1324,15 @@ doup(void)
         You_cant("go up here.");
         return ECMD_OK;
     }
+    if (Is_sanctum(&u.uz) && u.uevent.sanctum_frozen) {
+        pline("The Road to Salvation is not yet open.");
+        return ECMD_OK;
+    }
+    if (Is_sanctum(&u.uz)
+        && (u.uevent.sanctum_grace || u.uevent.sanctum_doom)) {
+        pline("The hosts of darkness bar the way.");
+        return ECMD_OK;
+    }
     if (stucksteed(TRUE)) {
         return ECMD_OK;
     }
@@ -1480,6 +1490,27 @@ wilderness_intro_window(const char *verse, const char *ref)
     destroy_nhwindow(win);
 }
 
+/* Once per game, the first Sanctum arrival while the Sword of the Spirit
+   is carried. Arriving without it shows nothing and does not use up
+   the showing. */
+staticfn void
+sanctum_sword_arrival(void)
+{
+    struct obj *otmp;
+
+    if (!Is_sanctum(&u.uz) || u.uevent.sanctum_sword)
+        return;
+    for (otmp = gi.invent; otmp; otmp = otmp->nobj)
+        if (otmp->oartifact == ART_SWORD_OF_THE_SPIRIT)
+            break;
+    if (!otmp)
+        return;
+    u.uevent.sanctum_sword = 1;
+    wilderness_intro_window(
+        "As you enter the Sanctum of the Great Dragon, the Sword of the Spirit glows with power. For it is written: 'And take the helmet of salvation, and the sword of the Spirit, which is the word of God.'",
+        (const char *) 0);
+}
+
 /* Once per floor per game. The desert (level 1) is the entrance and is
    not Greed, Pride, Fear, or the Garden, so only the entrance line shows
    there. If it ever were one of those floors too, that text would follow. */
@@ -1586,6 +1617,16 @@ goto_level(
         && !strcmp(svd.dungeons[newlevel->dnum].dname, "The Wilderness Trial")) {
         pline("The wilderness is sealed.");
         return;
+    }
+    if (Is_sanctum(&u.uz) && !on_level(newlevel, &u.uz)) {
+        if (u.uevent.sanctum_frozen) {
+            pline("The Road to Salvation is not yet open.");
+            return;
+        }
+        if (u.uevent.sanctum_grace || u.uevent.sanctum_doom) {
+            pline("The hosts of darkness bar the way.");
+            return;
+        }
     }
     /* The sword's return is not a portal and is not the sealed way up. */
     wildhome = (u.utotype & UTOTYPE_WILDHOME) != 0;
@@ -2101,6 +2142,7 @@ goto_level(
         }
         wilderness_arrival();
     }
+    sanctum_sword_arrival();
 
     /* this was originally done earlier; moved here to be logged after
        any achievement related to entering a dungeon branch

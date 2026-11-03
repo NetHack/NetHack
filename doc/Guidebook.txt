@@ -3877,7 +3877,7 @@
          Gehennom     -  Entered Gehennom.
          Candle       -  Unused. The Candelabrum of Invocation is gone.
          Book         -  Unused. The Book of the Dead has been removed.
-         Invocation   -  Opened the Gates of Hell into Moloch's Sanctum.
+         Invocation   -  Opened the Gates of Hell into the Sanctum of the Great Dragon.
          Amulet       -  Acquired the fabled Amulet of Yendor.
          Endgame      -  Reached the Elemental Planes.
          Astral       -  Reached the Astral Plane level.
