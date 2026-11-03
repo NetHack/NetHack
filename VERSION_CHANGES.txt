@@ -11,6 +11,12 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-03
+Offering the real Amulet of Yendor on the Sanctum high altar
+prints "You feel ashamed." The Amulet is not used up, you live,
+and the alignment record is not touched. It takes a turn. An
+offering on the Astral Plane is unchanged.
+
+2026-11-03
 On Sodom and Tyre, the Sword of the Spirit deals double damage.
 Lightning the hero deals a monster there is triple: a rod, a
 prophecy, or breath. Lightning that hits you, and lightning

@@ -1290,11 +1290,16 @@ save format is unchanged.
 
 Where the unaligned god was named Moloch in play, the name is
 "the Great Dragon", capitalized when it starts a sentence. That
-is the priest, the high altar, the Amulet offer, the #turn line
+is the priest, the high altar, the #turn line
 in Gehennom while the random god is that name, the historian's
 amulet speech (without "the Wizard and"), the priest quest's
 nemesis death, and the oracle paragraph. The encyclopedia, the
 backup quest file, and comments are unchanged.
+
+Offering the real Amulet of Yendor on the Sanctum high altar
+prints "You feel ashamed." The Amulet is not used up, you live,
+and the alignment record is not touched. It takes a turn. An
+offering on the Astral Plane is unchanged.
 
 After the yes path has frozen the Sanctum, a blow that would
 have called down the smite on that high priest does not. Lucifer's

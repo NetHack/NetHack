@@ -54,18 +54,8 @@ staticfn boolean blocked_boulder(int, int);
  *      responsible for the theft of the Amulet from Marduk, the Creator.
  *      Moloch is unaligned.
  */
-/* Lowercase "the". Mid-sentence text prints this as-is.
-   A sentence that starts with the name uses Moloch_up(). */
+/* Lowercase "the". Mid-sentence text prints this as-is. */
 static const char *const Moloch = "the Great Dragon";
-
-static const char *
-Moloch_up(void)
-{
-    static char buf[BUFSZ];
-
-    Strcpy(buf, Moloch);
-    return upstart(buf); /* first letter only; the rest stays */
-}
 
 static const char *const godvoices[] = {
     "booms out", "thunders", "rings out", "booms",
@@ -1304,9 +1294,11 @@ offer_too_soon(aligntyp altaralign)
                         : "ashamed");
 }
 
-/* offering the Amulet on a high altar (checked by caller) ends the game;
-   we don't declare this 'NORETURN' because done() can return (if called
-   with some reasons other than ASCENDED and ESCAPED) */
+/* offering the Amulet on an Astral high altar (checked by caller) ends
+   the game. The Sanctum's unaligned high altar is handled by the caller
+   and does not reach here. we don't declare this 'NORETURN' because
+   done() can return (if called with some reasons other than ASCENDED
+   and ESCAPED) */
 staticfn void
 offer_real_amulet(struct obj *otmp, aligntyp altaralign)
 {
@@ -1323,25 +1315,7 @@ offer_real_amulet(struct obj *otmp, aligntyp altaralign)
 
     You("offer the Amulet of Yendor to %s...", a_gname());
 
-    if (altaralign == A_NONE) {
-        /* Moloch's high altar at the bottom of Gehennom. */
-        if (u.ualign.record > -99)
-            u.ualign.record = -99;
-        pline("An invisible choir chants, and you are bathed in darkness...");
-        /*[apparently shrug/snarl can be sensed without being seen]*/
-        pline("%s shrugs and retains dominion over %s,", Moloch_up(), u_gname());
-        pline("then mercilessly snuffs out your life.");
-        Sprintf(svk.killer.name, "%s indifference", s_suffix(Moloch));
-        svk.killer.format = KILLED_BY;
-        done(DIED);
-        /* life-saved (or declined to die in wizard/explore mode) */
-        pline("%s snarls and tries again...", Moloch_up());
-        
-        /* declined to die in wizard or explore mode */
-        pline(cloud_of_smoke, hcolor(NH_BLACK));
-        done(ESCAPED);
-        /*NOTREACHED*/
-    } else if (u.ualign.type != altaralign) {
+    if (u.ualign.type != altaralign) {
         /* And the opposing team picks you up and carries you off
            on their shoulders. */
         adjalign(-99);
@@ -1505,6 +1479,10 @@ dosacrifice(void)
     if (otmp->otyp == AMULET_OF_YENDOR) {
         if (!highaltar) {
             offer_too_soon(altaralign);
+            return ECMD_TIME;
+        } else if (altaralign == A_NONE) {
+            /* Sanctum high altar. The Amulet stays, and you live. */
+            You_feel("ashamed.");
             return ECMD_TIME;
         } else {
             offer_real_amulet(otmp, altaralign);
