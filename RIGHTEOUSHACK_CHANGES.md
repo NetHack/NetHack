@@ -1006,8 +1006,22 @@ is the cold rod and not the prophetic book of the same name. At the
 east end of the hall, just west of the secret door, is an altar of
 your own alignment. Praying there works as a normal prayer, and the
 first time it also locks the eight treasure doors so they will not
-open, kick, unlock, or be dug, opens the secret door with "A hidden
-way opens.", and creates the down stair beyond it. Until that prayer
+open, kick, unlock, or be dug, and creates the down stair beyond
+the secret door. After the ordinary prayer lines it says one
+line. If you are carrying a lure, even nested in a bag: "You drop
+to your knees and repent of your pride. The treasures crumble
+into dust, and a hidden way opens." With no lure in your pack:
+"The treasures crumble into dust, and a hidden way opens."
+A wish for any of those lure names is refused the way a wish for
+a quest artifact is refused, including in prophet mode. The line
+is "For a moment, you feel something in your hands, but it
+disappears!" The wish is spent and nothing is given. That covers
+the name by itself, as in "blessed Amulet of Immortality", and a
+real item "named" with one of those names. The plain base item
+can still be wished for. The +12 gray dragon scale mail is left
+to the ordinary enchantment cap. Naming an item you already hold
+is unchanged.
+Until that prayer
 the level has no down stair, and nothing else is allowed to add one.
 Praying anywhere else on Pride does not change the doors or the stair.
 The lures, including one inside a nested bag, are destroyed by that
@@ -1041,7 +1055,11 @@ full strength, with no grace turn and no damage reduction. A
 Psalm 91 you engrave on any other level still only scares
 monsters, exactly as before. Attacking does not remove the Fear
 protection. Monsters will not step onto a path tile or a stair.
-A boulder will not land or be generated there.
+A boulder will not land or be generated there. Each of the three
+Fear maps used to place 8 monsters: one blue dragon, master lich,
+arch-lich, titan, jabberwock, purple worm, pit fiend, and balrog.
+Each map now places 40, five of each of those, on floor that is
+not a Psalm 91 tile and not a stair. All 40 fit.
 
 Picking up the Sword of the Spirit returns you to the main-dungeon
 level that holds the Wilderness stair, standing on that stair.
@@ -1138,7 +1156,10 @@ the path, removes the protection until you step onto the path
 again. The garden's entry line is the one in the plan. Trees stand in
 the four corners. The last of Psalm 91, exact KJV, rings the
 altar, but the altar square itself is not engraved, so stepping
-there shows the sword instead of a verse. The Sword of the
+there shows the sword instead of a verse. Praying on that
+altar crowns you, the same crowning as anywhere else, and it
+does so every time until you already are the Servant of the
+Lord. The Sword of the
 Spirit there is blessed and +2, and it stays +2 if it is created
 again. No monsters are generated there, and none can step onto
 the level. Drinking from a fountain says "The water is living.
