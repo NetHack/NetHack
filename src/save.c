@@ -936,6 +936,8 @@ savemonchn(NHFILE *nhfp, struct monst *mtmp)
                so we need to skip the writing of any dead monsters */
             && !(program_state.in_idlecheckpoint && DEADMONSTER(mtmp))) {
             mtmp->mnum = monsndx(mtmp->data);
+            if (DEADMONSTER(mtmp) && mtmp->minvent)
+                impossible("Dead monster still has minvent");
             if (mtmp->ispriest)
                 forget_temple_entry(mtmp); /* EPRI() */
             savemon(nhfp, mtmp);

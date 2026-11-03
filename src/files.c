@@ -1385,7 +1385,7 @@ plname_from_file(
                X is actually NUL and X is playmode: one of '-', 'X', or 'D' */
             ln = (unsigned) PL_NSIZ_PLUS;
             result = memset((genericptr_t) alloc(ln), '\0', ln);
-            get_plname_from_file(nhfp, result, FALSE);
+            get_plname_from_file(nhfp, result, (size_t) ln, FALSE);
         }
         close_nhfile(nhfp);
     }
