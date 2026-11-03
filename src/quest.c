@@ -21,6 +21,7 @@ staticfn void chat_with_leader(struct monst *);
 staticfn void chat_with_nemesis(void);
 staticfn void chat_with_guardian(void);
 staticfn void prisoner_speaks(struct monst *);
+static void give_word_lamp(void);
 
 staticfn void
 on_start(void)
@@ -262,10 +263,7 @@ finish_quest(struct obj *obj) /* quest artifact or thrown unique item or faux
     } else {
         /* normal quest completion; threw artifact or walked up carrying it */
         qt_pager(!Qstat(got_thanks) ? "offeredit" : "offeredit2");
-        /* should have obtained bell during quest;
-           if not, suggest returning for it now */
-        if ((otmp = carrying(BELL_OF_OPENING)) == 0)
-            com_pager("quest_complete_no_bell");
+        /* The bell is gone. The lamp is given below, once. */
     }
     Qstat(got_thanks) = TRUE;
 
@@ -275,7 +273,29 @@ finish_quest(struct obj *obj) /* quest artifact or thrown unique item or faux
            quest artifact */
         fully_identify_obj(obj);
         update_inventory();
+        if (!u.uevent.lamp_given)
+            give_word_lamp();
     }
+}
+
+/* Class quest completion. The lamp goes straight into inventory.
+   Stock class artifacts are not changed. */
+static void
+give_word_lamp(void)
+{
+    struct obj *otmp;
+
+    u.uevent.lamp_given = 1;
+    otmp = mksobj(LAMP_OF_GODS_WORD, TRUE, FALSE);
+    if (!otmp)
+        return;
+    bless(otmp);
+    otmp->spe = 1; /* stays lit, the way a magic lamp does */
+    otmp->bknown = otmp->known = otmp->dknown = 1;
+    pline("You receive the Lamp of God's Word.");
+    (void) hold_another_object(otmp, "Oops!  %s to the floor!",
+                               The(aobjnam(otmp, "drop")),
+                               (const char *) 0);
 }
 
 staticfn void

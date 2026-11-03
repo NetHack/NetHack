@@ -4423,11 +4423,13 @@ zhitm(
         break;
     case ZT_LIGHTNING:
         tmp = d(nd, 6);
-        /* Sodom and Tyre: lightning deals triple damage. */
-        if (Is_medusa_level(&u.uz))
-            tmp *= 3;
         if (spellcaster)
             tmp = spell_damage_bonus(tmp);
+        /* Sodom and Tyre: lightning the hero deals to a monster
+           is triple. type >= 0 is the hero's wand, spell, or breath.
+           A monster's bolt is not tripled. Blinding uses nd. */
+        if (type >= 0 && Is_medusa_level(&u.uz))
+            tmp *= 3;
         orig_dmg = tmp;
         if (resists_elec(mon) || defended(mon, AD_ELEC)) {
             sho_shieldeff = TRUE;
@@ -4604,10 +4606,8 @@ zhitu(
         done(DIED);
         return; /* lifesaved */
     case ZT_LIGHTNING:
+        /* Lightning that hits the hero stays the stock roll. */
         orig_dam = d(nd, 6);
-        /* Sodom and Tyre: lightning deals triple damage. */
-        if (Is_medusa_level(&u.uz))
-            orig_dam *= 3;
         if (Shock_resistance) {
             shieldeff(sx, sy);
             You("aren't affected.");
@@ -6535,6 +6535,10 @@ wish_from_text(char *buf, boolean last_try)
             || otmp->otyp == SCR_SCHOLARS_SCROLL
             || otmp->otyp == SCR_PETERS_SCROLL
             || otmp->otyp == ROCK_WITH_KEYHOLE
+            || otmp->otyp == LAMP_OF_GODS_WORD
+            || otmp->otyp == BELL_OF_OPENING
+            || otmp->otyp == CANDELABRUM_OF_INVOCATION
+            || otmp->otyp == SPE_BOOK_OF_THE_DEAD
             || (otmp->otyp == CRYSTAL_BALL && !otmp->oartifact))) {
         pline("You cannot wish for that.");
         obfree(otmp, (struct obj *) 0);

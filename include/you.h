@@ -63,12 +63,15 @@ struct u_event {
     Bitfield(sodom_taunts, 7);      /* one-time Sodom and Tyre taunts */
     Bitfield(wilderness_sealed, 1); /* sword taken; branch cannot be reentered */
     Bitfield(fear_exposed, 1);      /* attacked, so the path no longer protects */
-    Bitfield(greed_hint, 2);        /* which full-verse hint the gate last gave */
+    Bitfield(greed_hint, 2);        /* 0 until the Greed gate's first bounce */
     Bitfield(pride_prayed, 1);      /* prayed on the Pride altar; the way is open */
     Bitfield(greed_warned, 1);      /* the 30-turns-left hunger warning has been shown */
     Bitfield(greed_snapped, 1);     /* gold on entering Greed has been recorded */
+    Bitfield(gates_revealed, 1);    /* prayer opened the walled square */
+    Bitfield(lamp_verse, 1);        /* Psalm 119:105 has been shown */
+    Bitfield(lamp_given, 1);        /* quest completion gave the lamp */
     Bitfield(wilderness_intro, 5);  /* which Wilderness floors have shown the intro */
-    /* 47 bits */
+    /* 50 bits */
 };
 
 /*

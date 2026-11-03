@@ -400,6 +400,7 @@ struct obj {
 #define ignitable(otmp) \
     ((otmp)->otyp == BRASS_LANTERN || (otmp)->otyp == OIL_LAMP      \
      || ((otmp)->otyp == MAGIC_LAMP && (otmp)->spe > 0)             \
+     || (otmp)->otyp == LAMP_OF_GODS_WORD                           \
      || (otmp)->otyp == CANDELABRUM_OF_INVOCATION                   \
      || (otmp)->otyp == TALLOW_CANDLE || (otmp)->otyp == WAX_CANDLE \
      || (otmp)->otyp == POT_OIL)

@@ -20,6 +20,7 @@ staticfn void use_bell(struct obj **);
 staticfn void use_candelabrum(struct obj *);
 staticfn void use_candle(struct obj **);
 staticfn void use_lamp(struct obj *);
+static int use_word_lamp(struct obj *);
 staticfn void light_cocktail(struct obj **);
 staticfn int rub_ok(struct obj *);
 staticfn void display_jump_positions(boolean);
@@ -1206,6 +1207,13 @@ staticfn void
 use_bell(struct obj **optr)
 {
     struct obj *obj = *optr;
+
+    if (obj->otyp == BELL_OF_OPENING) {
+        pline("The Bell of Opening crumbles into dust. It has no place here.");
+        useup(obj);
+        *optr = 0;
+        return;
+    }
     struct monst *mtmp;
     boolean wakem = FALSE, learno = FALSE,
             ordinary = (obj->otyp != BELL_OF_OPENING || !obj->spe),
@@ -1322,69 +1330,8 @@ use_bell(struct obj **optr)
 staticfn void
 use_candelabrum(struct obj *obj)
 {
-    const char *s = (obj->spe != 1) ? "candles" : "candle";
-
-    if (obj->lamplit) {
-        You("snuff the %s.", s);
-        end_burn(obj, TRUE);
-        return;
-    }
-    if (obj->spe <= 0) {
-        struct obj *otmp;
-
-        pline("This %s has no %s.", xname(obj), s);
-        /* only output tip if candles are in inventory */
-        for (otmp = gi.invent; otmp; otmp = otmp->nobj)
-            if (Is_candle(otmp))
-                break;
-        if (otmp)
-            pline("To attach candles, apply them instead of the %s.",
-                  xname(obj));
-        return;
-    }
-    if (Underwater) {
-        You("cannot make fire under water.");
-        return;
-    }
-    if (u.uswallow || obj->cursed) {
-        if (!Blind)
-            pline_The("%s %s for a moment, then %s.", s, vtense(s, "flicker"),
-                      vtense(s, "die"));
-        return;
-    }
-    if (obj->spe < 7) {
-        There("%s only %d %s in %s.", vtense(s, "are"), obj->spe, s,
-              the(xname(obj)));
-        if (!Blind)
-            pline("%s lit.  %s dimly.", obj->spe == 1 ? "It is" : "They are",
-                  Tobjnam(obj, "shine"));
-    } else {
-        pline("%s's %s burn%s", The(xname(obj)), s,
-              (Blind ? "." : " brightly!"));
-    }
-    if (!invocation_pos(u.ux, u.uy) || On_stairs(u.ux, u.uy)) {
-        pline_The("%s %s being rapidly consumed!", s, vtense(s, "are"));
-        /* this used to be obj->age /= 2, rounding down; an age of
-           1 would yield 0, confusing begin_burn() and producing an
-           unlightable, unrefillable candelabrum; round up instead */
-        obj->age = (obj->age + 1L) / 2L;
-
-        /* to make absolutely sure the game doesn't become unwinnable as
-           a consequence of a broken candelabrum */
-        if (obj->age == 0) {
-            impossible("Candelabrum with candles but no fuel?");
-            obj->age = 1;
-        }
-    } else {
-        if (obj->spe == 7) {
-            if (Blind)
-                pline("%s a strange warmth!", Tobjnam(obj, "radiate"));
-            else
-                pline("%s with a strange light!", Tobjnam(obj, "glow"));
-        }
-        obj->known = 1;
-    }
-    begin_burn(obj, FALSE);
+    pline("The Candelabrum of Invocation crumbles into dust. It has no place here.");
+    useup(obj);
 }
 
 staticfn void
@@ -1701,6 +1648,68 @@ use_lamp(struct obj *obj)
         }
         begin_burn(obj, FALSE);
     }
+}
+
+/* Direction the flame leans. Null means the hero is standing on the
+   vibrating square. "downward" and "upward" are used as the whole
+   direction, not after "toward the". */
+static const char *
+word_lamp_bearing(void)
+{
+    static const char *const diag[3][3] = {
+        { "northwest", "north", "northeast" },
+        { "west", (const char *) 0, "east" },
+        { "southwest", "south", "southeast" }
+    };
+    d_level inv;
+    int dx, dy;
+
+    if (Invocation_lev(&u.uz)) {
+        if (u.ux == svi.inv_pos.x && u.uy == svi.inv_pos.y)
+            return (const char *) 0;
+        dx = (svi.inv_pos.x > u.ux) - (svi.inv_pos.x < u.ux);
+        dy = (svi.inv_pos.y > u.uy) - (svi.inv_pos.y < u.uy);
+        return diag[dy + 1][dx + 1];
+    }
+    inv.dnum = sanctum_level.dnum;
+    inv.dlevel = (sanctum_level.dlevel > 1) ? sanctum_level.dlevel - 1 : 1;
+    if (depth(&u.uz) < depth(&inv))
+        return "downward";
+    if (depth(&u.uz) > depth(&inv))
+        return "upward";
+    return "toward the vibrating square";
+}
+
+/* The lamp stays lit. Applying it again only reads the flame. */
+static int
+use_word_lamp(struct obj *obj)
+{
+    const char *bearing;
+
+    if (Underwater) {
+        pline("This is not a diving lamp.");
+        return ECMD_TIME;
+    }
+    if (!obj->lamplit) {
+        check_unpaid(obj);
+        obj->spe = 1;
+        begin_burn(obj, FALSE);
+        pline("%s is now on.", Yname2(obj));
+    }
+    if (!u.uevent.lamp_verse) {
+        /* Psalm 119:105 KJV, without the acrostic heading "NUN." */
+        pline("Thy word is a lamp unto my feet, and a light unto my path.");
+        u.uevent.lamp_verse = 1;
+    }
+    bearing = word_lamp_bearing();
+    if (!bearing)
+        pline("The flame burns straight up.");
+    else if (!strcmp(bearing, "downward") || !strcmp(bearing, "upward")
+             || !strncmp(bearing, "toward ", 7))
+        pline("The flame bends %s.", bearing);
+    else
+        pline("The flame bends toward the %s.", bearing);
+    return ECMD_TIME;
 }
 
 staticfn void
@@ -4370,12 +4379,16 @@ doapply(void)
         break;
     case CANDELABRUM_OF_INVOCATION:
         use_candelabrum(obj);
+        obj = (struct obj *) 0; /* useup() freed it */
         break;
     case WAX_CANDLE:
     case TALLOW_CANDLE:
         use_candle(&obj);
         break;
-    case THURIBLE:    
+    case LAMP_OF_GODS_WORD:
+        res = use_word_lamp(obj);
+        break;
+    case THURIBLE:
     case OIL_LAMP:
     case MAGIC_LAMP:
         if (has_oname(obj) && !strcmp(ONAME(obj), "magic lamp of unlimited wishing")

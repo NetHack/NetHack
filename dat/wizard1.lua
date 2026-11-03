@@ -56,8 +56,8 @@ local wiz1 = des.map({ halign = "center", valign = "center", map = [[
    des.monster({ id = "Wizard of Yendor", x=16, y=05, asleep=1 })
    des.monster("hell hound", 15, 05)
    des.monster("vampire lord", 17, 05)
-   -- The local treasure
-   des.object("Book of the Dead", 16, 05)
+   -- The Book of the Dead is removed. The Lamp of God's Word is the
+   -- class-quest reward, not a treasure on this level.
    -- Surrounding terror
    des.monster("kraken", 14, 02)
    des.monster("giant eel", 17, 02)

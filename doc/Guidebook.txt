@@ -2952,15 +2952,13 @@
           The `\' and ``a' commands will list artifacts that you have fully
      identified (knowing the name and item type isn't sufficient).
 
-     7.3.  Relics
+     7.3.  The Lamp and the Gates
 
-          There are three unique items that are named and have limited spe-
-     cial  powers but aren't classified as artifacts.  Each is guarded by a
-     particular monster and you'll need to collect all three for  use  late
-     in  the game.  They are the Bell of Opening, the Book of the Dead, and
-     the Candelabrum of Invocation.  Their corresponding descriptions  when
-     not  yet  identified  are  silver  bell, papyrus spellbook, and cande-
-     labrum.
+          The Bell of Opening, the Book of the Dead, and the Candelabrum
+     of Invocation are gone.  Finishing your class quest places the Lamp
+     of God's Word in your pack.  Apply it and the flame leans toward the
+     vibrating square.  Pray there.  A wall seals you in, and the Gates of
+     Hell appear.  The key Peter gives you is what opens them.
 
 
 
@@ -3875,12 +3873,11 @@
          Medusa       -  Defeated Medusa.
          Tune         -  Discovered  the  tune that can be used to open
                          and close the drawbridge on the Castle level.
-         Bell         -  Acquired the Bell of Opening.
+         Bell         -  Unused. The Bell of Opening has been removed.
          Gehennom     -  Entered Gehennom.
-         Candle       -  Acquired the Candelabrum of Invocation.
-         Book         -  Acquired the Book of the Dead.
-         Invocation   -  Gained  access  to  the  bottommost  level  of
-                         Gehennom.
+         Candle       -  Unused. The Candelabrum of Invocation is gone.
+         Book         -  Unused. The Book of the Dead has been removed.
+         Invocation   -  Opened the Gates of Hell into Moloch's Sanctum.
          Amulet       -  Acquired the fabled Amulet of Yendor.
          Endgame      -  Reached the Elemental Planes.
          Astral       -  Reached the Astral Plane level.

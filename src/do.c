@@ -1241,6 +1241,13 @@ dodown(void)
             }
         }
     }
+    /* The stairs exist once the square has been revealed. They stay
+       shut until Peter's key is used on them. */
+    if (stairs_down && invocation_pos(u.ux, u.uy) && !u.uevent.invoked) {
+        pline("The gates stay shut. The key Peter gave you will open them.");
+        return ECMD_OK;
+    }
+
     if (on_level(&valley_level, &u.uz) && !u.uevent.gehennom_entered) {
         You("are standing at the gate to Gehennom.");
         pline("Unspeakable cruelty and harm lurk down there.");

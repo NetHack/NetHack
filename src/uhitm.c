@@ -942,6 +942,12 @@ hmon_hitmon_weapon_melee(
     /* "normal" weapon usage */
     hmd->use_weapon_skill = TRUE;
     hmd->dmg = dmgval(obj, mon);
+    /* Sword of the Spirit: d(experience level, 2) on every melee hit.
+       Added before hmon_hitmon_dmg_recalc(), so the Sodom and Tyre
+       double of the whole total includes this bonus. */
+    if (hmd->thrown == HMON_MELEE
+        && obj->oartifact == ART_SWORD_OF_THE_SPIRIT)
+        hmd->dmg += d((int) u.ulevel, 2);
     /* a minimal hit doesn't exercise proficiency */
     hmd->train_weapon_skill = (hmd->dmg > 1);
 
@@ -1519,10 +1525,10 @@ hmon_hitmon_dmg_recalc(struct _hitmon_data *hmd, struct obj *obj)
     /* don't let penalty, if bonus is negative, turn a hit into a miss */
     if (hmd->dmg < 1)
         hmd->dmg = 1;
-    /* Sodom and Tyre: the Sword of the Spirit deals triple damage. */
+    /* Sodom and Tyre: the Sword of the Spirit deals double damage. */
     if (Is_medusa_level(&u.uz) && obj
         && obj->oartifact == ART_SWORD_OF_THE_SPIRIT)
-        hmd->dmg *= 3;
+        hmd->dmg *= 2;
 }
 
 staticfn void

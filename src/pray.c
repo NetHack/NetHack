@@ -1991,6 +1991,14 @@ prayer_done(void)
         && gibeon_vision())
         return 1;
 
+    /* Vibrating square: the verse, the walled square, and the gates.
+       This is the way into the Sanctum, so a prayer timeout does not
+       block it, and it does not also grant a miracle. */
+    if (invocation_pos(u.ux, u.uy) && !u.uevent.gates_revealed) {
+        reveal_gates();
+        return 1;
+    }
+
     /* The Garden altar the Sword of the Spirit rests on crowns.
        Same crowning as any other, and certain. */
     if (in_wilderness() && dunlev(&u.uz) == 5 && on_altar()

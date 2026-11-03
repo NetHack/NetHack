@@ -1533,7 +1533,7 @@ sos_hit(struct monst *magr,   /* attacker – will always be &youmonst */
         ndice = 2;
         die   = 4;
     }
-    /* Roll the 3d4 extra damage that represents the convicting power of the Word */
+    /* Roll the 2d4 extra damage that represents the convicting power of the Word */
     stun_damage = d(ndice, die);
     *dmgptr += stun_damage;
 
@@ -1545,20 +1545,19 @@ sos_hit(struct monst *magr,   /* attacker – will always be &youmonst */
     /* Roll to see if the truth convicts and overwhelms the enemy */
     if (rn2(100) < stun_chance) {
         stunned = TRUE;
-        stun_duration = stun_damage;  /* duration = total rolled on 3d4 */
+        stun_duration = stun_damage;  /* duration = total rolled on 2d4 */
 
         /* Apply paralyze to the monster */
         paralyze_monst(mdef, stun_duration);
-        
-
 
         if (vis) {
             pline("The Sword of the Spirit blazes with holy light. %s %s overwhelmed by divine truth!",
                   Monnam(mdef), mdef->mstun > 5 ? "is" : "seems");
+            return TRUE; /* this line replaces the normal hit message */
         }
-    } 
+    }
 
-    return TRUE;  /* message was always given */
+    return FALSE; /* caller prints the normal hit message */
 }
 
 DISABLE_WARNING_FORMAT_NONLITERAL

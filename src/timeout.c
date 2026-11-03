@@ -1717,10 +1717,14 @@ begin_burn(struct obj *obj, boolean already_lit)
     long turns = 0;
     boolean do_timer = TRUE;
 
-    if (obj->age == 0 && obj->otyp != MAGIC_LAMP && obj->oartifact != ART_GOLDEN_CENSER_OF_INCENSE  && !artifact_light(obj))
+    if (obj->age == 0 && obj->otyp != MAGIC_LAMP
+        && obj->otyp != LAMP_OF_GODS_WORD
+        && obj->oartifact != ART_GOLDEN_CENSER_OF_INCENSE
+        && !artifact_light(obj))
         return;
 
     switch (obj->otyp) {
+    case LAMP_OF_GODS_WORD:
     case MAGIC_LAMP:
         obj->lamplit = 1;
         do_timer = FALSE;
@@ -1823,7 +1827,8 @@ end_burn(struct obj *obj, boolean timer_attached)
         return;
     }
 
-    if (obj->otyp == MAGIC_LAMP || artifact_light(obj))
+    if (obj->otyp == MAGIC_LAMP || obj->otyp == LAMP_OF_GODS_WORD
+        || artifact_light(obj))
         timer_attached = FALSE;
 
     if (obj->otyp == THURIBLE && obj->oartifact == ART_GOLDEN_CENSER_OF_INCENSE )

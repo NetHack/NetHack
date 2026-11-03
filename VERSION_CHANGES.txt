@@ -11,6 +11,28 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-03
+On Sodom and Tyre, the Sword of the Spirit deals double damage.
+Lightning the hero deals a monster there is triple: a rod, a
+prophecy, or breath. Lightning that hits you, and lightning
+between monsters, is unchanged. The flash is unchanged.
+
+2026-11-03
+Wearing an artifact that resists blindness, such as the Belt of
+Truth, is recognized when a flash is resisted.
+
+2026-11-03
+Every melee hit with the Sword of the Spirit adds dice equal to
+your experience level, each die having 2 sides, on top of the
+blade and the holy light. A holy-light hit that does not paralyze
+still shows the ordinary hit line.
+
+2026-11-03
+The first time the Greed gate sends you back, it says Matthew
+19:22: "But when the young man heard that saying, he went away
+sorrowful: for he had great possessions." Every bounce after
+that says "Thou must leave all behind to pass this way."
+
+2026-11-03
 Each Fear map still places 40 monsters. The master lich, the
 arch-lich, and the titan are now a minotaur, an ettin, and a
 storm giant, five of each. Blue dragon, jabberwock, purple worm,
@@ -94,6 +116,17 @@ Stepping on a Wilderness verse shows only the verse. The Sword of
 the Spirit opens a portal home. The rod of frozen power is the
 cold rod. Finger of execution on Pride is never easier than it is
 elsewhere, and never better than 30 percent.
+
+2026-11-01
+The Bell, the Candelabrum, and the Book of the Dead are gone.
+Finishing a class quest puts the Lamp of God's Word in your pack.
+Applying it, the flame leans toward the vibrating square, and the
+first time it quotes Psalm 119:105. Praying on that square quotes
+Ephesians 6:13, blasts open a walled 9x9 square, and the Gates of
+Hell appear. Peter's key quotes Matthew 16:18 and then Psalm
+107:16, and the gates open. Without the key they stay shut. No
+piece of the Armor of God is required. The order of those lines
+is the one used here and is still open for Jon to confirm.
 
 2026-11-01
 A pet will not step onto a Mines' End letter, on the path or

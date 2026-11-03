@@ -32,7 +32,6 @@ struct chain_lightning_zap;
 staticfn int spell_let_to_idx(char);
 staticfn boolean cursed_book(struct obj * bp);
 staticfn boolean confused_book(struct obj *);
-staticfn void deadbook_pacify_undead(struct monst *);
 staticfn void deadbook(struct obj *);
 staticfn int learn(void);
 staticfn boolean rejectcasting(void);
@@ -206,136 +205,17 @@ confused_book(struct obj *spellbook)
     return gone;
 }
 
-/* pacify or tame an undead monster */
-staticfn void
-deadbook_pacify_undead(struct monst *mtmp)
-{
-    if ((is_undead(mtmp->data) || is_vampshifter(mtmp))
-        && cansee(mtmp->mx, mtmp->my)) {
-        mtmp->mpeaceful = TRUE;
-        if (sgn(mtmp->data->maligntyp) == sgn(u.ualign.type)
-            && mdistu(mtmp) < 4)
-            if (mtmp->mtame) {
-                if (mtmp->mtame < 20)
-                    mtmp->mtame++;
-            } else
-                (void) tamedog(mtmp, (struct obj *) 0, TRUE);
-        else
-            monflee(mtmp, 0, FALSE, TRUE);
-    }
-}
-
-/* special effects for the Book of the Dead; reading it while blind is
-   allowed so that needs to be taken into account too */
+/* The Book of the Dead is removed. Reading a leftover copy destroys it
+   and does not open the Sanctum. */
 staticfn void
 deadbook(struct obj *book2)
 {
-    struct monst *mtmp;
-    coord mm;
-
-    You("turn the pages of the Book of the Dead...");
-    makeknown(SPE_BOOK_OF_THE_DEAD);
-    observe_object(book2); /* in case blind now and hasn't been seen yet */
-    /* KMH -- Need ->known to avoid "_a_ Book of the Dead" */
-    book2->known = 1;
-    if (invocation_pos(u.ux, u.uy) && !On_stairs(u.ux, u.uy)) {
-        struct obj *otmp;
-        boolean arti1_primed = FALSE, arti2_primed = FALSE,
-                         arti_cursed = FALSE;
-
-        if (book2->cursed) {
-            pline_The("%s!",
-                      Blind ? "Book seems to be ignoring you"
-                            : "runes appear scrambled.  You can't read them");
-            return;
-        }
-
-        if (!u.uhave.bell || !u.uhave.menorah) {
-            pline("A chill runs down your %s.", body_part(SPINE));
-            if (!u.uhave.bell) {
-                Soundeffect(se_faint_chime, 30);
-                You_hear("a faint chime...");
-            }
-            if (!u.uhave.menorah)
-                pline("Vlad's doppelganger is amused.");
-            return;
-        }
-
-        for (otmp = gi.invent; otmp; otmp = otmp->nobj) {
-            if (otmp->otyp == CANDELABRUM_OF_INVOCATION && otmp->spe == 7
-                && otmp->lamplit) {
-                if (!otmp->cursed)
-                    arti1_primed = TRUE;
-                else
-                    arti_cursed = TRUE;
-            }
-            if (otmp->otyp == BELL_OF_OPENING
-                && (svm.moves - otmp->age) < 5L) { /* you rang it recently */
-                if (!otmp->cursed)
-                    arti2_primed = TRUE;
-                else
-                    arti_cursed = TRUE;
-            }
-        }
-
-        if (arti_cursed) {
-            pline_The("invocation fails!");
-            /* this used to say "your artifacts" but the invocation tools
-               are not artifacts */
-            pline("At least one of your relics is cursed...");
-        } else if (arti1_primed && arti2_primed) {
-            unsigned soon = (unsigned) d(2, 6); /* time til next intervene() */
-
-            /* successful invocation */
-            mkinvokearea();
-            u.uevent.invoked = 1;
-            record_achievement(ACH_INVK);
-            /* in case you haven't killed the Wizard yet, behave as if
-               you just did */
-            u.uevent.udemigod = 1; /* wizdeadorgone() */
-            if (!u.udg_cnt || u.udg_cnt > soon)
-                u.udg_cnt = soon;
-        } else { /* at least one relic not prepared properly */
-            You("have a feeling that %s is amiss...", something);
-            goto raise_dead;
-        }
-        return;
+    pline("The Book of the Dead crumbles into dust. It has no place here.");
+    if (svc.context.spbook.book == book2) {
+        svc.context.spbook.book = 0;
+        svc.context.spbook.o_id = 0;
     }
-
-    /* when not an invocation situation */
-    if (book2->cursed) {
- raise_dead:
-
-        You("raised the dead!");
-        /* first maybe place a dangerous adversary */
-        if (!rn2(3) && ((mtmp = makemon(&mons[PM_MASTER_LICH], u.ux, u.uy,
-                                        NO_MINVENT)) != 0
-                        || (mtmp = makemon(&mons[PM_NALFESHNEE], u.ux, u.uy,
-                                           NO_MINVENT)) != 0)) {
-            mtmp->mpeaceful = 0;
-            set_malign(mtmp);
-        }
-        /* next handle the affect on things you're carrying */
-        (void) unturn_dead(&gy.youmonst);
-        /* last place some monsters around you */
-        mm.x = u.ux;
-        mm.y = u.uy;
-        mkundead(&mm, TRUE, NO_MINVENT);
-    } else if (book2->blessed) {
-        iter_mons(deadbook_pacify_undead);
-    } else {
-        switch (rn2(3)) {
-        case 0:
-            Your("ancestors are annoyed with you!");
-            break;
-        case 1:
-            pline_The("headstones in the cemetery begin to move!");
-            break;
-        default:
-            pline("Oh my!  Your name appears in the book!");
-        }
-    }
-    return;
+    useup(book2);
 }
 
 /* 'book' has just become cursed; if we're reading it, interrupt */

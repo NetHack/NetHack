@@ -1023,6 +1023,10 @@ mksobj_init(struct obj **obj, boolean artif)
             otmp->lamplit = 0;
             blessorcurse(otmp, 2);
             break;
+        case LAMP_OF_GODS_WORD:
+            otmp->spe = 1; /* lightable, and it does not burn out */
+            otmp->lamplit = 0;
+            break;
         case THURIBLE:
             otmp->spe = 1;
             otmp->lamplit = 0;

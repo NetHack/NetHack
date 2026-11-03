@@ -659,8 +659,10 @@ prayers at the altar are ordinary prayers.
 The Belt of Truth is the artifact that was already defined on the
 humble sash. Its base item and properties are unchanged. The +2 is
 the enchantment of this gift. While worn, that enchantment is +2
-Intelligence. The human race table still lists a Wisdom ceiling of
-18. This gift raises the ceiling for the hero who receives it, so
+Intelligence. Wearing it, or any artifact with blindness resistance,
+is recognized when a flash is resisted. The human race table still
+lists a Wisdom ceiling of 18. This gift raises the ceiling for the
+hero who receives it, so
 the 25 is not immediately pulled back down to 18.
 
 Humans are the only race in the race table. No other race can be
@@ -923,10 +925,13 @@ stone says she meets her own gaze in the reflecting item as
 the hero knows it, and shrieks as her flesh turns to stone,
 whether or not she is seen. With no worn or wielded item, the
 line names no item. The kill says "You defeat Medusa!" The
-experience is unchanged. Lightning from a rod, a prophecy, or a breath,
-and the Sword of the Spirit, deal triple damage on this level.
-Shock resistance still negates lightning. Tyre's gold piles can be
-kept. Medusa's seven taunts each play once, as a single message.
+experience is unchanged. Lightning the hero deals a monster,
+from a rod, a prophecy, or a breath, is triple on this level.
+Lightning that hits you, and lightning one monster deals another,
+is unchanged. The flash is unchanged. Shock resistance still
+negates lightning. The Sword of the Spirit deals double damage
+here. Tyre's gold piles can be kept. Medusa's seven taunts each
+play once, as a single message.
 She still leaves Medusa's essence under the food rules. The level
 does not generate random monsters and cannot be dug or teleported
 across. The arrival line is the first taunt. The first real room on the
@@ -957,8 +962,11 @@ flawless gems of every color and with gold. Most piles are 1,000 to
 gate is the door at the far east. Job 1:21 is on the square before
 it. Past the gate is the restore square, Matthew 6:33, then the down
 stair. Stepping on the gate while carrying anything, gold included,
-sends you back to the entrance stair and cycles Matthew 6:19, Luke
-18:22, and Job 1:21. Empty-handed, only objects you yourself dropped,
+sends you back to the entrance stair. The first bounce says
+Matthew 19:22, "But when the young man heard that saying, he
+went away sorrowful: for he had great possessions." Every bounce
+after that says "Thou must leave all behind to pass this way."
+Empty-handed, only objects you yourself dropped,
 and not a flawless gem, are moved to the restore square. On entering
 Greed the game records how much gold you are carrying, in hand and in
 bags. On leaving, your gold is set back to exactly that amount. The
@@ -1168,6 +1176,16 @@ It restores you." Hit points return to full and hunger is cured.
 Dipping says "The living water does no harm." There is no snake,
 no demon, and no curse.
 
+### Sword of the Spirit hits (2026-11-03)
+
+Every melee hit adds d(experience level, 2) on top of the blade's
+own dice, its +2, and the holy light's 2d4. That 2d4 still happens
+only when the to-hit roll is 8 or less. The paralyze chance is
+unchanged. On Sodom and Tyre that whole hit total is doubled, so
+the double covers this bonus. When the holy light does not print
+its own line, the ordinary
+hit message is shown.
+
 ### Long sword for every playable role (2026-11-03)
 
 The Sword of the Spirit is a doubled-edged blade, trained as a
@@ -1193,6 +1211,39 @@ spell group "Prophetic Skills". The seven schools use the names
 already shown for a prophecy's category: spiritual warfare,
 healing, discernment, blessing, prayer, deliverance, and creation.
 They stay lowercase, with no "spells" suffix.
+
+### Entering Moloch's Sanctum (2026-11-01)
+
+The Bell of Opening, the Candelabrum of Invocation, and the Book
+of the Dead are not placed, cannot be wished for, and crumble if
+one is used. Vlad does not carry the candelabrum. A quest nemesis
+does not carry the bell. The wizard's tower does not hold the book.
+Reading the book no longer performs the invocation. Class quest
+artifacts are unchanged. Stock quest dialogue may still mention
+the silver bell. That pager which sent you back for the bell is
+no longer shown.
+
+Completing a class quest places a blessed Lamp of God's Word in
+inventory, once. Applying it lights it and does not snuff it on
+the next apply, so it can be read again. The first time, it shows
+Psalm 119:105 KJV without the acrostic heading. On the vibrating
+square's level the flame bends toward a compass point, or burns
+straight up on the square itself. Off that level it bends downward
+or upward.
+
+Praying on the vibrating square, even during a prayer timeout,
+shows Ephesians 6:13 KJV, replaces a 9x9 square with floor and an
+undiggable wall, and puts down stairs in the middle. Those stairs
+are the Gates of Hell. They do not open until the Key to the Gates
+of Hell is applied while standing on them. That shows Matthew
+16:18 KJV, then Psalm 107:16 KJV. Going down before that says the
+gates stay shut and names Peter's key. No Armor of God piece is
+required. Opening the gates does not pretend the Wizard is already
+dead. Prophet mode can levelport with "vibrating" or "gates".
+
+The lines that are not in the plan, and the message order, are
+listed in the pull request for Jon. The plan still marks that
+order as pending.
 
 ### Planned (not done)
 
