@@ -11,6 +11,11 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-03
+On the Sanctum, the Sword of the Spirit does double damage to
+every monster. There is no message. The level dice and the holy
+light are in that total, the same way Sodom and Tyre triples it.
+
+2026-11-03
 The Sanctum level is called the Sanctum of the Great Dragon.
 A smite from its unaligned shrine names the Great Dragon, not
 Moloch. The bolt and the odds are unchanged.
