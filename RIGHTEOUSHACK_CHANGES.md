@@ -1230,7 +1230,9 @@ looting.
 Stepping into the Sanctum temple, while the high priest can
 speak and you are not deaf, that priest says "Welcome, we have
 long awaited thee. Look thou within the chest, and receive thy
-reward." The first time, the priest still becomes hostile. The
+reward." The welcome leaves the priest peaceful. Attacking
+still asks the ordinary question, then she turns hostile and the
+smite is unchanged. The
 lead-in "The high priest intones:" still appears on its old
 timer. Other temples are unchanged.
 
