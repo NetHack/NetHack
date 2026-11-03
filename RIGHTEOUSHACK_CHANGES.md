@@ -659,8 +659,10 @@ prayers at the altar are ordinary prayers.
 The Belt of Truth is the artifact that was already defined on the
 humble sash. Its base item and properties are unchanged. The +2 is
 the enchantment of this gift. While worn, that enchantment is +2
-Intelligence. The human race table still lists a Wisdom ceiling of
-18. This gift raises the ceiling for the hero who receives it, so
+Intelligence. Wearing it, or any artifact with blindness resistance,
+is recognized when a flash is resisted. The human race table still
+lists a Wisdom ceiling of 18. This gift raises the ceiling for the
+hero who receives it, so
 the 25 is not immediately pulled back down to 18.
 
 Humans are the only race in the race table. No other race can be

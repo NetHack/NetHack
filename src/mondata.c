@@ -284,9 +284,15 @@ resists_blnd_by_arti(struct monst *mon)
     if (o && o->oartifact && defends(AD_BLND, o))
         return TRUE;
     o = is_you ? gi.invent : mon->minvent;
-    for (; o; o = o->nobj)
+    for (; o; o = o->nobj) {
         if (defends_when_carried(AD_BLND, o))
             return TRUE;
+        /* Worn artifact whose spfx includes SPFX_BLIND_RES, such as
+           the Belt of Truth. W_ART and W_ARTI are not worn. */
+        if (o->oartifact && (o->owornmask & ~(W_ART | W_ARTI))
+            && spec_ability(o, SPFX_BLIND_RES))
+            return TRUE;
+    }
 #if 0   /* omit this; the Eyes of the Overworld have no carry property and
          * their worn property is magic resistance rather than blindness
          * resistance; wearing them blocks blindness without actually
