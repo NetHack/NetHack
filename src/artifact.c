@@ -424,6 +424,12 @@ artifact_exists(
                        there's no ONAME_ flag) and flgs might also contain
                        the know_arti bit (hero knows that artifact exists) */
                     artifact_origin(otmp, flgs);
+                    /* The garden sword is +2 and never cursed, including
+                       when a gift or a wish creates it again. */
+                    if (!strcmp(a->name, "Sword of the Spirit")) {
+                        otmp->spe = 2;
+                        uncurse(otmp);
+                    }
                 } else { /* uncreate */
                     /* clear all the flag bits */
                     artiexist[m] = zero_artiexist;

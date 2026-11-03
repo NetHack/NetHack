@@ -10,6 +10,28 @@ RighteousHack will eventually replace lawful, neutral, and chaotic
 with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
+2026-11-03
+Each Wilderness floor shows a full-screen intro once, the
+first time you arrive. The desert says he or she was led into
+the wilderness. Greed, Pride, and Fear add Luke 12:15,
+Proverbs 16:18, and 2 Timothy 1:7 under the verse. The garden
+has no reference. On the Fear path or either stair, monsters
+still walk up and crowd the tile, but they do not start an
+attack. Stepping off, they attack at full strength. A Psalm 91
+you engrave yourself is unchanged. The Cave of Wonders clock
+starts at 200 turns. Every accepted prayer adds 50 and says
+"The Lord is pleased with you and has restored your strength."
+Picking up a gold pile or a gem costs 25, and the command
+then says that greed has hastened your hunger. At 30 or fewer the
+countdown shows, and it stops if a prayer lifts you above 30.
+At 0 the tombstone is unchanged. A Pride reflection has 60 hit
+points. Its level and its drain both stop at 4. Finger of
+execution casts at a flat 50 percent and kills through resistance
+and reflection. It leaves the spell list when you leave Pride.
+The Rod of Frozen Power burst is blue and stays on screen about
+a second and a half longer. The Garden altar under the Sword of
+the Spirit has no engraving. The sword is a blessed +2.
+
 2026-11-02
 A Wilderness verse shows its text every time you step on that
 square. Waiting there does not repeat it. Ordinary engravings

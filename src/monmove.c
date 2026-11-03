@@ -557,7 +557,12 @@ distfleeck(
     }
 
     sawscary = onscary(seescaryx, seescaryy, mtmp);
-    if (*nearby && (sawscary
+    /* On the Fear path the crowd closes in. It does not flee from the
+       hero. onscary() itself is unchanged, so a Psalm 91 engraved on
+       any other level still scares. */
+    if (fear_protected()) {
+        *scared = 0;
+    } else if (*nearby && (sawscary
                     || (flees_light(mtmp) && !bravegremlin)
                     || (!mtmp->mpeaceful && in_your_sanctuary(mtmp, 0, 0)))) {
         *scared = 1;
@@ -734,11 +739,10 @@ dochug(struct monst *mtmp)
         mtmp->mstrategy |= STRAT_WAITFORU;
     if (has_mgivenname(mtmp) && !strcmp(MGIVENNAME(mtmp), "your reflection")
         && distmin(mtmp->mx, mtmp->my, u.ux, u.uy) <= 5) {
-        if (mtmp->m_lev < 30)
+        /* Level and drain both stop at 4. */
+        if (mtmp->m_lev < 4)
             mtmp->m_lev++;
-        /* The counter still climbs, but one turn never takes more than 5. */
-        losehp(mtmp->m_lev > 5 ? 5 : (int) mtmp->m_lev,
-               "a reflection", KILLED_BY);
+        losehp((int) mtmp->m_lev, "a reflection", KILLED_BY);
     }
 
     /* update quest status flags */
@@ -770,6 +774,14 @@ dochug(struct monst *mtmp)
     /* stunned monsters get un-stunned with larger probability */
     if (mtmp->mstun && !rn2(10))
         mtmp->mstun = 0;
+
+    /* Fear path and stairs: hostiles walk up and stay. They do not
+       keep a flee that would carry them off, and they do not attack.
+       The moment the hero steps off, this is false and they fight. */
+    if (fear_protected() && !mtmp->mtame && !mtmp->mpeaceful) {
+        mtmp->mflee = 0;
+        mtmp->mfleetim = 0;
+    }
 
     /* Some monsters teleport. Teleportation costs a turn. */
     if (mtmp->mflee && !rn2(40) && can_teleport(mdat) && !mtmp->iswiz
@@ -858,7 +870,7 @@ dochug(struct monst *mtmp)
     if (is_watch(mdat)) {
         watch_on_duty(mtmp);
     /* mind flayers can make psychic attacks! */
-    } else if (is_mind_flayer(mdat) && !rn2(20)) {
+    } else if (is_mind_flayer(mdat) && !rn2(20) && !fear_protected()) {
         mind_blast(mtmp);
         set_apparxy(mtmp);
         distfleeck(mtmp, &inrange, &nearby, &scared);
@@ -914,7 +926,10 @@ dochug(struct monst *mtmp)
         || (mdat->mlet == S_LEPRECHAUN && !findgold(gi.invent)
             && (findgold(mtmp->minvent) || rn2(2)))
         || (is_wanderer(mdat) && !rn2(4)) || (Conflict && !mtmp->iswiz)
-        || (!mtmp->mcansee && !rn2(4)) || mtmp->mpeaceful) {
+        || (!mtmp->mcansee && !rn2(4)) || mtmp->mpeaceful
+        /* Adjacent on the Fear path: move and crowd, do not start
+           an attack. The safety net in mattacku still catches leaks. */
+        || (fear_protected() && !mtmp->mtame)) {
 
         /* Possibly cast an undirected spell if not attacking you */
         /* note that most of the time castmu() will pick a directed
@@ -922,7 +937,7 @@ dochug(struct monst *mtmp)
         /* arbitrary distance restriction to keep monster far away
            from you from having cast dozens of sticks-to-snakes
            or similar spells by the time you reach it */
-        if (!sanctum_no_hostility() && !mtmp->mspec_used
+        if (!sanctum_no_hostility() && !fear_protected() && !mtmp->mspec_used
             && dist2(mtmp->mx, mtmp->my, u.ux, u.uy) <= 49) {
             struct attack *a;
 
@@ -972,7 +987,7 @@ dochug(struct monst *mtmp)
                 return 0;
             /* Monsters can move and then shoot on same turn;
                our hero can't.  Is that fair? */
-            if (!nearby
+            if (!nearby && !fear_protected()
                 && (ranged_attk_available(mtmp)
                             || attacktype(mdat, AT_WEAP)
                             || find_offensive(mtmp)))
@@ -992,8 +1007,13 @@ dochug(struct monst *mtmp)
      * PHASE FOUR: Standard Attacks
      */
 
-    /* Now, attack the player if possible - one attack set per monst */
-    if (status != MMOVE_DONE && (!mtmp->mpeaceful
+    /* Now, attack the player if possible - one attack set per monst.
+       On the Fear path or either stair the sequence does not start,
+       so there is no swing and no miss. Already swallowed: spit out. */
+    if (fear_protected()) {
+        if (u.uswallow && mtmp == u.ustuck)
+            expels(mtmp, mtmp->data, TRUE);
+    } else if (status != MMOVE_DONE && (!mtmp->mpeaceful
                                  || (Conflict && !resist_conflict(mtmp)))) {
         if (((inrange && !scared) || panicattk) && !noattacks(mdat)
             /* [is this hp check really needed?] */
@@ -1010,7 +1030,8 @@ dochug(struct monst *mtmp)
     if (!helpless(mtmp) && nearby)
         quest_talk(mtmp);
     /* extra emotional attack for vile monsters */
-    if (inrange && mtmp->data->msound == MS_CUSS && !mtmp->mpeaceful
+    if (!fear_protected() && inrange && mtmp->data->msound == MS_CUSS
+        && !mtmp->mpeaceful
         && couldsee(mtmp->mx, mtmp->my) && !mtmp->minvis && !rn2(5))
         cuss(mtmp);
 
@@ -1908,6 +1929,9 @@ m_move(struct monst *mtmp, int after)
 
         /* hostiles with ranged weapon or attack try to stay away */
         appr = m_balks_at_approaching(appr, mtmp, &preferredrange_min, &preferredrange_max);
+        /* Fear path: close in and crowd the tile instead of hanging back. */
+        if (fear_protected() && !mtmp->mtame && !mtmp->mpeaceful && appr < 0)
+            appr = 1;
 
         if (!should_see && can_track(ptr)) {
             coord *cp;
@@ -1935,7 +1959,10 @@ m_move(struct monst *mtmp, int after)
         }
     }
 
-    if (getitems && m_search_items(mtmp, &ggx, &ggy, &mmoved, &appr))
+    /* On the Fear path the crowd stays on the hero instead of loot. */
+    if (getitems
+        && !(fear_protected() && !mtmp->mtame && !mtmp->mpeaceful)
+        && m_search_items(mtmp, &ggx, &ggy, &mmoved, &appr))
         return postmov(mtmp, ptr, omx, omy, mmoved,
                        seenflgs, can_tunnel, can_unlock, can_open);
 

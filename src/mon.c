@@ -4209,6 +4209,10 @@ m_respond_medusa(struct monst *mtmp)
 void
 m_respond(struct monst *mtmp)
 {
+    /* Fear path and stairs: no shriek, gaze, or call for help.
+       A Psalm 91 engraved anywhere else is not this check. */
+    if (fear_protected())
+        return;
     if (mtmp->data->msound == MS_SHRIEK && !um_dist(mtmp->mx, mtmp->my, 1))
         m_respond_shrieker(mtmp);
     if (mtmp->data == &mons[PM_MEDUSA] && couldsee(mtmp->mx, mtmp->my))
