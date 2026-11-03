@@ -110,6 +110,9 @@ fix checking if dungeon has too many dungeons or levels
 fix long key name overflowing unlock prompt buffer
 fix exploding named box buffer overflow
 fix aobjnam buffer overflow when adding a verb
+menu for interactively setting status fields to highlight listed
+	weapons/armor/terrain in the menu display than was used internally;
+	picking one affected the others
 
 
 Platform- and/or Interface-Specific Fixes

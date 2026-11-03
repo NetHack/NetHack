@@ -725,11 +725,6 @@ static struct istat_s initblstats[MAXBLSTATS] = {
     INIT_BLSTAT("dungeon-level", "%s", ANY_STR, MAXVALWIDTH, BL_LEVELDESC),
     INIT_BLSTATP("experience", "/%s", ANY_LONG, 30, BL_EXP, BL_EXP),
     INIT_BLSTAT("condition", "%s", ANY_MASK32, 0, BL_CONDITION),
-    /* optional; once set it doesn't change unless 'showvers' option is
-       toggled or player modifies the 'versinfo' option;
-       available mostly for screenshots or someone looking over shoulder;
-       blstat[][BL_VERS] is actually an int copy of flags.versinfo (0...7) */
-    INIT_BLSTAT("version", " %s", ANY_STR, MAXVALWIDTH, BL_VERS),
     /* weapon and armor are constructed strings with no particular numeric
        equivalent */
     INIT_BLSTAT("weapon", " %s", ANY_STR, 20, BL_WEAPON),
@@ -738,6 +733,11 @@ static struct istat_s initblstats[MAXBLSTATS] = {
        isn't useful; using type 'string' allows highlighting based on text
        matching which is potentially useful */
     INIT_BLSTAT("terrain", " %s", ANY_STR, 20, BL_TERRAIN),
+    /* optional; once set it doesn't change unless 'showvers' option is
+       toggled or player modifies the 'versinfo' option;
+       available mostly for screenshots or someone looking over shoulder;
+       blstat[][BL_VERS] is actually an int copy of flags.versinfo (0...7) */
+    INIT_BLSTAT("version", " %s", ANY_STR, MAXVALWIDTH, BL_VERS),
 };
 
 #undef INIT_BLSTATP
