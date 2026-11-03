@@ -1171,6 +1171,16 @@ It restores you." Hit points return to full and hunger is cured.
 Dipping says "The living water does no harm." There is no snake,
 no demon, and no curse.
 
+### Sword of the Spirit hits (2026-11-03)
+
+Every melee hit adds d(experience level, 2) on top of the blade's
+own dice, its +2, and the holy light's 2d4. That 2d4 still happens
+only when the to-hit roll is 8 or less. The paralyze chance is
+unchanged. On Sodom and Tyre the existing triple is applied to the
+whole hit total after this bonus is included, so the triple covers
+it. When the holy light does not print its own line, the ordinary
+hit message is shown.
+
 ### Long sword for every playable role (2026-11-03)
 
 The Sword of the Spirit is a doubled-edged blade, trained as a
