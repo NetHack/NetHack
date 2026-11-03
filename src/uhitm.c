@@ -1535,6 +1535,11 @@ hmon_hitmon_dmg_recalc(struct _hitmon_data *hmd, struct obj *obj)
     if (Is_medusa_level(&u.uz) && obj
         && obj->oartifact == ART_SWORD_OF_THE_SPIRIT)
         hmd->dmg *= 3;
+    /* Sanctum of the Great Dragon: the same total, doubled.
+       The level dice and the holy light are already in hmd->dmg. */
+    if (Is_sanctum(&u.uz) && obj
+        && obj->oartifact == ART_SWORD_OF_THE_SPIRIT)
+        hmd->dmg *= 2;
 }
 
 staticfn void

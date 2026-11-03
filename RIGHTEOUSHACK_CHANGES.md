@@ -1178,8 +1178,10 @@ own dice, its +2, and the holy light's 2d4. That 2d4 still happens
 only when the to-hit roll is 8 or less. The paralyze chance is
 unchanged. On Sodom and Tyre the existing triple is applied to the
 whole hit total after this bonus is included, so the triple covers
-it. When the holy light does not print its own line, the ordinary
-hit message is shown.
+it. On the Sanctum the same total is doubled, with no message, so
+the level dice and the holy light are doubled the same way. When
+the holy light does not print its own line, the ordinary hit
+message is shown.
 
 ### Long sword for every playable role (2026-11-03)
 
