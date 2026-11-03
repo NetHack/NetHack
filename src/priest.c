@@ -446,14 +446,8 @@ intemple(int roomno)
         if (sanctum && Is_sanctum(&u.uz)) {
             /* Same moments as the old Moloch greeting: the first
                entry, and each later entry while the priest can speak.
-               The words are the welcome. The priest still turns
-               hostile the first time. */
+               The words are the welcome. The priest stays peaceful. */
             msg1 = "Welcome, we have long awaited thee. Look thou within the chest, and receive thy reward.";
-            if (priest->mpeaceful) {
-                priest->mpeaceful = 0;
-                /* became angry voluntarily; no penalty for attacking him */
-                set_malign(priest);
-            }
         } else if (svm.moves >= epri_p->enter_time) {
             Sprintf(buf, "Pilgrim, you enter a %s place!",
                     !shrined ? "desecrated" : "sacred");

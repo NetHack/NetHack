@@ -11,6 +11,10 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-03
+The Sanctum high priest stays peaceful through the welcome, and
+turns hostile only if you attack.
+
+2026-11-03
 Wearing an artifact that resists blindness, such as the Belt of
 Truth, is recognized when a flash is resisted.
 
