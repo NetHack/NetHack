@@ -24,7 +24,7 @@ des.feature("fountain", 11, 3)
 des.feature("fountain", 3, 5)
 des.feature("fountain", 11, 5)
 des.altar({ x=7, y=4, align="law", type="altar" })
-des.engraving({ x=7, y=4, type="verse", degrade=false, text="And take the helmet of salvation, and the sword of the Spirit, which is the word of God:" })
+-- No verse on the altar. The sword's pickup line must stay visible.
 -- The last of Psalm 91, ringing the altar. Exact KJV.
 des.engraving({ x=7, y=3, type="verse", degrade=false, text="Because he hath set his love upon me, therefore will I deliver him:" })
 des.engraving({ x=8, y=3, type="verse", degrade=false, text="I will set him on high, because he hath known my name." })
@@ -34,4 +34,4 @@ des.engraving({ x=7, y=5, type="verse", degrade=false, text="With long life will
 des.engraving({ x=6, y=5, type="verse", degrade=false, text="Because he hath set his love upon me, therefore will I deliver him: I will set him on high, because he hath known my name." })
 des.engraving({ x=6, y=4, type="verse", degrade=false, text="He shall call upon me, and I will answer him: I will be with him in trouble; I will deliver him, and honour him." })
 des.engraving({ x=6, y=3, type="verse", degrade=false, text="With long life will I satisfy him, and shew him my salvation." })
-des.object({ id="doubled-edged blade", x=7, y=4, spe=0, buc="blessed", name="Sword of the Spirit" })
+des.object({ id="doubled-edged blade", x=7, y=4, spe=2, buc="blessed", name="Sword of the Spirit" })
