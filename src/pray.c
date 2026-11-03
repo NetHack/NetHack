@@ -54,7 +54,18 @@ staticfn boolean blocked_boulder(int, int);
  *      responsible for the theft of the Amulet from Marduk, the Creator.
  *      Moloch is unaligned.
  */
-static const char *const Moloch = "Moloch";
+/* Lowercase "the". Mid-sentence text prints this as-is.
+   A sentence that starts with the name uses Moloch_up(). */
+static const char *const Moloch = "the Great Dragon";
+
+static const char *
+Moloch_up(void)
+{
+    static char buf[BUFSZ];
+
+    Strcpy(buf, Moloch);
+    return upstart(buf); /* first letter only; the rest stays */
+}
 
 static const char *const godvoices[] = {
     "booms out", "thunders", "rings out", "booms",
@@ -1318,13 +1329,13 @@ offer_real_amulet(struct obj *otmp, aligntyp altaralign)
             u.ualign.record = -99;
         pline("An invisible choir chants, and you are bathed in darkness...");
         /*[apparently shrug/snarl can be sensed without being seen]*/
-        pline("%s shrugs and retains dominion over %s,", Moloch, u_gname());
+        pline("%s shrugs and retains dominion over %s,", Moloch_up(), u_gname());
         pline("then mercilessly snuffs out your life.");
         Sprintf(svk.killer.name, "%s indifference", s_suffix(Moloch));
         svk.killer.format = KILLED_BY;
         done(DIED);
         /* life-saved (or declined to die in wizard/explore mode) */
-        pline("%s snarls and tries again...", Moloch);
+        pline("%s snarls and tries again...", Moloch_up());
         
         /* declined to die in wizard or explore mode */
         pline(cloud_of_smoke, hcolor(NH_BLACK));

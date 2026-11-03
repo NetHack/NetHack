@@ -11,6 +11,23 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-03
+The first time you arrive on the Sanctum carrying the Sword of
+the Spirit, one black screen says it glows, then the verse about
+the helmet of salvation and the sword of the Spirit. Arriving
+without the sword shows nothing.
+
+2026-11-03
+On the Sanctum, the Sword of the Spirit's hit total is five
+fourths, rounded down. Sodom and Tyre is still triple. The level
+dice and the holy light are in that total.
+
+2026-11-03
+Where play named the unaligned god Moloch, the name is the Great
+Dragon. A sentence that starts with it is capitalized. The
+historian's amulet text no longer says "the Wizard and." The
+priest quest and the oracle say the Great Dragon too.
+
+2026-11-03
 The Sanctum high priest stays peaceful through the welcome, and
 turns hostile only if you attack.
 
