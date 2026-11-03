@@ -1167,6 +1167,14 @@ It restores you." Hit points return to full and hunger is cured.
 Dipping says "The living water does no harm." There is no snake,
 no demon, and no curse.
 
+### Prophetic skills (2026-11-03)
+
+The #enhance screen, and the same list in the dumplog, heads the
+spell group "Prophetic Skills". The seven schools use the names
+already shown for a prophecy's category: spiritual warfare,
+healing, discernment, blessing, prayer, deliverance, and creation.
+They stay lowercase, with no "spells" suffix.
+
 ### Entering Moloch's Sanctum (2026-11-01)
 
 The Bell of Opening, the Candelabrum of Invocation, and the Book
