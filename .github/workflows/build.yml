@@ -8,6 +8,15 @@ on:
   merge_group:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
+# Cancel superseded runs of the same ref, but not for merge queue checks:
+# an aborted merge_group run is hard to diagnose and may stall the queue.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   compile:
     name: Compilation
