@@ -11,6 +11,12 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-03
+On Sodom and Tyre, the Sword of the Spirit deals double damage.
+Lightning the hero deals a monster there is triple: a rod, a
+prophecy, or breath. Lightning that hits you, and lightning
+between monsters, is unchanged. The flash is unchanged.
+
+2026-11-03
 Wearing an artifact that resists blindness, such as the Belt of
 Truth, is recognized when a flash is resisted.
 
