@@ -444,16 +444,15 @@ intemple(int roomno)
         }
         msg1 = msg2 = 0;
         if (sanctum && Is_sanctum(&u.uz)) {
+            /* Same moments as the old Moloch greeting: the first
+               entry, and each later entry while the priest can speak.
+               The words are the welcome. The priest still turns
+               hostile the first time. */
+            msg1 = "Welcome, we have long awaited thee. Look thou within the chest, and receive thy reward.";
             if (priest->mpeaceful) {
-                /* first time inside */
-                msg1 = "Infidel, you have entered Moloch's Sanctum!";
-                msg2 = "Be gone!";
                 priest->mpeaceful = 0;
                 /* became angry voluntarily; no penalty for attacking him */
                 set_malign(priest);
-            } else {
-                /* repeat visit, or attacked priest before entering */
-                msg1 = "You desecrate this place by your presence!";
             }
         } else if (svm.moves >= epri_p->enter_time) {
             Sprintf(buf, "Pilgrim, you enter a %s place!",
@@ -800,6 +799,20 @@ ghod_hitsu(struct monst *priest)
 
     if (!roomno || !has_shrine(priest))
         return;
+
+    /* After the yes path, the bolt that would smite the hero is
+       turned aside and the Sanctum high priest dies instead. */
+    if (u.uevent.sanctum_frozen && Is_sanctum(&u.uz)
+        && priest->data == &mons[PM_HIGH_CLERIC] && priest->ispriest) {
+        pline("Lucifer's wrath strikes down from above, but the hand of God turns it aside!");
+        if (priest->female)
+            pline("The LORD's fire falls upon the high priestess of the Great Dragon, and she is consumed where she stands!");
+        else
+            pline("The LORD's fire falls upon the high priest of the Great Dragon, and he is consumed where he stands!");
+        if (!DEADMONSTER(priest))
+            xkilled(priest, XKILL_NOMSG | XKILL_NOCORPSE);
+        return;
+    }
 
     ax = x = EPRI(priest)->shrpos.x;
     ay = y = EPRI(priest)->shrpos.y;

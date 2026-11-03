@@ -1261,6 +1261,19 @@ yes or no. There is no quit that asks again later. The first
 open does not also take the soul out. A second open is ordinary
 looting.
 
+Stepping into the Sanctum temple, while the high priest can
+speak and you are not deaf, that priest says "Welcome, we have
+long awaited thee. Look thou within the chest, and receive thy
+reward." The first time, the priest still becomes hostile. The
+lead-in "The high priest intones:" still appears on its old
+timer. Other temples are unchanged.
+
+After the yes path has frozen the Sanctum, a blow that would
+have called down the smite on that high priest does not. Lucifer's
+wrath is turned aside, and the LORD's fire consumes the priest.
+A priestess is "she"; a priest is "he". You take none of that
+bolt. Before the freeze, the smite is the stock lightning.
+
 Both answers say the shadows line, then six hostile demons appear
 beside you: horned devil, barbed devil, vrock, hezrou, marilith,
 pit fiend. That roster is a placeholder for "the hosts".
