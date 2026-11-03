@@ -6516,6 +6516,15 @@ wish_from_text(char *buf, boolean last_try)
     oldwisharti = u.uconduct.wisharti;
     refused = FALSE;
     Strcpy(bufcpy, buf);
+    /* Pride lure names are refused the way a quest artifact is: the
+       wish is spent, nothing is given, and the same line is shown.
+       Prophet mode is wizard mode, so this is not skipped for wizard. */
+    if (pride_lure_wish(buf)) {
+        pline("For a moment, you feel %s in your %s, but it disappears!",
+              something, makeplural(body_part(HAND)));
+        wish_history_add(bufcpy);
+        return 1;
+    }
     otmp = readobjnam(buf, &nothing);
     if (otmp && otmp != &nothing && otmp != &hands_obj
         && (otmp->otyp == BURNT_OFFERING

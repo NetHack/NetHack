@@ -1990,6 +1990,12 @@ prayer_done(void)
     if (!u.uevent.gibeon_wish && is_gibeon_altar(u.ux, u.uy)
         && gibeon_vision())
         return 1;
+
+    /* The Garden altar the Sword of the Spirit rests on crowns.
+       Same crowning as any other, and certain. */
+    if (in_wilderness() && dunlev(&u.uz) == 5 && on_altar()
+        && !u.uevent.uhand_of_elbereth)
+        gcrownu();
     
     /* ------------------------------------------------------------------
      *  1. Altar use: always attempt to bless water (anointing oil
@@ -2007,6 +2013,7 @@ prayer_done(void)
         pline("\"Be still, and know that I am God.\" (Psalm 46:10)");
         u.ublesscnt += rnz(50 + (Luck > 0 ? 0 : 20)); /* longer wait if unlucky */
         //change_luck(-1); /* small humility penalty */
+        pride_altar_after_prayer();
         return 1;
     }
 
@@ -2091,6 +2098,7 @@ prayer_done(void)
     /* Reset prayer timer for next time */
     reset_prayer_timer();
 
+    pride_altar_after_prayer();
     return 1;
 }
 

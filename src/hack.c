@@ -3498,15 +3498,29 @@ pride_immune(void)
     return FALSE;
 }
 
+static const char *const pride_lure_names[] = {
+    "silver long sword", "ring of complete immunity",
+    "Amulet of Immortality", "Rod of Frozen Power",
+    "prophecy book of execution", "magic lamp of unlimited wishing",
+    "bag of infinite holding", (const char *) 0
+};
+
+static boolean
+pride_name_is_lure(const char *s)
+{
+    int i;
+
+    if (!s || !*s)
+        return FALSE;
+    for (i = 0; pride_lure_names[i]; i++)
+        if (!strcmpi(s, pride_lure_names[i]))
+            return TRUE;
+    return FALSE;
+}
+
 static boolean
 is_pride_lure(struct obj *otmp)
 {
-    static const char *const lures[] = {
-        "silver long sword", "ring of complete immunity",
-        "Amulet of Immortality", "Rod of Frozen Power",
-        "prophecy book of execution", "magic lamp of unlimited wishing",
-        "bag of infinite holding", (const char *) 0
-    };
     int i;
 
     if (!otmp)
@@ -3515,10 +3529,75 @@ is_pride_lure(struct obj *otmp)
         return TRUE;
     if (!has_oname(otmp))
         return FALSE;
-    for (i = 0; lures[i]; i++)
-        if (!strcmp(ONAME(otmp), lures[i]))
+    for (i = 0; pride_lure_names[i]; i++)
+        if (!strcmp(ONAME(otmp), pride_lure_names[i]))
             return TRUE;
     return FALSE;
+}
+
+/* A wish names a Pride lure when the calling name, or the item text
+   left after ordinary wish prefixes, is one of those names. */
+boolean
+pride_lure_wish(const char *bp)
+{
+    static const char *const prefixes[] = {
+        "a ", "an ", "the ",
+        "blessed ", "holy ", "cursed ", "unholy ", "uncursed ",
+        "rustproof ", "erodeproof ", "corrodeproof ", "fixed ",
+        "fireproof ", "rotproof ", "tempered ", "crackproof ",
+        "lit ", "burning ", "unlit ", "extinguished ",
+        "poisoned ", "greased ", "very ", "thoroughly ",
+        "rusty ", "rusted ", "burnt ", "burned ", "cracked ",
+        "corroded ", "rotted ", "diluted ", "empty ",
+        "historic ", "real ", "fake ",
+        (const char *) 0
+    };
+    char buf[BUFSZ];
+    char *s, *named;
+    int i;
+
+    if (!bp || !*bp)
+        return FALSE;
+    Snprintf(buf, sizeof buf, "%s", bp);
+    (void) mungspaces(buf);
+    named = strstri(buf, " named ");
+    if (named) {
+        if (pride_name_is_lure(named + 7))
+            return TRUE;
+        *named = '\0';
+        (void) mungspaces(buf);
+    }
+    s = buf;
+    for (;;) {
+        if (!*s)
+            break;
+        if (digit(*s) && strcmp(s, "0")) {
+            while (digit(*s))
+                s++;
+            while (*s == ' ')
+                s++;
+            continue;
+        }
+        if (*s == '+' || *s == '-') {
+            s++;
+            while (digit(*s))
+                s++;
+            while (*s == ' ')
+                s++;
+            continue;
+        }
+        for (i = 0; prefixes[i]; i++) {
+            int l = (int) strlen(prefixes[i]);
+
+            if (!strncmpi(s, prefixes[i], l)) {
+                s += l;
+                break;
+            }
+        }
+        if (!prefixes[i])
+            break;
+    }
+    return pride_name_is_lure(s);
 }
 
 /* Destroy one lure, including a lure nested inside a container.
@@ -3560,11 +3639,42 @@ pride_purge_one(struct obj *otmp)
     return TRUE;
 }
 
+static boolean
+pride_obj_holds_lure(struct obj *otmp)
+{
+    struct obj *content;
+
+    if (!otmp)
+        return FALSE;
+    if (is_pride_lure(otmp))
+        return TRUE;
+    if (Has_contents(otmp))
+        for (content = otmp->cobj; content; content = content->nobj)
+            if (pride_obj_holds_lure(content))
+                return TRUE;
+    return FALSE;
+}
+
+static boolean
+pride_carrying_lure(void)
+{
+    struct obj *otmp;
+
+    for (otmp = gi.invent; otmp; otmp = otmp->nobj)
+        if (pride_obj_holds_lure(otmp))
+            return TRUE;
+    return FALSE;
+}
+
+/* Set during the altar prayer, printed after the ordinary prayer lines. */
+static int pride_prayer_line = 0;
+
 void
-pride_leave_lures(void)
+pride_leave_lures(boolean altar_prayer)
 {
     struct obj *otmp, *next;
     boolean any = FALSE;
+    boolean carried = altar_prayer && pride_carrying_lure();
 
     for (otmp = gi.invent; otmp; otmp = next) {
         next = otmp->nobj;
@@ -3578,8 +3688,20 @@ pride_leave_lures(void)
         if (pride_purge_one(otmp))
             any = TRUE;
     }
-    if (any)
+    if (altar_prayer)
+        pride_prayer_line = carried ? 2 : 1;
+    else if (any)
         pline("The treasures crumble into dust.");
+}
+
+void
+pride_altar_after_prayer(void)
+{
+    if (pride_prayer_line == 2)
+        pline("You drop to your knees and repent of your pride. The treasures crumble into dust, and a hidden way opens.");
+    else if (pride_prayer_line == 1)
+        pline("The treasures crumble into dust, and a hidden way opens.");
+    pride_prayer_line = 0;
 }
 
 /* Offsets from the altar. des.map() does not leave the level at (0,0),
@@ -3678,8 +3800,7 @@ pride_prayer(void)
     stairy = u.uy;
     mkstairs(stairx, stairy, 0, (struct mkroom *) 0, TRUE);
     newsym(stairx, stairy);
-    pline("A hidden way opens.");
-    pride_leave_lures();
+    pride_leave_lures(TRUE);
     return FALSE;
 }
 
