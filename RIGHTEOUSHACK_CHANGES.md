@@ -1180,8 +1180,9 @@ own dice, its +2, and the holy light's 2d4. That 2d4 still happens
 only when the to-hit roll is 8 or less. The paralyze chance is
 unchanged. On Sodom and Tyre the existing triple is applied to the
 whole hit total after this bonus is included, so the triple covers
-it. On the Sanctum the same total is doubled, with no message, so
-the level dice and the holy light are doubled the same way. When
+it. On the Sanctum the same total is five fourths, rounded down,
+with no message, so the level dice and the holy light are scaled
+the same way. When
 the holy light does not print its own line, the ordinary hit
 message is shown.
 
@@ -1272,7 +1273,27 @@ reward." The welcome leaves the priest peaceful. Attacking
 still asks the ordinary question, then she turns hostile and the
 smite is unchanged. The
 lead-in "The high priest intones:" still appears on its old
-timer. Other temples are unchanged.
+timer, and on the Sanctum it names the priest of the Great Dragon.
+An endgame temple still does not name the altar's owner. Other
+temples are unchanged.
+
+The first arrival on the Sanctum while the Sword of the Spirit is
+carried, wielded or not, shows one black screen: "As you enter
+the Sanctum of the Great Dragon, the Sword of the Spirit glows
+with power. For it is written: 'And take the helmet of salvation,
+and the sword of the Spirit, which is the word of God.'" It is
+once per game. Arriving without the sword shows nothing, and a
+later arrival with the sword still shows it if it has not been
+seen. The flag sits in the spare bits of the event word, so the
+save format is unchanged.
+
+Where the unaligned god was named Moloch in play, the name is
+"the Great Dragon", capitalized when it starts a sentence. That
+is the priest, the high altar, the Amulet offer, the #turn line
+in Gehennom while the random god is that name, the historian's
+amulet speech (without "the Wizard and"), the priest quest's
+nemesis death, and the oracle paragraph. The encyclopedia, the
+backup quest file, and comments are unchanged.
 
 After the yes path has frozen the Sanctum, a blow that would
 have called down the smite on that high priest does not. Lucifer's

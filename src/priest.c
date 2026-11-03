@@ -429,10 +429,10 @@ intemple(int roomno)
         if (can_speak && !Deaf && svm.moves >= epri_p->intone_time) {
             unsigned save_priest = priest->ispriest;
 
-            /* don't reveal the altar's owner upon temple entry in
-               the endgame; for the Sanctum, the next message names
-               Moloch so suppress the "of Moloch" for him here too */
-            if (sanctum && !Hallucination)
+            /* Stock: an endgame temple's intones line does not name
+               the altar's owner. The Sanctum welcome does not name a
+               god, so that priest is named in the usual way. */
+            if (In_endgame(&u.uz) && !Hallucination)
                 priest->ispriest = 0;
             pline("%s intones:",
                   canseemon(priest) ? Monnam(priest) : "A nearby voice");

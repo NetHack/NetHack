@@ -76,7 +76,9 @@ struct u_event {
     Bitfield(sanctum_grace, 2);     /* YES: turns of movement still to come */
     Bitfield(sanctum_doom, 2);      /* NO: attack turns still to come */
     Bitfield(wilderness_intro, 5);  /* which Wilderness floors have shown the intro */
-    /* 57 bits */
+    Bitfield(sanctum_sword, 1);     /* Sanctum glow screen has been shown */
+    /* 58 bits; this one fits in the spare bits of the last word,
+       so the earlier flags do not move and EDITLEVEL stays 9 */
 };
 
 /*

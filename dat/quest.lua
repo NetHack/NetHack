@@ -308,7 +308,7 @@ you know you must return %o to %l.]],
          synopsis = "[Take the Amulet to the Astral Plane and sacrifice it at the altar of %d.]",
          output = "text",
          text = [["Congratulations, %p.  I wondered if anyone could prevail against
-the Wizard and the minions of Moloch.  Now, you must embark on one
+the minions of the Great Dragon.  Now, you must embark on one
 final adventure.
 
 "Take the Amulet, and find your way onto the Astral Plane.
@@ -1419,7 +1419,7 @@ the Astral Plane.  I suspect that I shall never see you again in this
 life, but I hope to at %ds feet."]],
       },
       killed_nemesis = {
-         synopsis = "[%nC dies.  Moloch is aware of you and angry at %n.]",
+         synopsis = "[%nC dies.  The Great Dragon is aware of you and angry at %n.]",
          output = "text",
          text = [[You feel a wrenching shift in the ether as %ns body dissolves
 into a cloud of noxious gas.
@@ -1427,7 +1427,7 @@ into a cloud of noxious gas.
 Suddenly, a voice booms out:
 
     "Thou hast defeated the least of my minions, %r.
-    Know now that Moloch is aware of thy presence.
+    Know now that the Great Dragon is aware of thy presence.
     As for thee, %n, I shall deal with thy failure
     at my leisure."
 
