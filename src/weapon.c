@@ -52,8 +52,8 @@ static NEARDATA const short skill_names_indices[P_NUM_SKILLS] = {
 static NEARDATA const char *const odd_skill_names[] = {
     "no skill", "bare hands", /* use barehands_or_martial[] instead */
     "two weapon combat", "riding", "polearms", "saber", "hammer", "whip",
-    "attack spells", "healing spells", "divination spells",
-    "enchantment spells", "clerical spells", "escape spells", "matter spells",
+    "spiritual warfare", "healing", "discernment",
+    "blessing", "prayer", "deliverance", "creation",
 };
 /* indexed via is_martial() */
 static NEARDATA const char *const barehands_or_martial[] = {
@@ -1218,7 +1218,7 @@ static const struct skill_range {
 } skill_ranges[] = {
     { P_FIRST_H_TO_H, P_LAST_H_TO_H, "Fighting Skills" },
     { P_FIRST_WEAPON, P_LAST_WEAPON, "Weapon Skills" },
-    { P_FIRST_SPELL, P_LAST_SPELL, "Spellcasting Skills" },
+    { P_FIRST_SPELL, P_LAST_SPELL, "Prophetic Skills" },
 };
 
 /* write a list of skills onto the given menu

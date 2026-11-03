@@ -11,6 +11,11 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-03
+The #enhance screen heads the spell schools "Prophetic Skills".
+The seven names are spiritual warfare, healing, discernment,
+blessing, prayer, deliverance, and creation.
+
+2026-11-03
 Each Wilderness floor shows a full-screen intro once, the
 first time you arrive. The desert says he or she was led into
 the wilderness. Greed, Pride, and Fear add Luke 12:15,
