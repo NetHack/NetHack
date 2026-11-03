@@ -150,17 +150,20 @@ $(LUALIB):
 luabin:
 	$(MAKE) -C $(LUATOP) $(LUAMAKEFLAGS) LUA_T=nhlua all
 
-# Parse-check the Lua scripts with the compiler built from the bundled Lua
-# sources.  That is not necessarily the exact library the game links against:
+# Parse-check the Lua scripts with a luac built from the bundled Lua sources.
 # USE_SYSTEM_LUA links the system library and GITSUBMODULES may use the
-# submodules/lua headers.  Not part of 'all'; run 'make checklua' explicitly.
-LUAC := $(LUATOP)/luac
+# submodules/lua headers, so the bundled lua can differ from the one the game
+# actually runs.  Cross-compiling still builds this luac with the host
+# compiler (hints/include/cross-post.501), so it remains runnable; point LUAC
+# at a matching luac (a path, not a bare command name) to override it.
+# Not part of 'all'; run 'make checklua' explicitly.
+LUAC ?= $(LUATOP)/luac
 
 $(LUAC):
 	$(MAKE) -C $(LUATOP) $(LUAMAKEFLAGS) LUA_A=$(LUABASELIB) luac
 
 .PHONY: checklua
-checklua: $(LUAC)
+checklua: $(PRECHECK) $(LUAC)
 	@set -e; for f in dat/*.lua test/*.lua; do "$(LUAC)" -p "$$f"; done
 	@echo "Lua scripts syntax check: OK"
 
