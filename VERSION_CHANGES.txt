@@ -11,6 +11,12 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-03
+On Sodom and Tyre, the Sword of the Spirit deals double damage.
+Lightning the hero deals a monster there is triple: a rod, a
+prophecy, or breath. Lightning that hits you, and lightning
+between monsters, is unchanged. The flash is unchanged.
+
+2026-11-03
 The first time you arrive on the Sanctum carrying the Sword of
 the Spirit, one black screen says it glows, then the verse about
 the helmet of salvation and the sword of the Spirit. Arriving
@@ -18,7 +24,7 @@ without the sword shows nothing.
 
 2026-11-03
 On the Sanctum, the Sword of the Spirit's hit total is five
-fourths, rounded down. Sodom and Tyre is still triple. The level
+fourths, rounded down. The level
 dice and the holy light are in that total.
 
 2026-11-03

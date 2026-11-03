@@ -925,10 +925,13 @@ stone says she meets her own gaze in the reflecting item as
 the hero knows it, and shrieks as her flesh turns to stone,
 whether or not she is seen. With no worn or wielded item, the
 line names no item. The kill says "You defeat Medusa!" The
-experience is unchanged. Lightning from a rod, a prophecy, or a breath,
-and the Sword of the Spirit, deal triple damage on this level.
-Shock resistance still negates lightning. Tyre's gold piles can be
-kept. Medusa's seven taunts each play once, as a single message.
+experience is unchanged. Lightning the hero deals a monster,
+from a rod, a prophecy, or a breath, is triple on this level.
+Lightning that hits you, and lightning one monster deals another,
+is unchanged. The flash is unchanged. Shock resistance still
+negates lightning. The Sword of the Spirit deals double damage
+here. Tyre's gold piles can be kept. Medusa's seven taunts each
+play once, as a single message.
 She still leaves Medusa's essence under the food rules. The level
 does not generate random monsters and cannot be dug or teleported
 across. The arrival line is the first taunt. The first real room on the
@@ -1178,13 +1181,11 @@ no demon, and no curse.
 Every melee hit adds d(experience level, 2) on top of the blade's
 own dice, its +2, and the holy light's 2d4. That 2d4 still happens
 only when the to-hit roll is 8 or less. The paralyze chance is
-unchanged. On Sodom and Tyre the existing triple is applied to the
-whole hit total after this bonus is included, so the triple covers
-it. On the Sanctum the same total is five fourths, rounded down,
-with no message, so the level dice and the holy light are scaled
-the same way. When
-the holy light does not print its own line, the ordinary hit
-message is shown.
+unchanged. On Sodom and Tyre that whole hit total is doubled, so
+the double covers this bonus. On the Sanctum the same total is
+five fourths, rounded down, with no message, so the level dice
+and the holy light are scaled the same way. When the holy light
+does not print its own line, the ordinary hit message is shown.
 
 ### Long sword for every playable role (2026-11-03)
 
