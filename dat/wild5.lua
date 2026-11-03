@@ -34,4 +34,5 @@ des.engraving({ x=7, y=5, type="verse", degrade=false, text="With long life will
 des.engraving({ x=6, y=5, type="verse", degrade=false, text="Because he hath set his love upon me, therefore will I deliver him: I will set him on high, because he hath known my name." })
 des.engraving({ x=6, y=4, type="verse", degrade=false, text="He shall call upon me, and I will answer him: I will be with him in trouble; I will deliver him, and honour him." })
 des.engraving({ x=6, y=3, type="verse", degrade=false, text="With long life will I satisfy him, and shew him my salvation." })
-des.object({ id="doubled-edged blade", x=7, y=4, spe=2, buc="blessed", name="Sword of the Spirit" })
+-- eroded=-1 is oerodeproof. The one flag stops rust, fire, corrosion, and rot.
+des.object({ id="doubled-edged blade", x=7, y=4, spe=2, buc="blessed", eroded=-1, name="Sword of the Spirit" })

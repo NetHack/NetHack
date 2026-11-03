@@ -2282,6 +2282,8 @@ create_object(object *o, struct mkroom *croom)
         otmp->oeroded = otmp->oeroded2 = 0;
         otmp->oerodeproof = 0;
     }
+    /* The eroded==0 case clears proof. Put the garden sword back. */
+    sword_of_spirit_fix(otmp);
     if (o->recharged)
         otmp->recharged = (o->recharged % 8);
     if (o->locked == 0 || o->locked == 1) {

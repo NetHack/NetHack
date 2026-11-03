@@ -1167,6 +1167,17 @@ It restores you." Hit points return to full and hunger is cured.
 Dipping says "The living water does no harm." There is no snake,
 no demon, and no curse.
 
+### Sword of the Spirit proof (2026-11-03)
+
+The garden sword is created blessed, +2, and erodeproof, with
+oeroded and oeroded2 both 0. NetHack keeps one erodeproof flag.
+erode_obj() consults that flag for burn, rust, rot, corrosion,
+and cracking, after it asks whether the material can take that
+kind of damage. This blade is iron, so it can rust and corrode,
+and the flag stops both. Iron is not flammable or rottable, so
+fire and rot do not start; the same flag would stop them if they
+did. Identified, the adjective is "rustproof".
+
 ### Prophetic skills (2026-11-03)
 
 The #enhance screen, and the same list in the dumplog, heads the
