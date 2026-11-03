@@ -25,17 +25,27 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      # Run-id suffix so the cache is re-saved on every run; restore-keys
+      # falls back to the most recent entry with the same prefix.
+      - name: Restore ccache
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ccache
+          key: ccache-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            ccache-${{ runner.os }}-
+
       - name: Install build dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
-            build-essential bison flex groff libncurses-dev
+            build-essential bison flex ccache groff libncurses-dev
 
       - name: Generate makefiles
         run: sh sys/unix/setup.sh sys/unix/hints/linux.501
 
       - name: Compile and install
-        run: make WANT_WIN_TTY=1 WANT_WIN_CURSES=1 install
+        run: make CC="ccache gcc" WANT_WIN_TTY=1 WANT_WIN_CURSES=1 install
 
       - name: Smoke test (installed)
         working-directory: playground
