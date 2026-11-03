@@ -2081,6 +2081,13 @@ prayer_done(void)
         pline("\"Call to me and I will answer you...\" (Jeremiah 33:3)");
     }*/
 
+    /* An accepted prayer on Greed restores 50 turns. Praying too soon
+       returns above and does not reach this, so the timeout is unchanged. */
+    if (in_wilderness() && dunlev(&u.uz) == 2) {
+        u.uspare1 += 50L;
+        pline("The Lord is pleased with you and has restored your strength.");
+    }
+
     /* Reset prayer timer for next time */
     reset_prayer_timer();
 

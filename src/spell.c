@@ -2187,6 +2187,11 @@ percent_success(int spell)
     boolean paladin_bonus = (Role_if(PM_KNIGHT)
                              && skilltype == P_CLERIC_SPELL);
 
+    /* Finger of execution is a flat 50. No stat, level, skill, armor,
+       shield, or Pride cap. */
+    if (spellid(spell) == SPE_FINGER_OF_DEATH)
+        return 50;
+
     /* Calculate intrinsic ability (splcaster) */
 
     splcaster = gu.urole.spelbase;
@@ -2292,13 +2297,30 @@ percent_success(int spell)
         chance = 100;
     if (chance < 0)
         chance = 0;
-    /* On Pride, finger of execution is never easier than elsewhere,
-       and never better than 30. */
-    if (in_wilderness() && dunlev(&u.uz) == 3
-        && spellid(spell) == SPE_FINGER_OF_DEATH && chance > 30)
-        chance = 30;
 
     return chance;
+}
+
+/* Drop finger of execution from the spell list entirely. */
+void
+pride_unlearn_execution(void)
+{
+    int i, j;
+
+    for (i = 0; i < MAXSPELL; i++) {
+        if (spellid(i) != SPE_FINGER_OF_DEATH)
+            continue;
+        for (j = i; j < MAXSPELL - 1; j++)
+            svs.spl_book[j] = svs.spl_book[j + 1];
+        svs.spl_book[MAXSPELL - 1].sp_id = NO_SPELL;
+        svs.spl_book[MAXSPELL - 1].sp_lev = 0;
+        svs.spl_book[MAXSPELL - 1].sp_know = 0;
+        if (gs.spl_orderindx) {
+            free((genericptr_t) gs.spl_orderindx);
+            gs.spl_orderindx = 0;
+        }
+        i--;
+    }
 }
 
 staticfn char *

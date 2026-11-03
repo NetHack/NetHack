@@ -3673,6 +3673,7 @@ pride_prayer(void)
         newsym(sx, sy);
     }
     u.uevent.pride_prayed = 1;
+    pride_unlearn_execution();
     stairx = u.ux + 8;
     stairy = u.uy;
     mkstairs(stairx, stairy, 0, (struct mkroom *) 0, TRUE);
@@ -3719,29 +3720,32 @@ wilderness_check(void)
         struct obj *otmp;
         static long greed_counted_move = -1L;
 
-        /* One tick per hero move. The gate's teleport must not count again. */
+        /* One tick per hero move. The gate's teleport must not count again.
+           uspare1 is turns remaining. Entry sets it to 200. */
         if (greed_counted_move != svm.moves) {
             greed_counted_move = svm.moves;
-            if ((long) u.uspare1 < 50L)
-                u.uspare1++;
+            if (u.uspare1 > 0L)
+                u.uspare1--;
         }
-        if (u.uspare1 >= 50L) {
+        if (u.uspare1 <= 0L) {
+            u.uspare1 = 0L;
             svk.killer.format = NO_KILLER_PREFIX;
-            Strcpy(svk.killer.name, "Starved, clinging to worldly possessions.");
+            Strcpy(svk.killer.name,
+                   "Starved, clinging to worldly possessions.");
             done(STARVING);
             return;
         }
-        if (u.uspare1 == 25L && !u.uevent.greed_warned) {
-            u.uevent.greed_warned = 1;
-            pline("Your stomach twists with hunger... Your strength fails beneath the weight of all you carry. For where your treasure is, there will your heart be also");
-        }
-        if (u.uspare1 >= 25L) {
-            long left = 50L - (long) u.uspare1;
-
-            if (left == 1L)
+        if (u.uspare1 > 30L)
+            u.uevent.greed_warned = 0;
+        else {
+            if (!u.uevent.greed_warned) {
+                u.uevent.greed_warned = 1;
+                pline("Your stomach twists with hunger... Your strength fails beneath the weight of all you carry. For where your treasure is, there will your heart be also");
+            }
+            if (u.uspare1 == 1L)
                 pline("1 turn until you starve.");
             else
-                pline("%ld turns until you starve.", left);
+                pline("%ld turns until you starve.", u.uspare1);
         }
         for (otmp = gi.invent; otmp; otmp = otmp->nobj)
             if (otmp->oclass == FOOD_CLASS) {
@@ -3822,9 +3826,9 @@ pride_touch_mirror(struct obj *obj)
     pride_waken_reflection();
 }
 
-/* A reflection keeps the growing life drain (m_lev starts at 0 and
-   climbs to 30). The body is a doppelganger so the blows matter,
-   with the hit points and armor of a mid-level fight. */
+/* A reflection's life drain starts at 0 and climbs to 4, and that
+   level is also the damage. The body is a doppelganger and stays one,
+   with 60 hit points. */
 static void
 pride_waken_reflection(void)
 {
@@ -3849,7 +3853,7 @@ pride_waken_reflection(void)
        Protection from shape changers must not turn that back on. */
     refl->cham = NON_PM;
     refl->m_lev = 0;
-    refl->mhp = refl->mhpmax = 130;
+    refl->mhp = refl->mhpmax = 60;
 }
 
 boolean
@@ -3951,6 +3955,62 @@ greed_snapshot_gold(void)
         return;
     u.ugreed_gold = carried_gold();
     u.uevent.greed_snapped = 1;
+}
+
+/* 200 turns on entering the Cave of Wonders. */
+void
+greed_start_clock(void)
+{
+    u.uspare1 = 200L;
+    u.uevent.greed_warned = 0;
+}
+
+/* Gold piles, real gems, and worthless glass. Not rocks or gray stones. */
+boolean
+greed_costly_obj(struct obj *obj)
+{
+    if (!obj || !in_wilderness() || dunlev(&u.uz) != 2)
+        return FALSE;
+    if (obj->oclass == COIN_CLASS)
+        return TRUE;
+    return (boolean) (obj->oclass == GEM_CLASS
+                      && obj->otyp >= FIRST_REAL_GEM
+                      && obj->otyp <= LAST_GLASS_GEM);
+}
+
+/* Charges taken during the current pickup or loot command. */
+static int greed_charges = 0;
+
+/* One pickup of a pile or stack. 0 or below starves at once. */
+void
+greed_clock_spend(long cost)
+{
+    if (!in_wilderness() || dunlev(&u.uz) != 2 || cost <= 0L)
+        return;
+    u.uspare1 -= cost;
+    greed_charges++;
+    if (u.uspare1 <= 0L) {
+        u.uspare1 = 0L;
+        svk.killer.format = NO_KILLER_PREFIX;
+        Strcpy(svk.killer.name, "Starved, clinging to worldly possessions.");
+        done(STARVING);
+    }
+}
+
+/* One line for the whole command, after the pickup lines. */
+void
+greed_cost_finish(void)
+{
+    static const char *const lines[3] = {
+        "Thy covetousness hath hastened thy hunger.",
+        "Thy greed gnaweth at thee, and thy hunger waxeth sore.",
+        "Woe unto thee, for thy greed hath driven thee unto hunger.",
+    };
+
+    if (greed_charges <= 0)
+        return;
+    greed_charges = 0;
+    pline("%s", lines[rn2(3)]);
 }
 
 void
