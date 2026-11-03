@@ -3742,7 +3742,12 @@ xkilled(
            a corpse or animating a statue and usually will be hostile */
         && mndx != PM_HUMAN
         /* only applicable if hero is lawful or neutral */
-        && u.ualign.type != A_CHAOTIC) {
+        && u.ualign.type != A_CHAOTIC
+        /* A priest of the Great Dragon is evil. Killing one is not
+           murder: no "You murderer!", no Favor loss, no telepathy loss.
+           malign stays at the peaceful value, so the check above would
+           otherwise fire even after the priest turns hostile. */
+        && !(mtmp->ispriest && mon_aligntyp(mtmp) == A_NONE)) {
         HTelepat &= ~INTRINSIC;
         change_luck(-2);
         You("murderer!");

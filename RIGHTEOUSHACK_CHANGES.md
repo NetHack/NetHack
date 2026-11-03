@@ -1272,7 +1272,10 @@ speak and you are not deaf, that priest says "Welcome, we have
 long awaited thee. Look thou within the chest, and receive thy
 reward." The welcome leaves the priest peaceful. Attacking
 still asks the ordinary question, then she turns hostile and the
-smite is unchanged. The
+smite is unchanged. Killing that priest, or any priest of the
+Great Dragon, is not murder: no "You murderer!", and no Favor
+loss. The
+
 lead-in "The high priest intones:" still appears on its old
 timer, and on the Sanctum it names the priest of the Great Dragon.
 An endgame temple still does not name the altar's owner. Other

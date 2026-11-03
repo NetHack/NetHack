@@ -11,6 +11,10 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-03
+Killing a priest of the Great Dragon is not murder. There is no
+"You murderer!", and Favor is not lost for it.
+
+2026-11-03
 Offering the real Amulet of Yendor on the Sanctum high altar
 prints "You feel ashamed." The Amulet is not used up, you live,
 and the alignment record is not touched. It takes a turn. An
