@@ -365,7 +365,8 @@ learn(void)
     if (svc.context.spbook.delay && ublindf
         && ublindf->otyp == LENSES && rn2(2))
         svc.context.spbook.delay++;
-    if (Confusion) { /* became confused while learning */
+    /* The finger of execution book is not ruined by confusion. */
+    if (Confusion && book->otyp != SPE_FINGER_OF_DEATH) { /* became confused while learning */
         (void) confused_book(book);
         svc.context.spbook.book = 0; /* no longer studying */
         svc.context.spbook.o_id = 0;
@@ -447,7 +448,8 @@ learn(void)
             update_inventory();
     }
 
-    if (book->cursed) { /* maybe a demon cursed it */
+    /* A cursed finger of execution book still only teaches the spell. */
+    if (book->cursed && booktype != SPE_FINGER_OF_DEATH) { /* maybe a demon cursed it */
         if (cursed_book(book)) {
             useup(book);
             svc.context.spbook.book = 0;
@@ -574,7 +576,10 @@ study_book(struct obj *spellbook)
 
         /* Books are often wiser than their readers (Rus.) */
         spellbook->in_use = TRUE;
-        if (!spellbook->blessed && spellbook->otyp != SPE_BOOK_OF_THE_DEAD) {
+        /* The finger of execution book always teaches its spell. */
+        if (booktype != SPE_FINGER_OF_DEATH
+            && !spellbook->blessed
+            && spellbook->otyp != SPE_BOOK_OF_THE_DEAD) {
             if (spellbook->cursed) {
                 too_hard = TRUE;
             } else {
@@ -602,7 +607,7 @@ study_book(struct obj *spellbook)
             }
         }
 
-        if (too_hard) {
+        if (booktype != SPE_FINGER_OF_DEATH && too_hard) {
             boolean gone = cursed_book(spellbook);
 
             nomul(svc.context.spbook.delay); /* study time */
@@ -617,7 +622,7 @@ study_book(struct obj *spellbook)
             } else
                 spellbook->in_use = FALSE;
             return 1;
-        } else if (confused) {
+        } else if (booktype != SPE_FINGER_OF_DEATH && confused) {
             if (!confused_book(spellbook)) {
                 spellbook->in_use = FALSE;
             }
@@ -2182,6 +2187,11 @@ percent_success(int spell)
     boolean paladin_bonus = (Role_if(PM_KNIGHT)
                              && skilltype == P_CLERIC_SPELL);
 
+    /* Finger of execution is a flat 50. No stat, level, skill, armor,
+       shield, or Pride cap. */
+    if (spellid(spell) == SPE_FINGER_OF_DEATH)
+        return 50;
+
     /* Calculate intrinsic ability (splcaster) */
 
     splcaster = gu.urole.spelbase;
@@ -2289,6 +2299,28 @@ percent_success(int spell)
         chance = 0;
 
     return chance;
+}
+
+/* Drop finger of execution from the spell list entirely. */
+void
+pride_unlearn_execution(void)
+{
+    int i, j;
+
+    for (i = 0; i < MAXSPELL; i++) {
+        if (spellid(i) != SPE_FINGER_OF_DEATH)
+            continue;
+        for (j = i; j < MAXSPELL - 1; j++)
+            svs.spl_book[j] = svs.spl_book[j + 1];
+        svs.spl_book[MAXSPELL - 1].sp_id = NO_SPELL;
+        svs.spl_book[MAXSPELL - 1].sp_lev = 0;
+        svs.spl_book[MAXSPELL - 1].sp_know = 0;
+        if (gs.spl_orderindx) {
+            free((genericptr_t) gs.spl_orderindx);
+            gs.spl_orderindx = 0;
+        }
+        i--;
+    }
 }
 
 staticfn char *

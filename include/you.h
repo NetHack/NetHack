@@ -61,7 +61,14 @@ struct u_event {
     Bitfield(peter_quest, 1);       /* Peter has given the quest scroll */
     Bitfield(church_gifts, 4);      /* XP donations to God's church, 0..10 */
     Bitfield(sodom_taunts, 7);      /* one-time Sodom and Tyre taunts */
-    /* 35 bits: 3 used in the following word */
+    Bitfield(wilderness_sealed, 1); /* sword taken; branch cannot be reentered */
+    Bitfield(fear_exposed, 1);      /* attacked, so the path no longer protects */
+    Bitfield(greed_hint, 2);        /* which full-verse hint the gate last gave */
+    Bitfield(pride_prayed, 1);      /* prayed on the Pride altar; the way is open */
+    Bitfield(greed_warned, 1);      /* the 30-turns-left hunger warning has been shown */
+    Bitfield(greed_snapped, 1);     /* gold on entering Greed has been recorded */
+    Bitfield(wilderness_intro, 5);  /* which Wilderness floors have shown the intro */
+    /* 47 bits */
 };
 
 /*
@@ -364,6 +371,7 @@ enum utotypes {
     UTOTYPE_ATSTAIRS = 0x01,
     UTOTYPE_FALLING  = 0x02,
     UTOTYPE_PORTAL   = 0x04,
+    UTOTYPE_WILDHOME = 0x08,  /* sword return to the Wilderness stair */
     UTOTYPE_RMPORTAL = 0x10,  /* remove portal */
     UTOTYPE_DEFERRED = 0x20   /* deferred_goto */
 };
@@ -490,7 +498,8 @@ struct you {
     int ugifts;              /* number of artifacts bestowed */
     int ublessed, ublesscnt; /* blessing/duration from #pray */
     long umoney0;
-    long uspare1;
+    long uspare1;                /* Greed: turns remaining, 200 on entry */
+    long ugreed_gold;            /* gold carried on entering Greed */
     long uexp, urexp;        /* exper pts for gaining levels and for score */
     long ucleansed;          /* to record moves when player was cleansed */
     long usleep;             /* sleeping; monstermove you last started */

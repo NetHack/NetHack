@@ -97,6 +97,13 @@ goodpos(
 
     if (!isok(x, y))
         return FALSE;
+    /* Fear: monsters cannot step onto the path or the stairs. */
+    if (mtmp && mtmp != &gy.youmonst && in_wilderness() && dunlev(&u.uz) == 4
+        && (on_fear_path(x, y) || levl[x][y].typ == STAIRS))
+        return FALSE;
+    /* The garden never receives a monster. */
+    if (mtmp && mtmp != &gy.youmonst && in_wilderness() && dunlev(&u.uz) == 5)
+        return FALSE;
 
     /* in many cases, we're trying to create a new monster, which
      * can't go on top of the player or any existing monster.

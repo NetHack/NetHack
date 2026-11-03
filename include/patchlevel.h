@@ -17,7 +17,7 @@
  * Incrementing EDITLEVEL can be used to force invalidation of old bones
  * and save files.
  */
-#define EDITLEVEL 6 /* church donations share the save with the Sodom taunt bits */
+#define EDITLEVEL 7 /* wilderness progress bits; church donations shifted the event flags */
 
 /*
  * Development status possibilities.

@@ -4378,6 +4378,12 @@ doapply(void)
     case THURIBLE:    
     case OIL_LAMP:
     case MAGIC_LAMP:
+        if (has_oname(obj) && !strcmp(ONAME(obj), "magic lamp of unlimited wishing")
+            && in_wilderness() && dunlev(&u.uz) == 3) {
+            pline("The lamp hums with boundless power, but it may only be used beyond this place.");
+            break;
+        }
+        /*FALLTHRU*/
     case BRASS_LANTERN:
         use_lamp(obj);
         break;

@@ -22,6 +22,8 @@ staticfn long score_targ(struct monst *, struct monst *);
 staticfn boolean can_reach_location(struct monst *, coordxy, coordxy, coordxy,
                                   coordxy) NONNULLARG1;
 staticfn boolean mnum_leashable(int);
+staticfn boolean pet_avoids_petra_letter(struct monst *, coordxy, coordxy);
+staticfn boolean pet_spares_capernaum_monster(struct monst *);
 
 /* pick a carried item for pet to drop */
 struct obj *
@@ -477,6 +479,31 @@ dog_invent(struct monst *mtmp, struct edog *edog, int udist)
     return 0;
 }
 
+/* A Mines' End letter, on the path or a decoy. A pet will not
+   step onto one. Standing on one already is not a step onto it. */
+staticfn boolean
+pet_avoids_petra_letter(struct monst *mtmp, coordxy x, coordxy y)
+{
+    if (!petra_map_letter(x, y))
+        return FALSE;
+    if (mtmp->mx == x && mtmp->my == y)
+        return FALSE;
+    return TRUE;
+}
+
+/* On Capernaum a pet attacks no monster at all. Other levels
+   keep the old behavior, including the plot-NPC exceptions. */
+staticfn boolean
+pet_spares_capernaum_monster(struct monst *mtarg)
+{
+    s_level *slev;
+
+    if (!mtarg || mtarg == &gy.youmonst)
+        return FALSE;
+    slev = Is_special(&u.uz);
+    return (boolean) (slev && !strcmp(slev->proto, "capernaum"));
+}
+
 /* set dog's goal -- gtyp, gx, gy;
    returns -1/0/1 (dog's desire to approach player) or -2 (abort move) */
 staticfn int
@@ -528,6 +555,9 @@ dog_goal(
             nx = obj->ox;
             ny = obj->oy;
             if (nx >= min_x && nx <= max_x && ny >= min_y && ny <= max_y) {
+                /* Do not fetch from a letter tile. */
+                if (pet_avoids_petra_letter(mtmp, nx, ny))
+                    continue;
                 otyp = dogfood(mtmp, obj);
                 /* skip inferior goals */
                 if (otyp > gg.gtyp || otyp == UNDEF)
@@ -742,6 +772,9 @@ score_targ(struct monst *mtmp, struct monst *mtarg)
     /* Pets never attack plot NPCs, even when confused or in conflict. */
     if (is_plot_npc(mtarg))
         return -5000L;
+    /* On Capernaum, no monster is a target. Elsewhere, vanilla. */
+    if (pet_spares_capernaum_monster(mtarg))
+        return -5000L;
 
     /* If the monster is confused, normal scoring is disrupted -
      * anything may happen
@@ -868,7 +901,8 @@ best_target(struct monst *mtmp, boolean forced)   /* Pet */
             temp_targ = find_targ(mtmp, dx, dy, 7);
 
             /* Nothing in this line? */
-            if (!temp_targ || is_plot_npc(temp_targ))
+            if (!temp_targ || is_plot_npc(temp_targ)
+                || pet_spares_capernaum_monster(temp_targ))
                 continue;
 
             /* Decide how attractive the target is */
@@ -1097,6 +1131,21 @@ dog_move(
         if (mtmp->mleashed && distu(nx, ny) > 4)
             continue;
 
+        /* Never choose a letter tile. A pet already on one still
+           considers every other square, so it can step off. */
+        if (pet_avoids_petra_letter(mtmp, nx, ny))
+            continue;
+        if (petra_map_letter((coordxy) omx, (coordxy) omy)
+            && !MON_AT(nx, ny) && !u_at(nx, ny)) {
+            if (chi < 0 || GDIST(nx, ny) < GDIST(nix, niy)) {
+                nix = nx;
+                niy = ny;
+                nidist = GDIST(nx, ny);
+                chi = i;
+            }
+            goto nxti;
+        }
+
         /* if a guardian, try to stay close by choice */
         if (!edog && (j = distu(nx, ny)) > 16 && j >= udist)
             continue;
@@ -1122,7 +1171,8 @@ dog_move(
              */
             int balk = mtmp->m_lev + ((5 * mtmp->mhp) / mtmp->mhpmax) - 2;
 
-            if (is_plot_npc(mtmp2))
+            if (is_plot_npc(mtmp2)
+                || pet_spares_capernaum_monster(mtmp2))
                 continue;
 
             if ((int) mtmp2->m_lev >= balk
@@ -1336,18 +1386,21 @@ dog_move(
         ny = sgn(omy - u.uy);
         cc.x = u.ux + nx;
         cc.y = u.uy + ny;
-        if (goodpos(cc.x, cc.y, mtmp, 0))
+        if (goodpos(cc.x, cc.y, mtmp, 0)
+            && !petra_map_letter(cc.x, cc.y))
             goto dognext;
 
         i = xytodir(nx, ny);
         for (j = DIR_LEFT(i); j < DIR_RIGHT(i); j++) {
             dirtocoord(&cc, j);
-            if (goodpos(cc.x, cc.y, mtmp, 0))
+            if (goodpos(cc.x, cc.y, mtmp, 0)
+                && !petra_map_letter(cc.x, cc.y))
                 goto dognext;
         }
         for (j = DIR_LEFT2(i); j < DIR_RIGHT2(i); j++) {
             dirtocoord(&cc, j);
-            if (goodpos(cc.x, cc.y, mtmp, 0))
+            if (goodpos(cc.x, cc.y, mtmp, 0)
+                && !petra_map_letter(cc.x, cc.y))
                 goto dognext;
         }
         cc.x = mtmp->mx;

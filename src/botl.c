@@ -130,7 +130,7 @@ do_statusline2(void)
     Sprintf(eos(dloc), "%s:%-2ld", /* strongest hero can lift ~300000 gold */
             (iflags.in_dumplog || iflags.invis_goldsym) ? "$"
               : encglyph(objnum_to_glyph(GOLD_PIECE)),
-            min(money, 999999L));
+            min(money, 99999999L));
     dln = strlen(dloc);
     /* '$' encoded as \GXXXXNNNN is 9 chars longer than display will need */
     dx = strstri(dloc, "\\G") ? 9 : 0;
@@ -1051,7 +1051,7 @@ bot_via_windowport(void)
     if ((money = money_cnt(gi.invent)) < 0L)
         money = 0L; /* ought to issue impossible() and then discard gold */
     gb.blstats[idx][BL_GOLD].rawval.a_long = money;
-    gb.blstats[idx][BL_GOLD].a.a_long = min(money, 999999L);
+    gb.blstats[idx][BL_GOLD].a.a_long = min(money, 99999999L);
     /*
      * The tty port needs to display the current symbol for gold
      * as a field header, so to accommodate that we pass gold with

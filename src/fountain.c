@@ -244,6 +244,20 @@ drinkfountain(void)
 {
     /* What happens when you drink from a fountain? */
     boolean mgkftn = (levl[u.ux][u.uy].blessedftn == 1);
+
+    /* Garden fountains of living water. Always beneficial. */
+    if (in_wilderness() && dunlev(&u.uz) == 5) {
+        pline("The water is living. It restores you.");
+        if (Upolyd)
+            u.mh = u.mhmax;
+        else
+            u.uhp = u.uhpmax;
+        if (u.uhunger < 1000)
+            u.uhunger = 1000;
+        newuhs(FALSE);
+        disp.botl = TRUE;
+        return;
+    }
     int fate = rnd(30);
 
     if (Levitation) {
@@ -395,6 +409,11 @@ dipfountain(struct obj *obj)
 {
     int er = ER_NOTHING;
     boolean is_hands = (obj == &hands_obj);
+
+    if (in_wilderness() && dunlev(&u.uz) == 5) {
+        pline("The living water does no harm.");
+        return;
+    }
 
     if (Levitation) {
         floating_above("fountain");

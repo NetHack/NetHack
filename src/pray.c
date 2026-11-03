@@ -1797,6 +1797,10 @@ dopray(void)
     /* set up p_type and p_alignment */
     if (!can_pray(TRUE))
         return ECMD_OK;
+    if (pride_prayer()) {
+        nomul(0);
+        return ECMD_TIME;
+    }
 
     
     nomul(-3);
@@ -1986,6 +1990,12 @@ prayer_done(void)
     if (!u.uevent.gibeon_wish && is_gibeon_altar(u.ux, u.uy)
         && gibeon_vision())
         return 1;
+
+    /* The Garden altar the Sword of the Spirit rests on crowns.
+       Same crowning as any other, and certain. */
+    if (in_wilderness() && dunlev(&u.uz) == 5 && on_altar()
+        && !u.uevent.uhand_of_elbereth)
+        gcrownu();
     
     /* ------------------------------------------------------------------
      *  1. Altar use: always attempt to bless water (anointing oil
@@ -2003,6 +2013,7 @@ prayer_done(void)
         pline("\"Be still, and know that I am God.\" (Psalm 46:10)");
         u.ublesscnt += rnz(50 + (Luck > 0 ? 0 : 20)); /* longer wait if unlucky */
         //change_luck(-1); /* small humility penalty */
+        pride_altar_after_prayer();
         return 1;
     }
 
@@ -2077,9 +2088,17 @@ prayer_done(void)
         pline("\"Call to me and I will answer you...\" (Jeremiah 33:3)");
     }*/
 
+    /* An accepted prayer on Greed restores 50 turns. Praying too soon
+       returns above and does not reach this, so the timeout is unchanged. */
+    if (in_wilderness() && dunlev(&u.uz) == 2) {
+        u.uspare1 += 50L;
+        pline("The Lord is pleased with you and has restored your strength.");
+    }
+
     /* Reset prayer timer for next time */
     reset_prayer_timer();
 
+    pride_altar_after_prayer();
     return 1;
 }
 

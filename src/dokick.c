@@ -522,6 +522,9 @@ really_kick_object(coordxy x, coordxy y)
         return 1;
     }
 
+    if (gk.kickedobj->otyp == MIRROR)
+        pride_touch_mirror(gk.kickedobj);
+
     if ((trap = t_at(x, y)) != 0) {
         if ((is_pit(trap->ttyp) && !Passes_walls) || trap->ttyp == WEB) {
             if (!trap->tseen)
@@ -921,7 +924,8 @@ kick_door(coordxy x, coordxy y, int avrg_attrib)
         return; /* uses a turn */
     }
 
-    if (peters_door_blocks(x, y) || sodom_door_blocks(x, y))
+    if (peters_door_blocks(x, y) || sodom_door_blocks(x, y)
+        || pride_door_blocks(x, y))
         return;
 
     /* not enough leverage to kick open doors while levitating */

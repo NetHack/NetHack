@@ -909,6 +909,7 @@ pickup(int what) /* should be a long */
  pickupdone:
     gp.pickup_encumbrance = 0;
     add_valid_menu_class(0); /* reset */
+    greed_cost_finish();
     return (n_tried > 0);
 }
 
@@ -1884,6 +1885,8 @@ pickup_object(
         obj = splitobj(obj, count);
 
     obj = pick_obj(obj);
+    if (greed_costly_obj(obj))
+        greed_clock_spend(25L);
 
     if (uwep && uwep == obj)
         gm.mrg_to_wielded = TRUE;
@@ -1941,6 +1944,7 @@ pick_obj(struct obj *otmp)
     }
 
     result = addinv(otmp);
+    wilderness_took(result);
     /* if you're taking a shop item from outside the shop, make shk notice */
     if (robshop)
         remote_burglary(ox, oy);
@@ -2774,8 +2778,14 @@ out_container(struct obj *obj)
     if (is_pick(obj))
         pick_pick(obj); /* shopkeeper feedback */
 
-    otmp = addinv(obj);
-    pickup_prinv(otmp, count, "removing");
+    {
+        boolean costly = greed_costly_obj(obj);
+
+        otmp = addinv(obj);
+        pickup_prinv(otmp, count, "removing");
+        if (costly)
+            greed_clock_spend(25L);
+    }
 
     if (is_gold) {
         bot(); /* update character's gold piece count immediately */
@@ -3264,6 +3274,8 @@ traditional_loot(boolean put_in)
     } else if (menu_on_request < 0) {
         used = (menu_loot(menu_on_request, put_in) > 0);
     }
+    if (!put_in)
+        greed_cost_finish();
     return used;
 }
 
@@ -3397,6 +3409,8 @@ menu_loot(int retry, boolean put_in)
             free((genericptr_t) pick_list);
         }
     }
+    if (!put_in)
+        greed_cost_finish();
     return n_looted ? ECMD_TIME : ECMD_OK;
 }
 

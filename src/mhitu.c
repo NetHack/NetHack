@@ -510,12 +510,21 @@ mattacku(struct monst *mtmp)
 
     calc_mattacku_vars(mtmp, &ranged, &range2, &foundyou, &youseeit);
 
-    if (!ranged)
-        nomul(0);
     if (DEADMONSTER(mtmp))
         return 1;
     if (Underwater && !is_swimmer(mtmp->data))
         return 0;
+
+    /* The Fear path and its stairs stop every attack before it lands.
+       A Psalm 91 engraved anywhere else is not this check. */
+    if (fear_protected()) {
+        if (u.uswallow && mtmp == u.ustuck)
+            expels(mtmp, mtmp->data, TRUE);
+        return 0;
+    }
+
+    if (!ranged)
+        nomul(0);
 
     /* If swallowed, can only be affected by u.ustuck */
     if (u.uswallow) {
@@ -709,6 +718,9 @@ mattacku(struct monst *mtmp)
     /*  Work out the armor class differential   */
     tmp = AC_VALUE(u.uac) + 10; /* tmp ~= 0 - 20 */
     tmp += mtmp->m_lev;
+    /* The drain uses m_lev, which starts at 0. The blow does not. */
+    if (has_mgivenname(mtmp) && !strcmp(MGIVENNAME(mtmp), "your reflection"))
+        tmp += 10;
     if (gm.multi < 0)
         tmp += 4;
     if ((Invis && !perceives(mdat)) || !mtmp->mcansee)
@@ -1153,6 +1165,9 @@ hitmu(struct monst *mtmp, struct attack *mattk)
     mhm.specialdmg = 0;
     mhm.done = FALSE;
 
+    if (fear_protected())
+        return M_ATTK_MISS;
+
     if (!canspotmon(mtmp))
         map_invisible(mtmp->mx, mtmp->my);
 
@@ -1295,6 +1310,14 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
     struct obj *otmp2, *nextobj;
     int i;
     boolean physical_damage = FALSE;
+
+    /* Miss before the monster steps onto the hero. If already swallowed
+       on a path tile or stair, spit the hero out instead of digesting. */
+    if (fear_protected()) {
+        if (u.uswallow && u.ustuck == mtmp)
+            expels(mtmp, mtmp->data, TRUE);
+        return M_ATTK_MISS;
+    }
 
     if (!u.uswallow) { /* swallows you */
         int omx = mtmp->mx, omy = mtmp->my;
@@ -1600,6 +1623,8 @@ explmu(
 
     if (mtmp->mcan)
         return M_ATTK_MISS;
+    if (fear_protected())
+        return M_ATTK_MISS;
 
     tmp = d((int) mattk->damn, (int) mattk->damd);
     not_affected = defended(mtmp, (int) mattk->adtyp);
@@ -1703,6 +1728,8 @@ gazemu(struct monst *mtmp, struct attack *mattk)
             mcanseeu = (canseemon(mtmp) && couldsee(mtmp->mx, mtmp->my)
                         && mtmp->mcansee);
 
+    if (fear_protected())
+        return M_ATTK_MISS;
     if (m_seenres(mtmp, cvt_adtyp_to_mseenres(mattk->adtyp)))
         return M_ATTK_MISS;
 
@@ -1930,6 +1957,8 @@ gazemu(struct monst *mtmp, struct attack *mattk)
 void
 mdamageu(struct monst *mtmp, int n)
 {
+    if (fear_protected())
+        return;
     if (n < 0) {
         impossible("mdamageu for negative damage? (%d)", n);
         n = 0;
@@ -2020,6 +2049,8 @@ doseduce(struct monst *mon)
     int attr_tot, tried_gloves = 0;
     char qbuf[QBUFSZ], Who[QBUFSZ];
 
+    if (fear_protected())
+        return 0;
     if (mon->mcan || mon->mspec_used) {
         pline_mon(mon, "%s acts as though %s has got a %sheadache.",
                   Monnam(mon), mhe(mon), mon->mcan ? "severe " : "");

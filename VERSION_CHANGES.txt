@@ -10,6 +10,123 @@ RighteousHack will eventually replace lawful, neutral, and chaotic
 with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
+2026-11-03
+Each Fear map still places 40 monsters. The master lich, the
+arch-lich, and the titan are now a minotaur, an ettin, and a
+storm giant, five of each. Blue dragon, jabberwock, purple worm,
+pit fiend, and balrog are unchanged.
+
+2026-11-03
+Royal Historian, Healer, Priest, and Prophet can train long
+sword to Basic. Knight, Adventurer, and Champion are unchanged.
+
+2026-11-03
+The Sword of the Spirit is blessed, +2, and erodeproof, with no
+rust or burn on it. That one flag stops rust, fire, corrosion,
+and rot. Once identified, the iron blade shows as rustproof.
+
+2026-11-03
+The #enhance screen heads the spell schools "Prophetic Skills".
+The seven names are spiritual warfare, healing, discernment,
+blessing, prayer, deliverance, and creation.
+
+2026-11-03
+Each Wilderness floor shows a full-screen intro once, the
+first time you arrive. The desert says he or she was led into
+the wilderness. Greed, Pride, and Fear add Luke 12:15,
+Proverbs 16:18, and 2 Timothy 1:7 under the verse. The garden
+has no reference. On the Fear path or either stair, monsters
+still walk up and crowd the tile, but they do not start an
+attack. Stepping off, they attack at full strength. A Psalm 91
+you engrave yourself is unchanged. The Cave of Wonders clock
+starts at 200 turns. Every accepted prayer adds 50 and says
+"The Lord is pleased with you and has restored your strength."
+Picking up a gold pile or a gem costs 25, and the command
+then says that greed has hastened your hunger. At 30 or fewer the
+countdown shows, and it stops if a prayer lifts you above 30.
+At 0 the tombstone is unchanged. A Pride reflection has 60 hit
+points. Its level and its drain both stop at 4. Finger of
+execution casts at a flat 50 percent and kills through resistance
+and reflection. It leaves the spell list when you leave Pride.
+The Rod of Frozen Power burst is blue and stays on screen about
+a second and a half longer. The Garden altar under the Sword of
+the Spirit has no engraving. The sword is a blessed +2. Praying
+on that altar crowns you, the Servant of the Lord, if you are
+not already. The Pride altar prayer says one line. With a lure
+in the pack, even nested in a bag: "You drop to your knees and
+repent of your pride. The treasures crumble into dust, and a
+hidden way opens." With no lure: "The treasures crumble into
+dust, and a hidden way opens." Each Fear map placed 8 monsters
+and now places 40, five of each of the same eight, all off the
+Psalm 91 path and the stairs. A wish that names a Pride lure is
+refused the way a quest artifact is: "For a moment, you feel
+something in your hands, but it disappears!" The plain item,
+without that name, can still be wished for.
+
+2026-11-02
+A Wilderness verse shows its text every time you step on that
+square. Waiting there does not repeat it. Ordinary engravings
+are unchanged.
+
+2026-11-02
+A Pride reflection is always a doppelganger and does not change
+shape. Its life drain still grows, but one turn never takes more
+than 5 hit points. Reading the finger of execution book always
+teaches the spell. Casting it is unchanged. The Rod of Frozen
+Power never runs out, and its burst is drawn as a cold explosion.
+The Amulet of Immortality does not save you. An ordinary amulet
+of life saving still does, on Pride and everywhere else. On the
+Fear path or either stair, no monster can harm or afflict you.
+A Psalm 91 you engrave yourself is unchanged. The Sword of
+the Spirit returns you to the Wilderness stair. There is no
+portal error, and the branch stays sealed.
+
+2026-11-02
+The Wilderness maps for the desert, greed, pride, and the garden
+use real walls. Greed is the Cave of Wonders: the gate is at the
+far east, gold you carry in is the gold you carry out, and from
+the halfway point of the hunger clock each move says how many
+turns are left. Pride's way down appears only after you pray on
+the altar at the east end of the hall. Lures are destroyed then
+and again on the stairs to Fear. On the Fear path or either stair,
+nothing damages you, and monsters and boulders stay off it.
+Stepping on a Wilderness verse shows only the verse. The Sword of
+the Spirit opens a portal home. The rod of frozen power is the
+cold rod. Finger of execution on Pride is never easier than it is
+elsewhere, and never better than 30 percent.
+
+2026-11-01
+A pet will not step onto a Mines' End letter, on the path or
+a decoy. If it is already on one, it steps off. On Capernaum,
+a pet will not attack any monster. Other levels are unchanged.
+
+2026-11-01
+The Wilderness Trial is chained to the prophet level, the same
+name the overview shows.
+
+2026-11-01
+Pride now has eight treasure rooms. Each game shuffles one lure
+into each room. A harmless mirror stands outside every door, and
+a live mirror stands inside. Stepping on that inner mirror, or
+kicking it, wakes the reflection, the same as picking up the lure.
+The garden fountains are living water: drinking restores you and
+ends hunger, and nothing harmful comes of them. The last of
+Psalm 91 is engraved around the altar. No monster can enter the
+garden. Greed is a pillared hall with side rooms. Its gems stay
+on that level. The desert still scatters four loaves and does
+not make you hungry just for arriving.
+
+2026-11-01
+The Wilderness Trial is a five-level branch below the Prophet.
+The desert bread makes you hungrier. Greed makes you leave
+everything at the gate, and only what you dropped comes back.
+Pride's lures work until you pray at the stone. Fear's path is
+Psalm 91, and the monsters cannot step on it. The garden holds
+the Sword of the Spirit. Taking it sends you back and seals the
+branch. Matthew 4:4 on the desert is the full King James verse,
+including "But he answered and said,". Ephesians 6:17 keeps the
+King James colon.
+
 2026-11-01
 Killing a man of Sodom or a woman of Gomorrah is not murder.
 There is no "You murderer!", no loss of Favor, and no loss of

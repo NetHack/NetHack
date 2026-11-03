@@ -2217,6 +2217,10 @@ mfndpos(
         for (ny = max(0, y - 1); ny <= maxy; ny++) {
             if (nx == x && ny == y)
                 continue;
+            /* Fear: never step onto the path or either stair. */
+            if (in_wilderness() && dunlev(&u.uz) == 4
+                && (on_fear_path(nx, ny) || levl[nx][ny].typ == STAIRS))
+                continue;
             ntyp = levl[nx][ny].typ;
             if (IS_OBSTRUCTED(ntyp)
                 && !((flag & ALLOW_WALL) && may_passwall(nx, ny))
@@ -4205,6 +4209,10 @@ m_respond_medusa(struct monst *mtmp)
 void
 m_respond(struct monst *mtmp)
 {
+    /* Fear path and stairs: no shriek, gaze, or call for help.
+       A Psalm 91 engraved anywhere else is not this check. */
+    if (fear_protected())
+        return;
     if (mtmp->data->msound == MS_SHRIEK && !um_dist(mtmp->mx, mtmp->my, 1))
         m_respond_shrieker(mtmp);
     if (mtmp->data == &mons[PM_MEDUSA] && couldsee(mtmp->mx, mtmp->my))
@@ -4715,7 +4723,8 @@ rescham(void)
 staticfn void
 m_restartcham(struct monst *mtmp)
 {
-    if (!mtmp->mcan)
+    /* A reflection is not a shapechanger, even after the ring comes off. */
+    if (!mtmp->mcan && !is_pride_reflection(mtmp))
         mtmp->cham = pm_to_cham(monsndx(mtmp->data));
     if (mtmp->data->mlet == S_MIMIC && mtmp->msleeping) {
         set_mimic_sym(mtmp);
@@ -4737,6 +4746,10 @@ restartcham(void)
 void
 restore_cham(struct monst *mon)
 {
+    if (is_pride_reflection(mon)) {
+        mon->cham = NON_PM;
+        return;
+    }
     if (Protection_from_shape_changers || mon->mcan) {
         /* force chameleon or mimic to revert to its natural shape */
         normal_shape(mon);
@@ -5378,6 +5391,9 @@ newcham(
     char *p, oldname[BUFSZ], l_oldname[BUFSZ];
 
     if (is_peter(mtmp))
+        return 0;
+    /* A Pride reflection stays a doppelganger. */
+    if (is_pride_reflection(mtmp))
         return 0;
 
     /* Riders are immune to polymorph and green slime

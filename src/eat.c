@@ -2882,6 +2882,17 @@ doeat(void)
         pline("You lick the statue. It tastes of salt.");
         return ECMD_TIME;
     }
+    if (has_oname(otmp) && !strcmp(ONAME(otmp), "loaf of bread")) {
+        pline("The bread turns to dust in your mouth. You are hungrier than before.");
+        morehungry(500);
+        useup(otmp);
+        return ECMD_TIME;
+    }
+    if (in_wilderness() && dunlev(&u.uz) == 2 && otmp->oclass == FOOD_CLASS) {
+        pline("The food turns to ash.");
+        useup(otmp);
+        return ECMD_TIME;
+    }
     if (check_capacity((char *) 0))
         return ECMD_OK;
 

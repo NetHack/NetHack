@@ -19,6 +19,7 @@ staticfn boolean u_stuck_cannot_go(const char *);
 staticfn NHFILE *currentlevel_rewrite(void);
 staticfn void familiar_level_msg(void);
 staticfn void capernaum_arrival(void);
+staticfn void wilderness_arrival(void);
 staticfn void final_level(void);
 staticfn void temperature_change_msg(schar);
 staticfn boolean better_not_try_to_drop_that(struct obj *);
@@ -1457,6 +1458,67 @@ capernaum_arrival(void)
     destroy_nhwindow(win);
 }
 
+/* Full-screen text, same window the quest intro uses. Dismissed with a key. */
+staticfn void
+wilderness_intro_window(const char *verse, const char *ref)
+{
+    winid win = create_nhwindow(NHW_TEXT);
+
+    putstr(win, 0, verse);
+    if (ref) {
+        putstr(win, 0, "");
+        putstr(win, 0, ref);
+    }
+    display_nhwindow(win, TRUE);
+    destroy_nhwindow(win);
+}
+
+/* Once per floor per game. The desert (level 1) is the entrance and is
+   not Greed, Pride, Fear, or the Garden, so only the entrance line shows
+   there. If it ever were one of those floors too, that text would follow. */
+staticfn void
+wilderness_arrival(void)
+{
+    int lev = dunlev(&u.uz);
+    unsigned bit;
+
+    if (lev < 1 || lev > 5)
+        return;
+    bit = 1U << (lev - 1);
+    if (u.uevent.wilderness_intro & bit)
+        return;
+    u.uevent.wilderness_intro |= bit;
+
+    if (lev == 1)
+        wilderness_intro_window(
+            flags.female
+            ? "And she was led by the Spirit into the wilderness, being tempted by the devil."
+            : "And he was led by the Spirit into the wilderness, being tempted by the devil.",
+            (const char *) 0);
+    switch (lev) {
+    case 2:
+        wilderness_intro_window(
+            "Take heed, and beware of covetousness: for a man's life consisteth not in the abundance of the things which he possesseth.",
+            "Luke 12:15");
+        break;
+    case 3:
+        wilderness_intro_window(
+            "Pride goeth before destruction, and an haughty spirit before a fall.",
+            "Proverbs 16:18");
+        break;
+    case 4:
+        wilderness_intro_window(
+            "For God hath not given us the spirit of fear; but of power, and of love, and of a sound mind.",
+            "2 Timothy 1:7");
+        break;
+    case 5:
+        wilderness_intro_window(
+            "And take up the sword of the Spirit, which is the word of God.",
+            (const char *) 0);
+        break;
+    }
+}
+
 staticfn void
 familiar_level_msg(void)
 {
@@ -1508,11 +1570,31 @@ goto_level(
     struct monst *mtmp;
     char whynot[BUFSZ];
     int dist = depth(newlevel) - depth(&u.uz);
-    boolean do_fall_dmg = FALSE;
+    boolean do_fall_dmg = FALSE, wildhome;
     schar prev_temperature = svl.level.flags.temperature;
 
     if (dunlev(newlevel) > dunlevs_in_dungeon(newlevel))
         newlevel->dlevel = dunlevs_in_dungeon(newlevel);
+    if (u.uevent.wilderness_sealed
+        && !strcmp(svd.dungeons[newlevel->dnum].dname, "The Wilderness Trial")) {
+        pline("The wilderness is sealed.");
+        return;
+    }
+    /* The sword's return is not a portal and is not the sealed way up. */
+    wildhome = (u.utotype & UTOTYPE_WILDHOME) != 0;
+    if (in_wilderness() && up && dunlev(&u.uz) > 1 && !portal && !wildhome) {
+        pline("The way back is sealed.");
+        return;
+    }
+    if (in_wilderness() && dunlev(&u.uz) == 2 && !on_level(newlevel, &u.uz)) {
+        greed_leave_gems();
+        greed_restore_gold();
+    }
+    if (in_wilderness() && dunlev(&u.uz) == 3
+        && !on_level(newlevel, &u.uz)) {
+        pride_leave_lures(FALSE);
+        pride_unlearn_execution();
+    }
     if (newdungeon) {
         if (In_endgame(newlevel)) { /* 1st Endgame Level !!! */
             if (!u.uhave.amulet)
@@ -1772,7 +1854,19 @@ goto_level(
     gv.vision_full_recalc = 0; /* don't let that reenable vision yet */
     flush_screen(-1);       /* ensure all map flushes are postponed */
 
-    if (portal && !In_endgame(&u.uz)) {
+    if (wildhome) {
+        stairway *stway;
+
+        for (stway = gs.stairs; stway; stway = stway->next)
+            if (stway->tolev.dnum != u.uz.dnum
+                && !strcmp(svd.dungeons[stway->tolev.dnum].dname,
+                           "The Wilderness Trial"))
+                break;
+        if (stway)
+            u_on_newpos(stway->sx, stway->sy);
+        else
+            u_on_rndspot(0);
+    } else if (portal && !In_endgame(&u.uz)) {
         /* find the portal on the new level */
         struct trap *ttrap;
 
@@ -1993,6 +2087,13 @@ goto_level(
     }
 
     temperature_change_msg(prev_temperature);
+    if (in_wilderness()) {
+        if (dunlev(&u.uz) == 2) {
+            greed_snapshot_gold();
+            greed_start_clock();
+        }
+        wilderness_arrival();
+    }
 
     /* this was originally done earlier; moved here to be logged after
        any achievement related to entering a dungeon branch

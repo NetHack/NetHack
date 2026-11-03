@@ -1032,6 +1032,32 @@ done(int how)
             return;
         }
     }
+    if (how != QUIT && how != ASCENDED && in_wilderness() && dunlev(&u.uz) == 3) {
+        struct obj *otmp;
+
+        /* Death and life-saving both leave the spell behind. */
+        pride_unlearn_execution();
+
+        for (otmp = gi.invent; otmp; otmp = otmp->nobj)
+            if (otmp->owornmask && has_oname(otmp)
+                && !strcmp(ONAME(otmp), "Amulet of Immortality")) {
+                long worn = otmp->owornmask;
+
+                pline("The amulet seems to flare with light.");
+                pline("You really died, a fool killed by your own vanity.");
+                pline("Pride goeth before destruction, and an haughty spirit before a fall.");
+                svk.killer.format = NO_KILLER_PREFIX;
+                Strcpy(svk.killer.name,
+                       "Killed by their own vanity, believing they were immortal.");
+                /* The name is the trap. Take this one item off before the
+                   ordinary life-saving check. An unnamed amulet of life
+                   saving, on Pride or anywhere else, is not touched. */
+                if (worn)
+                    setworn((struct obj *) 0, worn);
+                useup(otmp);
+                break;
+            }
+    }
     if (program_state.panicking
 #ifdef HANGUPHANDLING
         || program_state.done_hup

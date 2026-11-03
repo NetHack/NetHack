@@ -2629,6 +2629,54 @@ zap_ok(struct obj *obj)
     return GETOBJ_EXCLUDE;
 }
 
+/* Column first, row second, matching explode()'s explosion[]. */
+static const int frozen_expl[3][3] = {
+    { S_expl_tl, S_expl_ml, S_expl_bl },
+    { S_expl_tc, S_expl_mc, S_expl_bc },
+    { S_expl_tr, S_expl_mr, S_expl_br }
+};
+
+/* Frost-shaped glyphs, colored blue. EXPL_FROSTY is white. EXPL_MAGICAL
+   is magenta. EXPL_WET is the existing blue explosion (CLR_BLUE), and
+   that color is what the tty ports paint. Other frost bursts stay white. */
+static void
+frozen_power_show(void)
+{
+    coordxy dx, dy;
+    boolean starting = TRUE;
+    int i;
+
+    for (dx = -3; dx <= 3; dx++)
+        for (dy = -3; dy <= 3; dy++) {
+            coordxy xx = u.ux + dx, yy = u.uy + dy;
+            int col, row;
+
+            if (!isok(xx, yy))
+                continue;
+            col = (dx < 0) ? 0 : (dx > 0) ? 2 : 1;
+            row = (dy < 0) ? 0 : (dy > 0) ? 2 : 1;
+            tmp_at(starting ? DISP_BEAM : DISP_CHANGE,
+                   explosion_to_glyph(EXPL_WET, frozen_expl[col][row]));
+            tmp_at(xx, yy);
+            starting = FALSE;
+        }
+    if (!starting) {
+        boolean save_nap = flags.nap;
+
+        /* curs_on_u() flushes the glyphs. Force the 50 ms timed delay
+           for this burst only (curses and the Unix tty skip it when
+           timed_delay is off). The Windows console tty and the Windows
+           GUI always wait about 50 ms per call. Thirty calls past the
+           old two are about 1500 ms extra, 1600 ms in all. */
+        flags.nap = TRUE;
+        curs_on_u();
+        for (i = 0; i < 32; i++)
+            nh_delay_output();
+        flags.nap = save_nap;
+        tmp_at(DISP_END, 0);
+    }
+}
+
 /* #zap command, 'z' (or 'y' if numbed_pad==-1) */
 int
 dozap(void)
@@ -2645,6 +2693,31 @@ dozap(void)
     obj = getobj("zap", zap_ok, GETOBJ_NOFLAGS);
     if (!obj)
         return ECMD_CANCEL;
+    if (has_oname(obj) && !strcmp(ONAME(obj), "Rod of Frozen Power")) {
+        struct monst *mtmp, *nmon;
+
+        /* Unlimited. Never consult charges, and never wrest or fizzle. */
+        pline("Winter answers, and the cold bursts outward.");
+        frozen_power_show();
+        for (mtmp = fmon; mtmp; mtmp = nmon) {
+            int dmg;
+
+            nmon = mtmp->nmon;
+            if (DEADMONSTER(mtmp))
+                continue;
+            if (distmin(u.ux, u.uy, mtmp->mx, mtmp->my) > 3)
+                continue;
+            if (resists_cold(mtmp))
+                continue;
+            dmg = d(8, 8);
+            mtmp->mhp -= dmg;
+            if (mtmp->mhp < 1)
+                mondied(mtmp);
+            else
+                pline("%s is frozen.", Monnam(mtmp));
+        }
+        return ECMD_TIME;
+    }
 
     check_unpaid(obj);
 
@@ -2889,8 +2962,10 @@ zapyourself(struct obj *obj, boolean ordinary)
             learn_it = TRUE;
         break;
 
-    case WAN_DEATH:
     case SPE_FINGER_OF_DEATH:
+        /* Aimed at yourself: the prophecy does not turn back on you. */
+        break;
+    case WAN_DEATH:
         if (nonliving(gy.youmonst.data) || is_demon(gy.youmonst.data)) {
             pline((obj->otyp == WAN_DEATH)
                       ? "The wand shoots an apparently harmless beam at you."
@@ -3654,7 +3729,7 @@ zap_map(
         struct engr *e = engr_at(x, y);
 
         /* subset of engraving effects; none sets `disclose' */
-        if (e && e->engr_type != HEADSTONE) {
+        if (e && e->engr_type != HEADSTONE && e->engr_type != VERSE) {
             switch (obj->otyp) {
             case WAN_POLYMORPH:
             case SPE_POLYMORPH:
@@ -4418,6 +4493,13 @@ zhitu(
     int dam = 0, abstyp = zaptype(type);
     int orig_dam = 0;
 
+    if (pride_immune()) {
+        You("are untouched. No sorcery can reach you.");
+        return;
+    }
+    /* A monster's ray or breath. The hero's own zap is not mon_moving. */
+    if (svc.context.mon_moving && fear_protected())
+        return;
     switch (abstyp % 10) {
     case ZT_MAGIC_MISSILE:
         if (Antimagic) {
@@ -4474,6 +4556,8 @@ zhitu(
         }
         break;
     case ZT_DEATH:
+        if (type == ZT_PBOOK(ZT_DEATH))
+            break;
         if (abstyp == ZT_BREATH(ZT_DEATH)) {
             boolean disn_prot = inventory_resistance_check(AD_DISN);
 
@@ -4819,6 +4903,12 @@ dobuzz(
 
         if (type < 0)
             return;
+        /* Finger of execution kills the swallower. It does not touch you. */
+        if (type == ZT_PBOOK(ZT_DEATH)) {
+            if (u.ustuck && !peter_unhurt(u.ustuck))
+                xkilled(u.ustuck, XKILL_GIVEMSG);
+            return;
+        }
         tmp = zhitm(u.ustuck, type, nd, &otmp);
         if (!u.ustuck) {
             u.uswallow = 0;
@@ -4846,8 +4936,12 @@ dobuzz(
         sx += dx;
         lsy = sy;
         sy += dy;
-        if (!isok(sx, sy) || levl[sx][sy].typ == STONE)
+        if (!isok(sx, sy) || levl[sx][sy].typ == STONE) {
+            /* Finger of execution stops. It does not bounce back at you. */
+            if (type == ZT_PBOOK(ZT_DEATH))
+                break;
             goto make_bounce;
+        }
 
         mon = m_at(sx, sy);
         if (cansee(sx, sy)) {
@@ -4884,7 +4978,13 @@ dobuzz(
  buzzmonst:
             gn.notonhead = (mon->mx != gb.bhitpos.x
                             || mon->my != gb.bhitpos.y);
-            if (!forcemiss && zap_hit(find_mac(mon), spell_type)) {
+            /* Finger of execution: no miss, no reflection, no resistance.
+               Pets and peacefuls are hit, the same as any other ray.
+               Peter is spared, the same as any other ray. */
+            if (type == ZT_PBOOK(ZT_DEATH)) {
+                if (!peter_unhurt(mon))
+                    xkilled(mon, XKILL_GIVEMSG);
+            } else if (!forcemiss && zap_hit(find_mac(mon), spell_type)) {
                 if (mon_reflects(mon, (char *) 0)) {
                     if (cansee(mon->mx, mon->my)) {
                         hit(flash_str(fltyp, FALSE), mon, exclam(0));
@@ -4969,7 +5069,7 @@ dobuzz(
                     || (canseemon(mon) && !disguised_as_non_mon(mon)))
                     miss(flash_str(fltyp, FALSE), mon);
             }
-        } else if (u_at(sx, sy) && range >= 0) {
+        } else if (u_at(sx, sy) && range >= 0 && type != ZT_PBOOK(ZT_DEATH)) {
             nomul(0);
             if (u.usteed && !rn2(3) && !mon_reflects(u.usteed, (char *) 0)) {
                 mon = u.usteed;
@@ -5010,8 +5110,9 @@ dobuzz(
         if (gas_hit)
             (void) zap_over_floor(sx, sy, type, &shopdamage, TRUE, 0);
 
-        if (!ZAP_POS(levl[sx][sy].typ)
-            || (closed_door(sx, sy) && range >= 0)) {
+        if (type != ZT_PBOOK(ZT_DEATH)
+            && (!ZAP_POS(levl[sx][sy].typ)
+                || (closed_door(sx, sy) && range >= 0))) {
             int bchance;
 
  make_bounce:
@@ -6415,6 +6516,15 @@ wish_from_text(char *buf, boolean last_try)
     oldwisharti = u.uconduct.wisharti;
     refused = FALSE;
     Strcpy(bufcpy, buf);
+    /* Pride lure names are refused the way a quest artifact is: the
+       wish is spent, nothing is given, and the same line is shown.
+       Prophet mode is wizard mode, so this is not skipped for wizard. */
+    if (pride_lure_wish(buf)) {
+        pline("For a moment, you feel %s in your %s, but it disappears!",
+              something, makeplural(body_part(HAND)));
+        wish_history_add(bufcpy);
+        return 1;
+    }
     otmp = readobjnam(buf, &nothing);
     if (otmp && otmp != &nothing && otmp != &hands_obj
         && (otmp->otyp == BURNT_OFFERING

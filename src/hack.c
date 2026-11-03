@@ -433,6 +433,7 @@ moverock_core(coordxy sx, coordxy sy)
         }
         if (isok(rx, ry) && !IS_OBSTRUCTED(levl[rx][ry].typ)
             && levl[rx][ry].typ != IRONBARS
+            && !fear_forbids_boulder(rx, ry)
             && (!IS_DOOR(levl[rx][ry].typ) || !(u.dx && u.dy)
                 || doorless_door(rx, ry)) && !sobj_at(BOULDER, rx, ry)) {
             ttmp = t_at(rx, ry);
@@ -3096,10 +3097,12 @@ maybe_smudge_engr(coordxy x1, coordxy y1, coordxy x2, coordxy y2)
     struct engr *ep;
 
     if (can_reach_floor(TRUE)) {
-        if ((ep = engr_at(x1, y1)) && ep->engr_type != HEADSTONE)
+        if ((ep = engr_at(x1, y1)) && ep->engr_type != HEADSTONE
+            && ep->engr_type != VERSE)
             wipe_engr_at(x1, y1, rnd(5), FALSE);
         if ((x2 != x1 || y2 != y1)
-                && (ep = engr_at(x2, y2)) && ep->engr_type != HEADSTONE)
+                && (ep = engr_at(x2, y2)) && ep->engr_type != HEADSTONE
+                && ep->engr_type != VERSE)
             wipe_engr_at(x2, y2, rnd(5), FALSE);
     }
 }
@@ -3449,6 +3452,758 @@ petra_fail(coordxy x, coordxy y)
     /* 20, or 10 with fire resistance. Death only when this
        takes hit points to 0 or below. */
     losehp(Fire_resistance ? 10 : 20, "a false step", KILLED_BY);
+}
+
+boolean
+in_wilderness(void)
+{
+    return (boolean) !strcmp(svd.dungeons[u.uz.dnum].dname,
+                             "The Wilderness Trial");
+}
+
+boolean
+on_fear_path(coordxy x, coordxy y)
+{
+    struct engr *ep;
+
+    if (!in_wilderness() || dunlev(&u.uz) != 4)
+        return FALSE;
+    ep = engr_at(x, y);
+    return (boolean) (ep && ep->engr_type == VERSE
+                      && ep->engr_txt[actual_text]
+                      && ep->engr_txt[actual_text][0]);
+}
+
+boolean
+fear_forbids_boulder(coordxy x, coordxy y)
+{
+    if (!in_wilderness() || dunlev(&u.uz) != 4)
+        return FALSE;
+    if (on_fear_path(x, y))
+        return TRUE;
+    return (boolean) (levl[x][y].typ == STAIRS);
+}
+
+boolean
+pride_immune(void)
+{
+    struct obj *otmp;
+
+    if (!in_wilderness() || dunlev(&u.uz) != 3)
+        return FALSE;
+    for (otmp = gi.invent; otmp; otmp = otmp->nobj)
+        if (otmp->owornmask && has_oname(otmp)
+            && !strcmp(ONAME(otmp), "ring of complete immunity"))
+            return TRUE;
+    return FALSE;
+}
+
+static const char *const pride_lure_names[] = {
+    "silver long sword", "ring of complete immunity",
+    "Amulet of Immortality", "Rod of Frozen Power",
+    "prophecy book of execution", "magic lamp of unlimited wishing",
+    "bag of infinite holding", (const char *) 0
+};
+
+static boolean
+pride_name_is_lure(const char *s)
+{
+    int i;
+
+    if (!s || !*s)
+        return FALSE;
+    for (i = 0; pride_lure_names[i]; i++)
+        if (!strcmpi(s, pride_lure_names[i]))
+            return TRUE;
+    return FALSE;
+}
+
+static boolean
+is_pride_lure(struct obj *otmp)
+{
+    int i;
+
+    if (!otmp)
+        return FALSE;
+    if (otmp->otyp == GRAY_DRAGON_SCALE_MAIL && otmp->spe >= 12)
+        return TRUE;
+    if (!has_oname(otmp))
+        return FALSE;
+    for (i = 0; pride_lure_names[i]; i++)
+        if (!strcmp(ONAME(otmp), pride_lure_names[i]))
+            return TRUE;
+    return FALSE;
+}
+
+/* A wish names a Pride lure when the calling name, or the item text
+   left after ordinary wish prefixes, is one of those names. */
+boolean
+pride_lure_wish(const char *bp)
+{
+    static const char *const prefixes[] = {
+        "a ", "an ", "the ",
+        "blessed ", "holy ", "cursed ", "unholy ", "uncursed ",
+        "rustproof ", "erodeproof ", "corrodeproof ", "fixed ",
+        "fireproof ", "rotproof ", "tempered ", "crackproof ",
+        "lit ", "burning ", "unlit ", "extinguished ",
+        "poisoned ", "greased ", "very ", "thoroughly ",
+        "rusty ", "rusted ", "burnt ", "burned ", "cracked ",
+        "corroded ", "rotted ", "diluted ", "empty ",
+        "historic ", "real ", "fake ",
+        (const char *) 0
+    };
+    char buf[BUFSZ];
+    char *s, *named;
+    int i;
+
+    if (!bp || !*bp)
+        return FALSE;
+    Snprintf(buf, sizeof buf, "%s", bp);
+    (void) mungspaces(buf);
+    named = strstri(buf, " named ");
+    if (named) {
+        if (pride_name_is_lure(named + 7))
+            return TRUE;
+        *named = '\0';
+        (void) mungspaces(buf);
+    }
+    s = buf;
+    for (;;) {
+        if (!*s)
+            break;
+        if (digit(*s) && strcmp(s, "0")) {
+            while (digit(*s))
+                s++;
+            while (*s == ' ')
+                s++;
+            continue;
+        }
+        if (*s == '+' || *s == '-') {
+            s++;
+            while (digit(*s))
+                s++;
+            while (*s == ' ')
+                s++;
+            continue;
+        }
+        for (i = 0; prefixes[i]; i++) {
+            int l = (int) strlen(prefixes[i]);
+
+            if (!strncmpi(s, prefixes[i], l)) {
+                s += l;
+                break;
+            }
+        }
+        if (!prefixes[i])
+            break;
+    }
+    return pride_name_is_lure(s);
+}
+
+/* Destroy one lure, including a lure nested inside a container.
+   A bag of infinite holding gives artifacts back and destroys the rest. */
+static boolean
+pride_purge_one(struct obj *otmp)
+{
+    boolean any = FALSE;
+
+    if (!otmp)
+        return FALSE;
+    if (Has_contents(otmp)) {
+        struct obj *content, *cnext;
+
+        for (content = otmp->cobj; content; content = cnext) {
+            cnext = content->nobj;
+            if (pride_purge_one(content))
+                any = TRUE;
+        }
+    }
+    if (!is_pride_lure(otmp))
+        return any;
+    if (has_oname(otmp) && !strcmp(ONAME(otmp), "bag of infinite holding")) {
+        struct obj *content, *cnext;
+
+        for (content = otmp->cobj; content; content = cnext) {
+            cnext = content->nobj;
+            obj_extract_self(content);
+            if (content->oartifact)
+                (void) addinv(content);
+            else
+                obfree(content, (struct obj *) 0);
+        }
+    }
+    if (otmp->where == OBJ_INVENT || otmp->owornmask)
+        useupall(otmp);
+    else
+        delobj(otmp);
+    return TRUE;
+}
+
+static boolean
+pride_obj_holds_lure(struct obj *otmp)
+{
+    struct obj *content;
+
+    if (!otmp)
+        return FALSE;
+    if (is_pride_lure(otmp))
+        return TRUE;
+    if (Has_contents(otmp))
+        for (content = otmp->cobj; content; content = content->nobj)
+            if (pride_obj_holds_lure(content))
+                return TRUE;
+    return FALSE;
+}
+
+static boolean
+pride_carrying_lure(void)
+{
+    struct obj *otmp;
+
+    for (otmp = gi.invent; otmp; otmp = otmp->nobj)
+        if (pride_obj_holds_lure(otmp))
+            return TRUE;
+    return FALSE;
+}
+
+/* Set during the altar prayer, printed after the ordinary prayer lines. */
+static int pride_prayer_line = 0;
+
+void
+pride_leave_lures(boolean altar_prayer)
+{
+    struct obj *otmp, *next;
+    boolean any = FALSE;
+    boolean carried = altar_prayer && pride_carrying_lure();
+
+    for (otmp = gi.invent; otmp; otmp = next) {
+        next = otmp->nobj;
+        if (pride_purge_one(otmp))
+            any = TRUE;
+    }
+    for (otmp = fobj; otmp; otmp = next) {
+        next = otmp->nobj;
+        if (otmp->where != OBJ_FLOOR)
+            continue;
+        if (pride_purge_one(otmp))
+            any = TRUE;
+    }
+    if (altar_prayer)
+        pride_prayer_line = carried ? 2 : 1;
+    else if (any)
+        pline("The treasures crumble into dust.");
+}
+
+void
+pride_altar_after_prayer(void)
+{
+    if (pride_prayer_line == 2)
+        pline("You drop to your knees and repent of your pride. The treasures crumble into dust, and a hidden way opens.");
+    else if (pride_prayer_line == 1)
+        pline("The treasures crumble into dust, and a hidden way opens.");
+    pride_prayer_line = 0;
+}
+
+/* Offsets from the altar. des.map() does not leave the level at (0,0),
+   so the altar is not at the map-file coordinate (64,9). The secret
+   door is two steps east, the alcove stair eight steps east, and the
+   eight treasure doors keep their places relative to that altar. */
+static const coordxy pride_door_dx[8] = {
+    -56, -39, -23, -6, -56, -39, -23, -6
+};
+static const coordxy pride_door_dy[8] = {
+    -3, -3, -3, -3, 3, 3, 3, 3
+};
+
+static boolean
+pride_find_altar(coordxy *ax, coordxy *ay)
+{
+    coordxy x, y;
+
+    if (!in_wilderness() || dunlev(&u.uz) != 3)
+        return FALSE;
+    for (x = 1; x < COLNO; x++)
+        for (y = 0; y < ROWNO; y++)
+            if (IS_ALTAR(levl[x][y].typ)) {
+                *ax = x;
+                *ay = y;
+                return TRUE;
+            }
+    return FALSE;
+}
+
+boolean
+pride_door_blocks(coordxy x, coordxy y)
+{
+    coordxy ax, ay;
+    int i;
+
+    if (!pride_find_altar(&ax, &ay))
+        return FALSE;
+    /* The secret door stays shut until the altar prayer. */
+    if (!u.uevent.pride_prayed && x == ax + 2 && y == ay) {
+        pline("This door will not yield.");
+        return TRUE;
+    }
+    if (!u.uevent.pride_prayed)
+        return FALSE;
+    for (i = 0; i < 8; i++)
+        if (x == ax + pride_door_dx[i] && y == ay + pride_door_dy[i]) {
+            pline("This door will not yield.");
+            return TRUE;
+        }
+    return FALSE;
+}
+
+static void
+pride_seal_doors(coordxy ax, coordxy ay)
+{
+    int i;
+
+    for (i = 0; i < 8; i++) {
+        coordxy x = ax + pride_door_dx[i], y = ay + pride_door_dy[i];
+
+        if (!isok(x, y) || !IS_DOOR(levl[x][y].typ))
+            continue;
+        levl[x][y].doormask = D_LOCKED;
+        block_point(x, y);
+        newsym(x, y);
+    }
+}
+
+/* Prayer on the coaligned altar at the east end of the hall.
+   Returns FALSE so the ordinary prayer still runs. */
+boolean
+pride_prayer(void)
+{
+    coordxy sx, sy, stairx, stairy;
+
+    if (!in_wilderness() || dunlev(&u.uz) != 3)
+        return FALSE;
+    if (!IS_ALTAR(levl[u.ux][u.uy].typ))
+        return FALSE;
+    if (u.uevent.pride_prayed)
+        return FALSE;
+    pride_seal_doors(u.ux, u.uy);
+    sx = u.ux + 2;
+    sy = u.uy;
+    if (isok(sx, sy)
+        && (levl[sx][sy].typ == SDOOR || IS_DOOR(levl[sx][sy].typ))) {
+        levl[sx][sy].typ = DOOR;
+        levl[sx][sy].doormask = D_ISOPEN;
+        unblock_point(sx, sy);
+        newsym(sx, sy);
+    }
+    u.uevent.pride_prayed = 1;
+    pride_unlearn_execution();
+    stairx = u.ux + 8;
+    stairy = u.uy;
+    mkstairs(stairx, stairy, 0, (struct mkroom *) 0, TRUE);
+    newsym(stairx, stairy);
+    pride_leave_lures(TRUE);
+    return FALSE;
+}
+
+boolean
+fear_protected(void)
+{
+    if (!in_wilderness() || dunlev(&u.uz) != 4)
+        return FALSE;
+    if (on_fear_path(u.ux, u.uy))
+        return TRUE;
+    return (boolean) (levl[u.ux][u.uy].typ == STAIRS);
+}
+
+static void
+wilderness_check(void)
+{
+    static d_level garden_shown = { 0, 0 };
+
+    if (!in_wilderness())
+        return;
+    if (dunlev(&u.uz) == 4) {
+        boolean was = on_fear_path(u.ux0, u.uy0)
+                      || (isok(u.ux0, u.uy0) && levl[u.ux0][u.uy0].typ == STAIRS);
+        boolean now = fear_protected() || on_fear_path(u.ux, u.uy)
+                      || levl[u.ux][u.uy].typ == STAIRS;
+
+        if (now && !was)
+            u.uevent.fear_exposed = 0;
+    }
+    if (dunlev(&u.uz) == 3 && (u.ux != u.ux0 || u.uy != u.uy0)) {
+        struct obj *otmp;
+
+        for (otmp = svl.level.objects[u.ux][u.uy]; otmp; otmp = otmp->nexthere)
+            if (otmp->otyp == MIRROR)
+                pride_touch_mirror(otmp);
+    }
+    if (dunlev(&u.uz) == 2) {
+        struct obj *otmp;
+        static long greed_counted_move = -1L;
+
+        /* One tick per hero move. The gate's teleport must not count again.
+           uspare1 is turns remaining. Entry sets it to 200. */
+        if (greed_counted_move != svm.moves) {
+            greed_counted_move = svm.moves;
+            if (u.uspare1 > 0L)
+                u.uspare1--;
+        }
+        if (u.uspare1 <= 0L) {
+            u.uspare1 = 0L;
+            svk.killer.format = NO_KILLER_PREFIX;
+            Strcpy(svk.killer.name,
+                   "Starved, clinging to worldly possessions.");
+            done(STARVING);
+            return;
+        }
+        if (u.uspare1 > 30L)
+            u.uevent.greed_warned = 0;
+        else {
+            if (!u.uevent.greed_warned) {
+                u.uevent.greed_warned = 1;
+                pline("Your stomach twists with hunger... Your strength fails beneath the weight of all you carry. For where your treasure is, there will your heart be also");
+            }
+            if (u.uspare1 == 1L)
+                pline("1 turn until you starve.");
+            else
+                pline("%ld turns until you starve.", u.uspare1);
+        }
+        for (otmp = gi.invent; otmp; otmp = otmp->nobj)
+            if (otmp->oclass == FOOD_CLASS) {
+                pline("Your food turns to ash.");
+                useup(otmp);
+                break;
+            }
+        /* Lua (55,10) lands at (56,10): the 79-wide map starts at x=1. */
+        if (u.ux == 56 && u.uy == 10 && (u.ux != u.ux0 || u.uy != u.uy0)) {
+            if (gi.invent || money_cnt(gi.invent) > 0) {
+                static const char *const hints[3] = {
+                    "Lay not up for yourselves treasures upon earth, where moth and rust doth corrupt, and where thieves break through and steal:",
+                    "Now when Jesus heard these things, he said unto him, Yet lackest thou one thing: sell all that thou hast, and distribute unto the poor, and thou shalt have treasure in heaven: and come, follow me.",
+                    "And said, Naked came I out of my mother's womb, and naked shall I return thither: the LORD gave, and the LORD hath taken away; blessed be the name of the LORD.",
+                };
+                pline("%s", hints[u.uevent.greed_hint % 3]);
+                u.uevent.greed_hint = (u.uevent.greed_hint + 1) % 3;
+                teleds(2, 10, TELEDS_NO_FLAGS);
+            } else {
+                for (otmp = fobj; otmp; ) {
+                    struct obj *next = otmp->nobj;
+
+                    if (otmp->where == OBJ_FLOOR && otmp->ox < 56
+                        && otmp->how_lost == LOST_DROPPED
+                        && !greed_lure_gem(otmp)) {
+                        coordxy ox = otmp->ox, oy = otmp->oy;
+
+                        obj_extract_self(otmp);
+                        place_object(otmp, 59, 10);
+                        newsym(ox, oy);
+                    }
+                    otmp = next;
+                }
+                newsym(59, 10);
+                pline("But seek ye first the kingdom of God, and his righteousness; and all these things shall be added unto you.");
+            }
+        }
+    }
+    if (dunlev(&u.uz) == 5 && !on_level(&garden_shown, &u.uz)) {
+        garden_shown = u.uz;
+        pline("Light floods the chamber, warm as morning. The air is sweet, and for the first time since entering the wilderness, you are not afraid.");
+    }
+    {
+        struct engr *ep = engr_at(u.ux, u.uy);
+        static coordxy vx = -1, vy = -1;
+        static d_level vz = { 0, 0 };
+
+        /* Remember the square only while the hero is still on it, so a
+           later step onto the same verse shows the text again. Waiting
+           there does not. eread does not suppress this. */
+        if (!ep || ep->engr_type != VERSE || !ep->engr_txt[actual_text]
+            || !ep->engr_txt[actual_text][0]) {
+            vx = -1;
+            vy = -1;
+        } else if (vx != u.ux || vy != u.uy || !on_level(&vz, &u.uz)) {
+            vx = u.ux;
+            vy = u.uy;
+            vz = u.uz;
+            custompline(PLINE_NOSTOP, "%s", ep->engr_txt[actual_text]);
+            Strcpy(ep->engr_txt[remembered_text], ep->engr_txt[actual_text]);
+            ep->eread = 1;
+            ep->erevealed = 1;
+        }
+    }
+}
+
+static void pride_waken_reflection(void);
+
+/* A live mirror is spe 1. Waking it once clears that mark. */
+void
+pride_touch_mirror(struct obj *obj)
+{
+    if (!obj || obj->otyp != MIRROR || obj->spe != 1)
+        return;
+    if (!in_wilderness() || dunlev(&u.uz) != 3 || u.uevent.pride_prayed)
+        return;
+    obj->spe = 2;
+    pride_waken_reflection();
+}
+
+/* A reflection's life drain starts at 0 and climbs to 4, and that
+   level is also the damage. The body is a doppelganger and stays one,
+   with 60 hit points. */
+static void
+pride_waken_reflection(void)
+{
+    struct monst *refl;
+
+    pline("Your reflection smiles, and steps out of the glass.");
+    refl = makemon(&mons[PM_DOPPELGANGER], u.ux, u.uy, MM_ADJACENTOK);
+    if (!refl)
+        return;
+    /* makemon() has already called newcham() unless shape-changing
+       is blocked, so this may already be a slime or some other form.
+       Put the doppelganger body back before cham is cleared. Clearing
+       cham first would freeze the random shape. */
+    if (refl->data != &mons[PM_DOPPELGANGER]) {
+        refl->cham = PM_DOPPELGANGER;
+        (void) newcham(refl, &mons[PM_DOPPELGANGER], NO_NC_FLAGS);
+    }
+    (void) christen_monst(refl, "your reflection");
+    refl->mpeaceful = 0;
+    set_malign(refl);
+    /* NON_PM: not a shapechanger, so it does not take a new form later.
+       Protection from shape changers must not turn that back on. */
+    refl->cham = NON_PM;
+    refl->m_lev = 0;
+    refl->mhp = refl->mhpmax = 60;
+}
+
+boolean
+is_pride_reflection(struct monst *mtmp)
+{
+    return (boolean) (mtmp && has_mgivenname(mtmp)
+                      && !strcmp(MGIVENNAME(mtmp), "your reflection"));
+}
+
+boolean
+greed_lure_gem(struct obj *obj)
+{
+    const char *nm;
+
+    if (!obj || !has_oname(obj))
+        return FALSE;
+    nm = ONAME(obj);
+    return (boolean) (strstri(nm, "flawless") != 0);
+}
+
+static void
+greed_drop_one(struct obj *obj)
+{
+    obj_extract_self(obj);
+    obj->how_lost = LOST_NONE;
+    place_object(obj, u.ux, u.uy);
+}
+
+static boolean
+greed_drop_gems_in(struct obj *otmp)
+{
+    boolean any = FALSE;
+
+    if (!otmp)
+        return FALSE;
+    if (Has_contents(otmp)) {
+        struct obj *content, *cnext;
+
+        for (content = otmp->cobj; content; content = cnext) {
+            cnext = content->nobj;
+            if (greed_drop_gems_in(content))
+                any = TRUE;
+        }
+    }
+    if (greed_lure_gem(otmp)) {
+        greed_drop_one(otmp);
+        any = TRUE;
+    }
+    return any;
+}
+
+/* Level-only gems stay on Greed, including ones inside a container. */
+void
+greed_leave_gems(void)
+{
+    struct obj *otmp, *next;
+    boolean any = FALSE;
+
+    for (otmp = gi.invent; otmp; otmp = next) {
+        next = otmp->nobj;
+        if (greed_drop_gems_in(otmp))
+            any = TRUE;
+    }
+    if (any) {
+        newsym(u.ux, u.uy);
+        pline("The gems will not leave this place.");
+    }
+}
+
+static long
+carried_gold(void)
+{
+    return money_cnt(gi.invent) + hidden_gold(TRUE);
+}
+
+static void
+greed_strip_gold(struct obj *otmp)
+{
+    struct obj *content, *cnext;
+
+    if (!otmp)
+        return;
+    if (Has_contents(otmp)) {
+        for (content = otmp->cobj; content; content = cnext) {
+            cnext = content->nobj;
+            greed_strip_gold(content);
+        }
+    }
+    if (otmp->oclass == COIN_CLASS) {
+        obj_extract_self(otmp);
+        obfree(otmp, (struct obj *) 0);
+    }
+}
+
+void
+greed_snapshot_gold(void)
+{
+    if (u.uevent.greed_snapped)
+        return;
+    u.ugreed_gold = carried_gold();
+    u.uevent.greed_snapped = 1;
+}
+
+/* 200 turns on entering the Cave of Wonders. */
+void
+greed_start_clock(void)
+{
+    u.uspare1 = 200L;
+    u.uevent.greed_warned = 0;
+}
+
+/* Gold piles, real gems, and worthless glass. Not rocks or gray stones. */
+boolean
+greed_costly_obj(struct obj *obj)
+{
+    if (!obj || !in_wilderness() || dunlev(&u.uz) != 2)
+        return FALSE;
+    if (obj->oclass == COIN_CLASS)
+        return TRUE;
+    return (boolean) (obj->oclass == GEM_CLASS
+                      && obj->otyp >= FIRST_REAL_GEM
+                      && obj->otyp <= LAST_GLASS_GEM);
+}
+
+/* Charges taken during the current pickup or loot command. */
+static int greed_charges = 0;
+
+/* One pickup of a pile or stack. 0 or below starves at once. */
+void
+greed_clock_spend(long cost)
+{
+    if (!in_wilderness() || dunlev(&u.uz) != 2 || cost <= 0L)
+        return;
+    u.uspare1 -= cost;
+    greed_charges++;
+    if (u.uspare1 <= 0L) {
+        u.uspare1 = 0L;
+        svk.killer.format = NO_KILLER_PREFIX;
+        Strcpy(svk.killer.name, "Starved, clinging to worldly possessions.");
+        done(STARVING);
+    }
+}
+
+/* One line for the whole command, after the pickup lines. */
+void
+greed_cost_finish(void)
+{
+    static const char *const lines[3] = {
+        "Thy covetousness hath hastened thy hunger.",
+        "Thy greed gnaweth at thee, and thy hunger waxeth sore.",
+        "Woe unto thee, for thy greed hath driven thee unto hunger.",
+    };
+
+    if (greed_charges <= 0)
+        return;
+    greed_charges = 0;
+    pline("%s", lines[rn2(3)]);
+}
+
+void
+greed_restore_gold(void)
+{
+    struct obj *otmp, *next, *gold;
+    long want;
+
+    if (!u.uevent.greed_snapped)
+        return;
+    want = u.ugreed_gold;
+    for (otmp = gi.invent; otmp; otmp = next) {
+        next = otmp->nobj;
+        greed_strip_gold(otmp);
+    }
+    if (want > 0L) {
+        gold = mksobj(GOLD_PIECE, FALSE, FALSE);
+        gold->quan = want;
+        gold->owt = weight(gold);
+        (void) addinv(gold);
+    }
+    u.ugreed_gold = 0L;
+    u.uevent.greed_snapped = 0;
+}
+
+void
+wilderness_took(struct obj *obj)
+{
+    if (!obj || !in_wilderness())
+        return;
+    if (dunlev(&u.uz) == 5 && obj->oartifact == ART_SWORD_OF_THE_SPIRIT) {
+        branch *br;
+
+        u.uevent.wilderness_sealed = 1;
+        for (br = svb.branches; br; br = br->next)
+            if (!strcmp(svd.dungeons[br->end2.dnum].dname,
+                        "The Wilderness Trial")) {
+                /* Not a magic portal: nothing on the far side to arrive
+                   through. Land on the branch stair instead. */
+                schedule_goto(&br->end1, UTOTYPE_WILDHOME, (char *) 0,
+                              "The sword is in your hand, and the wilderness is sealed behind you.");
+                return;
+            }
+        pline("The sword is in your hand, but the way out is not yet marked.");
+    }
+    if (dunlev(&u.uz) == 3 && obj->otyp == MIRROR)
+        pride_touch_mirror(obj);
+    if (dunlev(&u.uz) == 3 && has_oname(obj)) {
+        const char *nm = ONAME(obj);
+        const char *vanity = 0;
+
+        if (!strcmp(nm, "silver long sword"))
+            vanity = "You admire your reflection, the +12 blade blazing in your mighty hand. How magnificent you are. Armies would tremble at your name.";
+        else if (obj->otyp == GRAY_DRAGON_SCALE_MAIL && obj->spe >= 12)
+            vanity = "You gaze at yourself clad in gleaming +12 dragon scales. How splendid, how untouchable you look. Surely no hero was ever so glorious.";
+        else if (!strcmp(nm, "ring of complete immunity"))
+            vanity = "You admire the ring upon your hand. No sorcery could ever touch you now. How invincible you are, beyond the reach of every power in heaven and earth.";
+        else if (!strcmp(nm, "Amulet of Immortality"))
+            vanity = "You admire the amulet resting upon your breast. Death itself has no claim on you now. How eternal, how godlike you are.";
+        else if (!strcmp(nm, "Rod of Frozen Power"))
+            vanity = "You behold yourself raising the rod, and winter itself answers your command. Who could stand against one as mighty as you?";
+        else if (!strcmp(nm, "prophecy book of execution"))
+            vanity = "You see yourself reading the book, and wisdom shines in your eyes. With but a word, you could execute any foe. All the secrets of heaven and earth would bow to your understanding.";
+        else if (!strcmp(nm, "magic lamp of unlimited wishing"))
+            vanity = "You behold yourself holding the lamp, and you marvel. Unlimited wishes, forever. Every desire of your heart, yours for the asking. Who could be greater than you?";
+        else if (!strcmp(nm, "bag of infinite holding"))
+            vanity = "You admire yourself bearing all the riches of the world, and they weigh nothing at all. Every treasure, forever yours. How wealthy, how blessed, how great you are.";
+        if (vanity) {
+            pline("%s", vanity);
+            pride_waken_reflection();
+        }
+    }
 }
 
 static void
@@ -4045,6 +4800,7 @@ spoteffects(boolean pick)
     }
     sodom_check();
     petra_check();
+    wilderness_check();
  spotdone:
     if (!--inspoteffects) {
         spotterrain = STONE; /* 0 */
@@ -4752,6 +5508,10 @@ end_running(boolean and_travel)
 void
 nomul(int nval)
 {
+    /* A monster cannot freeze or slow the hero on the Fear path.
+       The hero's own nomul, and a Psalm 91 elsewhere, are unchanged. */
+    if (nval < 0 && svc.context.mon_moving && fear_protected())
+        return;
     if (gm.multi < nval)
         return;              /* This is a bug fix by ab@unido */
     disp.botl |= (gm.multi >= 0);
@@ -4854,6 +5614,8 @@ losehp(int n, const char *knam, schar k_format)
         return;
     }
 #endif
+    if (n > 0 && fear_protected())
+        return;
     disp.botl = TRUE; /* u.uhp or u.mh is changing */
     end_running(TRUE);
     if (Upolyd) {
@@ -4946,8 +5708,13 @@ inv_weight(void)
     int wt = 0;
 
     while (otmp) {
-        if (otmp->oclass == COIN_CLASS)
-            wt += (int) (((long) otmp->quan + 50L) / 100L);
+        if (otmp->oclass == COIN_CLASS) {
+            long cwt = ((long) otmp->quan + 50L) / 100L;
+
+            if (cwt > 0x7fffffffL)
+                cwt = 0x7fffffffL;
+            wt += (int) cwt;
+        }
         else if (otmp->otyp != BOULDER || !throws_rocks(gy.youmonst.data))
             wt += otmp->owt;
         otmp = otmp->nobj;

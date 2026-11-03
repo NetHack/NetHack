@@ -818,6 +818,14 @@ Peter cannot be killed or hurt by a weapon, a missile, a spell, a
 rod, a trap, or a pet. He does not turn hostile, and he cannot be
 pushed off his post. A pet will not attack Peter, King Solomon,
 Isaiah, the angel at Jacob's Ladder, or a Babel builder.
+A pet will not step onto a Mines' End letter, whether that
+letter is on the path or a decoy, so it cannot wander the
+grid. If a pet is already standing on one, it steps off.
+On Capernaum, a pet will not attack any monster: a shopkeeper,
+townsfolk, the temple priest, a dog or a cat, Peter, or a
+hostile. It can still move, follow, and eat. Off Capernaum,
+pets keep their old behavior, apart from the plot people
+named above.
 
 Mines' End is three approved full-level maps, one chosen at
 random. The overview calls that level
@@ -926,6 +934,265 @@ level is the open walk on the shore side of Tyre, map (38,2)
 through (41,12). It is not a house, not the up stair, and not
 Lot's wife. The random statues are placed in that room. The
 level stays dark. The other Medusa maps are unused.
+
+### Wilderness Trial fixes (2026-11-02)
+
+Desert, Greed, Pride, and the Garden use real horizontal and
+vertical walls. Fear already did.
+
+Every engraving on the five Wilderness levels is a verse. Stepping
+on one shows only that text, and it shows again every time you
+step onto that same square. Waiting there does not repeat it. It does not say the writing was burned
+or engraved, it does not ask for --More-- or Enter, and it does not
+stop you if you are running. A blind hero reads the same line.
+The verse cannot be scuffed, overwritten, cancelled, or zapped away.
+Look-here and farlook quote it. The read command still reads a
+scroll or a prophetic book.
+
+Greed is the Cave of Wonders, 79 by 21. The up stair is at the west
+end of the three-wide hall, with Matthew 16:26 beside it. Four side
+rooms open off that hall. The pillared great room is packed with
+flawless gems of every color and with gold. Most piles are 1,000 to
+5,000 gold, and about one in five is 10,000 to 20,000. The narrow
+gate is the door at the far east. Job 1:21 is on the square before
+it. Past the gate is the restore square, Matthew 6:33, then the down
+stair. Stepping on the gate while carrying anything, gold included,
+sends you back to the entrance stair and cycles Matthew 6:19, Luke
+18:22, and Job 1:21. Empty-handed, only objects you yourself dropped,
+and not a flawless gem, are moved to the restore square. On entering
+Greed the game records how much gold you are carrying, in hand and in
+bags. On leaving, your gold is set back to exactly that amount. The
+gold counter can show amounts into the tens of millions. The weight
+of a coin stack is computed in a long and then clamped to a 32-bit
+int, which is enough for the piles on this level. Food still turns
+to ash. The hunger clock starts at 200 turns when you enter Greed.
+It counts one step each time you actually move, including through
+a bounce, and not while you wait. Every accepted prayer on Greed
+adds 50 turns, after the ordinary prayer messages, and prints
+"The Lord is pleased with you and has restored your strength."
+A prayer that is still too soon does not add turns and does not
+print that line. The prayer timeout is unchanged. Picking up a
+gold pile, or a real gem, or worthless glass, costs 25 turns,
+once per pile or stack, including several in one pickup and
+including taking one out of a container. Rocks and gray stones
+do not. After the pickup lines, one command prints one of
+"Thy covetousness hath hastened thy hunger.", "Thy greed gnaweth
+at thee, and thy hunger waxeth sore.", or "Woe unto thee, for thy
+greed hath driven thee unto hunger." If that drops the clock to
+0 or below, you starve at once. Whenever 30 or fewer turns remain, each move says how many
+are left, from "30 turns until you starve." through "1 turn until
+you starve." A prayer that lifts the clock above 30 stops the
+countdown until it falls to 30 again. The next move at 0 is the
+tombstone "Starved, clinging to worldly possessions."
+
+The first time you arrive on a Wilderness floor, a full-screen
+text window shows, the same kind the quest intro uses, and a
+keypress dismisses it. It does not show again on a later visit.
+The desert, the first floor, says "And he was led by the Spirit
+into the wilderness, being tempted by the devil." A woman hears
+"she" in place of "he". There is no reference. Greed then shows
+Luke 12:15 under its verse, Pride shows Proverbs 16:18, and Fear
+shows 2 Timothy 1:7. The garden shows its verse and no reference.
+The desert is not one of those four floors, so only the entrance
+line is shown there.
+
+Pride is 76 by 19. The hall is five rows. The up stair is at the west
+end. James 4:10 is engraved at the center. Four treasure rooms are
+north of the hall and four are south, each with a door, a harmless
+mirror in the hall outside the door, and a live mirror toward the
+back. One lure is shuffled into each room. The cold lure is the rod
+named Rod of Frozen Power, created as "rod of northern wind", so it
+is the cold rod and not the prophetic book of the same name. At the
+east end of the hall, just west of the secret door, is an altar of
+your own alignment. Praying there works as a normal prayer, and the
+first time it also locks the eight treasure doors so they will not
+open, kick, unlock, or be dug, and creates the down stair beyond
+the secret door. After the ordinary prayer lines it says one
+line. If you are carrying a lure, even nested in a bag: "You drop
+to your knees and repent of your pride. The treasures crumble
+into dust, and a hidden way opens." With no lure in your pack:
+"The treasures crumble into dust, and a hidden way opens."
+A wish for any of those lure names is refused the way a wish for
+a quest artifact is refused, including in prophet mode. The line
+is "For a moment, you feel something in your hands, but it
+disappears!" The wish is spent and nothing is given. That covers
+the name by itself, as in "blessed Amulet of Immortality", and a
+real item "named" with one of those names. The plain base item
+can still be wished for. The +12 gray dragon scale mail is left
+to the ordinary enchantment cap. Naming an item you already hold
+is unchanged.
+Until that prayer
+the level has no down stair, and nothing else is allowed to add one.
+Praying anywhere else on Pride does not change the doors or the stair.
+The lures, including one inside a nested bag, are destroyed by that
+prayer and again when you take the stairs down to Fear. The bag of
+infinite holding is one of them. A reflection is a doppelganger with
+60 hit points, armor eight points better than a doppelganger's, and
+a firmer blow. It is created as a doppelganger and stays one: it
+does not take a random shape when it steps out, and it does not
+change shape later, including when protection from shape changers
+wears off. Within five squares its level climbs from 0 to 4 and
+stays there. The drain each of its turns is that level, so it
+never takes more than 4 hit points.
+
+On Fear, standing on a path tile or either stair stops every
+monster affliction, not only damage. That includes stun, confusion,
+blindness, paralysis, sleep, slowing, hallucination, deafness,
+drain, poison, stoning, sliming, sickness, lycanthropy, teleport,
+polymorph, theft, seduction, item destruction, grabs, engulfing,
+knockback, and being moved off the tile. Melee, spells, gaze,
+sounds, breath, spit, missiles, monster wands and potions,
+explosions, and passive effects are all stopped at the start of
+the attack. A purple worm does not swallow you, and if you were
+already swallowed it spits you out. While you are on a path tile
+or either stair, hostile monsters do not start an attack at all.
+There is no swing, no miss, no spell, no breath, no spit, no wand
+or potion thrown at you, no gaze, no theft, and no shriek to wake
+the level. They still move. They walk toward you and crowd the
+squares next to the path, and they do not flee or hang back to
+shoot. The moment you step onto any other tile, they attack at
+full strength, with no grace turn and no damage reduction. A
+Psalm 91 you engrave on any other level still only scares
+monsters, exactly as before. Attacking does not remove the Fear
+protection. Monsters will not step onto a path tile or a stair.
+A boulder will not land or be generated there. Each of the three
+Fear maps used to place 8 monsters and now places 40, five each
+of blue dragon, minotaur, ettin, storm giant, jabberwock, purple
+worm, pit fiend, and balrog, on floor that is not a Psalm 91
+tile and not a stair. All 40 fit. The master lich, arch-lich,
+and titan were replaced so spellcasters do not cover the verse.
+
+Picking up the Sword of the Spirit returns you to the main-dungeon
+level that holds the Wilderness stair, standing on that stair.
+There is no portal trap and no "no corresponding portal" error.
+The branch stays sealed, and the stair will not let you back in.
+Reading the finger of execution book always succeeds. Level,
+intelligence, role, the book's level, and curse status do not
+matter, and it does not ask whether to continue or punish a failed
+reading. Other prophetic books are unchanged. Casting it is a flat
+50 percent. The prophecy list shows 50. Armor, shield, skill, and
+the old Pride cap do not change that. The ray kills every monster
+in its path, including the undead, demons, and anything that
+reflects or resists death or magic. It does not bounce back, and
+it does not harm you. Pets and peaceful monsters are struck the
+same way any other ray strikes them. Peter is spared, the same as
+any other ray. Leaving Pride, by the stairs, by level teleport, by
+death or life-saving, or by the prayer that opens the way, takes
+the prophecy off the spell list entirely. The book is destroyed
+with the other lures. The Rod of Frozen
+Power does not use charges and does not wrest or fizzle. Zapping
+it draws a cold explosion, the same explosion shapes, on every
+square of its 3-square burst. Those glyphs are the blue explosion
+(CLR_BLUE), not the white frost one. They stay up for the old two
+display delays plus thirty more, about 1.6 seconds, then clear.
+Other frost explosions stay white. The burst still
+does 8d8 cold damage to monsters in that radius and does not hurt
+you. The Amulet of Immortality is matched by that name. Dying
+while wearing it on Pride prints the three vanity lines and does
+not life-save, so the tombstone is reached. An ordinary amulet of
+life saving, with no such name, still saves you on Pride and on
+every other level. The garden fountains are unchanged.
+
+### Wilderness Trial (2026-11-01)
+
+The 2026-11-02 section above is the current Greed, Pride, Fear,
+verse, and sword behavior. This section is the first build.
+
+A branch, The Wilderness Trial, joins the main dungeon three
+levels below the Prophet. It is chained to the level named prophet.
+Five levels: desert, greed, pride, fear,
+garden. The desert is two-way. From greed on, the way up is sealed
+and teleport does not work. Taking the Sword of the Spirit in the
+garden returns you to the stair you entered by and seals the branch.
+
+Matthew 4:4 on the desert is the full KJV, including "But he
+answered and said,". The plan's engraving omitted that opening.
+Ephesians 6:17 in the garden keeps the KJV colon.
+
+The desert does not make you hungry when you arrive. Four loaves
+are scattered on the sand, not piled in one place. They are named
+food rations. Eating one says the dust line and makes you hungrier.
+That hunger is ordinary hunger, so it is still with you in greed.
+
+Greed is a pillared great room, a central hall, and two side
+treasure rooms, then the narrow gate. Matthew 16:26 is engraved
+at the entrance and Job 1:21 at the gate. Anything in your pack,
+gold included, sends you back to the start and cycles Matthew
+6:19, Luke 18:22, and Job 1:21, full KJV. Empty-handed, only
+objects you yourself dropped are moved into the next room, with
+Matthew 6:33. The four lure gems never come with you: not through
+the gate, and not onto the next level. They are an exquisite
+flawless diamond, a flawless emerald, a flawless ruby, and a
+flawless sapphire.
+Food turns to ash. After 25 turns on the level, counting through
+every reset, the hunger warning appears, including Matthew 6:21.
+After 50 turns the tombstone is "Starved, clinging to worldly
+possessions."
+
+Pride has eight rooms. Each game puts one lure in each room.
+A mirror outside the door is harmless. The mirror inside is
+live: picking up the lure, stepping onto that mirror, or kicking
+it says "Your reflection smiles, and steps out of the glass."
+The stone is engraved with James 4:10. Praying there says
+Proverbs 16:18, crumbles the lures, turns the treasure doors into
+undiggable walls, and opens the wall between the hall and the
+down stair. A reflection drains more life each turn it is near you.
+The +12 sword and +12 dragon scales are real. The ring stops
+sorcery on this level. The rod's zap is a cold blast of radius 3.
+The book is the existing death spell, now named finger of
+execution, and on this level it succeeds only 30% of the time.
+The lamp refuses with its line. The bag weighs nothing. The
+amulet, if you die wearing it, shows the vanity death and the
+tombstone "Killed by their own vanity, believing they were immortal."
+The line "The amulet seems to flare with light." and "You really
+died, a fool killed by your own vanity." were not quoted in the
+plan; the tombstone and Proverbs 16:18 were.
+
+Fear uses the three approved path maps, one per game. Each path
+tile is the next piece of Psalm 91, exact KJV, wrapping after the
+last verse. Stepping on a tile shows that text. On the path or
+either stair, monster damage does not land, and monsters cannot
+step onto the path or the stairs. Attacking a monster, or leaving
+the path, removes the protection until you step onto the path
+again. The garden's entry line is the one in the plan. Trees stand in
+the four corners. The last of Psalm 91, exact KJV, rings the
+altar, but the altar square itself is not engraved, so stepping
+there shows the sword instead of a verse. Praying on that
+altar crowns you, the same crowning as anywhere else, and it
+does so every time until you already are the Servant of the
+Lord. The Sword of the
+Spirit there is blessed and +2, and it stays +2 if it is created
+again. No monsters are generated there, and none can step onto
+the level. Drinking from a fountain says "The water is living.
+It restores you." Hit points return to full and hunger is cured.
+Dipping says "The living water does no harm." There is no snake,
+no demon, and no curse.
+
+### Long sword for every playable role (2026-11-03)
+
+The Sword of the Spirit is a doubled-edged blade, trained as a
+long sword. Royal Historian, Healer, Priest, and Prophet can
+train it to Basic. It starts Unskilled. Knight stays Expert,
+Adventurer stays Skilled, and Champion stays Expert.
+
+### Sword of the Spirit proof (2026-11-03)
+
+The garden sword is created blessed, +2, and erodeproof, with
+oeroded and oeroded2 both 0. NetHack keeps one erodeproof flag.
+erode_obj() consults that flag for burn, rust, rot, corrosion,
+and cracking, after it asks whether the material can take that
+kind of damage. This blade is iron, so it can rust and corrode,
+and the flag stops both. Iron is not flammable or rottable, so
+fire and rot do not start; the same flag would stop them if they
+did. Identified, the adjective is "rustproof".
+
+### Prophetic skills (2026-11-03)
+
+The #enhance screen, and the same list in the dumplog, heads the
+spell group "Prophetic Skills". The seven schools use the names
+already shown for a prophecy's category: spiritual warfare,
+healing, discernment, blessing, prayer, deliverance, and creation.
+They stay lowercase, with no "spells" suffix.
 
 ### Planned (not done)
 

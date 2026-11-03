@@ -2282,6 +2282,8 @@ create_object(object *o, struct mkroom *croom)
         otmp->oeroded = otmp->oeroded2 = 0;
         otmp->oerodeproof = 0;
     }
+    /* The eroded==0 case clears proof. Put the garden sword back. */
+    sword_of_spirit_fix(otmp);
     if (o->recharged)
         otmp->recharged = (o->recharged % 8);
     if (o->locked == 0 || o->locked == 1) {
@@ -3882,10 +3884,10 @@ int
 lspo_engraving(lua_State *L)
 {
     static const char *const engrtypes[] = {
-        "dust", "engrave", "burn", "mark", "blood", NULL
+        "dust", "engrave", "burn", "mark", "blood", "verse", NULL
     };
     static const int engrtypes2i[] = {
-        DUST, ENGRAVE, BURN, MARK, ENGR_BLOOD, 0
+        DUST, ENGRAVE, BURN, MARK, ENGR_BLOOD, VERSE, 0
     };
     int etyp = DUST;
     char *txt = (char *) 0;
