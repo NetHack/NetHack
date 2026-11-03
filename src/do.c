@@ -1599,7 +1599,7 @@ goto_level(
     }
     if (in_wilderness() && dunlev(&u.uz) == 3
         && !on_level(newlevel, &u.uz)) {
-        pride_leave_lures();
+        pride_leave_lures(FALSE);
         pride_unlearn_execution();
     }
     if (newdungeon) {

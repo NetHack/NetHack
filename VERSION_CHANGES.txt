@@ -30,7 +30,18 @@ execution casts at a flat 50 percent and kills through resistance
 and reflection. It leaves the spell list when you leave Pride.
 The Rod of Frozen Power burst is blue and stays on screen about
 a second and a half longer. The Garden altar under the Sword of
-the Spirit has no engraving. The sword is a blessed +2.
+the Spirit has no engraving. The sword is a blessed +2. Praying
+on that altar crowns you, the Servant of the Lord, if you are
+not already. The Pride altar prayer says one line. With a lure
+in the pack, even nested in a bag: "You drop to your knees and
+repent of your pride. The treasures crumble into dust, and a
+hidden way opens." With no lure: "The treasures crumble into
+dust, and a hidden way opens." Each Fear map placed 8 monsters
+and now places 40, five of each of the same eight, all off the
+Psalm 91 path and the stairs. A wish that names a Pride lure is
+refused the way a quest artifact is: "For a moment, you feel
+something in your hands, but it disappears!" The plain item,
+without that name, can still be wished for.
 
 2026-11-02
 A Wilderness verse shows its text every time you step on that
