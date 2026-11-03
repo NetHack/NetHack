@@ -812,7 +812,7 @@ dorecover(NHFILE *nhfp)
     /* suppress map display if some part of the code tries to update that */
     program_state.restoring = REST_GSTATE;
 
-    get_plname_from_file(nhfp, plname, TRUE);
+    get_plname_from_file(nhfp, plname, sizeof plname, TRUE);
     Snprintf(svp.plname, sizeof(svp.plname), "%s", plname);
     /*
      * The position in the save file is now here:
@@ -906,7 +906,7 @@ dorecover(NHFILE *nhfp)
 
     rewind_nhfile(nhfp);        /* return to beginning of file */
     (void) validate(nhfp, (char *) 0, FALSE, 0);
-    get_plname_from_file(nhfp, plname, TRUE);
+    get_plname_from_file(nhfp, plname, sizeof plname, TRUE);
     Snprintf(svp.plname, sizeof(svp.plname), "%s", plname);
 
     /* not 0 nor REST_GSTATE nor REST_LEVELS */
@@ -1404,6 +1404,7 @@ void
 get_plname_from_file(
     NHFILE *nhfp,
     char *outbuf, /* size must be at least [PL_NSIZ_PLUS] even if name_only */
+    size_t bufsz,   /* caller-passed size of outbuf */
     boolean name_only) /* True: just name; False: name-role-race-gend-algn */
 {
     char plbuf[PL_NSIZ_PLUS];
@@ -1411,8 +1412,13 @@ get_plname_from_file(
 
     plbuf[0] = '\0';
 
+    if (bufsz != PL_NSIZ_PLUS)
+        panic("Caller of get_plname_from_file() failed to provide PL_NSIZ_PLUS buffer (%ld)",
+              (long) bufsz);
     Sfi_int(nhfp, &pltmpsiz, "plname-size");
-    /* pltmpsiz should now be PL_NSIZ_PLUS */
+    /* pltmpsiz should now be PL_NSIZ_PLUS; verify */
+    if (pltmpsiz > PL_NSIZ_PLUS || pltmpsiz <= 0)
+        panic("Get_plname_from_file read invalid plname size %d", pltmpsiz);
     Sfi_char(nhfp, plbuf, "plname", pltmpsiz);
     /* plbuf[PL_NSIZ_PLUS-2] should be '\0';
        plbuf[PL_NSIZ_PLUS-1] should be '-' or 'X' or 'D' */
@@ -1423,7 +1429,9 @@ get_plname_from_file(
         *eos(plbuf) = '-';
     /* not simple strcpy(); playmode is in the last slot and could (probably
        will) be preceded by NULs */
-    (void) memcpy((genericptr_t) outbuf, (genericptr_t) plbuf, PL_NSIZ_PLUS);
+    if (pltmpsiz > (int) bufsz || pltmpsiz < 0)
+        pltmpsiz = (int) bufsz;
+    (void) memcpy((genericptr_t) outbuf, (genericptr_t) plbuf, pltmpsiz);
     return;
 }
 
