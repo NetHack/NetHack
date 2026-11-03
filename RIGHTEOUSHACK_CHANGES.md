@@ -1213,11 +1213,12 @@ The Amulet of Yendor is not given to the high priest. A chest on
 the Sanctum altar holds one object, named from the player's name
 as "Elisha's soul" (always with 's, even if the name already ends
 in s). Until it is identified it looks like a chained relic called
-by that name. Opening the chest prints the reveal in three
-pieces, only because one message stops near 255 characters. Read
-in order, the words are the paragraph from the plan, unchanged.
-The game then asks "Do you choose that path?" so y, n, or q can
-be answered. q asks again on the next open. The first open does
+by that name. Opening the chest shows the reveal on one black
+screen, the same window a Wilderness floor intro uses. The words
+are the paragraph from the plan, in the same order, no longer
+split across three messages. After that screen is dismissed, the
+game asks "Do you choose that path?" so y, n, or q can be
+answered. q asks again on the next open. The first open does
 not also take the soul out. A second open is ordinary looting.
 
 Both answers say the shadows line, then six hostile demons appear

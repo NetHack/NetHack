@@ -6085,13 +6085,20 @@ int
 soul_opening(struct obj *box)
 {
     char ans;
+    winid win;
 
     if (u.uevent.soul_opened || !box_holds_soul(box))
         return 0;
 
-    pline("You peer inside, and horror grips you. There, bound in chains within Moloch's Sanctum, is your own soul. At last it all makes sense.");
-    pline("You have walked a path of evil your whole life, and the treasure you sought was the liberation of your very soul. Now the chance for redemption stands before you. But redemption is a choice.");
-    pline("God speaks in a thunderous voice: 'You must choose the path of good, not evil. Do you choose that path?'");
+    /* One text window, the same kind a Wilderness floor intro uses.
+       A single putstr is cut near 255 characters, so the sentences
+       are separate lines of that one screen. The words are unchanged. */
+    win = create_nhwindow(NHW_TEXT);
+    putstr(win, 0, "You peer inside, and horror grips you. There, bound in chains within Moloch's Sanctum, is your own soul. At last it all makes sense.");
+    putstr(win, 0, "You have walked a path of evil your whole life, and the treasure you sought was the liberation of your very soul. Now the chance for redemption stands before you. But redemption is a choice.");
+    putstr(win, 0, "God speaks in a thunderous voice: 'You must choose the path of good, not evil. Do you choose that path?'");
+    display_nhwindow(win, TRUE);
+    destroy_nhwindow(win);
     ans = ynq("Do you choose that path?");
     if (ans == 'q')
         return 1; /* asked, not answered; the next open asks again */
