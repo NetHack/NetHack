@@ -11,6 +11,12 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-03
+Every melee hit with the Sword of the Spirit adds dice equal to
+your experience level, each die having 2 sides, on top of the
+blade and the holy light. A holy-light hit that does not paralyze
+still shows the ordinary hit line.
+
+2026-11-03
 The first time the Greed gate sends you back, it says Matthew
 19:22: "But when the young man heard that saying, he went away
 sorrowful: for he had great possessions." Every bounce after
