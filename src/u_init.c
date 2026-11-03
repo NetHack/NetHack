@@ -262,6 +262,7 @@ static const struct def_skill Skill_A[] = {
     { P_KNIFE, P_BASIC },
     { P_PICK_AXE, P_EXPERT },
     { P_SHORT_SWORD, P_BASIC },
+    { P_LONG_SWORD, P_BASIC },
     { P_SABER, P_EXPERT },
     { P_CLUB, P_SKILLED },
     { P_QUARTERSTAFF, P_SKILLED },
@@ -331,6 +332,7 @@ static const struct def_skill Skill_H[] = {
     { P_DAGGER, P_SKILLED },
     { P_KNIFE, P_EXPERT },
     { P_SHORT_SWORD, P_SKILLED },
+    { P_LONG_SWORD, P_BASIC },
     { P_SABER, P_BASIC },
     { P_CLUB, P_SKILLED },
     { P_MACE, P_BASIC },
@@ -391,6 +393,7 @@ static const struct def_skill Skill_Mon[] = {
     { P_NONE, 0 }
 };
 static const struct def_skill Skill_P[] = {
+    { P_LONG_SWORD, P_BASIC },
     { P_CLUB, P_EXPERT },
     { P_MACE, P_EXPERT },
     { P_MORNING_STAR, P_EXPERT },
@@ -553,6 +556,7 @@ static const struct def_skill Skill_W[] = {
     { P_KNIFE, P_SKILLED },
     { P_AXE, P_SKILLED },
     { P_SHORT_SWORD, P_BASIC },
+    { P_LONG_SWORD, P_BASIC },
     { P_CLUB, P_SKILLED },
     { P_MACE, P_BASIC },
     { P_QUARTERSTAFF, P_EXPERT },
