@@ -957,8 +957,11 @@ flawless gems of every color and with gold. Most piles are 1,000 to
 gate is the door at the far east. Job 1:21 is on the square before
 it. Past the gate is the restore square, Matthew 6:33, then the down
 stair. Stepping on the gate while carrying anything, gold included,
-sends you back to the entrance stair and cycles Matthew 6:19, Luke
-18:22, and Job 1:21. Empty-handed, only objects you yourself dropped,
+sends you back to the entrance stair. The first bounce says
+Matthew 19:22, "But when the young man heard that saying, he
+went away sorrowful: for he had great possessions." Every bounce
+after that says "Thou must leave all behind to pass this way."
+Empty-handed, only objects you yourself dropped,
 and not a flawless gem, are moved to the restore square. On entering
 Greed the game records how much gold you are carrying, in hand and in
 bags. On leaving, your gold is set back to exactly that amount. The
