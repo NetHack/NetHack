@@ -1076,6 +1076,11 @@ shop_keeper(char rmno)
             return (struct monst *) 0;
         }
     } else {
+        /* NetHackJP / Upstream bugfix:
+         * Only flag an untrustworthy null shkp if this is actually a shop room
+         * (rmno >= ROOMOFFSET && svr.rooms[rmno - ROOMOFFSET].rtype >= SHOPBASE).
+         * Outside of shops or in non-shop rooms, a null shkp is completely normal.
+         */
         if (!level_status.shkready
             && rmno >= ROOMOFFSET
             && svr.rooms[rmno - ROOMOFFSET].rtype >= SHOPBASE) {
