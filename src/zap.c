@@ -4425,9 +4425,9 @@ zhitm(
         tmp = d(nd, 6);
         if (spellcaster)
             tmp = spell_damage_bonus(tmp);
-        /* Sodom and Tyre: lightning the hero deals a monster is
-           triple. type >= 0 is a wand, spell, or breath from the
-           hero. A monster's bolt is not tripled. Blinding uses nd. */
+        /* Sodom and Tyre: lightning the hero deals to a monster
+           is triple. type >= 0 is the hero's wand, spell, or breath.
+           A monster's bolt is not tripled. Blinding uses nd. */
         if (type >= 0 && Is_medusa_level(&u.uz))
             tmp *= 3;
         orig_dmg = tmp;
