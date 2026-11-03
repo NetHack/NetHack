@@ -151,6 +151,7 @@ extern struct obj *mk_artifact(struct obj *, aligntyp, uchar, boolean);
 extern const char *artifact_name(const char *, short *, boolean) NONNULLARG1;
 extern boolean exist_artifact(int, const char *) NONNULLPTRS;
 extern void artifact_exists(struct obj *, const char *, boolean, unsigned) ;
+extern void sword_of_spirit_fix(struct obj *);
 extern void found_artifact(int);
 extern void find_artifact(struct obj *) NONNULLPTRS;
 extern int nartifact_exist(void);
