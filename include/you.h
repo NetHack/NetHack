@@ -63,7 +63,7 @@ struct u_event {
     Bitfield(sodom_taunts, 7);      /* one-time Sodom and Tyre taunts */
     Bitfield(wilderness_sealed, 1); /* sword taken; branch cannot be reentered */
     Bitfield(fear_exposed, 1);      /* attacked, so the path no longer protects */
-    Bitfield(greed_hint, 2);        /* which full-verse hint the gate last gave */
+    Bitfield(greed_hint, 2);        /* 0 until the Greed gate's first bounce */
     Bitfield(pride_prayed, 1);      /* prayed on the Pride altar; the way is open */
     Bitfield(greed_warned, 1);      /* the 30-turns-left hunger warning has been shown */
     Bitfield(greed_snapped, 1);     /* gold on entering Greed has been recorded */

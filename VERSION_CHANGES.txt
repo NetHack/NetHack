@@ -11,6 +11,12 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-03
+The first time the Greed gate sends you back, it says Matthew
+19:22: "But when the young man heard that saying, he went away
+sorrowful: for he had great possessions." Every bounce after
+that says "Thou must leave all behind to pass this way."
+
+2026-11-03
 Each Fear map still places 40 monsters. The master lich, the
 arch-lich, and the titan are now a minotaur, an ettin, and a
 storm giant, five of each. Blue dragon, jabberwock, purple worm,
