@@ -826,7 +826,13 @@ hmon(struct monst *mon,
     anger_guards = (mon->mpeaceful
                     && (mon->ispriest || mon->isshk || is_watch(mon->data)));
     result = hmon_hitmon(mon, obj, thrown, dieroll);
-    if (mon->ispriest && !rn2(2))
+    /* Stock: half of these hits smite the hero. After salvation,
+       every hit on the Sanctum high priest takes that same path,
+       and ghod_hitsu() turns the bolt aside. */
+    if (mon->ispriest
+        && ((u.uevent.sanctum_frozen && Is_sanctum(&u.uz)
+             && mon->data == &mons[PM_HIGH_CLERIC])
+            || !rn2(2)))
         ghod_hitsu(mon);
     if (anger_guards)
         (void) angry_guards(!!Deaf);

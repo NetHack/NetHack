@@ -11,6 +11,13 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-03
+Entering the Sanctum temple, the high priest says "Welcome, we
+have long awaited thee. Look thou within the chest, and receive
+thy reward." After the yes path, an attack that would smite you
+for striking that priest is turned aside, and the priest is
+consumed. Before that, the smite is unchanged.
+
+2026-11-03
 Opening the chest that holds your soul shows four paragraphs on
 one black screen, the same kind of screen as a Wilderness floor
 intro. The last is Romans 10:9, with no citation added. After
