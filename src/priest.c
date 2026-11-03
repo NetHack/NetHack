@@ -857,19 +857,26 @@ ghod_hitsu(struct monst *priest)
             return;
     }
 
-    switch (rn2(3)) {
-    case 0:
-        pline("%s roars in anger:  \"Thou shalt suffer!\"",
-              a_gname_at(ax, ay));
-        break;
-    case 1:
-        pline("%s voice booms:  \"How darest thou harm my servant!\"",
-              s_suffix(a_gname_at(ax, ay)));
-        break;
-    default:
-        pline("%s roars:  \"Thou dost profane my shrine!\"",
-              a_gname_at(ax, ay));
-        break;
+    {
+        const char *gname = a_gname_at(ax, ay);
+
+        /* Moloch is the unaligned god. Name him in these three
+           lines only; prayer and altar text stay as they are. */
+        if (IS_ALTAR(levl[ax][ay].typ)
+            && Amask2align(levl[ax][ay].altarmask & AM_MASK) == A_NONE)
+            gname = "The Great Dragon";
+        switch (rn2(3)) {
+        case 0:
+            pline("%s roars in anger:  \"Thou shalt suffer!\"", gname);
+            break;
+        case 1:
+            pline("%s voice booms:  \"How darest thou harm my servant!\"",
+                  s_suffix(gname));
+            break;
+        default:
+            pline("%s roars:  \"Thou dost profane my shrine!\"", gname);
+            break;
+        }
     }
 
     /* bolt of lightning cast by unspecified monster */

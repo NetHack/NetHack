@@ -6095,7 +6095,7 @@ soul_opening(struct obj *box)
        A single putstr is cut near 255 characters, and each of these
        is shorter than that. */
     win = create_nhwindow(NHW_TEXT);
-    putstr(win, 0, "You peer inside, and horror grips you. There, bound in chains within Moloch's Sanctum, is your own soul. At last it all makes sense.");
+    putstr(win, 0, "You peer inside, and horror grips you. There, bound in chains within the Sanctum of the Great Dragon, is your own soul. At last it all makes sense.");
     putstr(win, 0, "");
     putstr(win, 0, "You have walked a path of evil your whole life, and the treasure you sought was the liberation of your very soul. Now the chance for redemption stands before you. But redemption is a choice.");
     putstr(win, 0, "");

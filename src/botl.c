@@ -457,6 +457,10 @@ describe_level(
         if (!addbranch)
             (void) strsubst(buf, "Plane of ", ""); /* just keep <element> */
         addbranch = FALSE;
+    } else if (addbranch && Is_sanctum(&u.uz)) {
+        /* livelog and similar; the status line keeps Dlvl:N */
+        Strcpy(buf, "the Sanctum of the Great Dragon");
+        addbranch = FALSE;
     } else {
         /* ports with more room may expand this one */
         if (!addbranch)

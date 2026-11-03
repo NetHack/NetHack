@@ -602,6 +602,8 @@ background_enlightenment(int unused_mode UNUSED, int final)
             Strcat(tmpbuf, ", a primitive area");
         else if (Is_bigroom(&u.uz) && !Blind)
             Strcat(tmpbuf, ", a very big room");
+        else if (Is_sanctum(&u.uz))
+            Strcat(tmpbuf, ", the Sanctum of the Great Dragon");
         Snprintf(buf, sizeof(buf), "in %s, on %s", dgnbuf, tmpbuf);
     }
     you_are(buf, "");
@@ -2339,7 +2341,7 @@ show_achievements(
                     " the Book of the Dead", "");
             break;
         case ACH_INVK:
-            you_have_X("gained access to Moloch's Sanctum");
+            you_have_X("gained access to the Sanctum of the Great Dragon");
             break;
         case ACH_AMUL:
             /* alternate wording for ascended (always past tense) since

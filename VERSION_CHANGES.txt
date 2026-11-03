@@ -11,6 +11,11 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-03
+The Sanctum level is called the Sanctum of the Great Dragon.
+A smite from its unaligned shrine names the Great Dragon, not
+Moloch. The bolt and the odds are unchanged.
+
+2026-11-03
 Entering the Sanctum temple, the high priest says "Welcome, we
 have long awaited thee. Look thou within the chest, and receive
 thy reward." After the yes path, an attack that would smite you

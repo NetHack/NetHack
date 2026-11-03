@@ -2330,6 +2330,8 @@ visible_level_tag(const char *proto)
         return "babylon";
     if (!strcmp(proto, "minend"))
         return "minesend";
+    if (!strcmp(proto, "sanctum"))
+        return "Sanctum of the Great Dragon";
     return proto;
 }
 
@@ -3718,9 +3720,9 @@ print_mapseen(
     } else if (mptr->flags.valley) {
         Sprintf(buf, "%sValley of the Dead.", PREFIX);
     } else if (mptr->flags.vibrating_square) {
-        Sprintf(buf, "%sGateway to Moloch's Sanctum.", PREFIX);
+        Sprintf(buf, "%sGateway to the Sanctum of the Great Dragon.", PREFIX);
     } else if (mptr->flags.msanctum) {
-        Sprintf(buf, "%sMoloch's Sanctum.", PREFIX);
+        Sprintf(buf, "%sSanctum of the Great Dragon.", PREFIX);
     }
     if (*buf) {
         add_menu_str(win, buf);

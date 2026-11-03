@@ -696,7 +696,7 @@ summon a demon or convert the altar. That refusal stays.
 Random altars and temples follow God. The Gehennom filler no
 longer places an unaligned shrine. A mimic that looks like an
 altar follows God. The fixed Valley of the Dead shrine and
-Moloch's Sanctum are unchanged. Class-quest altars are unchanged.
+the altar in the Sanctum of the Great Dragon are unchanged. Class-quest altars are unchanged.
 
 King Solomon's #chat, before the Gibeon vision, always speaks
 the hint about asking for a heart to judge rightly, then
@@ -1245,7 +1245,7 @@ diamond named "PLACEHOLDER main-quest artifact". It does
 nothing. The engraving is Genesis 28:12 KJV. The plan names
 Jacob's dream and does not quote that verse.
 
-### The soul in Moloch's Sanctum (2026-11-01)
+### The soul in the Sanctum of the Great Dragon (2026-11-01)
 
 The Amulet of Yendor is not given to the high priest. A chest on
 the Sanctum altar holds one object, named from the player's name
@@ -1295,7 +1295,7 @@ The elemental planes still look for the Amulet if one exists.
 None is placed. The soul is the quest object. Wishes for it are
 refused.
 
-### Entering Moloch's Sanctum (2026-11-01)
+### Entering the Sanctum of the Great Dragon (2026-11-01)
 
 The Bell of Opening, the Candelabrum of Invocation, and the Book
 of the Dead are not placed, cannot be wished for, and crumble if
