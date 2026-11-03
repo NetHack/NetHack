@@ -1056,10 +1056,11 @@ Psalm 91 you engrave on any other level still only scares
 monsters, exactly as before. Attacking does not remove the Fear
 protection. Monsters will not step onto a path tile or a stair.
 A boulder will not land or be generated there. Each of the three
-Fear maps used to place 8 monsters: one blue dragon, master lich,
-arch-lich, titan, jabberwock, purple worm, pit fiend, and balrog.
-Each map now places 40, five of each of those, on floor that is
-not a Psalm 91 tile and not a stair. All 40 fit.
+Fear maps used to place 8 monsters and now places 40, five each
+of blue dragon, minotaur, ettin, storm giant, jabberwock, purple
+worm, pit fiend, and balrog, on floor that is not a Psalm 91
+tile and not a stair. All 40 fit. The master lich, arch-lich,
+and titan were replaced so spellcasters do not cover the verse.
 
 Picking up the Sword of the Spirit returns you to the main-dungeon
 level that holds the Wilderness stair, standing on that stair.
