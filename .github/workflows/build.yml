@@ -34,8 +34,12 @@ jobs:
       - name: Generate makefiles
         run: sh sys/unix/setup.sh sys/unix/hints/linux.501
 
-      - name: Compile
-        run: make WANT_WIN_TTY=1 WANT_WIN_CURSES=1
+      - name: Compile and install
+        run: make WANT_WIN_TTY=1 WANT_WIN_CURSES=1 install
+
+      - name: Smoke test (installed)
+        working-directory: playground
+        run: ./nethack --version
 
   checklua:
     name: Lua scripts syntax check
