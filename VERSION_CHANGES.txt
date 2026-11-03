@@ -11,6 +11,10 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-03
+Royal Historian, Healer, Priest, and Prophet can train long
+sword to Basic. Knight, Adventurer, and Champion are unchanged.
+
+2026-11-03
 The Sword of the Spirit is blessed, +2, and erodeproof, with no
 rust or burn on it. That one flag stops rust, fire, corrosion,
 and rot. Once identified, the iron blade shows as rustproof.

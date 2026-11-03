@@ -1167,6 +1167,13 @@ It restores you." Hit points return to full and hunger is cured.
 Dipping says "The living water does no harm." There is no snake,
 no demon, and no curse.
 
+### Long sword for every playable role (2026-11-03)
+
+The Sword of the Spirit is a doubled-edged blade, trained as a
+long sword. Royal Historian, Healer, Priest, and Prophet can
+train it to Basic. It starts Unskilled. Knight stays Expert,
+Adventurer stays Skilled, and Champion stays Expert.
+
 ### Sword of the Spirit proof (2026-11-03)
 
 The garden sword is created blessed, +2, and erodeproof, with
