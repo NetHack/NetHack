@@ -11,10 +11,12 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-03
-Opening the chest that holds your soul shows the reveal on one
-black screen, the same kind of screen as a Wilderness floor
-intro. The words are unchanged. After that screen, the game
-still asks "Do you choose that path?"
+Opening the chest that holds your soul shows four paragraphs on
+one black screen, the same kind of screen as a Wilderness floor
+intro. The last is Romans 10:9, with no citation added. After
+that screen, the only question is "Dost thou confess with thy
+mouth the Lord Jesus, and believe in thine heart that God hath
+raised him from the dead?" Yes and no are the only answers.
 
 2026-11-03
 Every melee hit with the Sword of the Spirit adds dice equal to
