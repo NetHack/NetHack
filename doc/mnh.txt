@@ -58,4 +58,4 @@ UR        mac     -         -    URL passthrough for HTML generator
 
 
 
-NETHACK                         1 January 1970                          MNH(6)
+NETHACK                         4 November 2018                         MNH(6)
