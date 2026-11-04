@@ -73,10 +73,10 @@ BUGS
        nism to avoid conflicts.
 
 COPYRIGHT
-       This   file   is   Copyright  (C)  Kenneth  Lorber,  1970  for  version
+       This   file   is   Copyright  (C)  Kenneth  Lorber,  2026  for  version
        NetHack-5.0:1.27.  NetHack may be freely  redistributed.   See  license
        for details.
 
 
 
-NETHACK                         1 January 1970                      RECOVER(6)
+NETHACK                          26 April 2026                      RECOVER(6)
