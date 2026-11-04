@@ -1540,9 +1540,18 @@ same.
 Berachah has no random monsters. Three shops: the Scribes of Ezra
 (Baruch), the Library of the Prophets (Nathan), the Sheep Gate
 Market (Lydia). The first #chat with a child gives the Tears of
-the Children, once. Quaffing them grants a level. They do not
-break, dilute, dip, or curse. The two fountains, and the
+the Children, once. After that gift, each of the six children
+has his own thank-you. Quaffing the Tears grants a level. They
+do not break, dilute, dip, or curse. The two fountains, and the
 Wilderness garden fountains, are living water.
+
+A male prisoner named "town elder" stands one square inside the
+open gate (map 43,10). He is not a shopkeeper and not a priest.
+A guide was not used: killing a guide also applies the
+quest-guardian penalty. While the elder is peaceful he stays
+on that square. #chat picks one of four lines; those lines are
+still PLACEHOLDER. Killing him is murder, the same as any
+other peaceful human.
 
 Lines Jon has not written are marked PLACEHOLDER in the source.
 The list is in the pull request.

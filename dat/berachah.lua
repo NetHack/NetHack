@@ -67,6 +67,10 @@ des.monster({ id = "Michael the Archangel", x = 72, y = 10, peaceful = 1 })
 des.monster({ id = "Angel", x = 40, y = 9, peaceful = 1 })
 des.monster({ id = "Angel", x = 40, y = 11, peaceful = 1 })
 des.monster({ id = "Angel", x = 46, y = 10, peaceful = 1 })
+-- Male prisoner, shown as "town elder", just inside the open gate.
+-- A guide would add the quest-guardian death penalty on top of murder.
+des.monster({ id = "prisoner", name = "town elder", x = 43, y = 10,
+              peaceful = 1, waiting = 1, female = false })
 des.monster({ id = "Angel", x = 57, y = 10, peaceful = 1 })
 des.monster({ id = "Angel", x = 73, y = 8, peaceful = 1 })
 des.monster({ id = "Angel", x = 73, y = 12, peaceful = 1 })

@@ -11,6 +11,12 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-04
+After the Tears of the Children are given, each child in
+the Valley of Berachah thanks the hero in his own words.
+A town elder stands just inside the gate. His greeting is
+still a placeholder.
+
+2026-11-04
 After the victory at Hinnom, each angel on the Valley of
 Berachah gives his own congratulation. Michael keeps his
 own words. The first time the hero arrives in the Valley,

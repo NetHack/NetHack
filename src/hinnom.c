@@ -996,6 +996,77 @@ angel_victory_line(struct monst *speaker)
     return angel_victory[0];
 }
 
+/* After the Tears have been given. Six children stand on Berachah,
+   so the first six lines are used. A seventh would take line seven. */
+static const char *const child_thanks[] = {
+    "You came for us. Nobody else did. Thank you!",
+    "My mother says you are a hero from the old stories.",
+    "I am not afraid of the dark anymore.",
+    "When I grow up, I want to be brave like you.",
+    "We prayed every night that someone would come. And you came!",
+    "Thank you for bringing us home.",
+    "I made you a crown of flowers. Well, I tried to.",
+    "The LORD sent you. I just know it.",
+};
+#define CHILD_THANKS_N SIZE(child_thanks)
+
+static const char *
+child_thanks_line(struct monst *speaker)
+{
+    struct monst *kids[32], *mtmp, *key;
+    int n, i, k;
+
+    n = 0;
+    for (mtmp = fmon; mtmp && n < SIZE(kids); mtmp = mtmp->nmon) {
+        if (DEADMONSTER(mtmp) || mtmp->data != &mons[PM_CHILD])
+            continue;
+        kids[n++] = mtmp;
+    }
+    for (i = 1; i < n; i++) {
+        key = kids[i];
+        k = i;
+        while (k > 0 && kids[k - 1]->m_id > key->m_id) {
+            kids[k] = kids[k - 1];
+            k--;
+        }
+        kids[k] = key;
+    }
+    for (i = 0; i < n; i++)
+        if (kids[i] == speaker)
+            return child_thanks[(n <= CHILD_THANKS_N) ? i
+                                                      : (i % CHILD_THANKS_N)];
+    return child_thanks[0];
+}
+
+/* PLACEHOLDER until Jon approves the town elder's lines. */
+static const char *const elder_lines[] = {
+    "Rest a while, champion. You have earned it.", /* PLACEHOLDER */
+    "My grandfather told of the days before Moloch. Now my grandchildren will tell of you.", /* PLACEHOLDER */
+    "Blessed be the LORD, who did not forget this valley.", /* PLACEHOLDER */
+    "Our shops are open to you, and our hearts as well.", /* PLACEHOLDER */
+};
+
+static boolean
+is_town_elder(struct monst *mtmp)
+{
+    return (boolean) (mtmp && has_mgivenname(mtmp)
+                      && !strcmp(MGIVENNAME(mtmp), "town elder"));
+}
+
+/* A male prisoner named "town elder". He stays inside the gate
+   while he is peaceful. An attack releases him. A guide would
+   add the quest-guardian penalty on top of ordinary murder. */
+void
+berachah_elder_hold(struct monst *mtmp)
+{
+    if (!mtmp || !Is_berachah_level(&u.uz) || !mtmp->mpeaceful)
+        return;
+    if (!is_town_elder(mtmp))
+        return;
+    mtmp->mstrategy |= STRAT_WAITFORU;
+    mtmp->msleeping = 0;
+}
+
 boolean
 hinnom_chat(struct monst *mtmp)
 {
@@ -1030,6 +1101,12 @@ hinnom_chat(struct monst *mtmp)
         return TRUE;
     }
 
+    if (Is_berachah_level(&u.uz) && is_town_elder(mtmp)) {
+        SetVoice(mtmp, 0, 80, 0);
+        verbalize("%s", elder_lines[rn2(SIZE(elder_lines))]); /* PLACEHOLDER */
+        return TRUE;
+    }
+
     if (mtmp->data == &mons[PM_CHILD]) {
         SetVoice(mtmp, 0, 80, 0);
         if (Is_berachah_level(&u.uz)) {
@@ -1037,7 +1114,7 @@ hinnom_chat(struct monst *mtmp)
                 verbalize("We saved these for you. Thank you for coming for us."); /* PLACEHOLDER */
                 give_tears();
             } else {
-                verbalize("We are safe now."); /* PLACEHOLDER */
+                verbalize("%s", child_thanks_line(mtmp));
             }
             return TRUE;
         }
