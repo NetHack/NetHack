@@ -1432,8 +1432,12 @@ get_plname_from_file(
     /* "-race-role-gend-algn" is already present except that it has been
        hidden by replacing the initial dash with NUL; if we want that
        information, replace the NUL with a dash */
-    if (!name_only)
-        *eos(plbuf) = '-';
+    if (!name_only) {
+        cp = eos(plbuf);
+        if (cp == &plbuf[PL_NSIZ_PLUS - 2])
+            return -4;
+        *cp = '-';
+    }
     /* not simple strcpy(); playmode is in the last slot and could (probably
        will) be preceded by NULs */
     if (pltmpsiz > (int) bufsz || pltmpsiz < 0)
@@ -1445,16 +1449,24 @@ get_plname_from_file(
 ATTRNORETURN void
 plnabort(int errcode)
 {
+    const char *plfunc = "get_plname_from_file()";
+
     switch (errcode) {
     case -1:
-        panic("caller of get_plname_from_file() failed to provide "
-              "PL_NSIZ_PLUS buffer");
+        panic("%s caller failed to provide PL_NSIZ_PLUS buffer",
+              plfunc);
         break;
     case -2:
-        panic("get_plname_from_file read invalid plname size");
+        panic("%s invalid plname size read",
+              plfunc);
         break;
     case -3:
-        panic("read unexpected trailing plname indicator from file");
+        panic("%s unexpected trailing plname indicator read",
+              plfunc);
+        break;
+    case -4:
+        panic("badly-formed plname read",
+              plfunc);
         break;
     }
     /* this should never happen */
