@@ -1551,13 +1551,17 @@ The outside guards still say "Pass, Your Holiness." The
 inside guard and the clerics still give their lever clues
 and nothing else. The doctor gives his lever clue on every
 chat, and then one of six lines of his own, so the clue is
-never the one that failed to come up. The other ten (both
+never the one that failed to come up. The other nine (both
 horned devils, both barbed devils, the bone devil, the ice
-devil, the nalfeshnee, both pit fiends, and Moloch) share
-eight court lines. The first eight each have their own. The
-ninth and tenth repeat the first two, and those two repeats
-are not on squares next to the creatures who already have
-them. Horned, barbed, bone, and ice devils are silent in
+devil, the nalfeshnee, and both pit fiends) share eight
+court lines. The first eight each have their own. The ninth
+repeats the first, and that repeat is not next to the
+creature who already has it. Moloch is not in that set. On
+#chat he picks one of five lines of his own. Those lines
+are still PLACEHOLDER. The first time an attack of his
+actually proceeds, he may say one of them once. The swing,
+the damage, and the raze are the same. Horned, barbed,
+bone, and ice devils are silent in
 the rest of the game; this chat is allowed before that
 check. The six captive children, before the Valley, each
 pick one of six lines about the doctor. After the Tears,

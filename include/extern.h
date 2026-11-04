@@ -4136,6 +4136,7 @@ extern void berachah_setup(void);
 extern void berachah_fix_objects(void);
 extern void berachah_intro(void);
 extern void berachah_elder_hold(struct monst *);
+extern void moloch_opening_taunt(struct monst *);
 extern boolean living_water_here(void);
 extern boolean living_water_at(coordxy, coordxy);
 extern void living_water_restore(void);

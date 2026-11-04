@@ -517,6 +517,9 @@ mattacku(struct monst *mtmp)
         return 0;
     if (moloch_disguise_holds() && fortress_monster(mtmp))
         return 0;
+    /* After the checks that call off the swing. The blow itself
+       is the same. */
+    moloch_opening_taunt(mtmp);
     /* A wanderer does not get to open the fight while the disguise holds
        and the hero has not broken the peace. */
     if (hinnom_keep_intruder_out(mtmp)

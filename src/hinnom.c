@@ -1067,10 +1067,10 @@ berachah_elder_hold(struct monst *mtmp)
     mtmp->msleeping = 0;
 }
 
-/* Court lines for fortress creatures who do not give a lever clue.
-   Ten are placed (the devils, the nalfeshnee, both pit fiends, and
-   Moloch). The first eight each get one line. The last two repeat
-   the first two, and those repeats are not on neighboring squares. */
+/* Court lines for fortress creatures who do not give a lever clue
+   and are not Moloch. Nine are placed. The first eight each get
+   one line. The ninth repeats the first, and that repeat is not
+   on a square next to the creature who already has it. */
 static const char *const fortress_court[] = {
     "Your Holiness honors us with a visit.",
     "The fires burn hot today, Your Holiness.",
@@ -1101,6 +1101,35 @@ static const char *const captive_child[] = {
     "Please don't tell him I talked to you.",
 };
 
+/* PLACEHOLDER until Jon approves Moloch's lines. */
+static const char *const moloch_lines[] = {
+    "Every fire needs fuel, priest. Mine prefers the young.", /* PLACEHOLDER */
+    "Their mothers weep, and I grow strong. Such is the old bargain.", /* PLACEHOLDER */
+    "Bring me the little ones. The flames are hungry tonight.", /* PLACEHOLDER */
+    "Your God gave His Son. I simply take theirs.", /* PLACEHOLDER */
+    "No song pleases me like the silence after the drums stop.", /* PLACEHOLDER */
+};
+
+static boolean moloch_taunted = FALSE;
+
+static const char *
+moloch_line(void)
+{
+    return moloch_lines[rn2(SIZE(moloch_lines))];
+}
+
+/* Once, the first time an attack on the hero is actually underway.
+   Damage, the raze, and whether he swings are unchanged. */
+void
+moloch_opening_taunt(struct monst *mtmp)
+{
+    if (!mtmp || mtmp->data != &mons[PM_MOLOCH] || moloch_taunted || Deaf)
+        return;
+    moloch_taunted = TRUE;
+    SetVoice(mtmp, 0, 80, 0);
+    verbalize("%s", moloch_line()); /* PLACEHOLDER */
+}
+
 static boolean
 fortress_court_member(struct monst *mtmp)
 {
@@ -1109,7 +1138,8 @@ fortress_court_member(struct monst *mtmp)
     if (!hinnom_staff(mtmp))
         return FALSE;
     ptr = mtmp->data;
-    if (ptr == &mons[PM_DOCTOR] || ptr == &mons[PM_FORTRESS_GUARD]
+    if (ptr == &mons[PM_MOLOCH] || ptr == &mons[PM_DOCTOR]
+        || ptr == &mons[PM_FORTRESS_GUARD]
         || ptr == &mons[PM_ALIGNED_CLERIC] || ptr == &mons[PM_HIGH_CLERIC])
         return FALSE;
     return TRUE;
@@ -1168,6 +1198,12 @@ hinnom_chat(struct monst *mtmp)
 
     if (!mtmp)
         return FALSE;
+
+    if (mtmp->data == &mons[PM_MOLOCH]) {
+        SetVoice(mtmp, 0, 80, 0);
+        verbalize("%s", moloch_line()); /* PLACEHOLDER */
+        return TRUE;
+    }
 
     if (mtmp->data == &mons[PM_MICHAEL]) {
         SetVoice(mtmp, 0, 80, 0);
