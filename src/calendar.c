@@ -95,7 +95,7 @@ char *
 yyyymmddhhmmss(time_t date)
 {
     long datenum;
-    static char datestr[15];
+    static char datestr[NHDATELEN + 1];
     struct tm *lt;
 
     if (date == 0)
@@ -124,7 +124,7 @@ time_from_yyyymmddhhmmss(char *buf)
     struct tm t, *lt;
     char *d, *p, y[5], mo[3], md[3], h[3], mi[3], s[3];
 
-    if (buf && strlen(buf) == 14) {
+    if (buf && strlen(buf) == NHDATELEN) {
         d = buf;
         p = y; /* year */
         for (k = 0; k < 4; ++k)

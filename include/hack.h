@@ -1434,6 +1434,9 @@ typedef uint32_t mmflags_nht;     /* makemon MM_ flags */
 #define MENU_FULL 2
 #define MENU_PARTIAL 3
 
+/* sizeof YYYYMMDDHHMMSS */
+#define NHDATELEN 14
+
 /* flags to control teleds() */
 #define TELEDS_NO_FLAGS   0
 #define TELEDS_ALLOW_DRAG 1

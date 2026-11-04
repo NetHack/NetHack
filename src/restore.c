@@ -537,7 +537,7 @@ restgamestate(NHFILE *nhfp)
     struct flag newgameflags;
     struct context_info newgamecontext; /* all 0, but has some pointers */
     struct obj *bc_obj;
-    char timebuf[15];
+    char timebuf[NHDATELEN + 1];
     unsigned long uid = 0;
 #ifndef SFCTOOL
     boolean defer_perm_invent, restoring_special;
@@ -621,12 +621,12 @@ restgamestate(NHFILE *nhfp)
     }
 #endif
 
-    Sfi_char(nhfp, timebuf, "gamestate-ubirthday", 14);
-    timebuf[14] = '\0';
+    Sfi_char(nhfp, timebuf, "gamestate-ubirthday", NHDATELEN);
+    timebuf[NHDATELEN] = '\0';
     ubirthday = time_from_yyyymmddhhmmss(timebuf);
     Sfi_long(nhfp, &urealtime.realtime, "gamestate-realtime");
-    Sfi_char(nhfp, timebuf, "gamestate-start_timing", 14);
-    timebuf[14] = '\0';
+    Sfi_char(nhfp, timebuf, "gamestate-start_timing", NHDATELEN);
+    timebuf[NHDATELEN] = '\0';
 #ifndef SFCTOOL
     urealtime.start_timing = time_from_yyyymmddhhmmss(timebuf);
 

@@ -314,9 +314,9 @@ savegamestate(NHFILE *nhfp)
      */
     u.ustuck_mid = 0;
     u.usteed_mid = 0;
-    Sfo_char(nhfp, yyyymmddhhmmss(ubirthday), "gamestate-ubirthday", 14);
+    Sfo_char(nhfp, yyyymmddhhmmss(ubirthday), "gamestate-ubirthday", NHDATELEN);
     Sfo_long(nhfp, &urealtime.realtime, "gamestate-realtime");
-    Sfo_char(nhfp, yyyymmddhhmmss(urealtime.start_timing), "gamestate-start_timing", 14);
+    Sfo_char(nhfp, yyyymmddhhmmss(urealtime.start_timing), "gamestate-start_timing", NHDATELEN);
     /* this is the value to use for the next update of urealtime.realtime */
     urealtime.start_timing = urealtime.finish_time;
     save_killers(nhfp);
