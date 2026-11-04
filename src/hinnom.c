@@ -726,6 +726,75 @@ hinnom_finish_swap(void)
         svl.level_info[ledger].flags &= ~(LFILE_EXISTS | VISITED);
     u.uevent.berachah = 1;
     svm.mvitals[PM_MICHAEL].mvflags &= ~(G_EXTINCT | G_GENOD);
+    /* The hero is leaving. The Valley is built on the next visit,
+       and the arrival text waits for that visit. */
+}
+
+/* Quest-style text window. Break only at spaces so the words stay
+   the approved text. */
+static void
+put_wrapped(winid win, const char *text)
+{
+    char line[80];
+    const char *p = text;
+
+    while (*p) {
+        int n, cut;
+
+        while (*p == ' ')
+            p++;
+        if (!*p)
+            break;
+        n = 0;
+        while (p[n] && n < 76)
+            n++;
+        cut = n;
+        if (p[n] && p[n] != ' ') {
+            while (cut > 40 && p[cut] != ' ')
+                cut--;
+            if (p[cut] != ' ')
+                cut = n;
+        }
+        while (cut > 0 && p[cut - 1] == ' ')
+            cut--;
+        if (cut <= 0)
+            cut = n;
+        (void) strncpy(line, p, (size_t) cut);
+        line[cut] = '\0';
+        putstr(win, 0, line);
+        p += cut;
+    }
+}
+
+/* Once. The swap sets berachah while the hero is still recorded on
+   the level, but that call is the departure: the Valley map is
+   created on the way back in. Showing the text here, on arrival,
+   is the first time the hero is standing in the Valley. */
+void
+berachah_intro(void)
+{
+    winid win;
+    static const char *const para[] = {
+        "The smoke of Moloch's fires is gone. Where the fortress once loomed, gates stand open and lamps burn in every window.",
+        "As you pass through the gate, a great cheer goes up. Families pour out of the old fortress halls, now homes and shops, and children run ahead to tell everyone that the hero has come back. Old men weep openly. Someone presses bread into your hands, and someone else lays a garland about your neck.",
+        "A white-haired elder steps forward and raises his voice over the crowd:",
+        "\"Look! Here is the one who broke the altar of Moloch and set the captives free! This valley was once a place of fire and sorrow. Now we bless the LORD here, and it shall be called the Valley of Berachah forever.\"",
+        "\"Rest, eat, and trade among us, friend. Whatever we have is yours.\"",
+        "The name echoes the scripture: \"for there they blessed the LORD: therefore the name of the same place was called, The valley of Berachah, unto this day.\" (2 Chronicles 20:26)",
+    };
+    int i;
+
+    if (!Is_berachah_level(&u.uz) || u.uevent.berachah_intro)
+        return;
+    u.uevent.berachah_intro = 1;
+    win = create_nhwindow(NHW_TEXT);
+    for (i = 0; i < SIZE(para); i++) {
+        if (i)
+            putstr(win, 0, "");
+        put_wrapped(win, para[i]);
+    }
+    display_nhwindow(win, TRUE);
+    destroy_nhwindow(win);
 }
 
 void
@@ -855,6 +924,78 @@ say_clue(struct monst *mtmp, const char *line)
     verbalize("%s", line);
 }
 
+/* Jon's lines, in order. Michael is not an angel of this type and
+   keeps his own speech. Fewer than six angels use the first lines.
+   More than six cycle, and a line is skipped when it would repeat
+   on an angel standing next to one who already has it. */
+static const char *const angel_victory[] = {
+    "The fire of Hinnom is quenched. Well fought, champion!",
+    "Heaven rings with your name this day!",
+    "The Dragon's servant has fallen. Glory to the Most High!",
+    "I have watched a thousand battles. Few were fought so bravely.",
+    "The children are avenged. Go in peace, faithful one.",
+    "Where you stand, darkness has fled. Rejoice!",
+};
+#define ANGEL_VICTORY_N SIZE(angel_victory)
+
+static boolean
+angels_beside(struct monst *a, struct monst *b)
+{
+    int dx = a->mx - b->mx, dy = a->my - b->my;
+
+    if (dx < 0)
+        dx = -dx;
+    if (dy < 0)
+        dy = -dy;
+    return (boolean) (dx <= 1 && dy <= 1 && (dx || dy));
+}
+
+static const char *
+angel_victory_line(struct monst *speaker)
+{
+    struct monst *ang[128], *mtmp, *key;
+    int n, i, k, line, guard;
+    int assigned[128];
+
+    n = 0;
+    for (mtmp = fmon; mtmp && n < SIZE(ang); mtmp = mtmp->nmon) {
+        if (DEADMONSTER(mtmp) || mtmp->data != &mons[PM_ANGEL])
+            continue;
+        ang[n++] = mtmp;
+    }
+    for (i = 1; i < n; i++) {
+        key = ang[i];
+        k = i;
+        while (k > 0 && ang[k - 1]->m_id > key->m_id) {
+            ang[k] = ang[k - 1];
+            k--;
+        }
+        ang[k] = key;
+    }
+    for (i = 0; i < n; i++) {
+        if (n <= ANGEL_VICTORY_N) {
+            assigned[i] = i;
+            continue;
+        }
+        line = i % ANGEL_VICTORY_N;
+        for (guard = 0; guard < ANGEL_VICTORY_N; guard++) {
+            boolean clash = FALSE;
+
+            for (k = 0; k < i; k++)
+                if (assigned[k] == line && angels_beside(ang[k], ang[i]))
+                    clash = TRUE;
+            if (!clash)
+                break;
+            line = (line + 1) % ANGEL_VICTORY_N;
+        }
+        assigned[i] = line;
+    }
+    for (i = 0; i < n; i++)
+        if (ang[i] == speaker)
+            return angel_victory[assigned[i]];
+    return angel_victory[0];
+}
+
 boolean
 hinnom_chat(struct monst *mtmp)
 {
@@ -885,7 +1026,7 @@ hinnom_chat(struct monst *mtmp)
 
     if (Is_berachah_level(&u.uz) && mtmp->data == &mons[PM_ANGEL]) {
         SetVoice(mtmp, 0, 80, 0);
-        verbalize("Well done. Rest here a while."); /* PLACEHOLDER */
+        verbalize("%s", angel_victory_line(mtmp));
         return TRUE;
     }
 

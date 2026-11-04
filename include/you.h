@@ -82,7 +82,10 @@ struct u_event {
     Bitfield(hinnom_razed, 1);      /* altar of Moloch razed */
     Bitfield(berachah, 1);          /* Hinnom is now the Valley of Berachah */
     Bitfield(berachah_tears, 1);    /* a child gave the Tears */
-    /* 63 bits. The five Hinnom flags need EDITLEVEL 10. */
+    Bitfield(berachah_intro, 1);    /* the Valley arrival text has been shown */
+    /* 64 bits. berachah_intro fills spare padding in the last
+       unsigned unit, so the saved size of this struct is unchanged.
+       The five Hinnom flags need EDITLEVEL 10. */
 };
 
 /*

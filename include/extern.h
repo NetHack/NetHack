@@ -4134,6 +4134,7 @@ extern void hinnom_finish_swap(void);
 extern boolean hinnom_swap_pending(void);
 extern void berachah_setup(void);
 extern void berachah_fix_objects(void);
+extern void berachah_intro(void);
 extern boolean living_water_here(void);
 extern boolean living_water_at(coordxy, coordxy);
 extern void living_water_restore(void);

@@ -1525,6 +1525,18 @@ with Berachah. Living children on the way out give +1 Favor and
 +1 alignment each. A child who dies on Hinnom costs 5 alignment
 and 2 Favor.
 
+The six angels on Berachah each speak one of Jon's victory
+lines, in the order they were placed. Michael still says
+"Well done. Rest here a while." A seventh angel would take
+the first line again, unless that angel is standing next to
+one who already has it. The Valley's arrival text is a
+full-screen window, the same kind the quest intro uses. The
+swap runs while the hero is leaving, so the window waits
+for the first step back into the Valley. `berachah_intro`
+remembers that showing. The bit sits in padding that was
+already part of `struct u_event`, so the save size is the
+same.
+
 Berachah has no random monsters. Three shops: the Scribes of Ezra
 (Baruch), the Library of the Prophets (Nathan), the Sheep Gate
 Market (Lydia). The first #chat with a child gives the Tears of

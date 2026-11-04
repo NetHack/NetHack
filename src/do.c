@@ -2096,6 +2096,9 @@ goto_level(
             destroy_nhwindow(win);
         }
     }
+    /* First entrance to the Valley. The swap itself runs while the
+       hero is leaving, so this waits for the arrival. */
+    berachah_intro();
 
     /* Check whether we just entered Gehennom. */
     if (!In_hell(&u.uz0) && Inhell) {

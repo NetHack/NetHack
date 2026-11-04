@@ -11,6 +11,13 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-04
+After the victory at Hinnom, each angel on the Valley of
+Berachah gives his own congratulation. Michael keeps his
+own words. The first time the hero arrives in the Valley,
+a text window tells how the place was renamed. That window
+is shown once and is remembered in the save.
+
+2026-11-04
 The three shops in the Valley of Berachah never contain mimics.
 Other shops still have the usual chance that a square is a
 mimic instead of an item.
