@@ -1557,9 +1557,9 @@ devil, the nalfeshnee, and both pit fiends) share eight
 court lines. The first eight each have their own. The ninth
 repeats the first, and that repeat is not next to the
 creature who already has it. Moloch is not in that set. On
-#chat he picks one of five lines of his own. Those lines
-are still PLACEHOLDER. The first time an attack of his
-actually proceeds, he may say one of them once. The swing,
+#chat he picks one of four lines of his own. The first time
+an attack of his actually proceeds, he may say one of them
+once. The swing,
 the damage, and the raze are the same. Horned, barbed,
 bone, and ice devils are silent in
 the rest of the game; this chat is allowed before that

@@ -1101,13 +1101,11 @@ static const char *const captive_child[] = {
     "Please don't tell him I talked to you.",
 };
 
-/* PLACEHOLDER until Jon approves Moloch's lines. */
 static const char *const moloch_lines[] = {
-    "Every fire needs fuel, priest. Mine prefers the young.", /* PLACEHOLDER */
-    "Their mothers weep, and I grow strong. Such is the old bargain.", /* PLACEHOLDER */
-    "Bring me the little ones. The flames are hungry tonight.", /* PLACEHOLDER */
-    "Your God gave His Son. I simply take theirs.", /* PLACEHOLDER */
-    "No song pleases me like the silence after the drums stop.", /* PLACEHOLDER */
+    "Every fire needs fuel, priest. Mine prefers the young.",
+    "Their mothers weep, and I grow strong. Such is the old bargain.",
+    "Bring me the little ones. The flames are hungry tonight.",
+    "No song pleases me like the silence after the drums stop.",
 };
 
 static boolean moloch_taunted = FALSE;
@@ -1127,7 +1125,7 @@ moloch_opening_taunt(struct monst *mtmp)
         return;
     moloch_taunted = TRUE;
     SetVoice(mtmp, 0, 80, 0);
-    verbalize("%s", moloch_line()); /* PLACEHOLDER */
+    verbalize("%s", moloch_line());
 }
 
 static boolean
@@ -1201,7 +1199,7 @@ hinnom_chat(struct monst *mtmp)
 
     if (mtmp->data == &mons[PM_MOLOCH]) {
         SetVoice(mtmp, 0, 80, 0);
-        verbalize("%s", moloch_line()); /* PLACEHOLDER */
+        verbalize("%s", moloch_line());
         return TRUE;
     }
 
