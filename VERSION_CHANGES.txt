@@ -11,6 +11,12 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-04
+Each of the six Sokoban builders has a different ancient
+Near Eastern name: Akkadian, Sumerian, Hebrew, Canaanite,
+Egyptian, and Elamite. Canaanite, Egyptian, and Elamite do
+not yet speak a line in their own language.
+
+2026-11-04
 Jacob's Ladder is a garden. Its fountains are living water,
 the same full cure as the Wilderness garden. A magic portal
 there returns to the Sokoban level where you first arrive,

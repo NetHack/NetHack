@@ -103,8 +103,8 @@ des.region({ region={18,10, 22,16}, lit = 1, type = "zoo", filled = 0, irregular
 des.levregion({ type = "branch", region = {20,12,20,12} })
 local builders = {
    {18,10,"Akkadian builder"}, {22,10,"Sumerian builder"},
-   {18,16,"Hebrew builder"}, {22,16,"builder"},
-   {18,11,"builder"}, {22,15,"builder"},
+   {18,16,"Hebrew builder"}, {22,16,"Canaanite builder"},
+   {18,11,"Egyptian builder"}, {22,15,"Elamite builder"},
 }
 for _, b in ipairs(builders) do
    des.monster({ id = "human", x = b[1], y = b[2], peaceful = 1,

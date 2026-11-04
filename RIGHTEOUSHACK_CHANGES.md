@@ -1250,6 +1250,9 @@ we had already lost." Then one of these:
 
 None of them says "AI".
 
+The six names are Akkadian, Sumerian, Hebrew, Canaanite,
+Egyptian, and Elamite. No two share a name.
+
 Three also speak before the English line. These are for
 verification, not a certified translation:
 
@@ -1259,6 +1262,9 @@ verification, not a certified translation:
   (meant as "mighty king")
 - Sumerian builder: e2 an-še3
   (meant as "house toward heaven")
+
+Canaanite, Egyptian, and Elamite say only the English lines.
+No ancient phrase was added for them.
 
 The angel says "You seek what was taken from you, though you know it not."
 The first time, a blessed +2 Gospel of Peace is given, and the
