@@ -1272,8 +1272,11 @@
             | M2_COLLECT | M2_MAGIC,
         M3_INFRAVISIBLE | M3_INFRAVISION,
         26, HI_LORD, ARCHON),
-    /* Michael waits in the portal room. He cannot die. */
-    MON(NAM("Michael"), S_ANGEL,
+    /* Michael the Archangel waits in the portal room. He cannot die.
+       The token stays MICHAEL: saves store the monster number, not
+       this string. M2_PNAME keeps the article off the front, so the
+       name is not "the Michael the Archangel". */
+    MON(NAM("Michael the Archangel"), S_ANGEL,
         LVL(19, 16, -6, 80, 15), (G_NOGEN | G_UNIQ | G_NOCORPSE),
         A(ATTK(AT_WEAP, AD_PHYS, 2, 4), ATTK(AT_WEAP, AD_PHYS, 2, 4),
           ATTK(AT_CLAW, AD_PHYS, 1, 8), ATTK(AT_MAGC, AD_MAGM, 2, 6),

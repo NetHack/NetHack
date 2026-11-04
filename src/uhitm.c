@@ -524,7 +524,7 @@ do_attack(struct monst *mtmp)
     if (attack_checks(mtmp, uwep))
         return TRUE;
     if (mtmp->data == &mons[PM_MICHAEL]) {
-        pline("You cannot bring yourself to strike the archangel."); /* PLACEHOLDER */
+        pline("You cannot bring yourself to strike %s.", mon_nam(mtmp)); /* PLACEHOLDER */
         return TRUE;
     }
     if (fortress_monster(mtmp))

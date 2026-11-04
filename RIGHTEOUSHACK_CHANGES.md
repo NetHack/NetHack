@@ -1458,7 +1458,7 @@ throw it, and flying or riding a flyer passes over it without
 
 ### The Battle of Hinnom and the Valley of Berachah (2026-11-03)
 
-EDITLEVEL is 10. New monsters: Michael, Moloch, child, fortress
+EDITLEVEL is 10. New monsters: Michael the Archangel, Moloch, child, fortress
 guard, doctor. New objects: High Priest of Moloch's cloak, Key to
 Hinnom's Gate, Key to the Sanctum, Tears of the Children. New trap:
 power lever. New event bits: hinnom_cloak, hinnom_alarm,
@@ -1482,7 +1482,12 @@ Valley. The revealed stairs are the Gate of the Sanctum and open
 with the Key to the Sanctum. Peter's key does not fit that gate.
 The verses on that use are unchanged.
 
-Hinnom: Michael gives the cloak once. Wearing it, the fortress
+Hinnom: Michael the Archangel gives the cloak once. He and the
+angels with him meditate in the portal room and do not leave
+their squares until the force field drops, or until that one is
+hurt, hostile, or under conflict. The displayed name is
+"Michael the Archangel". Saves store his monster number, which
+did not move, so an older save still has him. Wearing the cloak, the fortress
 inside the field stays peaceful until the cloak comes off, you
 attack, the field falls, or the gate key is used. The two gate
 guards open the field gate and lower the drawbridge if the cloak

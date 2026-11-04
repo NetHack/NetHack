@@ -11,6 +11,13 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-04
+Michael stays on his square in the portal room, meditating, until
+the force field drops or the peace around him breaks. The angels
+with him do the same; they were leaving that room before the
+assault. His name is shown as "Michael the Archangel". The
+monster number is unchanged, so an old save still has him.
+
+2026-11-04
 Each of the six Sokoban builders has a different ancient
 Near Eastern name: Akkadian, Sumerian, Hebrew, Canaanite,
 Egyptian, and Elamite. Canaanite, Egyptian, and Elamite do

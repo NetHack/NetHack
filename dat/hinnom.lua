@@ -69,11 +69,12 @@ des.trap({ type = "power lever", x = 61, y = 14, seen = 1 })
 des.trap({ type = "power lever", x = 56, y = 15, seen = 1 })
 des.trap({ type = "power lever", x = 60, y = 15, seen = 1 })
 
-des.monster({ id = "Michael", x = 7, y = 4, peaceful = 1 })
-des.monster({ id = "Angel", x = 5, y = 3, peaceful = 1 })
-des.monster({ id = "Angel", x = 9, y = 3, peaceful = 1 })
-des.monster({ id = "Angel", x = 5, y = 5, peaceful = 1 })
-des.monster({ id = "Angel", x = 9, y = 5, peaceful = 1 })
+des.monster({ id = "Michael the Archangel", x = 7, y = 4, peaceful = 1,
+              waiting = 1 })
+des.monster({ id = "Angel", x = 5, y = 3, peaceful = 1, waiting = 1 })
+des.monster({ id = "Angel", x = 9, y = 3, peaceful = 1, waiting = 1 })
+des.monster({ id = "Angel", x = 5, y = 5, peaceful = 1, waiting = 1 })
+des.monster({ id = "Angel", x = 9, y = 5, peaceful = 1, waiting = 1 })
 
 des.monster({ id = "fortress guard", x = 40, y = 9, peaceful = 1, waiting = 1,
     inventory = function()

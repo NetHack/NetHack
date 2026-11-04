@@ -372,7 +372,8 @@ tactics(struct monst *mtmp)
     coordxy sx = 0, sy = 0, mx, my;
 
     mtmp->mstrategy =
-        (mtmp->mstrategy & (STRAT_WAITMASK | STRAT_APPEARMSG)) | strat;
+        (mtmp->mstrategy & (STRAT_WAITMASK | STRAT_APPEARMSG
+                            | STRAT_HINNOM_RELEASED)) | strat;
 
     switch (strat) {
     case STRAT_HEAL: /* hide and recover */

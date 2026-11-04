@@ -754,6 +754,10 @@ dochug(struct monst *mtmp)
         }
     }
 
+    /* Michael and the angels in the portal room. Re-applied after the
+       wait bit is cleared by seeing the hero or by #chat. */
+    hinnom_host_hold(mtmp);
+
     /* King Solomon stays on the platform at Gibeon, and stays peaceful. */
     if (has_mgivenname(mtmp) && !strcmp(MGIVENNAME(mtmp), "King Solomon")) {
         mtmp->mstrategy |= STRAT_WAITFORU;

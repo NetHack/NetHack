@@ -63,7 +63,7 @@ des.door("closed", 68, 13)
 des.door("broken", 37, 4)
 des.door("broken", 38, 16)
 
-des.monster({ id = "Michael", x = 72, y = 10, peaceful = 1 })
+des.monster({ id = "Michael the Archangel", x = 72, y = 10, peaceful = 1 })
 des.monster({ id = "Angel", x = 40, y = 9, peaceful = 1 })
 des.monster({ id = "Angel", x = 40, y = 11, peaceful = 1 })
 des.monster({ id = "Angel", x = 46, y = 10, peaceful = 1 })

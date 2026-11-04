@@ -35,6 +35,32 @@ hinnom_portal_room(coordxy x, coordxy y)
     return (boolean) (x >= HX(1) && x <= HX(13) && y >= 1 && y <= 6);
 }
 
+/* Michael and the angels with him meditate until the force field
+   drops, or until this one is no longer at peace. #chat clears the
+   wait bit; this puts it back on the next turn. A hurt, hostile, or
+   conflicted one is released for good, so healing does not plant
+   him again. The Valley of Berachah is after the battle. */
+void
+hinnom_host_hold(struct monst *mtmp)
+{
+    if (!mtmp || !Is_hinnom_level(&u.uz) || u.uevent.berachah)
+        return;
+    if (mtmp->data != &mons[PM_MICHAEL] && mtmp->data != &mons[PM_ANGEL])
+        return;
+    /* Hurt or hostile stays released after the hit points return.
+       Conflict lets him move only while it lasts. */
+    if (!mtmp->mpeaceful || mtmp->mhp < mtmp->mhpmax)
+        mtmp->mstrategy |= STRAT_HINNOM_RELEASED;
+    if (!hinnom_field_up() || Conflict
+        || (mtmp->mstrategy & STRAT_HINNOM_RELEASED)) {
+        mtmp->mstrategy &= ~STRAT_WAITFORU;
+        return;
+    }
+    mtmp->mstrategy |= STRAT_WAITFORU;
+    mtmp->mpeaceful = 1;
+    mtmp->msleeping = 0;
+}
+
 boolean
 hinnom_inside_field(coordxy x, coordxy y)
 {
@@ -297,7 +323,8 @@ move_angels_to_gate(void)
             mnexto(mtmp, RLOC_NOMSG);
         i++;
     }
-    pline("Michael and his angels charge the fortress!"); /* PLACEHOLDER */
+    pline("%s and his angels charge the fortress!",
+          pmname(&mons[PM_MICHAEL], MALE)); /* PLACEHOLDER */
 }
 
 static void
@@ -412,6 +439,12 @@ hinnom_setup(void)
                 EMIN(mtmp)->renegade = 0;
             }
             mtmp->mpeaceful = 1;
+        }
+        if (mtmp->data == &mons[PM_MICHAEL] || mtmp->data == &mons[PM_ANGEL]) {
+            mtmp->mpeaceful = 1;
+            mtmp->msleeping = 0;
+            mtmp->mflee = 0;
+            mtmp->mstrategy |= STRAT_WAITFORU;
         }
         if (fortress_monster(mtmp) || mtmp->data == &mons[PM_FORTRESS_GUARD]
             || mtmp->data == &mons[PM_CHILD]
@@ -877,7 +910,7 @@ michael_stands(struct monst *mtmp)
     if (!mtmp || mtmp->data != &mons[PM_MICHAEL])
         return FALSE;
     mtmp->mhp = mtmp->mhpmax;
-    pline("Michael stands firm."); /* PLACEHOLDER */
+    pline("%s stands firm.", pmname(&mons[PM_MICHAEL], MALE)); /* PLACEHOLDER */
     return TRUE;
 }
 
