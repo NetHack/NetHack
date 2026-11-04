@@ -1,5 +1,5 @@
 #!perl
-# $NHDT-Header: NetHack 5.0 mdgrep.pl 1970/01/01_00:00:00 NetHack-5.0:1.30 $
+# $NHDT-Header: NetHack 5.0 mdgrep.pl 2024/03/20_15:51:54 NetHack-5.0:1.30 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
 

@@ -1,4 +1,4 @@
-/* $NHDT-Header: NetHack 5.0 tosconf.h 1970/01/01_00:00:00 NetHack-5.0:1.18 $ */
+/* $NHDT-Header: NetHack 5.0 tosconf.h 2015/05/25_00:13:02 NetHack-5.0:1.18 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */

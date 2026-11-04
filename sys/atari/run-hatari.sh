@@ -1,5 +1,5 @@
 #!/bin/sh
-# $NHDT-Header: NetHack 5.0 run-hatari.sh 1970/01/01_00:00:00 NetHack-5.0:1.3 $
+# $NHDT-Header: NetHack 5.0 run-hatari.sh 2026/10/01_13:29:51 NetHack-5.0:1.3 $
 # Copyright (c) Ingo Paschke, 2026.
 # NetHack may be freely redistributed.  See license for details.
 #

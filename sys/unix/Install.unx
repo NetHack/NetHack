@@ -251,6 +251,6 @@ Notes:
     '-DTPARM_WORKAROUND' to CFLAGS.  (This should not be needed
     on any modern system.)
 
-# $NHDT-Header: NetHack 5.0 Install.unx 1970/01/01_00:00:00 NetHack-5.0:1.22 $
+# $NHDT-Header: NetHack 5.0 Install.unx 2019/12/28_21:35:15 NetHack-5.0:1.22 $
 # Copyright (c) 2012 by Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.

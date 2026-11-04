@@ -1,4 +1,4 @@
-/* $NHDT-Header: NetHack 5.0 botl.c 1970/01/01_00:00:00 NetHack-5.0:1.289 $ */
+/* $NHDT-Header: NetHack 5.0 botl.c 2026/06/20_16:30:42 NetHack-5.0:1.289 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */

@@ -1,4 +1,4 @@
-/* $NHDT-Header: NetHack 5.0 wizcmds.c 1970/01/01_00:00:00 NetHack-5.0:1.41 $ */
+/* $NHDT-Header: NetHack 5.0 wizcmds.c 2026/06/20_16:31:14 NetHack-5.0:1.41 $ */
 /*-Copyright (c) Robert Patrick Rankin, 2024. */
 /* NetHack may be freely redistributed.  See license for details. */
 

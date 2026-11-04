@@ -1,4 +1,4 @@
-/* $NHDT-Header: NetHack 5.0 vidtxt.c 1970/01/01_00:00:00 NetHack-5.0:1.22 $ */
+/* $NHDT-Header: NetHack 5.0 vidtxt.c 2020/08/03_23:44:38 NetHack-5.0:1.22 $ */
 /*   Copyright (c) NetHack PC Development Team 1993                 */
 /*   NetHack may be freely redistributed.  See license for details. */
 /*                                                                  */

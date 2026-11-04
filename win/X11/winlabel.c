@@ -1,4 +1,4 @@
-/* $NHDT-Header: NetHack 5.0 winlabel.c 1970/01/01_00:00:00 NetHack-5.0:1.14 $ */
+/* $NHDT-Header: NetHack 5.0 winlabel.c 2026/06/20_16:31:50 NetHack-5.0:1.14 $ */
 /* Copyright (c) Ray Chason, 2026                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 

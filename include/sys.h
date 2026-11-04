@@ -1,4 +1,4 @@
-/* $NHDT-Header: NetHack 5.0 sys.h 1970/01/01_00:00:00 NetHack-5.0:1.47 $ */
+/* $NHDT-Header: NetHack 5.0 sys.h 2023/08/26_20:53:27 NetHack-5.0:1.47 $ */
 /* Copyright (c) Kenneth Lorber, Kensington, Maryland, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
 

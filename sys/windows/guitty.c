@@ -1,4 +1,4 @@
-/* $NHDT-Header: NetHack 5.0 guitty.c 1970/01/01_00:00:00 NetHack-5.0:1.1 $ */
+/* $NHDT-Header: NetHack 5.0 guitty.c 2023/05/17_21:09:32 NetHack-5.0:1.1 $ */
 /* Copyright (c) Ray Chason, 2023 */
 /* NetHack may be freely redistributed.  See license for details. */
 

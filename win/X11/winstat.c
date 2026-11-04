@@ -1,4 +1,4 @@
-/* $NHDT-Header: NetHack 5.0 winstat.c 1970/01/01_00:00:00 NetHack-5.0:1.79 $ */
+/* $NHDT-Header: NetHack 5.0 winstat.c 2026/06/20_16:31:50 NetHack-5.0:1.79 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 

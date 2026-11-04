@@ -1,4 +1,4 @@
-/* $NHDT-Header: NetHack 5.0 steed.c 1970/01/01_00:00:00 NetHack-5.0:1.138 $ */
+/* $NHDT-Header: NetHack 5.0 steed.c 2026/06/20_16:31:08 NetHack-5.0:1.138 $ */
 /* Copyright (c) Kevin Hugo, 1998-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 

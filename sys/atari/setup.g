@@ -1,3 +1,8 @@
+#
+# $NHDT-Header: NetHack 5.0 sbrk.c 2026/09/30_13:29:51 NetHack-5.0:1.2 $
+# Copyright (c) Ingo Paschke, 2026
+# NetHack may be freely redistributed.  See license for details.
+#
 # gulam shell script -- should work with tcsh and many
 # other Atari shells, too
 
