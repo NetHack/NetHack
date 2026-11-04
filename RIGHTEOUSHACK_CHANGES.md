@@ -1482,6 +1482,13 @@ Valley. The revealed stairs are the Gate of the Sanctum and open
 with the Key to the Sanctum. Peter's key does not fit that gate.
 The verses on that use are unchanged.
 
+Hinnom's level file has `noflip`. Berachah's does too. The
+loader's flip is also refused while that dungeon level is being
+built or is current, so a rebuild, `nh.flip_level`, or
+`#wizfliplevel` cannot mirror it. The up stair stays at the
+bottom left and the fortress stays on the east. The arrival
+line "To the north" matches that layout.
+
 Hinnom does not grow random monsters inside the field while the
 fortress is still closed. A wanderer that is already inside, or
 that tries to walk in, is put back outside and does not attack

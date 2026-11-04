@@ -11,6 +11,12 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-04
+The Battle of Hinnom and the Valley of Berachah keep the
+authored orientation. Neither is mirrored left-right or
+top-bottom, including when Hinnom is rebuilt as Berachah.
+Michael's "to the north" stays to the north.
+
+2026-11-04
 On the Battle of Hinnom, a random monster such as an invisible
 stalker no longer appears inside the closed fortress and attacks.
 Hitting one does not turn the garrison hostile. The peace still

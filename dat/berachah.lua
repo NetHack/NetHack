@@ -1,7 +1,7 @@
 -- The Valley of Berachah. Same geometry as Hinnom, redeemed.
 des.level_init({ style = "solidfill", fg = " " })
 
-des.level_flags("mazelevel", "nomongen", "noteleport", "hardfloor")
+des.level_flags("mazelevel", "nomongen", "noteleport", "hardfloor", "noflip")
 
 des.map({ halign = "left", valign = "top", map = [[
 -------------------------------------------------------------------------------
