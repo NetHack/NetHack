@@ -11,6 +11,11 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-04
+The three shops in the Valley of Berachah never contain mimics.
+Other shops still have the usual chance that a square is a
+mimic instead of an item.
+
+2026-11-04
 The Battle of Hinnom and the Valley of Berachah keep the
 authored orientation. Neither is mirrored left-right or
 top-bottom, including when Hinnom is rebuilt as Berachah.

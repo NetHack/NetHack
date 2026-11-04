@@ -1482,6 +1482,13 @@ Valley. The revealed stairs are the Gate of the Sanctum and open
 with the Key to the Sanctum. Peter's key does not fit that gate.
 The verses on that use are unchanged.
 
+A shop square is a mimic, instead of an item, with probability
+equal to the dungeon depth (`mkshobj_at` in `shknam.c`). Berachah
+is deep, so that used to fill the Scribes of Ezra, the Library
+of the Prophets, and the Sheep Gate Market. That roll is skipped
+only when the level is Berachah. No other shop is changed, and
+mimics outside shops are unchanged.
+
 Hinnom's level file has `noflip`. Berachah's does too. The
 loader's flip is also refused while that dungeon level is being
 built or is current, so a rebuild, `nh.flip_level`, or
