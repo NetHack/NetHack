@@ -716,6 +716,14 @@ dochug(struct monst *mtmp)
     }
     if (mtmp->data == &mons[PM_DOCTOR] && mtmp->mhp * 2 < mtmp->mhpmax)
         mtmp->mflee = 1;
+    /* A random monster inside the closed fortress is not the garrison.
+       Move it out before it can strike, and before a blow against it
+       could be read as an attack on the fortress. */
+    if (hinnom_keep_intruder_out(mtmp)
+        && hinnom_inside_field(mtmp->mx, mtmp->my)) {
+        hinnom_relocate_intruder(mtmp);
+        return 0;
+    }
     if (moloch_disguise_holds() && fortress_monster(mtmp))
         mtmp->mpeaceful = 1;
 
@@ -2144,6 +2152,12 @@ m_move(struct monst *mtmp, int after)
         }
 
         if (!m_in_out_region(mtmp, nix, niy))
+            return MMOVE_DONE;
+
+        /* The closed fortress is not a wandering ground. */
+        if (hinnom_keep_intruder_out(mtmp)
+            && hinnom_inside_field(nix, niy)
+            && !hinnom_inside_field(mtmp->mx, mtmp->my))
             return MMOVE_DONE;
 
         /* The Philistine Champion fights anyone who comes in, and

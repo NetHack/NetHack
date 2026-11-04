@@ -1096,6 +1096,9 @@ makemon_rnd_goodpos(
                                               : goodpos(nx, ny, mon, gpflags);
         if (good && Is_hinnom_level(&u.uz) && hinnom_portal_room(nx, ny))
             good = FALSE;
+        /* The closed fortress is filled by the level, not by wandering. */
+        if (good && hinnom_fortress_closed() && hinnom_inside_field(nx, ny))
+            good = FALSE;
     } while ((++tryct < 50) && !good);
 
     if (!good) {
@@ -1118,7 +1121,9 @@ makemon_rnd_goodpos(
                         continue;
                     if (goodpos(nx, ny, mon, gpflags)
                         && !(Is_hinnom_level(&u.uz)
-                             && hinnom_portal_room(nx, ny)))
+                             && hinnom_portal_room(nx, ny))
+                        && !(hinnom_fortress_closed()
+                             && hinnom_inside_field(nx, ny)))
                         goto gotgood;
                 }
             if (bl == 0 && (!mon || mon->data->mmove)) {

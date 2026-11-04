@@ -1482,6 +1482,15 @@ Valley. The revealed stairs are the Gate of the Sanctum and open
 with the Key to the Sanctum. Peter's key does not fit that gate.
 The verses on that use are unchanged.
 
+Hinnom does not grow random monsters inside the field while the
+fortress is still closed. A wanderer that is already inside, or
+that tries to walk in, is put back outside and does not attack
+the disguised hero. Only the placed garrison counts as the
+fortress, so striking a stalker does not raise the alarm. The
+alarm is still the hero's own act: attacking that garrison,
+standing next to them without the cloak, taking the cloak off,
+forcing the gate, or dropping the field.
+
 Hinnom: Michael the Archangel gives the cloak once. He and the
 angels with him meditate in the portal room and do not leave
 their squares until the force field drops, or until that one is

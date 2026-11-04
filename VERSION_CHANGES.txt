@@ -11,6 +11,14 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-04
+On the Battle of Hinnom, a random monster such as an invisible
+stalker no longer appears inside the closed fortress and attacks.
+Hitting one does not turn the garrison hostile. The peace still
+breaks only when you attack the fortress, approach the gate
+without the cloak, take the cloak off, force the gate, or drop
+the field.
+
+2026-11-04
 Michael stays on his square in the portal room, meditating, until
 the force field drops or the peace around him breaks. The angels
 with him do the same; they were leaving that room before the

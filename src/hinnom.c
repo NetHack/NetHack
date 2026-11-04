@@ -114,6 +114,39 @@ serves_great_dragon(struct monst *mtmp)
     return FALSE;
 }
 
+/* The fortress is still the closed, peaceful place. The alarm is
+   the hero's own break: an attack on the garrison, the cloak coming
+   off, the gate forced, or the field falling. */
+boolean
+hinnom_fortress_closed(void)
+{
+    return (boolean) (Is_hinnom_level(&u.uz) && !u.uevent.berachah
+                      && !u.uevent.hinnom_alarm);
+}
+
+/* Placed inhabitants. A random arrival of the same kind is treated
+   as one of them so it does not fight the disguise. A stalker is not. */
+boolean
+hinnom_staff(struct monst *mtmp)
+{
+    struct permonst *ptr;
+
+    if (!mtmp)
+        return FALSE;
+    ptr = mtmp->data;
+    return (ptr == &mons[PM_FORTRESS_GUARD]
+            || ptr == &mons[PM_DOCTOR]
+            || ptr == &mons[PM_ALIGNED_CLERIC]
+            || ptr == &mons[PM_HIGH_CLERIC]
+            || ptr == &mons[PM_HORNED_DEVIL]
+            || ptr == &mons[PM_BARBED_DEVIL]
+            || ptr == &mons[PM_BONE_DEVIL]
+            || ptr == &mons[PM_ICE_DEVIL]
+            || ptr == &mons[PM_NALFESHNEE]
+            || ptr == &mons[PM_PIT_FIEND]
+            || ptr == &mons[PM_MOLOCH]);
+}
+
 boolean
 fortress_monster(struct monst *mtmp)
 {
@@ -121,10 +154,49 @@ fortress_monster(struct monst *mtmp)
         return FALSE;
     if (!hinnom_inside_field(mtmp->mx, mtmp->my))
         return FALSE;
+    if (!hinnom_staff(mtmp))
+        return FALSE;
+    return TRUE;
+}
+
+/* Wanderers are not the garrison. While the fortress is closed they
+   do not stand inside it and they do not fight the disguised hero. */
+boolean
+hinnom_keep_intruder_out(struct monst *mtmp)
+{
+    if (!mtmp || !hinnom_fortress_closed())
+        return FALSE;
+    if (mtmp->mtame || hinnom_staff(mtmp))
+        return FALSE;
     if (mtmp->data == &mons[PM_MICHAEL] || mtmp->data == &mons[PM_ANGEL]
         || mtmp->data == &mons[PM_CHILD])
         return FALSE;
     return TRUE;
+}
+
+/* Put a wanderer back outside the bars. No message: it was never
+   part of the peace. If no square is open, it waits and does not fight. */
+void
+hinnom_relocate_intruder(struct monst *mtmp)
+{
+    int tries;
+    coordxy x, y;
+
+    if (!mtmp || !hinnom_inside_field(mtmp->mx, mtmp->my))
+        return;
+    for (tries = 0; tries < 50; tries++) {
+        x = rn1(COLNO - 2, 1);
+        y = rn2(ROWNO);
+        if (!goodpos(x, y, mtmp, GP_CHECKSCARY))
+            continue;
+        if (hinnom_inside_field(x, y) || hinnom_portal_room(x, y))
+            continue;
+        rloc_to(mtmp, x, y);
+        return;
+    }
+    mtmp->mpeaceful = 1;
+    mtmp->msleeping = 0;
+    mtmp->mstrategy |= STRAT_WAITFORU;
 }
 
 boolean
