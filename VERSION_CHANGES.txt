@@ -11,6 +11,13 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-04
+Riding the fiery steed down stairs no longer throws you. The
+saddle is the Knight's quest artifact, and changing levels was
+taking that saddle off, which is what knocks the rider loose.
+A worn saddle now stays on the steed. The monster's name is
+"fiery".
+
+2026-11-04
 A Knight no longer hears "You caitiff!" or loses alignment for
 striking a hostile enemy who is fleeing, asleep, or unable to
 move. A peaceful creature is unchanged.

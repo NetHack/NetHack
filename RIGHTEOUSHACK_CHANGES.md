@@ -70,7 +70,7 @@ does **not** match the code. The code wins.
 
 | ID | Item | Where |
 |----|------|-------|
-| ID-030 | `fiery steed of the Heavenly Host` (`FIREY_STEED_OF_HEAVEN`), unicorn class, flying, peaceful | `include/monsters.h` |
+| ID-030 | `fiery steed of the Heavenly Host` (`FIERY_STEED_OF_HEAVEN`), unicorn class, flying, peaceful | `include/monsters.h` |
 | ID-031 | Unique human `Zenodotus` (`ZENODOTUS`), Historian quest leader | `include/monsters.h` |
 
 No other monster names were changed. Vanilla monsters for removed roles
@@ -1422,10 +1422,16 @@ same, against the south wall of the lever room (map column 58,
 row 15). The engraving glyph shows once that square is seen, and
 the text does not fade. Random floor objects inside the field
 are removed after level fill. The lab supplies and the keys stay.
-The steed's name is "fiery steed of the Heavenly Host". Going
-down stairs on that steed flies down instead of throwing the
-rider. A power lever is a floor trap: walking can throw it, and
-flying or riding a flyer passes over it without
+The steed's name is "fiery steed of the Heavenly Host"
+(`FIERY_STEED_OF_HEAVEN`; the old spelling was only in the
+display name and comments, so existing saves keep the same
+monster number). Going down stairs on that steed flies down.
+The saddle is the Knight's quest artifact. Changing levels used
+to drop every quest artifact a monster carried, and dropping the
+worn saddle threw the rider before the stair message. A worn
+saddle stays on the steed; the Amulet and the invocation tools
+are still dropped. A power lever is a floor trap: walking can
+throw it, and flying or riding a flyer passes over it without
 `immune_to_trap: bad ttype`.
 
 ### The Battle of Hinnom and the Valley of Berachah (2026-11-03)

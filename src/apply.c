@@ -4834,7 +4834,7 @@ apply_blanket_of_the_heavenly_host(struct obj *saddle )
     }
 
     /* Prevent transformation if already a Winged White Horse */
-    if (mtmp->data == &mons[PM_FIREY_STEED_OF_HEAVEN]) {
+    if (mtmp->data == &mons[PM_FIERY_STEED_OF_HEAVEN]) {
         You("put the saddle on %s.", mon_nam(mtmp));
         if (saddle->owornmask)
             remove_worn_item(saddle, FALSE);
@@ -4844,7 +4844,7 @@ apply_blanket_of_the_heavenly_host(struct obj *saddle )
     }
 
     /* Transform horse into Winged White Horse of Heaven */
-    if (newcham(mtmp, &mons[PM_FIREY_STEED_OF_HEAVEN], NC_SHOW_MSG )) {
+    if (newcham(mtmp, &mons[PM_FIERY_STEED_OF_HEAVEN], NC_SHOW_MSG )) {
         mtmp->mhp += 100; /* HP buff */
         mtmp->mhpmax += 100;
         if (mtmp->mhp > mtmp->mhpmax) mtmp->mhp = mtmp->mhpmax;
