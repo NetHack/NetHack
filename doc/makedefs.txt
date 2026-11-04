@@ -141,10 +141,10 @@ AUTHOR
        The NetHack Development Team
 
 COPYRIGHT
-       This  file  is  Copyright  (C)  Kenneth  Lorber,   1970   for   version
+       This  file  is  Copyright  (C)  Kenneth  Lorber,   2026   for   version
        NetHack-5.0:1.45.   NetHack  may  be freely redistributed.  See license
        for details.
 
 
 
-NETHACK                         1 January 1970                     MAKEDEFS(6)
+NETHACK                           6 May 2026                       MAKEDEFS(6)
