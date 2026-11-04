@@ -1067,6 +1067,100 @@ berachah_elder_hold(struct monst *mtmp)
     mtmp->msleeping = 0;
 }
 
+/* Court lines for fortress creatures who do not give a lever clue.
+   Ten are placed (the devils, the nalfeshnee, both pit fiends, and
+   Moloch). The first eight each get one line. The last two repeat
+   the first two, and those repeats are not on neighboring squares. */
+static const char *const fortress_court[] = {
+    "Your Holiness honors us with a visit.",
+    "The fires burn hot today, Your Holiness.",
+    "Forgive me, Your Holiness. I did not see you there.",
+    "All is quiet at my post, Your Holiness.",
+    "The master grows restless. Will you speak with him?",
+    "I keep to my meditations, as you commanded.",
+    "May your shadow never shorten, Your Holiness.",
+    "The servants of the Dragon await your word.",
+};
+#define FORTRESS_COURT_N SIZE(fortress_court)
+
+static const char *const doctor_aside[] = {
+    "I have been measuring how long a man can go without sleep. The answer disappoints me.",
+    "The master wants stronger servants. I am... improving the recipe.",
+    "Do not mind the screaming from the lower cells. It is purely scientific.",
+    "I bled a prisoner with leeches for nine days. Remarkable endurance.",
+    "Fear makes the heart beat faster. I am learning to make it beat forever.",
+    "My latest patient grew a second shadow. I have not yet decided if that is a success.",
+};
+
+static const char *const captive_child[] = {
+    "The doctor says I am his best patient. I don't want to be his patient.",
+    "He makes us drink something bitter. Then everything spins.",
+    "He writes in his book every time I cry.",
+    "He took my friend to the lower cells. She hasn't come back.",
+    "He says if we are good, the master will not need us. I try so hard to be good.",
+    "Please don't tell him I talked to you.",
+};
+
+static boolean
+fortress_court_member(struct monst *mtmp)
+{
+    struct permonst *ptr;
+
+    if (!hinnom_staff(mtmp))
+        return FALSE;
+    ptr = mtmp->data;
+    if (ptr == &mons[PM_DOCTOR] || ptr == &mons[PM_FORTRESS_GUARD]
+        || ptr == &mons[PM_ALIGNED_CLERIC] || ptr == &mons[PM_HIGH_CLERIC])
+        return FALSE;
+    return TRUE;
+}
+
+static const char *
+fortress_court_line(struct monst *speaker)
+{
+    struct monst *court[32], *mtmp, *key;
+    int n, i, k, line, guard;
+    int assigned[32];
+
+    n = 0;
+    for (mtmp = fmon; mtmp && n < SIZE(court); mtmp = mtmp->nmon) {
+        if (DEADMONSTER(mtmp) || !fortress_court_member(mtmp))
+            continue;
+        court[n++] = mtmp;
+    }
+    for (i = 1; i < n; i++) {
+        key = court[i];
+        k = i;
+        while (k > 0 && court[k - 1]->m_id > key->m_id) {
+            court[k] = court[k - 1];
+            k--;
+        }
+        court[k] = key;
+    }
+    for (i = 0; i < n; i++) {
+        if (n <= FORTRESS_COURT_N) {
+            assigned[i] = i;
+            continue;
+        }
+        line = i % FORTRESS_COURT_N;
+        for (guard = 0; guard < FORTRESS_COURT_N; guard++) {
+            boolean clash = FALSE;
+
+            for (k = 0; k < i; k++)
+                if (assigned[k] == line && angels_beside(court[k], court[i]))
+                    clash = TRUE;
+            if (!clash)
+                break;
+            line = (line + 1) % FORTRESS_COURT_N;
+        }
+        assigned[i] = line;
+    }
+    for (i = 0; i < n; i++)
+        if (court[i] == speaker)
+            return fortress_court[assigned[i]];
+    return fortress_court[0];
+}
+
 boolean
 hinnom_chat(struct monst *mtmp)
 {
@@ -1074,9 +1168,6 @@ hinnom_chat(struct monst *mtmp)
 
     if (!mtmp)
         return FALSE;
-
-    if (mtmp->data == &mons[PM_MOLOCH] && moloch_disguise_holds())
-        return TRUE;
 
     if (mtmp->data == &mons[PM_MICHAEL]) {
         SetVoice(mtmp, 0, 80, 0);
@@ -1119,7 +1210,7 @@ hinnom_chat(struct monst *mtmp)
             return TRUE;
         }
         if (Is_hinnom_level(&u.uz)) {
-            verbalize("Please don't let him take us."); /* PLACEHOLDER */
+            verbalize("%s", captive_child[rn2(SIZE(captive_child))]);
             return TRUE;
         }
     }
@@ -1157,9 +1248,13 @@ hinnom_chat(struct monst *mtmp)
             || mtmp->data == &mons[PM_HIGH_CLERIC])) {
         mtmp->mpeaceful = 1;
         if (mtmp->data == &mons[PM_DOCTOR]) {
+            /* The clue is every chat, then one of his own lines.
+               The lever order cannot be missed by drawing only flavor. */
             Sprintf(buf, "The engineers always start with the %s lever.",
                     metal_of_rank(1));
             say_clue(mtmp, buf);
+            SetVoice(mtmp, 0, 80, 0);
+            verbalize("%s", doctor_aside[rn2(SIZE(doctor_aside))]);
             return TRUE;
         }
         if (mtmp->data == &mons[PM_FORTRESS_GUARD]) {
@@ -1176,7 +1271,7 @@ hinnom_chat(struct monst *mtmp)
             return TRUE;
         }
         SetVoice(mtmp, 0, 80, 0);
-        verbalize("The fires must never go out."); /* PLACEHOLDER */
+        verbalize("%s", fortress_court_line(mtmp));
         return TRUE;
     }
     return FALSE;

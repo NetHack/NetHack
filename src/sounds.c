@@ -688,6 +688,11 @@ domonnoise(struct monst *mtmp)
     /* presumably nearness and sleep checks have already been made */
     if (Deaf)
         return ECMD_OK;
+    /* Fortress speech runs before the silent check. Horned, barbed,
+       bone, and ice devils do not otherwise speak, and the cloak
+       still gets a line from each of them. */
+    if (hinnom_chat(mtmp))
+        return ECMD_TIME;
     /* shk_chat can handle nonverbal monsters */
     if (is_silent(ptr) && !mtmp->isshk)
         return ECMD_OK;
@@ -718,9 +723,6 @@ domonnoise(struct monst *mtmp)
      */
     if (!canspotmon(mtmp))
         map_invisible(mtmp->mx, mtmp->my);
-
-    if (hinnom_chat(mtmp))
-        return ECMD_TIME;
 
     if (has_mgivenname(mtmp)
         && !strcmp(MGIVENNAME(mtmp), "Angel of the Ladder")) {

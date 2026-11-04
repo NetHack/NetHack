@@ -1545,6 +1545,24 @@ has his own thank-you. Quaffing the Tears grants a level. They
 do not break, dilute, dip, or curse. The two fountains, and the
 Wilderness garden fountains, are living water.
 
+On Hinnom, with the High Priest of Moloch's cloak worn and
+the peace unbroken, #chat reaches every fortress creature.
+The outside guards still say "Pass, Your Holiness." The
+inside guard and the clerics still give their lever clues
+and nothing else. The doctor gives his lever clue on every
+chat, and then one of six lines of his own, so the clue is
+never the one that failed to come up. The other ten (both
+horned devils, both barbed devils, the bone devil, the ice
+devil, the nalfeshnee, both pit fiends, and Moloch) share
+eight court lines. The first eight each have their own. The
+ninth and tenth repeat the first two, and those two repeats
+are not on squares next to the creatures who already have
+them. Horned, barbed, bone, and ice devils are silent in
+the rest of the game; this chat is allowed before that
+check. The six captive children, before the Valley, each
+pick one of six lines about the doctor. After the Tears,
+the Valley children still use their own thank-yous.
+
 A male prisoner named "town elder" stands one square inside the
 open gate (map 43,10). He is not a shopkeeper and not a priest.
 A guide was not used: killing a guide also applies the
