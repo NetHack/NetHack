@@ -1465,7 +1465,7 @@ plnabort(int errcode)
               plfunc);
         break;
     case -4:
-        panic("badly-formed plname read",
+        panic("%s badly-formed plname read",
               plfunc);
         break;
     }
