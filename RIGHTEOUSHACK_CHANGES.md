@@ -1218,7 +1218,7 @@ They stay lowercase, with no "spells" suffix.
 Sokoban still climbs from the entrance (soko4) to the prize
 (soko1). That prize room is the end. It no longer fills with a
 zoo, and the level does not generate random monsters. The two
-mimics on the map are still placed. Eight peaceful confused
+mimics on the map are still placed. Six peaceful confused
 humans wait there. A branch stair in that room climbs to
 Jacob's Ladder, one lit garden, with no generation. Trees
 ring the room. Six fountains are living water: the same
@@ -1226,8 +1226,9 @@ restore as the Wilderness garden (full HP and power, ailments
 cleared). A seen magic portal returns to the Sokoban entry
 level, on the stair where that branch is first entered. The
 portal's destination is stored on the trap, so a save keeps it.
-The eight builders in the prize room stand in its corners.
-None stands on the branch stair. The count is still eight.
+Six builders stand toward the corners of the prize room.
+None stands on the branch stair. Two of the original eight
+were removed.
 
 ### Jacob's garden (2026-11-04)
 

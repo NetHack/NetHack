@@ -14,8 +14,8 @@ does now until that change is made.
 Jacob's Ladder is a garden. Its fountains are living water,
 the same full cure as the Wilderness garden. A magic portal
 there returns to the Sokoban level where you first arrive,
-on the stair you came in by. The eight builders in the
-Sokoban prize room stand in the corners, off that room's stair.
+on the stair you came in by. Six builders stand in the
+corners of the Sokoban prize room, off that room's stair.
 
 2026-11-04
 Riding the fiery steed down stairs no longer throws you. The
