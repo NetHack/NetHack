@@ -98,12 +98,14 @@ des.door("closed", 17, 13);
 des.door("closed", 17, 15);
 
 des.region({ region={18,10, 22,16}, lit = 1, type = "zoo", filled = 0, irregular = 1 });
--- The ladder up is the branch to Jacob's dream. Builders stand around it.
+-- The ladder up is the branch to Jacob's dream. Builders stand in
+-- the corners of this room, not on that stair.
 des.levregion({ type = "branch", region = {20,12,20,12} })
 local builders = {
-   {19,12,"Akkadian builder"}, {21,12,"Sumerian builder"}, {19,14,"Hebrew builder"},
-   {21,14,"builder"}, {20,14,"builder"}, {19,13,"builder"},
-   {21,13,"builder"}, {20,15,"builder"},
+   {18,10,"Akkadian builder"}, {22,10,"Sumerian builder"},
+   {18,16,"Hebrew builder"}, {22,16,"builder"},
+   {19,10,"builder"}, {21,10,"builder"},
+   {19,16,"builder"}, {21,16,"builder"},
 }
 for _, b in ipairs(builders) do
    des.monster({ id = "human", x = b[1], y = b[2], peaceful = 1,

@@ -1220,7 +1220,22 @@ Sokoban still climbs from the entrance (soko4) to the prize
 zoo, and the level does not generate random monsters. The two
 mimics on the map are still placed. Eight peaceful confused
 humans wait there. A branch stair in that room climbs to
-Jacob's Ladder, one lit room, with no generation.
+Jacob's Ladder, one lit garden, with no generation. Trees
+ring the room. Six fountains are living water: the same
+restore as the Wilderness garden (full HP and power, ailments
+cleared). A seen magic portal returns to the Sokoban entry
+level, on the stair where that branch is first entered. The
+portal's destination is stored on the trap, so a save keeps it.
+The eight builders in the prize room stand in its corners.
+None stands on the branch stair. The count is still eight.
+
+### Jacob's garden (2026-11-04)
+
+The room above Sokoban is a garden: trees, and six fountains of
+living water. Drinking one does what the Wilderness garden
+fountains do. A seen magic portal on that level goes to the
+Sokoban entry level and puts the hero on the stair where that
+branch is entered. The destination is kept on the portal trap.
 
 Every builder says "We built to reach heaven, and forgot what
 we had already lost." Then one of these:

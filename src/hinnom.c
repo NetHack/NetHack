@@ -654,6 +654,8 @@ living_water_at(coordxy x, coordxy y)
         return TRUE;
     if (in_wilderness() && dunlev(&u.uz) == 5)
         return TRUE;
+    if (on_jacobs_ladder(&u.uz))
+        return TRUE;
     return FALSE;
 }
 

@@ -100,11 +100,13 @@ des.door("closed",17,10)
 des.door("closed",17,12)
 des.door("closed",17,14)
 des.region({ region={18,09, 22,15}, lit = 1, type = "zoo", filled = 0, irregular = 1 });
+-- Builders stand in the corners of this room, not on the branch stair.
 des.levregion({ type = "branch", region = {20,11,20,11} })
 local builders = {
-   {19,11,"Akkadian builder"}, {21,11,"Sumerian builder"}, {19,13,"Hebrew builder"},
-   {21,13,"builder"}, {20,13,"builder"}, {19,12,"builder"},
-   {21,12,"builder"}, {20,14,"builder"},
+   {18,09,"Akkadian builder"}, {22,09,"Sumerian builder"},
+   {18,15,"Hebrew builder"}, {22,15,"builder"},
+   {19,09,"builder"}, {21,09,"builder"},
+   {19,15,"builder"}, {21,15,"builder"},
 }
 for _, b in ipairs(builders) do
    des.monster({ id = "human", x = b[1], y = b[2], peaceful = 1,

@@ -1938,6 +1938,21 @@ goto_level(
                    after already getting expelled once. The portal back
                    doesn't exist anymore - see expulsion(). */
                 u_on_rndspot(0);
+            } else if (on_jacobs_ladder(&u.uz0)
+                       && u.uz.dnum == sokoban_dnum
+                       && dunlev(&u.uz)
+                              == svd.dungeons[sokoban_dnum].entry_lev) {
+                /* One-way portal. Land on the stair where Sokoban is
+                   first entered, not on a second portal. */
+                stairway *stway;
+
+                for (stway = gs.stairs; stway; stway = stway->next)
+                    if (stway->tolev.dnum != u.uz.dnum)
+                        break;
+                if (stway)
+                    u_on_newpos(stway->sx, stway->sy);
+                else
+                    u_on_rndspot(0);
             } else {
                 if (!iflags.debug_fuzzer)
                     impossible("goto_level: no corresponding portal!");

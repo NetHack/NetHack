@@ -1457,6 +1457,15 @@ Is_special(d_level *lev)
     return (s_level *) 0;
 }
 
+/* The one-room level above the Sokoban prize. */
+boolean
+on_jacobs_ladder(d_level *lev)
+{
+    s_level *sp = Is_special(lev);
+
+    return (boolean) (sp && !strcmp(sp->proto, "jacob"));
+}
+
 /*
  * Is this a multi-dungeon branch level?  If so, return a pointer to the
  * branch.  Otherwise, return null.

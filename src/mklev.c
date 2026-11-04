@@ -26,6 +26,7 @@ staticfn void themerooms_post_level_generate(void);
 staticfn boolean chk_okdoor(coordxy, coordxy);
 staticfn void mklev_sanity_check(void);
 staticfn void makelevel(void);
+staticfn void jacob_set_portal(void);
 staticfn boolean water_has_kelp(coordxy, coordxy, int, int);
 staticfn boolean bydoor(coordxy, coordxy);
 staticfn void mktrap_victim(struct trap *);
@@ -1247,6 +1248,25 @@ mklev_sanity_check(void)
 }
 
 
+/* The portal on Jacob's Ladder returns to the Sokoban entry level,
+   the level where the hero first arrives in Sokoban. */
+staticfn void
+jacob_set_portal(void)
+{
+    struct trap *t;
+    d_level dest;
+
+    if (sokoban_dnum < 0)
+        return;
+    dest.dnum = sokoban_dnum;
+    dest.dlevel = svd.dungeons[sokoban_dnum].entry_lev;
+    if (dest.dlevel < 1)
+        dest.dlevel = 1;
+    for (t = gf.ftrap; t; t = t->ntrap)
+        if (t->ttyp == MAGIC_PORTAL)
+            assign_level(&t->dst, &dest);
+}
+
 staticfn void
 makelevel(void)
 {
@@ -1275,6 +1295,8 @@ makelevel(void)
             makemaz(slev->proto);
             if (Is_hinnom_level(&u.uz))
                 hinnom_setup();
+            if (on_jacobs_ladder(&u.uz))
+                jacob_set_portal();
         }
     } else if (svd.dungeons[u.uz.dnum].proto[0]) {
         makemaz("");

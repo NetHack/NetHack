@@ -11,6 +11,13 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-04
+Jacob's Ladder is a garden. Its fountains are living water,
+the same full cure as the Wilderness garden. A magic portal
+there returns to the Sokoban level where you first arrive,
+on the stair you came in by. The eight builders in the
+Sokoban prize room stand in the corners, off that room's stair.
+
+2026-11-04
 Riding the fiery steed down stairs no longer throws you. The
 saddle is the Knight's quest artifact, and changing levels was
 taking that saddle off, which is what knocks the rider loose.
