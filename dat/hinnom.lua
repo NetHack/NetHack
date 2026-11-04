@@ -1,7 +1,7 @@
 -- The Battle of Hinnom. Directly below Baalzebub.
 des.level_init({ style = "solidfill", fg = " " })
 
-des.level_flags("mazelevel", "noteleport", "hardfloor", "nommap")
+des.level_flags("mazelevel", "noteleport", "hardfloor", "nommap", "noflip")
 
 des.map({ halign = "left", valign = "top", map = [[
 -------------------------------------------------------------------------------

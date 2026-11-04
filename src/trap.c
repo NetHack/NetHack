@@ -1075,6 +1075,7 @@ floor_trigger(int ttyp)
     case SPIKED_PIT:
     case HOLE:
     case TRAPDOOR:
+    case POWER_LEVER: /* floor switch; flyers and riders pass over it */
         return TRUE;
     default:
         return FALSE;
@@ -2927,6 +2928,18 @@ immune_to_trap(struct monst *mon, unsigned ttype)
         return TRAP_NOT_IMMUNE;
     case VIBRATING_SQUARE:
         /* no adverse effects */
+        return TRAP_CLEARLY_IMMUNE;
+    case POWER_LEVER:
+        /* A floor switch. Flying, levitation, and a flying steed pass
+           over it. On foot it can be thrown, so it is not harmless. */
+        if (is_floater(pm) || is_flyer(pm))
+            return TRAP_CLEARLY_IMMUNE;
+        if (is_you && (Levitation || Flying))
+            return TRAP_CLEARLY_IMMUNE;
+        return TRAP_NOT_IMMUNE;
+    case TRAPPED_DOOR:
+    case TRAPPED_CHEST:
+        /* not map traps; nothing here is standing on them */
         return TRAP_CLEARLY_IMMUNE;
     default:
         impossible("immune_to_trap: bad ttype %u", ttype);

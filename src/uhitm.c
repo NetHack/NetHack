@@ -333,7 +333,10 @@ check_caitiff(struct monst *mtmp)
     if (u.ualign.record <= -10)
         return;
 
+    /* Hostile enemies are fair game, even stunned, helpless, or fleeing.
+       Peaceful creatures are unchanged. */
     if (Role_if(PM_KNIGHT) && u.ualign.type == A_LAWFUL
+        && mtmp->mpeaceful
         && !is_undead(mtmp->data)
         && (helpless(mtmp)
             || (mtmp->mflee && !mtmp->mavenge))) {

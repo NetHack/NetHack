@@ -551,6 +551,22 @@ priest_talk(struct monst *priest)
     boolean coaligned = p_coaligned(priest);
     boolean strayed = (u.ualign.record < 0);
     unsigned *cheapskate = NULL;
+
+    /*
+     * Battle of Hinnom only, and only while the High Priest of Moloch's
+     * cloak is worn and the fortress is not alarmed. Anywhere else this
+     * function is unchanged, including a temple priest on any other level
+     * and a priest on Hinnom when the cloak is off.
+     */
+    if (moloch_disguise_holds()) {
+        priest->mpeaceful = 1;
+        if (!hinnom_chat(priest)) {
+            SetVoice(priest, 0, 80, 0);
+            verbalize("The fires must never go out."); /* PLACEHOLDER */
+        }
+        return;
+    }
+
     if (EPRI(priest)) cheapskate = &EPRI(priest)->cheapskate_count;
 
     /*

@@ -390,6 +390,8 @@ Cloak_on(void)
     case ALCHEMY_SMOCK:
         EAcid_resistance |= WORN_CLOAK;
         break;
+    case HIGH_PRIEST_CLOAK:
+        break;
     default:
         impossible(unknown_type, c_cloak, uarmc->otyp);
     }
@@ -446,6 +448,8 @@ Cloak_off(void)
     /* Alchemy smock gives poison _and_ acid resistance */
     case ALCHEMY_SMOCK:
         EAcid_resistance &= ~WORN_CLOAK;
+        break;
+    case HIGH_PRIEST_CLOAK:
         break;
     default:
         impossible(unknown_type, c_cloak, otyp);

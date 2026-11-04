@@ -1977,7 +1977,10 @@ goto_level(
                 u_on_upstairs();
             if (!u.dz) {
                 ; /* stayed on same level? (no transit effects) */
-            } else if (Flying) {
+            } else if (Flying
+                       || (u.usteed && is_flyer(u.usteed->data))) {
+                /* A flying steed carries the hero down. Do not take the
+                   fall-and-dismount path used for a grounded mount. */
                 if (flags.verbose)
                     You("fly down %s.",
                         ga.at_ladder ? "along the ladder" : "the stairs");

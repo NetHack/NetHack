@@ -10,8 +10,15 @@ static const char *const lever_metal[5] = {
     "iron", "copper", "brass", "silver", "gold"
 };
 
+/* des.map({ halign = "left" }) puts map column 0 at x = 1.
+   Lua coordinates are shifted by that. These literals are the
+   map columns, so add the same shift before using them on levl[]. */
+#define HINNOM_XO 1
+#define HX(c) ((coordxy) ((c) + HINNOM_XO))
+
 static const coord lever_at[5] = {
-    { 55, 14 }, { 57, 14 }, { 61, 14 }, { 56, 15 }, { 60, 15 }
+    { HX(55), 14 }, { HX(57), 14 }, { HX(61), 14 },
+    { HX(56), 15 }, { HX(60), 15 }
 };
 
 boolean
@@ -25,27 +32,27 @@ altar_is_good(coordxy x, coordxy y)
 boolean
 hinnom_portal_room(coordxy x, coordxy y)
 {
-    return (boolean) (x >= 1 && x <= 13 && y >= 1 && y <= 6);
+    return (boolean) (x >= HX(1) && x <= HX(13) && y >= 1 && y <= 6);
 }
 
 boolean
 hinnom_inside_field(coordxy x, coordxy y)
 {
-    return (boolean) (x >= 42 && x <= 76 && y >= 2 && y <= 18);
+    return (boolean) (x >= HX(42) && x <= HX(76) && y >= 2 && y <= 18);
 }
 
 boolean
 hinnom_gate_square(coordxy x, coordxy y)
 {
     return (boolean) (Is_hinnom_level(&u.uz) && !u.uevent.berachah
-                      && x == 41 && y == 10);
+                      && x == HX(41) && y == 10);
 }
 
 boolean
 hinnom_backroom_door(coordxy x, coordxy y)
 {
     return (boolean) (Is_hinnom_level(&u.uz) && !u.uevent.berachah
-                      && x == 68 && y == 13);
+                      && x == HX(68) && y == 13);
 }
 
 boolean
@@ -59,6 +66,25 @@ hinnom_field_up(void)
         for (y = 0; y < ROWNO; y++)
             if (levl[x][y].typ == IRONBARS)
                 return TRUE;
+    return FALSE;
+}
+
+/* A human who serves the Great Dragon: a temple priest, a roving
+   aligned priest or high priest of that god, or the fortress staff.
+   Children are not servants. */
+boolean
+serves_great_dragon(struct monst *mtmp)
+{
+    if (!mtmp || !is_human(mtmp->data))
+        return FALSE;
+    if (mtmp->data == &mons[PM_CHILD])
+        return FALSE;
+    if ((mtmp->ispriest || mtmp->isminion)
+        && mon_aligntyp(mtmp) == A_NONE)
+        return TRUE;
+    if (mtmp->data == &mons[PM_FORTRESS_GUARD]
+        || mtmp->data == &mons[PM_DOCTOR])
+        return TRUE;
     return FALSE;
 }
 
@@ -118,12 +144,57 @@ anger_gate_guards(void)
     }
 }
 
+/* Burn engraving on a floor square that shares a side with a wall.
+   It does not fade, and the map shows the engraving once seen. */
+static void
+carve_wall_clue(coordxy x, coordxy y, const char *text)
+{
+    struct engr *ep;
+
+    if (!isok(x, y))
+        return;
+    make_engr_at(x, y, text, (char *) 0, 0L, BURN);
+    ep = engr_at(x, y);
+    if (ep)
+        ep->nowipeout = 1;
+}
+
+/* Floor objects inside the field, other than the lab supplies and
+   the quest items, are generation clutter. Monster inventories stay. */
+void
+hinnom_strip_floor_clutter(void)
+{
+    coordxy x, y;
+    struct obj *obj, *nobj;
+
+    if (!Is_hinnom_level(&u.uz) || u.uevent.berachah)
+        return;
+    for (x = 1; x < COLNO; x++)
+        for (y = 0; y < ROWNO; y++) {
+            if (!hinnom_inside_field(x, y))
+                continue;
+            for (obj = svl.level.objects[x][y]; obj; obj = nobj) {
+                nobj = obj->nexthere;
+                if (obj->otyp == POT_BOOZE || obj->otyp == POT_FRUIT_JUICE
+                    || obj->otyp == POT_OIL || obj->otyp == SACK
+                    || obj->otyp == FLINT_AND_TINDER
+                    || obj->otyp == KEY_TO_HINNOM_GATE
+                    || obj->otyp == KEY_TO_SANCTUM
+                    || obj->otyp == HIGH_PRIEST_CLOAK)
+                    continue;
+                obj_extract_self(obj);
+                obfree(obj, (struct obj *) 0);
+            }
+        }
+}
+
 static void
 lower_hinnom_bridge(void)
 {
-    coordxy x = 43, y = 10;
+    coordxy x = HX(43), y = 10;
 
-    /* Quiet: the placeholder line already says the bridge lowers. */
+    /* Span is the lava square; the portcullis is one step east.
+       Quiet: the placeholder line already says the bridge lowers. */
     if (isok(x, y) && levl[x][y].typ == DRAWBRIDGE_UP)
         open_drawbridge(x, y, TRUE);
 }
@@ -131,10 +202,10 @@ lower_hinnom_bridge(void)
 void
 hinnom_forced_entry(void)
 {
-    if (levl[41][10].typ == DOOR)
-        levl[41][10].doormask = D_ISOPEN;
-    newsym(41, 10);
-    unblock_point(41, 10);
+    if (levl[HX(41)][10].typ == DOOR)
+        levl[HX(41)][10].doormask = D_ISOPEN;
+    newsym(HX(41), 10);
+    unblock_point(HX(41), 10);
     lower_hinnom_bridge();
     hinnom_alarm_fortress();
     anger_gate_guards();
@@ -211,8 +282,8 @@ static void
 move_angels_to_gate(void)
 {
     struct monst *mtmp;
-    coordxy spots[5][2] = { { 46, 10 }, { 46, 9 }, { 46, 11 },
-                            { 47, 9 }, { 47, 11 } };
+    coordxy spots[5][2] = { { HX(46), 10 }, { HX(46), 9 }, { HX(46), 11 },
+                            { HX(47), 9 }, { HX(47), 11 } };
     int i = 0;
 
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
@@ -319,11 +390,15 @@ hinnom_setup(void)
             if (order[i] == t->launch.y)
                 t->launch.x = i + 1;
     }
+    /* Burned into the floor square against a wall, so the engraving
+       glyph shows as soon as that square is seen. Fourth is the
+       northwest corner of the lab, under the north wall. Fifth is
+       the lever room, against the south wall between the levers. */
     Sprintf(buf, "Fourth: %s.", metal_of_rank(4));
-    make_engr_at(50, 5, buf, (char *) 0, 0L, BURN);
+    carve_wall_clue(HX(55), 5, buf);
     Sprintf(buf, "%s last, or the power bites.", metal_of_rank(5));
     buf[0] = highc(buf[0]);
-    make_engr_at(50, 15, buf, (char *) 0, 0L, BURN);
+    carve_wall_clue(HX(58), 15, buf);
 
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         if (DEADMONSTER(mtmp))
@@ -341,14 +416,16 @@ hinnom_setup(void)
         if (fortress_monster(mtmp) || mtmp->data == &mons[PM_FORTRESS_GUARD]
             || mtmp->data == &mons[PM_CHILD]
             || mtmp->data == &mons[PM_ALIGNED_CLERIC]
-            || mtmp->data == &mons[PM_DOCTOR]) {
-            if (mtmp->data != &mons[PM_MOLOCH])
-                mtmp->mpeaceful = 1;
-            mtmp->msleeping = 0;
-        }
-        if (mtmp->data == &mons[PM_MOLOCH])
+            || mtmp->data == &mons[PM_DOCTOR]
+            || mtmp->data == &mons[PM_MOLOCH]) {
             mtmp->mpeaceful = 1;
+            mtmp->msleeping = 0;
+            mtmp->mflee = 0;
+            /* Meditating, not asleep, so #chat still works. */
+            mtmp->mstrategy |= STRAT_WAITFORU;
+        }
     }
+    hinnom_strip_floor_clutter();
 }
 
 void
@@ -383,9 +460,9 @@ hinnom_altar_razed(void)
         return;
     u.uevent.hinnom_razed = 1;
     svl.level.flags.rndmongen = 0;
-    if (isok(68, 13) && levl[68][13].typ == DOOR) {
-        levl[68][13].doormask = D_CLOSED;
-        newsym(68, 13);
+    if (isok(HX(68), 13) && levl[HX(68)][13].typ == DOOR) {
+        levl[HX(68)][13].doormask = D_CLOSED;
+        newsym(HX(68), 13);
     }
     pline("Somewhere nearby, a heavy bolt slides back."); /* PLACEHOLDER */
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
@@ -638,10 +715,10 @@ give_cloak(void)
 static void
 open_field_gate(void)
 {
-    if (levl[41][10].typ == DOOR) {
-        levl[41][10].doormask = D_ISOPEN;
-        newsym(41, 10);
-        unblock_point(41, 10);
+    if (levl[HX(41)][10].typ == DOOR) {
+        levl[HX(41)][10].doormask = D_ISOPEN;
+        newsym(HX(41), 10);
+        unblock_point(HX(41), 10);
     }
     lower_hinnom_bridge();
     pline("The gate swings open and the drawbridge lowers."); /* PLACEHOLDER */
@@ -729,8 +806,8 @@ hinnom_chat(struct monst *mtmp)
         && !hinnom_inside_field(mtmp->mx, mtmp->my)) {
         SetVoice(mtmp, 0, 80, 0);
         if (!hinnom_field_up()
-            || (levl[41][10].typ == DOOR
-                && (levl[41][10].doormask & D_ISOPEN))) {
+            || (levl[HX(41)][10].typ == DOOR
+                && (levl[HX(41)][10].doormask & D_ISOPEN))) {
             verbalize("None enter without the High Priest's mark."); /* PLACEHOLDER */
             return TRUE;
         }
@@ -744,8 +821,16 @@ hinnom_chat(struct monst *mtmp)
         return TRUE;
     }
 
-    if (moloch_disguise_holds() && mtmp->mpeaceful
-        && fortress_monster(mtmp)) {
+    /* Cloak on, fortress quiet. Priests of the Great Dragon are
+       included even if they have stepped outside the field box:
+       priest_talk() would otherwise turn them hostile. */
+    if (moloch_disguise_holds()
+        && (fortress_monster(mtmp)
+            || mtmp->data == &mons[PM_DOCTOR]
+            || mtmp->data == &mons[PM_FORTRESS_GUARD]
+            || mtmp->data == &mons[PM_ALIGNED_CLERIC]
+            || mtmp->data == &mons[PM_HIGH_CLERIC])) {
+        mtmp->mpeaceful = 1;
         if (mtmp->data == &mons[PM_DOCTOR]) {
             Sprintf(buf, "The engineers always start with the %s lever.",
                     metal_of_rank(1));

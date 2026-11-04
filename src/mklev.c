@@ -1426,6 +1426,9 @@ makelevel(void)
     }
 
     themerooms_post_level_generate();
+    /* After room fill, so a later filler cannot drop clutter back. */
+    if (Is_hinnom_level(&u.uz) && !u.uevent.berachah)
+        hinnom_strip_floor_clutter();
 
     if (gl.luacore && nhcb_counts[NHCB_LVL_ENTER]) {
         lua_getglobal(gl.luacore, "nh_callback_run");

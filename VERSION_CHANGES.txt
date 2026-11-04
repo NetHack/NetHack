@@ -10,6 +10,34 @@ RighteousHack will eventually replace lawful, neutral, and chaotic
 with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
+2026-11-04
+A Knight no longer hears "You caitiff!" or loses alignment for
+striking a hostile enemy who is fleeing, asleep, or unable to
+move. A peaceful creature is unchanged.
+
+2026-11-04
+On the Battle of Hinnom, #chat with a priest or priestess of the
+Great Dragon while the High Priest of Moloch's cloak is worn
+keeps them peaceful and gives their line. A temple priest
+anywhere else is unchanged. Killing any priest of the Great
+Dragon, or a fortress guard or the doctor, is not murder.
+
+2026-11-04
+Everyone inside the Hinnom fortress starts peaceful and
+meditating, and stays on their square until the peace breaks.
+With the cloak on, the doctor, an inside guard, and a priestess
+give the first three lever clues. The fourth is burned into the
+lab floor against the north wall, and the fifth against the
+south wall of the lever room. Random objects are not left on
+the fortress floor.
+
+2026-11-04
+The High Priest of Moloch's cloak can be worn and taken off.
+The field gate's drawbridge really lowers. The two gate guards
+outside the field start meditating. The steed of the Heavenly
+Host is spelled "fiery", and riding it down stairs does not
+throw you. The power levers are safe to walk, fly, or ride over.
+
 2026-11-03
 The Battle of Hinnom is the level under Baalzebub. Michael meets
 you there. The altar of Moloch can be razed with #raze. When

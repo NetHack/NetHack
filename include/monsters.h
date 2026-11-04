@@ -1047,7 +1047,7 @@
         M1_ANIMAL | M1_NOHANDS | M1_HERBIVORE,
         M2_WANDER | M2_STRONG | M2_DOMESTIC, M3_INFRAVISIBLE,
         9, CLR_BROWN, WARHORSE),
-    MON(NAM("firey steed of the Heavenly Host"), S_UNICORN,
+    MON(NAM("fiery steed of the Heavenly Host"), S_UNICORN,
       LVL(19, 24, -5, 90, 10), (G_NOHELL | G_NOGEN),
       A(ATTK(AT_KICK, AD_PHYS, 3, 4), ATTK(AT_BUTT, AD_PHYS, 3, 8),
         NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),

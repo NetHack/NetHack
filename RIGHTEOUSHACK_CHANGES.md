@@ -6,7 +6,7 @@ This file was written **before** merging tag `NetHack-5.0.0_Released`
 (`16ff591153`) so the upgrade can be checked against it.
 
 Spellings below are the owner's, including `elixer`, `exlier`,
-`doubled-edged`, `trusty sandles`, `firey`, `wiggy gain ability`,
+`doubled-edged`, `trusty sandles`, `wiggy gain ability`,
 and `PSALM 91`. They are intentional content (or at least content the
 owner shipped) and must not be "corrected" back to vanilla NetHack.
 
@@ -70,7 +70,7 @@ does **not** match the code. The code wins.
 
 | ID | Item | Where |
 |----|------|-------|
-| ID-030 | `firey steed of the Heavenly Host` (`FIREY_STEED_OF_HEAVEN`), unicorn class, flying, peaceful | `include/monsters.h` |
+| ID-030 | `fiery steed of the Heavenly Host` (`FIREY_STEED_OF_HEAVEN`), unicorn class, flying, peaceful | `include/monsters.h` |
 | ID-031 | Unique human `Zenodotus` (`ZENODOTUS`), Historian quest leader | `include/monsters.h` |
 
 No other monster names were changed. Vanilla monsters for removed roles
@@ -319,7 +319,7 @@ Helpers: `IS_STAFF_OF_WONDERS`, `IS_GOLDEN_CENSER`.
 | ID | Artifact | Base | Role gate in `artilist.h` | Behavior |
 |----|----------|------|---------------------------|----------|
 | ID-200 | Apostolic Writing Kit | writing tablet (`MAGIC_MARKER`) | `PM_ARCHEOLOGIST` | Unlimited writing (`src/write.c`); invoke gives paper |
-| ID-201 | Riding Blanket of the Heavenly Host | saddle | `PM_KNIGHT` | Apply transforms a horse into the firey steed; invoke tames nearby horses (`src/apply.c`, `src/artifact.c`) |
+| ID-201 | Riding Blanket of the Heavenly Host | saddle | `PM_KNIGHT` | Apply transforms a horse into the fiery steed; invoke tames nearby horses (`src/apply.c`, `src/artifact.c`) |
 | ID-202 | Handkerchief of the Apostle Paul | torn piece of cloth | `PM_KNIGHT` in `artilist.h`, but the Healer quest reward in `src/role.c` | Carry grants disease resistance; invoke heals and pushes monsters (`mhurtle_giant` in `src/dothrow.c`) |
 | ID-203 | Golden Censer of Incense | thurible | `PM_CLERIC` | Prayer timeout, light radius 5 with no burnout (`src/timeout.c`), invoke engraves and teleports |
 | ID-204 | Scarlet Cord of Rahab | rope | `PM_ROGUE` | Apply climbs; invoke toggles invisibility. Climb/fall messages in `src/hack.c` |
@@ -1383,6 +1383,50 @@ player's own deity names as opposing each other.
 | (new) | Resolved: the owner named the 5.0 stasis rod "stillness" (`WAN_STILLNESS`, "rod of stillness", Psalm 46:10). |
 | ID-084 | Healer's oil rows are tagged `POTION_CLASS` even though the objects are `ANOINTING_CLASS`. Creation uses `trotyp`, so the game start still works. |
 | ID-017 | Only human is playable. `src/u_init.c` still has tables for the removed roles. |
+
+### Knight conduct (2026-11-04)
+
+`check_caitiff()` in `src/uhitm.c` is the Knight penalty for striking
+someone who is asleep, paralyzed, or fleeing without vengeance. It
+prints "You caitiff!" and takes one alignment point. It does not
+change Favor. A hostile monster no longer triggers it, whether that
+monster is fleeing or helpless. A peaceful monster still does. The
+same function is used for a kick, a polearm, and a grappling hook.
+
+### Hinnom follow-ups (2026-11-04)
+
+The map is placed one column to the right of the numbers in
+`dat/hinnom.lua`, and the level does not flip. The gate, the
+drawbridge span, the levers, and the back room use that shift,
+so the drawbridge actually lowers when a cloaked hero is passed
+or the key is used.
+
+`#chat` with a priest or priestess of the Great Dragon, while the
+High Priest of Moloch's cloak is worn and the fortress is not
+alarmed, stays on the Hinnom lines and does not call the temple
+anger in `priest_talk()`. A priest anywhere else is unchanged.
+Killing a priest of the Great Dragon, a roving one as well as a
+temple one, or a fortress guard or the doctor, does not print
+"You murderer!" and does not take the murder Favor loss.
+
+The cloak has a case in `Cloak_on()` and `Cloak_off()`, so wearing
+it does not print "Unknown type of cloak". Every fortress
+inhabitant, and the two gate guards outside the field, starts
+peaceful and meditating. They stay on their square until they
+are attacked, the alarm sounds, or the hero steps next to them
+without the cloak. With the cloak on, the doctor gives the first
+lever, an inside guard the second, and a priest or priestess the
+third. The fourth clue is a burn engraving on the lab floor
+against the north wall (map column 55, row 5). The fifth is the
+same, against the south wall of the lever room (map column 58,
+row 15). The engraving glyph shows once that square is seen, and
+the text does not fade. Random floor objects inside the field
+are removed after level fill. The lab supplies and the keys stay.
+The steed's name is "fiery steed of the Heavenly Host". Going
+down stairs on that steed flies down instead of throwing the
+rider. A power lever is a floor trap: walking can throw it, and
+flying or riding a flyer passes over it without
+`immune_to_trap: bad ttype`.
 
 ### The Battle of Hinnom and the Valley of Berachah (2026-11-03)
 

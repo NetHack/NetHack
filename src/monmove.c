@@ -729,6 +729,31 @@ dochug(struct monst *mtmp)
         && (m_canseeu(mtmp) || mtmp->mhp < mtmp->mhpmax))
         mtmp->mstrategy &= ~STRAT_WAITFORU;
 
+    /* Fortress inhabitants, and the two guards outside the field,
+       meditate until the peace breaks: an attack (mpeaceful already
+       cleared), the alarm, or the hero stepping next to them with
+       the cloak off. With the cloak on they stay on their square. */
+    if (Is_hinnom_level(&u.uz) && !u.uevent.berachah
+        && (fortress_monster(mtmp)
+            || mtmp->data == &mons[PM_FORTRESS_GUARD]
+            || mtmp->data == &mons[PM_DOCTOR]
+            || mtmp->data == &mons[PM_ALIGNED_CLERIC]
+            || mtmp->data == &mons[PM_HIGH_CLERIC]
+            || mtmp->data == &mons[PM_MOLOCH])) {
+        if (u.uevent.hinnom_alarm || !mtmp->mpeaceful) {
+            mtmp->mstrategy &= ~STRAT_WAITFORU;
+        } else if (moloch_disguise_holds()
+                   || distmin(mtmp->mx, mtmp->my, u.ux, u.uy) > 1) {
+            mtmp->mstrategy |= STRAT_WAITFORU;
+            mtmp->mpeaceful = 1;
+            mtmp->msleeping = 0;
+        } else {
+            mtmp->mpeaceful = 0;
+            set_malign(mtmp);
+            mtmp->mstrategy &= ~STRAT_WAITMASK;
+        }
+    }
+
     /* King Solomon stays on the platform at Gibeon, and stays peaceful. */
     if (has_mgivenname(mtmp) && !strcmp(MGIVENNAME(mtmp), "King Solomon")) {
         mtmp->mstrategy |= STRAT_WAITFORU;
