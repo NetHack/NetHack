@@ -1548,10 +1548,11 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
 
     if (physical_damage) {
         /* same damage reduction for AC as in hitmu */
-        if (u.uac < 0)
+        if (tmp && u.uac < 0) {
             tmp -= rnd(-u.uac);
-        if (tmp < 0)
-            tmp = 1;
+            if (tmp < 1)
+                tmp = 1;
+        }
 
         tmp = Maybe_Half_Phys(tmp);
     }
