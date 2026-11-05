@@ -371,6 +371,13 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
         /* current symset handling and windowtype are
            not compatible, feature-wise. Use IBM defaults */
         load_symset("IBMGraphics_2", PRIMARYSET);
+    }
+    if (gs.symset[ROGUESET].handling == H_UNK
+        || (gs.symset[ROGUESET].handling
+            && !symset_is_compatible(gs.symset[ROGUESET].handling,
+                                     windowprocs.wincap2))) {
+        /* current symset handling and windowtype are
+           not compatible, feature-wise. Use IBM defaults */
         load_symset("RogueEpyx", ROGUESET);
     }
     /* Has the callback for the symset been invoked? Config file processing to
