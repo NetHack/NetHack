@@ -329,7 +329,9 @@ m_initweap(struct monst *mtmp)
     case S_ANGEL:
         if (humanoid(ptr)) {
             /* create minion stuff; bypass mongets */
-            int typ = rn2(3) ? LONG_SWORD : SILVER_MACE;
+            /* Michael the Archangel always bears Demonbane */
+            int typ = (ptr != &mons[PM_MICHAEL] && rn2(3)) ? LONG_SWORD
+                                                            : SILVER_MACE;
             const char *nam = (typ == LONG_SWORD) ? "Sunsword" : "Demonbane";
 
             otmp = mksobj(typ, FALSE, FALSE);

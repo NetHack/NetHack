@@ -11,6 +11,9 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-04
+Michael the Archangel is now far stronger: about level 49, AC -20, three heavy weapon blows, and he always carries Demonbane.
+
+2026-11-04
 Stepping on a Hinnom power lever now always asks to throw it, with no extra trap warning and no chance to slip past it.
 
 2026-11-04

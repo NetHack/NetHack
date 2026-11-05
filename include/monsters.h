@@ -1277,9 +1277,9 @@
        this string. M2_PNAME keeps the article off the front, so the
        name is not "the Michael the Archangel". */
     MON(NAM("Michael the Archangel"), S_ANGEL,
-        LVL(19, 16, -6, 80, 15), (G_NOGEN | G_UNIQ | G_NOCORPSE),
-        A(ATTK(AT_WEAP, AD_PHYS, 2, 4), ATTK(AT_WEAP, AD_PHYS, 2, 4),
-          ATTK(AT_CLAW, AD_PHYS, 1, 8), ATTK(AT_MAGC, AD_MAGM, 2, 6),
+        LVL(49, 16, -20, 80, 15), (G_NOGEN | G_UNIQ | G_NOCORPSE),
+        A(ATTK(AT_WEAP, AD_PHYS, 4, 10), ATTK(AT_WEAP, AD_PHYS, 4, 10),
+          ATTK(AT_WEAP, AD_PHYS, 4, 10), ATTK(AT_MAGC, AD_MAGM, 2, 6),
           NO_ATTK, NO_ATTK),
         SIZ(WT_HUMAN, 400, MS_HUMANOID, MZ_LARGE),
         MR_FIRE | MR_COLD | MR_ELEC | MR_SLEEP | MR_POISON, 0,

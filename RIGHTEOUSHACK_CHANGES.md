@@ -1457,6 +1457,8 @@ When the power field falls, Michael the Archangel and two angels are placed in t
 
 Power levers no longer trigger the paranoid "Really step onto that power lever?" question and are no longer skipped by the 1-in-5 "You escape" roll; walking onto one always asks "Throw the ... lever?". Flyers and levitators still pass over. All other traps are unchanged.
 
+Michael the Archangel is now LVL(49, 16, -20, 80, 15) with three 4d10 weapon attacks plus his 2d6 spell, and m_initweap always gives him a blessed silver mace, named Demonbane, for extra damage against demons. His resistances are unchanged and Moloch is unchanged. (A base level of 50 or more would use the special-demon hit point rule and give him only 88 hit points, so 49 is used.)
+
 ### Knight conduct (2026-11-04)
 
 `check_caitiff()` in `src/uhitm.c` is the Knight penalty for striking
