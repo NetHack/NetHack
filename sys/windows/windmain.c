@@ -364,7 +364,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
         toggle_mouse_support();
 #endif
 
-    if (!gs.symset[PRIMARYSET].handling
+    if (gs.symset[PRIMARYSET].handling == H_UNK
         || (gs.symset[PRIMARYSET].handling
             && !symset_is_compatible(gs.symset[PRIMARYSET].handling,
                                      windowprocs.wincap2))) {
