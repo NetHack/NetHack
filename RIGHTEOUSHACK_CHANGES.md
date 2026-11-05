@@ -1419,6 +1419,15 @@ deeper level (stairs, a fall, level teleport, prophet mode too) with
 "You cannot go down until Moloch is defeated." (placeholder). The up
 stairs and every route inside the level are unchanged.
 
+Every #chat with Michael on Hinnom while the field stands now opens a
+blackout text window with his briefing (placeholder text), addressed
+"Hear me, <rank> of the Most High." The rank is the hero's current
+rank title for the hero's gender, from `rank_of()`. His usual line
+follows: the cloak on the first talk, the field line after that. The
+arrival screen with "good sir" / "good lady" is unchanged. The
+window code in `src/hinnom.c` is now one helper, `hinnom_screen()`,
+shared with the Berachah arrival text.
+
 ### Knight conduct (2026-11-04)
 
 `check_caitiff()` in `src/uhitm.c` is the Knight penalty for striking

@@ -6,6 +6,9 @@ static boolean swap_pending = FALSE;
 static int raze_turns;
 static coordxy raze_x, raze_y;
 
+static void put_wrapped(winid, const char *);
+static void hinnom_screen(const char *const *, int);
+
 static const char *const lever_metal[5] = {
     "iron", "copper", "brass", "silver", "gold"
 };
@@ -775,6 +778,49 @@ put_wrapped(winid win, const char *text)
     }
 }
 
+/* Blackout text window, a blank line between paragraphs. */
+static void
+hinnom_screen(const char *const *para, int n)
+{
+    winid win = create_nhwindow(NHW_TEXT);
+    int i;
+
+    for (i = 0; i < n; i++) {
+        if (i)
+            putstr(win, 0, "");
+        put_wrapped(win, para[i]);
+    }
+    display_nhwindow(win, TRUE);
+    destroy_nhwindow(win);
+}
+
+/* PLACEHOLDER: the whole briefing is not final-approved. Shown on
+   every #chat with Michael while the field stands. */
+static void
+michael_briefing(void)
+{
+    static const char *const para[] = {
+        "Beyond these walls stands the fortress of Moloch, the devourer of children. For long ages his priests have fed his fires with the little ones of this land, and the cries of their mothers have risen up to Heaven. The LORD has heard them. This day we come to make an end of it.",
+        "But Moloch is cunning. His fortress is sealed by a field of unholy power, and no angel of the Host can pass through it. We cannot break it from without. It must be broken from within.",
+        "That is why you are here.",
+        "You must go in disguise, wearing the cloak of Moloch's High Priest. In that garment, his servants will take you for their master. The guards at the gate will bow and let you pass. Inside, his people keep to their meditations, and you may walk among them and speak with them freely.",
+        "Somewhere within lie five levers of five different metals. Pulled in the right order, they will bring down the field. Pulled wrongly, they will not. Listen well, and piece it together.",
+        "When the field falls, we will descend on that place like fire from Heaven, and you will fight beside us.",
+        "Heed this warning: do NOT approach that fortress without the cloak. If you are seen as you truly are, the guards will raise the alarm, the whole fortress will rise against you, and you will stand alone against all of them, with the field still between you and us.",
+        "Go now. The children are waiting.",
+    };
+    const char *text[SIZE(para) + 1];
+    char first[BUFSZ];
+    int i;
+
+    Sprintf(first, "Hear me, %s of the Most High.",
+            rank_of(u.ulevel, Role_switch, flags.female));
+    text[0] = first;
+    for (i = 0; i < SIZE(para); i++)
+        text[i + 1] = para[i];
+    hinnom_screen(text, SIZE(text));
+}
+
 /* Once. The swap sets berachah while the hero is still recorded on
    the level, but that call is the departure: the Valley map is
    created on the way back in. Showing the text here, on arrival,
@@ -782,7 +828,6 @@ put_wrapped(winid win, const char *text)
 void
 berachah_intro(void)
 {
-    winid win;
     static const char *const para[] = {
         "The smoke of Moloch's fires is gone. Where the fortress once loomed, gates stand open and lamps burn in every window.",
         "As you pass through the gate, a great cheer goes up. Families pour out of the old fortress halls, now homes and shops, and children run ahead to tell everyone that the hero has come back. Old men weep openly. Someone presses bread into your hands, and someone else lays a garland about your neck.",
@@ -791,19 +836,11 @@ berachah_intro(void)
         "\"Rest, eat, and trade among us, friend. Whatever we have is yours.\"",
         "The name echoes the scripture: \"for there they blessed the LORD: therefore the name of the same place was called, The valley of Berachah, unto this day.\" (2 Chronicles 20:26)",
     };
-    int i;
 
     if (!Is_berachah_level(&u.uz) || u.uevent.berachah_intro)
         return;
     u.uevent.berachah_intro = 1;
-    win = create_nhwindow(NHW_TEXT);
-    for (i = 0; i < SIZE(para); i++) {
-        if (i)
-            putstr(win, 0, "");
-        put_wrapped(win, para[i]);
-    }
-    display_nhwindow(win, TRUE);
-    destroy_nhwindow(win);
+    hinnom_screen(para, SIZE(para));
 }
 
 void
@@ -1220,6 +1257,8 @@ hinnom_chat(struct monst *mtmp)
         }
         if (!Is_hinnom_level(&u.uz))
             return FALSE;
+        if (hinnom_field_up())
+            michael_briefing();
         if (!u.uevent.hinnom_cloak) {
             verbalize("Wear this, and the fortress will take you for its high priest."); /* PLACEHOLDER */
             give_cloak();

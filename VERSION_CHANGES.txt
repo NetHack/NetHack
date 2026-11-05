@@ -11,6 +11,10 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-04
+Michael gives a full briefing, addressed to the hero by rank, every
+time he is spoken to before the field falls.
+
+2026-11-04
 Orcus Town no longer crashes the game when it is first built. Hinnom
 has no way down while Moloch lives.
 
