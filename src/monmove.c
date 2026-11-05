@@ -759,6 +759,8 @@ dochug(struct monst *mtmp)
             mtmp->mpeaceful = 0;
             set_malign(mtmp);
             mtmp->mstrategy &= ~STRAT_WAITMASK;
+            /* Seen without the cloak: the whole fortress wakes. */
+            hinnom_alarm_fortress();
         }
     }
 

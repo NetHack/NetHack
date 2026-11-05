@@ -227,6 +227,18 @@ hinnom_alarm_fortress(void)
         mtmp->msleeping = 0;
         mtmp->mstrategy &= ~STRAT_WAITMASK;
     }
+    /* Once, since the alarm bit is set above. When the field has
+       already fallen, the battle screen covers it and this is skipped. */
+    if (hinnom_field_up()) {
+        static const char *const para[] = {
+            "A cry goes up from somewhere in the halls: \"An impostor! That is not our master!\"",
+            "Heads turn. The meditating figures rise to their feet, one after another, and their eyes fill with hate. A bell begins to clang somewhere deep in the fortress, and the drums answer it.",
+            "Your disguise is broken. Every servant of Moloch in this place now knows you for what you are, an enemy of their master, and they will not rest until you are dead.",
+            "The field still stands. The Host cannot reach you. You are on your own.",
+        };
+
+        hinnom_screen(para, SIZE(para));
+    }
 }
 
 static void
@@ -1353,6 +1365,7 @@ hinnom_chat(struct monst *mtmp)
         } else {
             verbalize("You are not one of us!"); /* PLACEHOLDER */
             anger_gate_guards();
+            hinnom_alarm_fortress();
         }
         return TRUE;
     }

@@ -1436,6 +1436,16 @@ southwest, 4 southeast. They still hold their squares until the
 assault (`hinnom_host_hold()`), and the Berachah victory lines are
 separate and unchanged.
 
+The first time the fortress's peace breaks while the field still
+stands, a blackout screen says the disguise is broken. It is shown
+from `hinnom_alarm_fortress()`, which sets the alarm bit, so it can
+only show once. When the field falls the alarm is raised after the
+bars are gone, so that screen is skipped and the battle screen is the
+one shown. Two ways of being caught without the cloak now raise the
+same alarm: standing next to a fortress inhabitant or gate guard
+(`src/monmove.c`), and asking a gate guard to pass. Before, those
+turned only that one monster hostile.
+
 ### Knight conduct (2026-11-04)
 
 `check_caitiff()` in `src/uhitm.c` is the Knight penalty for striking
