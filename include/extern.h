@@ -4109,6 +4109,7 @@ extern void raze_altar(coordxy, coordxy, boolean);
 extern int doraze(void);
 extern boolean hinnom_portal_room(coordxy, coordxy);
 extern void hinnom_host_hold(struct monst *);
+extern boolean hinnom_host_goal(struct monst *, coordxy *, coordxy *);
 extern boolean hinnom_field_up(void);
 extern boolean hinnom_inside_field(coordxy, coordxy);
 extern boolean hinnom_fortress_closed(void);

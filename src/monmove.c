@@ -1831,7 +1831,7 @@ m_move(struct monst *mtmp, int after)
     xint16 chcnt;
     boolean can_tunnel = 0;
     boolean can_open = 0, can_unlock = 0 /*, doorbuster = 0 */;
-    boolean getitems = FALSE;
+    boolean getitems = FALSE, charging;
     boolean avoid = FALSE;
     boolean better_with_displacing = FALSE;
     unsigned seenflgs;
@@ -2003,7 +2003,14 @@ m_move(struct monst *mtmp, int after)
         }
     }
 
-    if ((!mtmp->mpeaceful || !rn2(10)) && (!Is_rogue_level(&u.uz))) {
+    /* Hinnom: Michael and the angels sent to the throne make for
+       Moloch instead of the hero, and do not stop for loot. */
+    charging = hinnom_host_goal(mtmp, &ggx, &ggy);
+    if (charging)
+        appr = 1;
+
+    if (!charging && (!mtmp->mpeaceful || !rn2(10))
+        && (!Is_rogue_level(&u.uz))) {
         boolean in_line = (lined_up(mtmp)
              && (distmin(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy)
                  <= (throws_rocks(gy.youmonst.data) ? 20

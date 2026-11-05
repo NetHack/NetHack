@@ -1453,6 +1453,8 @@ the field. It replaces the two placeholder lines "The hum dies. The
 barrier falls." and "Michael and his angels charge the fortress!".
 The disguise-broken screen is not shown with it.
 
+When the power field falls, Michael the Archangel and two angels are placed in the throne room and now make straight for Moloch (a Hinnom-only goal in m_move, marked by a new mstrategy bit). Four other angels take the foyer; extra angels are made if fewer than six are left. The foyer spots are inside the real room walls.
+
 ### Knight conduct (2026-11-04)
 
 `check_caitiff()` in `src/uhitm.c` is the Knight penalty for striking

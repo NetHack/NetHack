@@ -64,6 +64,28 @@ hinnom_host_hold(struct monst *mtmp)
     mtmp->msleeping = 0;
 }
 
+/* After the field falls, Michael and the angels marked for the
+   throne head for Moloch while he lives. */
+boolean
+hinnom_host_goal(struct monst *mtmp, coordxy *tx, coordxy *ty)
+{
+    struct monst *m;
+
+    if (!mtmp || !(mtmp->mstrategy & STRAT_HINNOM_THRONE))
+        return FALSE;
+    if (!Is_hinnom_level(&u.uz) || u.uevent.berachah || hinnom_field_up())
+        return FALSE;
+    if (!mtmp->mpeaceful || mtmp->mtame || mtmp->mconf)
+        return FALSE;
+    for (m = fmon; m; m = m->nmon)
+        if (!DEADMONSTER(m) && m->data == &mons[PM_MOLOCH]) {
+            *tx = m->mx;
+            *ty = m->my;
+            return TRUE;
+        }
+    return FALSE;
+}
+
 boolean
 hinnom_inside_field(coordxy x, coordxy y)
 {
@@ -391,24 +413,67 @@ levers_set(void)
     return n;
 }
 
+/* Put one of the Host on (x, y), or on the nearest open square. */
+static void
+place_host(struct monst *mtmp, coordxy x, coordxy y)
+{
+    coord cc;
+
+    if (goodpos(x, y, mtmp, 0))
+        rloc_to(mtmp, x, y);
+    else if (enexto(&cc, x, y, mtmp->data))
+        rloc_to(mtmp, cc.x, cc.y);
+}
+
+/* The assault. Michael and two angels go to Moloch in the throne
+   room; four other angels take the foyer. Angels are added if fewer
+   than six are on the level. Any beyond six stay where they are. */
 static void
 move_angels_to_gate(void)
 {
-    struct monst *mtmp;
-    coordxy spots[5][2] = { { HX(46), 10 }, { HX(46), 9 }, { HX(46), 11 },
-                            { HX(47), 9 }, { HX(47), 11 } };
-    int i = 0;
+    static const coordxy foyer[4][2] = {
+        { HX(46), 9 }, { HX(46), 11 }, { HX(48), 9 }, { HX(48), 11 }
+    };
+    struct monst *mtmp, *moloch = 0, *michael = 0, *ang[6];
+    coordxy tx = HX(72), ty = 10;
+    int n = 0, i;
 
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         if (DEADMONSTER(mtmp))
             continue;
-        if (mtmp->data != &mons[PM_MICHAEL] && mtmp->data != &mons[PM_ANGEL])
-            continue;
-        if (i < 5 && !m_at(spots[i][0], spots[i][1]))
-            rloc_to(mtmp, spots[i][0], spots[i][1]);
-        else
-            mnexto(mtmp, RLOC_NOMSG);
-        i++;
+        if (mtmp->data == &mons[PM_MOLOCH])
+            moloch = mtmp;
+        else if (mtmp->data == &mons[PM_MICHAEL])
+            michael = mtmp;
+        else if (mtmp->data == &mons[PM_ANGEL] && mtmp->isminion && n < 6)
+            ang[n++] = mtmp;
+    }
+    while (n < 6) {
+        mtmp = makemon(&mons[PM_ANGEL], foyer[0][0], foyer[0][1],
+                       MM_EMIN | MM_NOMSG | MM_ADJACENTOK);
+        if (!mtmp)
+            break;
+        mtmp->isminion = 1;
+        EMIN(mtmp)->min_align = A_LAWFUL;
+        EMIN(mtmp)->renegade = 0;
+        mtmp->mpeaceful = 1;
+        set_malign(mtmp);
+        ang[n++] = mtmp;
+    }
+    if (moloch) {
+        tx = moloch->mx;
+        ty = moloch->my;
+    }
+    if (michael) {
+        place_host(michael, tx, ty);
+        michael->mstrategy |= STRAT_HINNOM_THRONE;
+    }
+    for (i = 0; i < n; i++) {
+        if (i < 2) {
+            place_host(ang[i], tx, ty);
+            ang[i]->mstrategy |= STRAT_HINNOM_THRONE;
+        } else
+            place_host(ang[i], foyer[i - 2][0], foyer[i - 2][1]);
     }
 }
 
