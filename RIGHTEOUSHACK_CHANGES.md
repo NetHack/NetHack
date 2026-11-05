@@ -1406,6 +1406,19 @@ player's own deity names as opposing each other.
 | ID-084 | Healer's oil rows are tagged `POTION_CLASS` even though the objects are `ANOINTING_CLASS`. Creation uses `trotyp`, so the game start still works. |
 | ID-017 | Only human is playable. `src/u_init.c` still has tables for the removed roles. |
 
+### Hinnom battle batch (2026-11-04)
+
+The crash after razing Moloch's altar was the Orcus Town level file,
+not Hinnom. `dat/orcus.lua` still asked for `"magic marker"`, which
+is the writing tablet here, so half the time building that level
+panicked with "Unknown object id". Orcus Town can be the level
+under Hinnom, and the raze is what opens the way down. The file now
+asks for `"writing tablet"`. While Moloch is alive, Hinnom also has
+no way down: `hinnom_dest_clamp()` refuses any level change to a
+deeper level (stairs, a fall, level teleport, prophet mode too) with
+"You cannot go down until Moloch is defeated." (placeholder). The up
+stairs and every route inside the level are unchanged.
+
 ### Knight conduct (2026-11-04)
 
 `check_caitiff()` in `src/uhitm.c` is the Knight penalty for striking

@@ -649,6 +649,15 @@ doraze(void)
 boolean
 hinnom_dest_clamp(d_level *newlevel)
 {
+    /* No way down while Moloch lives: stairs, falls, and level
+       teleport all pass through here. Up and same-depth exits stay
+       open. Checked in prophet mode too, so it can be tested. */
+    if (Is_hinnom_level(&u.uz) && !u.uevent.berachah
+        && svm.mvitals[PM_MOLOCH].died == 0
+        && depth(newlevel) > depth(&u.uz)) {
+        pline("You cannot go down until Moloch is defeated."); /* PLACEHOLDER */
+        return TRUE;
+    }
     if (wizard)
         return FALSE;
     if (!u.uevent.gehennom_entered && In_hell(newlevel)

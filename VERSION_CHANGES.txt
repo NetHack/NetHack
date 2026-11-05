@@ -11,6 +11,10 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-04
+Orcus Town no longer crashes the game when it is first built. Hinnom
+has no way down while Moloch lives.
+
+2026-11-04
 Moloch has four lines of his own on #chat, and he may say
 one the first time he actually attacks. His blows and the
 raze are unchanged.
