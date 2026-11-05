@@ -2,6 +2,8 @@ $NHDT-Header: NetHack 5.0 fixes5-0-1.txt 2026/11/02_21:05:17 NetHack-5.0:1.105 $
 	
 General Fixes and Modified Features
 -----------------------------------
+allow travel across visibly harmless traps and preserve travel when
+	flying or levitating over floor-triggered traps
 fix some cross-compile package filenames that still referenced 370 instead
 	of 500
 Use NHV macro (NHV=500) for filenames in Makefiles and/or hints files to make
