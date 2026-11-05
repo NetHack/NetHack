@@ -29,6 +29,13 @@ struct pi_line {
 };
 static struct pi_line zero_pi_line;
 
+#define PERMINV_ITEM_PREFIX 4 /* " x) " inventory letter prefix */
+
+static unsigned pi_line_textwidth(struct pi_line *, unsigned);
+static unsigned pi_line_rows(struct pi_line *, unsigned);
+static unsigned pi_max_rowoffset(unsigned, unsigned);
+static unsigned pi_total_rows(unsigned);
+
 /* full perm_invent data; added to array[] one line at a time */
 struct pi_data {
     struct pi_line *array;         /* one element for each line of perminv */
@@ -136,24 +143,35 @@ static int
 curs_scroll_invt(WINDOW *win UNUSED)
 {
     char menukeys[QBUFSZ], qbuf[QBUFSZ];
-    unsigned uheight, uwidth, uhalfwidth, scrlmask;
+    unsigned maxoffset, totalrows, uheight, uwidth, uhalfwidth, scrlmask;
     int ch, menucmd, height, width;
     int res = 0;
+    boolean wrap = iflags.wc2_wraptext;
 
     curses_get_window_size(INV_WIN, &height, &width);
     uheight    = (unsigned) height;
     uwidth     = (unsigned) width;
+    if (!uheight)
+        uheight = 1;
+    if (!uwidth)
+        uwidth = 1;
     uhalfwidth = uwidth / 2;
+    totalrows  = wrap ? pi_total_rows(uwidth) : pi.inuseindx;
+    if (wrap)
+        pi.coloffset = 0;
+    maxoffset = pi_max_rowoffset(totalrows, uheight);
+    if (pi.rowoffset > maxoffset)
+        pi.rowoffset = maxoffset;
 
     menukeys[0] = '\0';
     scrlmask = 0U;
     if (pi.rowoffset > 0)
         scrlmask |= 1U; /* include scroll backwards: ^ and < */
-    if (pi.rowoffset + uheight <= pi.inuseindx)
+    if (pi.rowoffset + uheight <= totalrows)
         scrlmask |= 2U; /* include scroll forwards: > and | */
-    if (pi.coloffset > 0)
+    if (!wrap && pi.coloffset > 0)
         scrlmask |= 4U; /* include scroll left: { */
-    if (pi.widest > pi.coloffset + uwidth)
+    if (!wrap && pi.widest > pi.coloffset + uwidth)
         scrlmask |= 8U; /* include scroll right: } */
     (void) collect_menu_keys(menukeys, scrlmask, TRUE);
 
@@ -182,7 +200,7 @@ curs_scroll_invt(WINDOW *win UNUSED)
         res = 1;
         break;
     case ' ':
-        if (pi.rowoffset + uheight <= pi.inuseindx) {
+        if (pi.rowoffset + uheight <= totalrows) {
             pi.rowoffset = pi.coloffset = 0;
             res = 1;
             break;
@@ -192,12 +210,12 @@ curs_scroll_invt(WINDOW *win UNUSED)
     case KEY_RIGHT:
     case KEY_NPAGE:
     case MENU_NEXT_PAGE:
-        if (pi.inuseindx <= uheight)
+        if (totalrows <= uheight)
             pi.rowoffset = 0;
-        else if (pi.rowoffset + 2 * uheight <= pi.inuseindx)
+        else if (pi.rowoffset + 2 * uheight <= totalrows)
             pi.rowoffset += uheight;
         else
-            pi.rowoffset = pi.inuseindx - (uheight - 1);
+            pi.rowoffset = maxoffset;
         break;
     case KEY_LEFT:
     case KEY_PPAGE:
@@ -210,8 +228,8 @@ curs_scroll_invt(WINDOW *win UNUSED)
 
     case KEY_END:
     case MENU_LAST_PAGE:
-        if (pi.inuseindx > uheight)
-            pi.rowoffset = pi.inuseindx - (uheight - 1);
+        if (totalrows > uheight)
+            pi.rowoffset = maxoffset;
         else
             pi.rowoffset = 0;
         break;
@@ -221,7 +239,7 @@ curs_scroll_invt(WINDOW *win UNUSED)
         break;
 
     case KEY_DOWN:
-        if (pi.rowoffset + uheight <= pi.inuseindx)
+        if (pi.rowoffset + uheight <= totalrows)
             pi.rowoffset += 1;
         break;
     case KEY_UP:
@@ -232,6 +250,8 @@ curs_scroll_invt(WINDOW *win UNUSED)
         break;
 
     case MENU_SHIFT_RIGHT:
+        if (wrap)
+            break;
         if (pi.widest <= uwidth) {
             pi.coloffset = 0;
         } else {
@@ -241,6 +261,8 @@ curs_scroll_invt(WINDOW *win UNUSED)
         }
         break;
     case MENU_SHIFT_LEFT:
+        if (wrap)
+            break;
         if (pi.coloffset >= uhalfwidth)
             pi.coloffset -= uhalfwidth;
         else
@@ -284,6 +306,51 @@ pi_article_skip(const char *str)
     }
 
     return skip;
+}
+
+static unsigned
+pi_line_textwidth(struct pi_line *line, unsigned width)
+{
+    int textwidth = (int) width - (line->letter ? PERMINV_ITEM_PREFIX : 0);
+
+    return (unsigned) max(textwidth, 1);
+}
+
+static unsigned
+pi_line_rows(struct pi_line *line, unsigned width)
+{
+    const char *str = line->invtxt;
+    unsigned skip = line->letter ? pi_article_skip(str) : 0;
+
+    if (!iflags.wc2_wraptext)
+        return 1;
+    return (unsigned) curses_num_lines(str + skip,
+                                       (int) pi_line_textwidth(line, width));
+}
+
+static unsigned
+pi_max_rowoffset(unsigned totalrows, unsigned height)
+{
+    unsigned maxoffset;
+
+    if (!totalrows || totalrows <= height)
+        return 0;
+    if (!height)
+        height = 1;
+    maxoffset = totalrows - (height - 1);
+    if (maxoffset >= totalrows)
+        maxoffset = totalrows - 1;
+    return maxoffset;
+}
+
+static unsigned
+pi_total_rows(unsigned width)
+{
+    unsigned lineno, total = 0;
+
+    for (lineno = 0; lineno < pi.inuseindx; ++lineno)
+        total += pi_line_rows(&pi.array[lineno], width);
+    return total;
 }
 
 /* store an inventory item or class header but don't display anything yet */
@@ -333,22 +400,36 @@ static void
 curs_show_invt(WINDOW *win)
 {
     const char *str;
-    char accelerator, tmpbuf[BUFSZ];
+    char accelerator, tmpbuf[BUFSZ], *linestr;
     int attr, color;
-    unsigned lineno, stroffset, widest, left_col, right_col,
-        first_shown = 0, last_shown = 0, item_count = 0, xtra_line = 0;
-    int x, y, width, height, available_width,
+    unsigned drow = 0, lineno, linecount, lineoff, stroffset, widest,
+        left_col, maxoffset, right_col, totalrows, first_shown = 0,
+        last_shown = 0, item_count = 0, xtra_line = 0;
+    int x, y, width, height, available_width, footer_x,
         border = curses_window_has_border(INV_WIN) ? 1 : 0,
         /* we actually care about the topmost of message, map, or status
            but either they all have borders or none do so just check map */
         otherborder = curses_window_has_border(MAP_WIN) ? 1 : 0;
+    boolean wrap = iflags.wc2_wraptext;
+
+    if (pi.inuseindx == 0)
+        return;
 
     x = border; /* same for every line; 1 if border, 0 otherwise */
 
     curses_get_window_size(INV_WIN, &height, &width);
+    if (width < 1)
+        width = 1;
     widest = pi.widest;
     left_col = pi.coloffset + 1;
     right_col = left_col + (unsigned) width - 1;
+    if (wrap)
+        pi.coloffset = 0;
+    totalrows = pi_total_rows((unsigned) width);
+    maxoffset = pi_max_rowoffset(totalrows,
+                                 height > 0 ? (unsigned) height : 1);
+    if (pi.rowoffset > maxoffset)
+        pi.rowoffset = maxoffset;
 
     /*
      * If there will be any blank lines left at the bottom, sometimes
@@ -361,19 +442,18 @@ curs_show_invt(WINDOW *win)
      * fills pages beyond the first rather than just continuing from
      * last line of preceding page, hence no blank line(s) at bottom].
      */
-    if ((pi.array[0].letter && pi.inuseindx < (unsigned) height
-         && widest > (unsigned) width)
-        || (pi.inuseindx == 1 && otherborder && !border)) {
+    if ((!wrap
+         && ((pi.array[0].letter && pi.inuseindx < (unsigned) height
+              && widest > (unsigned) width)
+             || (pi.inuseindx == 1 && otherborder && !border)))
+        || (wrap && pi.inuseindx == 1 && totalrows == 1
+            && totalrows < (unsigned) height && otherborder && !border)) {
         wmove(win, 1, x);
         wprintw(win, "%.*s", width - 2 * border, "");
         xtra_line = 1;
     }
 
-    for (lineno = 0; lineno < pi.rowoffset; ++lineno)
-        if (pi.array[lineno].letter)
-            ++item_count;
-
-    for (lineno = pi.rowoffset; lineno < pi.inuseindx; ++lineno) {
+    for (lineno = 0; lineno < pi.inuseindx; ++lineno) {
         str = pi.array[lineno].invtxt;
         accelerator = pi.array[lineno].letter;
         attr = pi.array[lineno].c_attr; /* already converted when stored */
@@ -381,53 +461,87 @@ curs_show_invt(WINDOW *win)
         if (color == NO_COLOR)
             color = NONE;
 
+        linecount = pi_line_rows(&pi.array[lineno], (unsigned) width);
         if (accelerator)
             ++item_count;
-
-        /* Figure out where to draw the line */
-        y = (int) (lineno + xtra_line - pi.rowoffset) + border;
-        if (y - border >= height) { /* height already -2 for Top+Btm border */
-            /* 'y' has grown too big; there are too many lines to fit */
-            continue; /* skip, but still loop to update 'item_count' */
-        }
-        available_width = width; /* width is already -2 for Lft+Rgt borders */
-
-        wmove(win, y, x);
-
-        stroffset = 0;
-        if (accelerator) { /* inventory item line */
-            if (!first_shown)
-                first_shown = item_count;
-            last_shown = item_count;
-            /* despite being shown as a menu, nothing is selectable from the
-               persistent inventory window so avoid the usual highlighting
-               of inventory letters */
-            wprintw(win, " %c) ", accelerator);
-            available_width -= 4; /* space+letter+parenthesis+space */
-
-            /*
-             * Narrow the entries to fit more of the interesting text,
-             * but defer the removal until after menu colors matching.
-             * Do so unconditionally rather than trying to figure whether
-             * it's needed.  When 'sortpack' is enabled we could also strip
-             * out "<class> of" from "<prefix><class> of <item><suffix>"
-             * but if that's to be done, the core ought to do it.
-             */
-            stroffset = pi_article_skip(str); /* to skip "a "/"an "/"the " */
-            /* if/when scrolled right, invtxt for item lines gets shifted */
-            stroffset += pi.coloffset;
+        if (drow + linecount <= pi.rowoffset) {
+            drow += linecount;
+            continue;
         }
 
-        if (stroffset < strlen(str)) {
-            curses_menu_color_attr(win, color, attr, ON);
-            wprintw(win, "%.*s", available_width, str + stroffset);
-            curses_menu_color_attr(win, color, attr, OFF);
+        if (drow < pi.rowoffset + (unsigned) height) {
+            if (accelerator) {
+                if (!first_shown)
+                    first_shown = item_count;
+                last_shown = item_count;
+            }
         }
 
-        wclrtoeol(win);
+        for (lineoff = (pi.rowoffset > drow) ? pi.rowoffset - drow : 0;
+             lineoff < linecount; ++lineoff) {
+            /* Figure out where to draw the line */
+            y = (int) (drow + lineoff + xtra_line - pi.rowoffset) + border;
+            /* height already -2 for top+bottom border */
+            if (y - border >= height) {
+                /* 'y' has grown too big; there are too many lines to fit */
+                break; /* skip, but still loop to update 'item_count' */
+            }
+            /* width is already -2 for left+right border */
+            available_width = width;
+
+            wmove(win, y, x);
+
+            stroffset = 0;
+            if (accelerator) { /* inventory item line */
+                /*
+                 * Despite being shown as a menu, nothing is selectable from
+                 * the persistent inventory window so avoid the usual
+                 * highlighting of inventory letters.
+                 */
+                if (!wrap || !lineoff)
+                    wprintw(win, " %c) ", accelerator);
+                else
+                    wprintw(win, "%*s", PERMINV_ITEM_PREFIX, "");
+                available_width -= PERMINV_ITEM_PREFIX;
+
+                /*
+                 * Narrow the entries to fit more of the interesting text,
+                 * but defer the removal until after menu colors matching.
+                 * Do so unconditionally rather than trying to figure whether
+                 * it's needed.  When 'sortpack' is enabled we could also
+                 * strip out "<class> of" from
+                 * "<prefix><class> of <item><suffix>" but if that's to be
+                 * done, the core ought to do it.
+                 */
+                /* skip "a "/"an "/"the " */
+                stroffset = pi_article_skip(str);
+                /* if scrolled right, invtxt for item lines gets shifted */
+                if (!wrap)
+                    stroffset += pi.coloffset;
+            }
+            if (available_width < 1)
+                available_width = 1;
+
+            if (stroffset < strlen(str)) {
+                curses_menu_color_attr(win, color, attr, ON);
+                if (wrap) {
+                    linestr = curses_break_str(str + stroffset,
+                                               available_width,
+                                               (int) lineoff + 1);
+                    wprintw(win, "%s", linestr);
+                    free(linestr);
+                } else {
+                    wprintw(win, "%.*s", available_width, str + stroffset);
+                }
+                curses_menu_color_attr(win, color, attr, OFF);
+            }
+
+            wclrtoeol(win);
+        }
+        drow += linecount;
     } /* lineno loop */
 
-    if (pi.inuseindx > (unsigned) height) {
+    if (totalrows > (unsigned) height) {
         /*
          * More lines than will fit at one time so some lines aren't shown.
          * Overwrite the rightmost portion of last line with something
@@ -437,7 +551,7 @@ curs_show_invt(WINDOW *win)
          * case we need to erase that first.
          */
         y = height - (1 - border);
-        if ((unsigned) y == pi.inuseindx - pi.rowoffset) {
+        if ((unsigned) y == totalrows - pi.rowoffset) {
             wmove(win, y, x);
             wclrtoeol(win);
         }
@@ -445,9 +559,12 @@ curs_show_invt(WINDOW *win)
                 (first_shown > 1) ? '<' : '[',
                 first_shown, last_shown, item_count,
                 (last_shown < item_count) ? '>' : ']');
-        mvwaddstr(win, y, x + (width - (int) strlen(tmpbuf)), tmpbuf);
+        footer_x = width - (int) strlen(tmpbuf);
+        if (footer_x < 0)
+            footer_x = 0;
+        mvwaddstr(win, y, x + footer_x, tmpbuf);
     }
-    if (widest > (unsigned) width) {
+    if (!wrap && widest > (unsigned) width) {
         /*
          * More columns than the persistent inventory window can fit so
          * some columns aren't shown.  Overwrite the rightmost portion of
