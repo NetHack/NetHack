@@ -472,8 +472,12 @@ move_angels_to_gate(void)
         if (i < 2) {
             place_host(ang[i], tx, ty);
             ang[i]->mstrategy |= STRAT_HINNOM_THRONE;
-        } else
+        } else {
             place_host(ang[i], foyer[i - 2][0], foyer[i - 2][1]);
+            /* after the altar falls, every angel makes for Moloch */
+            if (u.uevent.hinnom_razed)
+                ang[i]->mstrategy |= STRAT_HINNOM_THRONE;
+        }
     }
 }
 
@@ -644,6 +648,15 @@ berachah_setup(void)
     }
 }
 
+static const char *const razed_screen[] = {
+    "With a final blow, the altar of Moloch splits from end to end and crashes down in ruin. The fire in its belly gutters, hisses, and dies.",
+    "A scream tears through the fortress, a sound of rage and agony so terrible that the very walls tremble. Moloch staggers, clutching at himself, and his power drains away like water poured out upon the ground.",
+    "Across the halls, a great shout goes up from the Host of Heaven.",
+    "\"His altar is broken! His strength is broken! ALL ANGELS, TO THE THRONE!\"",
+    "From every corner of the fortress, the angels turn as one and rush upon the wounded beast.",
+    "This is the final charge!",
+};
+
 void
 hinnom_altar_razed(void)
 {
@@ -664,9 +677,19 @@ hinnom_altar_razed(void)
         if (DEADMONSTER(mtmp) || mtmp->data != &mons[PM_MOLOCH])
             continue;
         mtmp->mhp = max(1, mtmp->mhp / 4);
-        if (canseemon(mtmp))
-            pline("Moloch staggers as his altar falls!"); /* PLACEHOLDER */
         break;
+    }
+    if (!mtmp)
+        return; /* Moloch is already dead: the short message only */
+    hinnom_screen(razed_screen, SIZE(razed_screen));
+    /* All the Host on the level now makes for Moloch. While the field
+       is up they are still held behind it; they go when it falls. */
+    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+        if (DEADMONSTER(mtmp))
+            continue;
+        if (mtmp->data == &mons[PM_MICHAEL]
+            || (mtmp->data == &mons[PM_ANGEL] && mtmp->isminion))
+            mtmp->mstrategy |= STRAT_HINNOM_THRONE;
     }
 }
 

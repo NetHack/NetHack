@@ -1463,6 +1463,8 @@ Balance check (prophet mode, no code change): six fights after the field fell, w
 
 Hinnom lighting: lit des regions now cover Moloch's throne room, the foyer, the doctor's lab, the lever room, and the ground outside the gate (each lit region also lights its surrounding walls). Michael's portal room stays lit and everything else stays dark. The foyer region uses the real room interior (columns 45-49). Berachah is built from its own file, which lights the whole map, so it is unchanged.
 
+When Moloch's altar is razed while Moloch lives, the approved altar-razed screen is shown once (it replaces the short "Moloch staggers" line), and Michael the Archangel and every angel of the Host on the level are marked to make for Moloch. While the field is still up they stay held behind it and go when it falls; angels made when the field falls after the raze are marked too. If Moloch is already dead, only the existing short message is shown.
+
 ### Knight conduct (2026-11-04)
 
 `check_caitiff()` in `src/uhitm.c` is the Knight penalty for striking

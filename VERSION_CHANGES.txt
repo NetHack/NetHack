@@ -11,6 +11,9 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-04
+Razing Moloch's altar while he lives now shows a full screen, and every angel on the level makes for Moloch.
+
+2026-11-04
 In Hinnom, Moloch's throne room, the foyer, the lab, the lever room and the ground outside the gate are now lit.
 
 2026-11-04
