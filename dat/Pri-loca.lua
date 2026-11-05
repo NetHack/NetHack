@@ -1,6 +1,6 @@
--- NetHack Priest Pri-loca.lua	$NHDT-Date: 1781994870 2026/06/20 22:34:30 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.5 $
+-- $NHDT-Header: NetHack 5.0 Pri-loca.lua 2026/06/20_22:35:38 NetHack-5.0:1.7 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
---	Copyright (c) 1991-2 by M. Stephenson
+--	Copyright (c) 1991-1992 by M. Stephenson
 -- NetHack may be freely redistributed.  See license for details.
 --
 des.level_init({ style = "solidfill", fg = " " });

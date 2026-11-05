@@ -1,4 +1,4 @@
-/* NetHack 5.0	sys.h	$NHDT-Date: 1693083207 2023/08/26 20:53:27 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.41 $ */
+/* $NHDT-Header: NetHack 5.0 sys.h 2023/08/26_20:53:27 NetHack-5.0:1.47 $ */
 /* Copyright (c) Kenneth Lorber, Kensington, Maryland, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
 

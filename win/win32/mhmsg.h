@@ -1,4 +1,4 @@
-/* NetHack 5.0	mhmsg.h	$NHDT-Date: 1781973104 2026/06/20 16:31:44 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.31 $ */
+/* $NHDT-Header: NetHack 5.0 mhmsg.h 2026/06/20_22:26:43 NetHack-5.0:1.33 $ */
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 

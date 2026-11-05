@@ -1,4 +1,4 @@
-/* NetHack 5.0	nhregex.h	$NHDT-Date: $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: $ */
+/* $NHDT-Header: NetHack 5.0 nhregex.h 2026/06/20_22:26:43 NetHack-5.0:1.5 $ */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifndef NHREGEX_H

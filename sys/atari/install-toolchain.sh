@@ -1,4 +1,8 @@
 #!/bin/sh
+# $NHDT-Header: NetHack 5.0 install_toolchain.sh 2026/09/30_10:47:34 NetHack-5.0:1.2 $
+# Copyright (c) Ingo Paschke, 2026
+# NetHack may be freely redistributed.  See license for details.
+#
 # install-toolchain.sh --- fetch & install the m68k-atari-mint cross-toolchain
 #
 # Default layout (canonical GNU cross-toolchain; everything under

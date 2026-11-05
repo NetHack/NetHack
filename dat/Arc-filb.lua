@@ -1,4 +1,4 @@
--- NetHack Archeologist Arc-filb.lua	$NHDT-Date: 1781994863 2026/06/20 22:34:23 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.2 $
+-- $NHDT-Header: NetHack 5.0 Arc-filb.lua 2026/06/20_22:35:38 NetHack-5.0:1.4 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1991 by M. Stephenson
 -- NetHack may be freely redistributed.  See license for details.

@@ -1,4 +1,4 @@
-/* NetHack 5.0	fnamesiz.h	$NHDT-Date: 1781973080 2026/06/20 16:31:20 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.5 $ */
+/* $NHDT-Header: NetHack 5.0 fnamesiz.h 2026/09/30_14:47:34 NetHack-5.0:1.10 $ */
 /*-Copyright (c) Michael Allison, 2020. */
 /* NetHack may be freely redistributed.  See license for details. */
 

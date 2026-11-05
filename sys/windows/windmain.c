@@ -1,4 +1,4 @@
-/* NetHack 5.0	windmain.c	$NHDT-Date: 1693359653 2023/08/30 01:40:53 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.189 $ */
+/* $NHDT-Header: NetHack 5.0 windmain.c 2026/07/31_12:59:20 NetHack-5.0:1.236 $ */
 /* Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
 

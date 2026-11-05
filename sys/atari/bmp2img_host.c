@@ -1,7 +1,8 @@
+/* $NHDT-Header: NetHack 5.0 bmp2img_host.c 2026/10/01_13:20:09 NetHack-5.0:1.2 $ */
+/* Copyright (c) Ingo Paschke, 2026 */
+/* NetHack may be freely redistributed.  See license for details. */
 /*
  * bmp2img_host.c - Convert a BMP tileset to Atari XIMG.
- * Copyright (c) 2026 by Ingo Paschke.
- * NetHack may be freely redistributed.  See license for details.
  *
  * Uses the same colour-reduction algorithm as the Amiga bmp2iff_host.c:
  *   - First 16 palette slots are reserved base colours.

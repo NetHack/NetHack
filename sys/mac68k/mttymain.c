@@ -1,4 +1,4 @@
-/* NetHack 5.0	mttymain.c	$NHDT-Date: 1554215928 2019/04/02 14:38:48 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.13 $ */
+/* $NHDT-Header: NetHack 5.0 mttymain.c 2026/09/30_14:47:34 NetHack-5.0:1.21 $ */
 /* Copyright (c) Jon W{tte, 1993					*/
 /* NetHack may be freely redistributed.  See license for details.	*/
 

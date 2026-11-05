@@ -1,4 +1,5 @@
-@REM  NetHack 5.0	nhsetup.bat	$NHDT-Date: 1596498315 2020/08/03 23:45:15 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.40 $ */
+@REM  $NHDT-Header: NetHack 5.0 nhsetup.bat 2026/04/26_14:47:48 NetHack-5.0:1.51 $
+@REM  Copyright (c) Copyright (c) Michael Allison, 2026
 @REM  Copyright (c) NetHack Development Team 1993-2024
 @REM  NetHack may be freely redistributed.  See license for details.
 @REM  Win32 setup batch file, see Install.windows for details

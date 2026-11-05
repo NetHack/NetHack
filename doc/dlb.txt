@@ -63,9 +63,9 @@ BUGS
          examining the source is the only way to know which files can be.
 
 COPYRIGHT
-       This file is Copyright (C) Kenneth Lorber, 2024 for  version  keni-git-
-       set:1.13.   NetHack  may  be freely redistributed.  See license for de-
-       tails.
+       This  file  is  Copyright  (C)  Kenneth  Lorber,   2024   for   version
+       NetHack-5.0:1.27.   NetHack  may  be freely redistributed.  See license
+       for details.
 
 
 

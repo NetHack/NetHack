@@ -1,4 +1,4 @@
-/* NetHack 5.0	nhmd4.c	$NHDT-Date: 1781973059 2026/06/20 16:30:59 $	$NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.6 $ */
+/* $NHDT-Header: NetHack 5.0 nhmd4.c 2026/06/20_22:26:43 NetHack-5.0:1.8 $ */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2024 */
 /* NetHack may be freely redistributed.  See license for details. */
 

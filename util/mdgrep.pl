@@ -1,5 +1,5 @@
 #!perl
-# NetHack 5.0  mdgrep.pl  $NHDT-Date: 1710949914 2024/03/20 15:51:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.26 $
+# $NHDT-Header: NetHack 5.0 mdgrep.pl 2024/03/20_15:51:54 NetHack-5.0:1.30 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
 
@@ -59,17 +59,14 @@ $specials = {
 
 $outfile = "mdgrep.h";
 sub start_file {
-	($rev) = ('$NHDT-Revision: 1.26 $') =~ m/: (.*) .$/;
-	my $date = '$NHDT-Date: 1710949915 2024/03/20 15:51:55 $';
-	my $branch = '$NHDT-Branch: NetHack-5.0 $';
-	my $revision = '$NHDT-Revision: 1.26 $';
+	(my $rev) = ('$NHDT-Revision: 1.30 $') =~ m/: (.*) .$/;
 	open(OUT, ">$outfile") || die "open $outfile: $!";
-# NB: Date and Revision below will be modified when mdgrep.h is written to
+# NB: Header below will be modified when mdgrep.h is written to
 # git - this is correct (but it means you must commit changes to mdgrep.pl
 # before generating mdgrep.h and committing that file).
 	print OUT <<E_O_M;
 /*
- * NetHack 5.0  $outfile  $date $branch:$revision
+ * \$NHDT-Header: NetHack 5.0 mdgrep.pl 2026/10/30_01:20:30 NetHack-5.0:1.29 \$
  * Copyright (c) Kenneth Lorber, Kensington, Maryland, 2008
  * NetHack may be freely redistributed.  See license for details.
  *

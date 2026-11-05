@@ -353,10 +353,10 @@ BUGS
        Probably infinite.
 
 COPYRIGHT
-       This file is Copyright (C) Robert  Patrick  Rankin,  2024  for  version
-       NetHack-5:1.31.   NetHack may be freely redistributed.  See license for
-       details.
+       This file is Copyright (C) Robert  Patrick  Rankin,  2026  for  version
+       NetHack-5.0:1.68.   NetHack  may  be freely redistributed.  See license
+       for details.
 
 
 
-NETHACK                          26 April 2026                      NETHACK(6)
+NETHACK                           7 May 2026                        NETHACK(6)

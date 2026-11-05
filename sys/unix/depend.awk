@@ -1,6 +1,9 @@
+# $NHDT-Header: NetHack 5.0 depend.awk 2026/04/26_14:41:11 NetHack-5.0:1.27 $
+# Copyright (c) Robert Patrick Rankin, 2023
+# NetHack may be freely redistributed.  See license for details.
+
 # depend.awk -- awk script used to construct makefile dependencies
 # for nethack's source files (`make depend' support for Makefile.src).
-# $NHDT-Date: 1709577497 2024/03/04 18:38:17 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.18 $
 #
 # usage:
 #   awk -f depend.awk ../include/*.h list-of-.c/.cpp-files

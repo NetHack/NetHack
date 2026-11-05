@@ -1,4 +1,4 @@
-/* NetHack 5.0	shk.c	$NHDT-Date: 1781973066 2026/06/20 16:31:06 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.323 $ */
+/* $NHDT-Header: NetHack 5.0 shk.c 2026/10/18_12:54:26 NetHack-5.0:1.329 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1076,11 +1076,18 @@ shop_keeper(char rmno)
             return (struct monst *) 0;
         }
     } else {
-        if (!level_status.shkready) {
+        /* NetHackJP / Upstream bugfix:
+         * Only flag an untrustworthy null shkp if this is actually a shop room
+         * (rmno >= ROOMOFFSET && svr.rooms[rmno - ROOMOFFSET].rtype >= SHOPBASE).
+         * Outside of shops or in non-shop rooms, a null shkp is completely normal.
+         */
+        if (!level_status.shkready
+            && rmno >= ROOMOFFSET
+            && svr.rooms[rmno - ROOMOFFSET].rtype >= SHOPBASE) {
             int hmm UNUSED = 1;
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED \
      && NH_DEVEL_STATUS != NH_STATUS_POSTRELEASE)
-         if (wizard)
+         if (wizard && !gw.whitelist_shk)
             impossible("debug: untrustworthy null shkp; level_status.shkready"
                         " is FALSE (%d, %d, %d, %d)",
                         level_status.making, level_status.loading,

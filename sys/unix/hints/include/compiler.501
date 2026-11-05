@@ -1,5 +1,7 @@
 #==============================================================================
-# NetHack 5.0  compiler $NHDT-Date: 1791741243 2026/10/11 17:54:03 $  $NHDT-Branch: NetHack-5.0 $ $NHDT-Revision: 1.58 $
+# $NHDT-Header: NetHack 5.0 compiler.501 2026/10/11_17:56:42 NetHack-5.0:1.61 $
+# Copyright (c) Michael Allison, 2006.
+# NetHack may be freely redistributed.  See license for details.
 
 # compiler flags:  CCFLAGS is used to construct a value for CFLAGS with
 #	various -I, -D, and -W settings appended below;

@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# NetHack 3.7  NHsubst       $NHDT-Date: 1596498407 2020/08/03 23:46:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.5 $
+# $NHDT-Header: NetHack 5.0 NHsubst 2026/10/28_15:40:20 NetHack-5.0:1.14 $
 # Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
 
@@ -280,49 +280,137 @@ print TRACE "MID: $ourstype/$oursval $theirtype/$theirval\n";
 
 # return undef if we can't merge the values; $NAME: VALUE $ or $NAME$ (as appropriate) if we can.
 sub merge_one_var_maybe {
-	my($varname, $oursval, $theirval) = @_;
+    my($varname, $oursval, $theirval) = @_;
 print TRACE "MVM: -$varname-$oursval-$theirval-\n";
-	my $resolvedas;
-	{
-		no strict;
-		my $fn = "PREFIX::$varname";
-		if(defined &$fn){
-			$resolvedas = &$fn($PREFIX,$varname,$oursval, $theirval);
-		} else {
-			$resolvedas = undef;	# can't resolve
+    my $resolvedas;
+    {
+	no strict;
+	my $fn = "PREFIX::$varname";
+	if(defined &$fn){
+	    $resolvedas = &$fn($PREFIX.'-',$varname,$oursval, $theirval);
+	    if(defined $resolvedas){	# mergeable
+		if(length $resolvedas){	# has a value
+		    $resolvedas = "\$$PREFIX-$varname: $resolvedas \$";
+		} else {			# has no value
+		    $resolvedas = "\$$PREFIX-$varname\$";
 		}
-	}
-
-	if(!defined $resolvedas){
-		$::count++;	# we have an externally visible conflict
-		return undef;
+	    }
 	} else {
-		return $resolvedas;
+	    $resolvedas = undef;	# can't resolve
 	}
-	# NOTREACHED
+    }
+
+    if(!defined $resolvedas){
+	$::count++;	# we have an externally visible conflict
+	return undef;
+    } else {
+	return $resolvedas;
+    }
+    # NOTREACHED
 }
 
 package PREFIX;
 # Resolve the conflict of a single var's 2 values.  Return undef to leave the conflict.
+
+use POSIX qw/mktime tzset/;
+
 sub Date {
     my($PREFIX, $varname, $mine, $theirs) = @_;
-    my $m = ($mine =~ m/(\d+)/)[0];
-    my $t = ($theirs =~ m/(\d+)/)[0];
-    return undef unless ($m>0) && ($t>0);
 
-    return "\$$PREFIX-$varname: " . (($m>$t)?$mine:$theirs) .' $';
+	# Transition issue: merging of old and new style dates.
+	# Old style: time_t YYYY/MM/DD HH:MM:SS
+	# New style: YYYY/MM/DD_HH:MM:SS
+    sub assure_new {
+	local $_ = $_[0];
+	return $_ unless(m/(\d{3,})\s(.*)/);
+	my $rv = $2;
+	$rv =~ s/ /_/;
+	return $rv;
+    }
+
+    $mine = assure_new($mine);
+    $theirs = assure_new($theirs);
+
+    my $m = length $mine;
+    my $t = length $theirs;
+    if($m == 0 || $t == 0){
+	if($m>0){ return $mine }
+	if($t>0){ return $theirs }
+    }
+
+    sub str2time2 {
+	my $str = $_[0];
+	    # parse strftime("%Y/%m/%d_%H:%M:%S");
+	return undef unless($str =~ m!^(\d\d\d\d)/(\d\d)/(\d\d)_(\d\d):(\d\d):(\d\d)$!);
+	    # $1 year
+	    # $2 month 01-12
+	    # $3 day 01-31
+	    # $4 hour 00-23
+	    # $5 minute 00-59
+	    # $6 second 00-60
+	local $ENV{TZ} = 'UTC';
+	POSIX::tzset();
+	return POSIX::mktime($6, $5, $4, $3, $2-1, $1);
+    }
+
+    $m = str2timet($mine);
+    $t = str2timet($theirs);
+    return (($m>$t)?$mine:$theirs);
 }
 
-#sub Header {
-#sub Author {
+sub Header {
+    my($PREFIX, $varname, $mine, $theirs) = @_;
+
+    sub splitheader {
+	my %h;
+	@h{'project','ver','file','d1','d2','d3','branch','revision'} = split(/\s+/, $_[0]);
+	$h{date} = join(' ',%h{'d1','d2','d3'});
+	delete %h{'d1','d2','d3'};
+	return %h
+    }
+
+    my %mine = splitheader($mine);
+    my %theirs = splitheader($theirs);
+
+	# sanity check - if the keys don't match the merge will blow up
+    if(join(' ',keys %mine) ne join(' ',keys %theirs)){
+	return undef;
+    }
+
+    my %rv;
+    foreach my $k (keys %mine){
+	$rv{$k} = merge_one_var_maybe($k,$mine{$k},$theirs{$k});
+	return undef unless(defined $rv{$k});
+    }
+
+    return "$rv{project} $rv{ver} $rv{file} $rv{date} $rv{branch}:$rv{revision}";
+}
+
+sub Brev {
+    my($PREFIX, $varname, $mine, $theirs) = @_;
+    $mine =~ s/^\s+//;	$mine =~ s/\s+$//;
+    $theirs =~ s/^\s+//;	$theirs =~ s/\s+$//;
+    return "$mine" if(length $mine);
+    return "$theirs" if(length $theirs);
+    return undef;
+}
+
+sub Ver {
+    my($PREFIX, $varname, $mine, $theirs) = @_;
+    $mine =~ s/^\s+//;	$mine =~ s/\s+$//;
+    $theirs =~ s/^\s+//;	$theirs =~ s/\s+$//;
+    return "$mine" if(length $mine);
+    return "$theirs" if(length $theirs);
+    return undef;
+}
 
 sub Branch {
     my($PREFIX, $varname, $mine, $theirs) = @_;
     $mine =~ s/^\s+//;	$mine =~ s/\s+$//;
     $theirs =~ s/^\s+//;	$theirs =~ s/\s+$//;
-    return "\$$PREFIX-$varname: $mine \$" if(length $mine);
-    return "\$$PREFIX-$varname: $theirs \$" if(length $theirs);
-    return "\$$PREFIX-$varname\$" if(length $theirs);
+    return "$mine" if(length $mine);
+    return "$theirs" if(length $theirs);
+    return undef;
 }
 
 sub Revision {
@@ -331,15 +419,15 @@ sub Revision {
     my($t) = ($theirs =~ m/1.(\d+)/);
     if($m > 0 && $t > 0){
 	my $q = ($m > $t) ? $m : $t;
-	return "\$$PREFIX-$varname: 1.$q \$";
+	return "1.$q";
     }
     if($m > 0){
-	return "\$$PREFIX-$varname: 1.$m \$";
+	return "1.$m";
     }
     if($t > 0){
-	return "\$$PREFIX-$varname: 1.$t \$";
+	return "1.$t";
     }
-    return "\$$PREFIX-$varname\$";
+    return "";	# NB: NOT undef!
 }
 __END__
 

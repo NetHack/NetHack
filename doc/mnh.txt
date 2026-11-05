@@ -1,4 +1,4 @@
-MNH(7)                 Miscellaneous Information Manual                 MNH(7)
+MNH(6)                           Games Manual                           MNH(6)
 
 
 
@@ -58,4 +58,4 @@ UR        mac     -         -    URL passthrough for HTML generator
 
 
 
-NETHACK                         4 November 2018                         MNH(7)
+NETHACK                         4 November 2018                         MNH(6)

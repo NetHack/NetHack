@@ -1,7 +1,8 @@
-/* NetHack 5.0	vmsmain.c	$NHDT-Date: 1693359633 2023/08/30 01:40:33 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.57 $ */
+/* $NHDT-Header: NetHack 5.0 vmsmain.c 2026/04/26_13:29:50 NetHack-5.0:1.69 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
+
 /* main.c - VMS NetHack */
 
 #include "hack.h"

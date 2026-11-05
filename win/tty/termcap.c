@@ -1,4 +1,4 @@
-/* NetHack 5.0	termcap.c	$NHDT-Date: 1781973100 2026/06/20 16:31:40 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.81 $ */
+/* $NHDT-Header: NetHack 5.0 termcap.c 2026/06/20_16:31:40 NetHack-5.0:1.84 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */

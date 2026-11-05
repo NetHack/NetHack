@@ -1,4 +1,4 @@
-/* NetHack 5.0	pckeys.c	$NHDT-Date: 1596498270 2020/08/03 23:44:30 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.14 $ */
+/* $NHDT-Header: NetHack 5.0 pckeys.c 2020/08/03_23:44:30 NetHack-5.0:1.24 $ */
 /* Copyright (c) NetHack PC Development Team 1996                 */
 /* NetHack may be freely redistributed.  See license for details. */
 

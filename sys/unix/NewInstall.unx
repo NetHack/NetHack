@@ -154,6 +154,6 @@ There are other hints file options that are meant to impact your NetHack build
 in various other ways too. A reference list can be found in
 sys/unix/README.hints. 
 
-# NetHack 5.0  NewInstall.unx       $NHDT-Date: 1652276817 2022/05/11 13:46:57 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.11 $
+# $NHDT-Header: NetHack 5.0 NewInstall.unx 2026/09/30_15:59:39 NetHack-5.0:1.24 $
 # Copyright (c) 2009 by Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.

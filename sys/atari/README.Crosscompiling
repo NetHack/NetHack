@@ -126,3 +126,7 @@ Notes
 
   - For playing the game and end-user configuration, see
     sys/atari/README.tos.
+
+/* $NHDT-Header: NetHack 5.0 README.Crosscompiling 2026/09/30_13:29:51 NetHack-5.0:1.2 $ */
+/* Copyright (c) Ingo Paschke, 2026 */
+/* NetHack may be freely redistributed.  See license for details. */

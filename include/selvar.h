@@ -1,4 +1,4 @@
-/* NetHack 5.0	selvar.h	$NHDT-Date: 1709677544 2024/03/05 22:25:44 $  $NHDT-Branch: keni-mdlib-followup $:$NHDT-Revision: 1.0 $ */
+/* $NHDT-Header: NetHack 5.0 selvar.h 2026/04/26_13:25:42 NetHack-5.0:1.2 $ */
 /* Copyright (c) 2024 by Pasi Kallinen */
 /* NetHack may be freely redistributed.  See license for details. */
 

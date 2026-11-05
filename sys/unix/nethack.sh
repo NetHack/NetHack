@@ -1,5 +1,5 @@
 #!/bin/sh
-# NetHack 5.0  nethack.sh	$NHDT-Date: 1596498294 2020/08/03 23:44:54 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.21 $
+# $NHDT-Header: NetHack 5.0 nethack.sh 2026/04/26_14:41:11 NetHack-5.0:1.25 $
 # Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
 

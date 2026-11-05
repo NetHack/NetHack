@@ -1,4 +1,4 @@
-/* NetHack 5.0	windows.c	$NHDT-Date: 1781973074 2026/06/20 16:31:14 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.147 $ */
+/* $NHDT-Header: NetHack 5.0 windows.c 2026/09/30_14:47:34 NetHack-5.0:1.153 $ */
 /* Copyright (c) D. Cohrs, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 

@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.36 $ $NHDT-Date: 1781062909 2026/06/09 19:41:49 $
+$NHDT-Header: NetHack 5.0 fixes5-0-1.txt 2026/11/02_21:05:17 NetHack-5.0:1.105 $
 	
 General Fixes and Modified Features
 -----------------------------------
@@ -96,6 +96,23 @@ make probing reveal egg type in inventory
 prevent monster spawning in Fort Ludios treasure vaults
 fix level gain maxhp change when polymorphed
 make #wizlevelteleport accept special level proto name
+add meat theme room
+fix tknown handling for boxes known not to be trapped
+change the monk quest locate level
+fix travel using up turns trying to displace pet that cannot move
+replace generic gem tile asterisk with a cut gem shape with shadow,
+	generic potion tile exclamation point with potion shape,
+	generic spellbook plus-tile with a spellbook shape
+fix impossible and use-after-free in lava_effects
+fix accessing deleted magic trap destroyed by ice turning into water
+fix chameleon shape change working on petrified monster
+fix checking if dungeon has too many dungeons or levels
+fix long key name overflowing unlock prompt buffer
+fix exploding named box buffer overflow
+fix aobjnam buffer overflow when adding a verb
+menu for interactively setting status fields to highlight listed
+	weapons/armor/terrain in the menu display than was used internally;
+	picking one affected the others
 
 
 Platform- and/or Interface-Specific Fixes
@@ -242,6 +259,7 @@ musl: musl libc does not have __sighandler_t so don't use it in the
 	macro definition for SIG_RET_TYPE with musl
 tty: allow custom glyph colors if they're basic 16 nethack colors
 	on terminals with less than 256 colors
+tty: fix uninitialized framecolor
 WASM: resolve some build failures in 'make CROSS_TO_WASM=1'
 WASM: hints file cross-pre2.500 update to CFLAGS to include -DNHUUID
 Windows: don't demand keypress on intentional exit

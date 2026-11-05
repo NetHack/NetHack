@@ -1,4 +1,4 @@
-/* NetHack 5.0	dokick.c	$NHDT-Date: 1781973046 2026/06/20 16:30:46 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.237 $ */
+/* $NHDT-Header: NetHack 5.0 dokick.c 2026/06/20_22:26:43 NetHack-5.0:1.239 $ */
 /* Copyright (c) Izchak Miller, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 

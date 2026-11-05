@@ -1,4 +1,4 @@
-/* NetHack 5.0	vidtxt.c	$NHDT-Date: 1596498278 2020/08/03 23:44:38 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.12 $ */
+/* $NHDT-Header: NetHack 5.0 vidtxt.c 2020/08/03_23:44:38 NetHack-5.0:1.22 $ */
 /*   Copyright (c) NetHack PC Development Team 1993                 */
 /*   NetHack may be freely redistributed.  See license for details. */
 /*                                                                  */

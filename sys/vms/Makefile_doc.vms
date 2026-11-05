@@ -1,7 +1,8 @@
-#      NetHack Documentation Makefile.
-# NetHack 5.0  Makefile.doc    $NHDT-Date: 1596498290 2020/08/03 23:44:50 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.21 $
+# $NHDT-Header$
 # Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
+
+# NetHack Documentation Makefile.
 
 # Root of source tree:
 NHSROOT=[-]

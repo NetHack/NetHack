@@ -1,4 +1,5 @@
-/* NetHack 5.0	windsys.c	$NHDT-Date: 1710949760 2024/03/20 15:49:20 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.95 $ */
+/* $NHDT-Header: NetHack 5.0 windsys.c 2026/05/16_16:15:20 NetHack-5.0:1.121 $ */
+/* Copyright (c) Michael Allison, 2026 */
 /* Copyright (c) NetHack PC Development Team 1993, 1994 */
 /* NetHack may be freely redistributed.  See license for details. */
 

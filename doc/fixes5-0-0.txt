@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.1649 $ $NHDT-Date: 1777000050 2026/04/23 19:07:30 $
+$NHDT-Header: NetHack 5.0 fixes5-0-0.txt 2026/04/23_19:07:30 NetHack-5.0:1.1656 $
 
 General Fixes and Modified Features
 -----------------------------------

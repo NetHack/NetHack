@@ -1,4 +1,4 @@
-/* NetHack 5.0  botl.h  $NHDT-Date: 1781973077 2026/06/20 16:31:17 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.45 $ */
+/* $NHDT-Header: NetHack 5.0 botl.h 2026/06/20_16:31:17 NetHack-5.0:1.48 $ */
 /* Copyright (c) Michael Allison, 2003                            */
 /* NetHack may be freely redistributed.  See license for details. */
 

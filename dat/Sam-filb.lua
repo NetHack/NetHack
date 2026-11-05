@@ -1,4 +1,4 @@
--- NetHack Samurai Sam-filb.lua	$NHDT-Date: 1781994873 2026/06/20 22:34:33 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.2 $
+-- $NHDT-Header: NetHack 5.0 Sam-filb.lua 2026/06/20_22:35:38 NetHack-5.0:1.4 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1991-92 by M. Stephenson, P. Winner
 -- NetHack may be freely redistributed.  See license for details.

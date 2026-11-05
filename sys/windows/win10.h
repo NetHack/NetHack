@@ -1,4 +1,4 @@
-/* NetHack 5.0	win10.h	$NHDT-Date: 1596498319 2020/08/03 23:45:19 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.8 $ */
+/* $NHDT-Header: NetHack 5.0 win10.h 2026/04/26_14:47:48 NetHack-5.0:1.16 $ */
 /* Copyright (C) 2018 by Bart House */
 /* NetHack may be freely redistributed.  See license for details. */
 

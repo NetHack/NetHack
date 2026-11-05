@@ -1,4 +1,4 @@
-# NetHack 5.0  bogusmon.txt       $NHDT-Date: 1596498237 2020/08/03 23:43:57 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.10 $
+# $NHDT-Header: NetHack 5.0 bogusmon.txt 2026/06/20_22:55:28 NetHack-5.0:1.19 $
 # Copyright (c) 2016 by Pasi Kallinen
 # NetHack may be freely redistributed.  See license for details.
 #

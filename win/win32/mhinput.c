@@ -1,4 +1,4 @@
-/* NetHack 5.0	mhinput.c	$NHDT-Date: 1781973102 2026/06/20 16:31:42 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.21 $ */
+/* $NHDT-Header: NetHack 5.0 mhinput.c 2026/06/20_22:26:43 NetHack-5.0:1.23 $ */
 /* Copyright (C) 2001 by Alex Kompel */
 /* NetHack may be freely redistributed.  See license for details. */
 

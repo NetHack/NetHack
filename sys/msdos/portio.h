@@ -1,4 +1,4 @@
-/* NetHack 5.0	portio.h	$NHDT-Date: 1596498273 2020/08/03 23:44:33 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.10 $ */
+/* $NHDT-Header: NetHack 5.0 portio.h 2026/04/26_14:47:48 NetHack-5.0:1.14 $ */
 /*   Copyright (c) NetHack PC Development Team 1995                 */
 /*   NetHack may be freely redistributed.  See license for details. */
 /*                                                                  */

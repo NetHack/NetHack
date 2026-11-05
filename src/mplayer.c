@@ -1,4 +1,4 @@
-/* NetHack 5.0	mplayer.c	$NHDT-Date: 1781973057 2026/06/20 16:30:57 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.54 $ */
+/* $NHDT-Header: NetHack 5.0 mplayer.c 2026/06/20_22:26:43 NetHack-5.0:1.56 $ */
 /*      Copyright (c) Izchak Miller, 1992.                        */
 /* NetHack may be freely redistributed.  See license for details. */
 

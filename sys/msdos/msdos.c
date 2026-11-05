@@ -1,4 +1,4 @@
-/* NetHack 5.0	msdos.c	$NHDT-Date: 1596498269 2020/08/03 23:44:29 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.15 $ */
+/* $NHDT-Header: NetHack 5.0 msdos.c 2020/08/03_23:44:29 NetHack-5.0:1.30 $ */
 /* Copyright (c) NetHack PC Development Team 1990 */
 /* NetHack may be freely redistributed.  See license for details.         */
 

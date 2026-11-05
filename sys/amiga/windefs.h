@@ -1,4 +1,4 @@
-/* NetHack 3.6	windefs.h	$NHDT-Date: 1432512795 2015/05/25 00:13:15 $  $NHDT-Branch: master $:$NHDT-Revision: 1.7 $ */
+/* $NHDT-Header: NetHack 5.0 windefs.h 2026/09/30_14:47:34 NetHack-5.0:1.22 $ */
 /* Copyright (c) Gregg Wonderly, Naperville, Illinois,  1991,1992,1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 

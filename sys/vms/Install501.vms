@@ -359,6 +359,6 @@ Notes:
     version, and the C compiler and version used, and the version of GNU
     make utility used.
 
-8-March-2024
-# NetHack 5.0  Install370.vms       $NHDT-Date: 1575245132 2019/12/02 00:05:32 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.16 $
+# $NHDT-Header: NetHack 5.0 Install501.vms 2026/09/25_13:07:53 NetHack-5.0:1.36 $ 
+# Copyright (c) 2003 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.

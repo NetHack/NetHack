@@ -1,4 +1,4 @@
-/* NetHack 5.0  decl.h  $NHDT-Date: 1781973078 2026/06/20 16:31:18 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.408 $ */
+/* $NHDT-Header: NetHack 5.0 decl.h 2026/10/18_12:54:26 NetHack-5.0:1.415 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1060,7 +1060,7 @@ struct instance_globals_w {
     /* new */
     struct win_settings wsettings;      /* wintype.h */
     long were_changes;                  /* were.c, allmain.c */
-
+    long whitelist_shk;
     boolean havestate;
 };
 

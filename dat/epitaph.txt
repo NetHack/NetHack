@@ -1,4 +1,4 @@
-# NetHack 5.0  epitaph.txt       $NHDT-Date: 1596498241 2020/08/03 23:44:01 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.4 $
+# $NHDT-Header: NetHack 5.0 epitaph.txt 2026/06/20_22:55:28 NetHack-5.0:1.10 $
 # Copyright (c) 2015 by Pasi Kallinen
 # NetHack may be freely redistributed.  See license for details.
 # Epitaphs for random headstones

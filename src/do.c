@@ -1,4 +1,4 @@
-/* NetHack 5.0	do.c	$NHDT-Date: 1781973045 2026/06/20 16:30:45 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.411 $ */
+/* $NHDT-Header: NetHack 5.0 do.c 2026/10/17_14:49:13 NetHack-5.0:1.416 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1370,7 +1370,18 @@ currentlevel_rewrite(void)
     return nhfp;
 }
 
+void
+do_idlecheckpoint(void)
+{
+    program_state.in_idlecheckpoint = 1;
 #ifdef INSURANCE
+    save_currentstate();
+#endif /* INSURANCE */
+    program_state.in_idlecheckpoint = 0;
+}
+
+#ifdef INSURANCE
+
 void
 save_currentstate(void)
 {

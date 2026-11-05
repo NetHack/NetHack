@@ -1,4 +1,4 @@
-/* NetHack 5.0  tile.h       $NHDT-Date: 1781973098 2026/06/20 16:31:38 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.17 $ */
+/* $NHDT-Header: NetHack 5.0 tile.h 2026/06/20_22:26:43 NetHack-5.0:1.19 $ */
 /*      Copyright (c) 2016 by Michael Allison             */
 /* NetHack may be freely redistributed.  See license for details. */
 

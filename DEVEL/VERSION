@@ -1,5 +1,4 @@
-6
-PRE and POST hooks will be dropped at some future date -
-see https://www.nethack.org/devel/deprecation.html for details.
-
-See "git log DEVEL" for previous changes.
+8
+bugfix for 7
+7
+Add support for PREFIX-Header to nhsub and NHsubst

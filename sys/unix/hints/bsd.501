@@ -1,4 +1,4 @@
-# NetHack 5.0 unix $NHDT-Date: 1778708083 2026/05/13 21:34:43 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.0 $
+# $NHDT-Header: NetHack 5.0 bsd.501 2026/10/21_14:42:01 NetHack-5.0:1.6 $
 # Copyright 2026 by Anthony C Howe.
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -33,7 +33,7 @@ VARDIR=/var/games/nethackdir
 # Suggest leaving /usr/games as-is from bsdgames.tgz.
 SHELLDIR=$(PREFIX)/bin
 
-CFLAGS=-O -I../include -USYSV -DBSD -DHACKDIR='"$(HACKDIR)"' -DVAR_PLAYGROUND='"$(VARDIR)"'
+CFLAGS=-O -I../include -I../nhlua/lua/src -USYSV -DBSD -DHACKDIR='"$(HACKDIR)"' -DVAR_PLAYGROUND='"$(VARDIR)"'
 LINK=$(CC)
 
 WINSRC = $(WINTTYSRC)

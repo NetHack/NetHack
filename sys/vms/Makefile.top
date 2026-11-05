@@ -1,7 +1,8 @@
-#	NetHack Makefile (VMS) - top level for making & installing everything.
-#	NetHack 5.0	Makefile.top	$NHDT-Date: 1596498303 2020/08/03 23:45:03 $	$NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.11 $
+# $NHDT-Header: NetHack 5.0 Makefile.top 2026/04/26_14:47:48 NetHack-5.0:1.14 $
 # Copyright (c) 2011 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
+
+# NetHack Makefile (VMS) - top level for making & installing everything.
 
 #  Copy this file to <top>Makefile.; edit the appropriate values for
 #  GAMEDIR ("playground" location) and GAMEOWNER (UIC or identifier

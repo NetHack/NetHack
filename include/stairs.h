@@ -1,4 +1,4 @@
-/* NetHack 5.0	stairs.h	$NHDT-Date: 1781973088 2026/06/20 16:31:28 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.1 $ */
+/* $NHDT-Header: NetHack 5.0 stairs.h 2026/06/20_22:26:43 NetHack-5.0:1.3 $ */
 /* Copyright (c) 2024 by Pasi Kallinen */
 /* NetHack may be freely redistributed.  See license for details. */
 

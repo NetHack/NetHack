@@ -1,4 +1,4 @@
--- NetHack bigroom bigrm-13.lua	$NHDT-Date: 1781994879 2026/06/20 22:34:39 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.5 $
+-- $NHDT-Header: NetHack 5.0 bigrm-13.lua 2026/06/20_22:35:38 NetHack-5.0:1.7 $
 --	Copyright (c) 2026 by Pasi Kallinen
 -- NetHack may be freely redistributed.  See license for details.
 --

@@ -1,4 +1,6 @@
-# NetHack 5.0  gbdates-pre $NHDT-Date: 1599687610 2020/09/09 21:40:10 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.11 $
+# $NHDT-Header: NetHack 5.0 gbdates-pre.501 2026/09/25_13:07:53 NetHack-5.0:1.6 $
+# Copyright (c) Michael Allison, 2026.
+# NetHack may be freely redistributed.  See license for details.
 
 ifdef MAKEFILE_DOC
 ifneq "$(GIT)" "0"

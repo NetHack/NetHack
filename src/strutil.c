@@ -1,4 +1,4 @@
-/* NetHack 5.0	strutil.c	$NHDT-Date: 1709571807 2024/03/04 17:03:27 $  $NHDT-Branch: keni-mdlib-followup $:$NHDT-Revision: 1.0 $ */
+/* $NHDT-Header: NetHack 5.0 strutil.c 2026/04/26_13:25:42 NetHack-5.0:1.4 $ */
 /* Copyright (c) Robert Patrick Rankin, 1991                      */
 /* NetHack may be freely redistributed.  See license for details. */
 

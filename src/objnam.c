@@ -1,4 +1,4 @@
-/* NetHack 5.0	objnam.c	$NHDT-Date: 1781973060 2026/06/20 16:31:00 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.464 $ */
+/* $NHDT-Header: NetHack 5.0 objnam.c 2026/11/02_21:05:17 NetHack-5.0:1.474 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2280,8 +2280,15 @@ aobjnam(struct obj *otmp, const char *verb)
         bp = strprepend(bp, prefix);
     }
     if (verb) {
-        Strcat(bp, " ");
-        Strcat(bp, otense(otmp, verb));
+        const char *vt = otense(otmp, verb);
+        char *outbuf = nextobuf();
+
+        /* the name can fill its obuf right to the end, leaving no room
+           for the verb there; build the result in a fresh obuf instead,
+           shortening the name if necessary so that the verb fits */
+        Snprintf(outbuf, BUFSZ, "%.*s %s",
+                 (int) (BUFSZ - 2 - strlen(vt)), bp, vt);
+        bp = outbuf;
     }
     return bp;
 }

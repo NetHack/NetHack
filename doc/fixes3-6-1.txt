@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.448 $ $NHDT-Date: 1524780380 2018/04/26 22:06:20 $
+$NHDT-Header: NetHack 5.0 fixes3-6-1.txt 2022/01/29_21:28:06 NetHack-5.0:1.454 $
 
 General Fixes and Modified Features
 -----------------------------------

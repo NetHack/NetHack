@@ -1,4 +1,4 @@
-/* NetHack 5.0	Window.c	$NHDT-Date: 1781973108 2026/06/20 16:31:48 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.17 $ */
+/* $NHDT-Header: NetHack 5.0 Window.c 2026/06/20_16:31:48 NetHack-5.0:1.20 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 

@@ -1,4 +1,4 @@
--- NetHack sokoban soko4-1.lua	$NHDT-Date: 1781994888 2026/06/20 22:34:48 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.6 $
+-- $NHDT-Header: NetHack 5.0 soko4-1.lua 2026/06/20_22:35:38 NetHack-5.0:1.8 $
 --	Copyright (c) 1998-1999 by Kevin Hugo
 -- NetHack may be freely redistributed.  See license for details.
 --

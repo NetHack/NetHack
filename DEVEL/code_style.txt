@@ -1,4 +1,4 @@
-# NetHack 3.7  code_style.txt       $NHDT-Date: 1694890786 2023/09/16 18:59:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.8 $
+# $NHDT-Header: NetHack 5.0 code_style.txt 2024/03/16_20:41:09 NetHack-5.0:1.12 $
 # Copyright (c) 2015 by Derek S. Ray
 # NetHack may be freely redistributed.  See license for details.
 

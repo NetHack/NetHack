@@ -1,4 +1,4 @@
-/* NetHack 5.0	dogmove.c	$NHDT-Date: 1781973046 2026/06/20 16:30:46 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.177 $ */
+/* $NHDT-Header: NetHack 5.0 dogmove.c 2026/08/16_14:31:31 NetHack-5.0:1.180 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */

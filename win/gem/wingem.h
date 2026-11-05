@@ -1,4 +1,4 @@
-/* NetHack 5.0	wingem.h	$NHDT-Date: 1596498570 2020/08/03 23:49:30 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.15 $ */
+/* $NHDT-Header: NetHack 5.0 wingem.h 2026/09/30_14:47:34 NetHack-5.0:1.27 $ */
 /* Copyright (c) Christian Bressler, 1999				  */
 /* NetHack may be freely redistributed.  See license for details. */
 

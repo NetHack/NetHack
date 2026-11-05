@@ -1,4 +1,4 @@
-/* NetHack 5.0  libnhmain.c $NHDT-Date: 1693359589 2023/08/30 01:39:49 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.106 $ */
+/* $NHDT-Header: NetHack 5.0 libnhmain.c 2026/05/31_17:21:25 NetHack-5.0:1.132 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */

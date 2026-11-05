@@ -1,4 +1,4 @@
-/* NetHack 5.0	sfmacros.h $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* $NHDT-Header: NetHack 5.0 sfmacros.h 2026/05/27_20:14:20 NetHack-5.0:1.3 $ */
 /* Copyright (c) Michael Allison, 2025. */
 /* NetHack may be freely redistributed.  See license for details. */
 

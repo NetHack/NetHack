@@ -1,4 +1,4 @@
-/* NetHack 5.0	save.c	$NHDT-Date: 1781973065 2026/06/20 16:31:05 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.263 $ */
+/* $NHDT-Header: NetHack 5.0 save.c 2026/10/27_11:20:36 NetHack-5.0:1.274 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -314,9 +314,9 @@ savegamestate(NHFILE *nhfp)
      */
     u.ustuck_mid = 0;
     u.usteed_mid = 0;
-    Sfo_char(nhfp, yyyymmddhhmmss(ubirthday), "gamestate-ubirthday", 14);
+    Sfo_char(nhfp, yyyymmddhhmmss(ubirthday), "gamestate-ubirthday", NHDATELEN);
     Sfo_long(nhfp, &urealtime.realtime, "gamestate-realtime");
-    Sfo_char(nhfp, yyyymmddhhmmss(urealtime.start_timing), "gamestate-start_timing", 14);
+    Sfo_char(nhfp, yyyymmddhhmmss(urealtime.start_timing), "gamestate-start_timing", NHDATELEN);
     /* this is the value to use for the next update of urealtime.realtime */
     urealtime.start_timing = urealtime.finish_time;
     save_killers(nhfp);
@@ -502,33 +502,40 @@ savelev_core(NHFILE *nhfp, xint8 lev)
      *    internal level number (ledger number);
      *    bones info;
      *    actual level data.
-     *
-     *  If we're tearing down the current level without saving anything
-     *  (which happens at end of game or upon entrance to endgame or
-     *  after an aborted restore attempt) then we don't want to do any
-     *  actual I/O.  So when only freeing, we skip to the bones info
-     *  portion (which has some freeing to do), then jump quite a bit
-     *  further ahead to the middle of the 'actual level data' portion.
      */
-    if (nhfp->mode != FREEING) {
-        /* WRITING (probably ORed with FREEING), or COUNTING */
 
+
+    if (!program_state.in_idlecheckpoint) {
         /* purge any dead monsters (necessary if we're starting
            a panic save rather than a normal one, or sometimes
            when changing levels without taking time -- e.g.
-           create statue trap then immediately level teleport) */
+           create statue trap then immediately level teleport);
+           do this when only freeing too: entering the endgame or
+           leaving the tutorial discards the level without writing
+           it, and savemonchn() below would otherwise free a still
+           pending detached monster without crediting the purge
+           count, which the next dmonsfree() then reports as a
+           count mismatch */
         if (iflags.purge_monsters)
             dmonsfree();
         /* clear objs_deleted list too */
         if (go.objs_deleted)
             dobjsfree(); /* really free deleted objects */
+    }
 
+    /* If we're tearing down the current level without saving anything
+     * (which happens at end of game or upon entrance to endgame or
+     * after an aborted restore attempt) then we don't want to do any
+     * actual IO.
+     * So when only freeing, we skip to the bones info
+     * portion (which has some freeing to do).
+     */
+    if (!freeing_only(nhfp)) {
         if (lev >= 0 && lev <= maxledgerno())
             svl.level_info[lev].flags |= VISITED;
         Sfo_int(nhfp, &svh.hackpid, "gamestate-hackpid");
         Sfo_xint8(nhfp, &lev, "gamestate-dlvl");
     }
-
     /* bones info comes before level data; the intent is for an external
        program ('hearse') to be able to match a bones file with the
        corresponding log file entry--or perhaps just skip that?--without
@@ -536,41 +543,41 @@ savelev_core(NHFILE *nhfp, xint8 lev)
        interpret level data to find where to start; unfortunately it
        still needs to handle all the data compression schemes */
     savecemetery(nhfp, &svl.level.bonesinfo);
-    if (nhfp->mode == FREEING) /* see above */
-        goto skip_lots;
 
-    savelevl(nhfp);
-    for (c = 0; c < COLNO; ++c) {
-        for (r = 0; r < ROWNO; ++r) {
-            Sfo_schar(nhfp, &svl.lastseentyp[c][r], "lastseentyp");
+    if (!freeing_only(nhfp)) { 
+        savelevl(nhfp);
+        for (c = 0; c < COLNO; ++c) {
+            for (r = 0; r < ROWNO; ++r) {
+                Sfo_schar(nhfp, &svl.lastseentyp[c][r], "lastseentyp");
+            }
         }
-    }
-    /* preserve idle time when copying levels; match getlev()'s
-       monster catch-up guard */
-    timestamp = (!u.uz.dlevel || program_state.restoring == REST_LEVELS)
-                    ? svo.omoves : svm.moves;
-    Sfo_long(nhfp, &timestamp, "lev-timestmp");
-    save_stairs(nhfp);
-    Sfo_dest_area(nhfp, &svu.updest, "lev-updest");
-    Sfo_dest_area(nhfp, &svd.dndest, "lev-dndest");
-    save_adjust_levelflags(timestamp);
-    Sfo_levelflags(nhfp, &svl.level.flags, "lev-level_flags");
-    rest_adjust_levelflags(svm.moves - timestamp, FALSE);
+        /* preserve idle time when copying levels; match getlev()'s
+           monster catch-up guard */
+        timestamp = (!u.uz.dlevel || program_state.restoring == REST_LEVELS)
+                        ? svo.omoves
+                        : svm.moves;
+        Sfo_long(nhfp, &timestamp, "lev-timestmp");
+        save_stairs(nhfp);
+        Sfo_dest_area(nhfp, &svu.updest, "lev-updest");
+        Sfo_dest_area(nhfp, &svd.dndest, "lev-dndest");
+        save_adjust_levelflags(timestamp);
+        Sfo_levelflags(nhfp, &svl.level.flags, "lev-level_flags");
+        rest_adjust_levelflags(svm.moves - timestamp, FALSE);
 
-    Sfo_int(nhfp, &svd.doors_alloc, "lev-doors_alloc");
-    /* don't rely on underlying write() behavior to write
-     *  nothing if count arg is 0, just skip it */
-    if (svd.doors_alloc) {
-        tmpc = svd.doors;
-        for (i = 0; i < svd.doors_alloc; ++i) {
-            Sfo_nhcoord(nhfp, tmpc, "lev-doors");
-            tmpc++;
+        Sfo_int(nhfp, &svd.doors_alloc, "lev-doors_alloc");
+        /* don't rely on underlying write() behavior to write
+         *  nothing if count arg is 0, just skip it */
+        if (svd.doors_alloc) {
+            tmpc = svd.doors;
+            for (i = 0; i < svd.doors_alloc; ++i) {
+                Sfo_nhcoord(nhfp, tmpc, "lev-doors");
+                tmpc++;
+            }
         }
+        save_rooms(nhfp); /* no dynamic memory to reclaim */
     }
-    save_rooms(nhfp); /* no dynamic memory to reclaim */
-
     /* from here on out, saving also involves allocated memory cleanup */
- skip_lots:
+
     /* timers and lights must be saved before monsters and objects */
     save_timers(nhfp, RANGE_LEVEL);
     save_light_sources(nhfp, RANGE_LEVEL);
@@ -588,7 +595,7 @@ savelev_core(NHFILE *nhfp, xint8 lev)
     save_exclusions(nhfp);
     save_track(nhfp);
 
-    if (nhfp->mode != FREEING) {
+    if (!freeing_only(nhfp)) {
         if (nhfp->structlevel)
             bflush(nhfp->fd);
     }
@@ -924,14 +931,19 @@ savemonchn(NHFILE *nhfp, struct monst *mtmp)
 
     while (mtmp) {
         mtmp2 = mtmp->nmon;
-        if (update_file(nhfp)) {
+        if (update_file(nhfp)
+            /* during idlecheckpoint, dmonsfree() intentionally does not run,
+               so we need to skip the writing of any dead monsters */
+            && !(program_state.in_idlecheckpoint && DEADMONSTER(mtmp))) {
             mtmp->mnum = monsndx(mtmp->data);
+            if (DEADMONSTER(mtmp) && mtmp->minvent)
+                impossible("Dead monster still has minvent");
             if (mtmp->ispriest)
                 forget_temple_entry(mtmp); /* EPRI() */
             savemon(nhfp, mtmp);
+            if (mtmp->minvent)
+                saveobjchn(nhfp, &mtmp->minvent);
         }
-        if (mtmp->minvent)
-            saveobjchn(nhfp, &mtmp->minvent);
         if (release_data(nhfp)) {
             if (mtmp == svc.context.polearm.hitmon) {
                 svc.context.polearm.m_id = mtmp->m_id;

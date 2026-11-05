@@ -1,4 +1,6 @@
-# NetHack 5.0  luahelper    $NHDT-Date: 1791741018 2026/10/11 17:50:18 $  $NHDT-Branch: NetHack-5.0 $ $NHDT-Revision: 1.8 $
+# $NHDT-Header: NetHack 5.0 luahelper 2026/10/11_17:56:42 NetHack-5.0:1.10 $
+# Copyright (c) Michael Allison, 2026
+# NetHack may be freely redistributed.  See license for details.
 #
 #  Makefile to assist developers in adding lines to various build
 #  Makefiles, or project files, as lua files are added or removed.

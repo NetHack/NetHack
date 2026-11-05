@@ -1,4 +1,4 @@
-/* NetHack 5.0	maccurs.c	$NHDT-Date: 1432512797 2015/05/25 00:13:17 $  $NHDT-Branch: master $:$NHDT-Revision: 1.9 $ */
+/* $NHDT-Header: NetHack 5.0 maccurs.c 2026/09/30_14:47:34 NetHack-5.0:1.22 $ */
 /* Copyright (c) Jon W{tte, 1992.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 

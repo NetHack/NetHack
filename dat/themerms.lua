@@ -1,4 +1,4 @@
--- NetHack themerms.lua	$NHDT-Date: 1781994889 2026/06/20 22:34:49 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.43 $
+-- $NHDT-Header: NetHack 5.0 themerms.lua 2026/06/20_22:34:49 NetHack-5.0:1.47 $
 --	Copyright (c) 2020 by Pasi Kallinen
 -- NetHack may be freely redistributed.  See license for details.
 --
@@ -277,6 +277,24 @@ themeroom_fills = {
          end
       end,
    },
+
+   {
+      name = "Meat",
+      contents = function(rm)
+         local meats = { "meatball", "meatball", "meat ring",
+                         "meat stick", "enormous meatball" };
+         local i = d(5, 5);
+         while (i > 0) do
+            local meatidx = math.random(#meats);
+            des.object({ id = meats[meatidx] });
+            i = i - meatidx;
+         end
+         if (nh.level_difficulty() > 8 and percent(75)) then
+            des.monster({ id = "flesh golem", waiting = true });
+         end
+      end,
+   },
+
 };
 
 themerooms = {

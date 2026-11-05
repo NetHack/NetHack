@@ -1,4 +1,4 @@
-/* NetHack 5.0	sp_lev.c	$NHDT-Date: 1778778225 2026/05/14 17:03:45 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.387 $ */
+/* $NHDT-Header: NetHack 5.0 sp_lev.c 2026/10/18_12:54:26 NetHack-5.0:1.391 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2342,12 +2342,14 @@ create_object(object *o, struct mkroom *croom)
     }
     /* container */
     if (o->containment & SP_OBJ_CONTAINER) {
+        /* gw.whitelist_shk |= 1; */
         delete_contents(otmp);
         if (container_idx < MAX_CONTAINMENT) {
             container_obj[container_idx] = otmp;
             container_idx++;
         } else
             impossible("create_object: too deeply nested containers.");
+        /* gw.whitelist_shk &= ~1; */
     }
 
     /* Medusa level special case: statues are petrified monsters, so they

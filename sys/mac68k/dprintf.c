@@ -1,4 +1,4 @@
-/* NetHack 5.0	dprintf.c	$NHDT-Date: 1432512798 2015/05/25 00:13:18 $  $NHDT-Branch: master $:$NHDT-Revision: 1.7 $ */
+/* $NHDT-Header: NetHack 5.0 dprintf.c 2026/09/30_14:47:34 NetHack-5.0:1.14 $ */
 /* Copyright (c) Jon W{tte, 1993.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 

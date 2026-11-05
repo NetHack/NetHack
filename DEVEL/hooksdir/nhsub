@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $NHDT-Date: 1524689646 2018/04/25 20:54:06 $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.7 $
+# $NHDT-Header: NetHack 5.0 nhsub 2026/10/31_22:55:58 NetHack-5.0:1.17 $
 # Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
 
@@ -438,7 +438,7 @@ sub handledatesub {
     my $newvalue = $_[1];
     $out =~ s/
 	\b	    # don't substitute on a partial word
-	(Assert|Date|Branch|Revision|Brev|Project)  # $1 - keyword
+	(Assert|Date|Branch|Revision|Brev|Ver|Project|Header)  # $1 - keyword
 	\(					    # (
 	([^)]*)					    # $2 - argument
 	\)					    # )
@@ -473,6 +473,9 @@ sub onedatesub {
 #    Branch()
 #    Revision()
 #    Brev()	Branch:Rev (aBREViated)
+#    Header()
+#    Project()
+#    Ver()
 
 sub handlevar {
     my($var, $val, $wrap) = @_;
@@ -527,13 +530,15 @@ sub Date {
     my(undef, $val) = @_;
     my $now;
 
-# DONE XXX after several bug fixes, this set of ifs needs some cleanup
-my $hash = `git log -1 '--format=format:%H' $::current_file`;
+	#XXX saved for posterity: update to last date before changing header format
+	# in this case, used -f -m and here: f7943a0f6b8facc05fd3b2558aa8529cec0127e6^
+    #my $rev = $::revopt . '--' if($::revopt);
+    my $rev;
+    chomp(my $hash = `git log -1 '--format=format:%H' $rev $::current_file`);
     $now = $^T;
-#    if($opt{m} or not defined $hash){
 
 	    # cope with file not yet added to git
-    if(not defined $hash){
+    if(length $hash < 40){
 	if(-f $::current_file){
 	    $now = (stat($::current_file))[9];
 	} else {
@@ -543,27 +548,33 @@ my $hash = `git log -1 '--format=format:%H' $::current_file`;
 	    #author keni <keni@his.com> 1429884677 -0400
 	chomp($now = `git cat-file -p $hash | awk '/author/{print \$4}'`);
     }
-#    } else {
-#    }
 
-# DONE XXX simplify this with %s ?
-#    my $fmt = length $val ? $val : "%Y/%m/%d %H:%M:%S";
-    my $fmt = length $val ? $val : "%s %Y/%m/%d %H:%M:%S";
-	# YYYY/MM/DD HH:MM:SS
-#    $val = ((length $val==0)?"$now ":"") . strftime($fmt, gmtime($now));
+    my $fmt = length $val ? $val : "%Y/%m/%d_%H:%M:%S";
+	# YYYY/MM/DD_HH:MM:SS
     $val = strftime($fmt, gmtime($now));
     return $val;
 }
 
-#sub Header {
-#}
-#sub Author {
-#}
+sub Header {
+    my %rv;
+    $rv{project} = &PREFIX::Project;
+    $rv{ver} = &PREFIX::Ver;
+    $rv{file} = &PREFIX::File;
+    $rv{date} = &PREFIX::Date;
+    $rv{branch} = &PREFIX::Branch;
+    $rv{revision} = &PREFIX::Revision;
+    return "$rv{project} $rv{ver} $rv{file} $rv{date} $rv{branch}:$rv{revision}"
+}
+
+sub File {
+    $::current_file =~ m!^(.*/)?(.*)$!;
+    return $2;
+}
 
 # NB: the standard-ish Revision line isn't enough - you need Branch:Revision -
 #     but we split it into 2 so we can use the standard processing code on
 #     Revision and just slip Branch in.
-# But see new Brev below.
+# But see new Brev below.  And also Header above.
 sub Branch {
     my $val;
     $val = `git symbolic-ref -q --short HEAD`;
@@ -599,6 +610,24 @@ sub Brev {
     return $val;
 }
 
+sub Ver {
+    chomp(my $root = `git rev-parse --show-toplevel`);
+    my $patchlevel = "$root/include/patchlevel.h";
+    return '1.0' unless(-f $patchlevel);	# no version unless in NHsource
+    open my $fh, "<", $patchlevel or return '1.0';
+    local $/;
+    local $_ = <$fh>;
+    my $major;
+    my $minor;
+    if(m/VERSION_MAJOR\s+(\d+)/){
+	$major = $1
+    }
+    if(m/VERSION_MINOR\s+(\d+)/){
+	$minor = $1
+    }
+    return "$major.$minor"
+}
+
 sub Project {
     my(undef, $arg) = @_;
     my $pn = &::git_config('nethack','projectname');
@@ -611,7 +640,6 @@ sub Project {
     }
     return $pn;
 }
-
 
 sub Assert {
     my(undef, $val) = @_;
@@ -758,10 +786,20 @@ current file.
 This is a convenience variable that concatenates C<Branch>, a colon, and
 C<Revision>.  Short for "aBREViated".
 
-=item Project()
+=item Project() / PREFIX-Project
 
 Returns git variable nethack.projectname.  If given the argument C<uc>, returns
 an upper-case version of nethack.projectname.
+
+=item Ver() / PREFIX-Ver
+Returns major.minor from include/patchlevel.h.  If not in a game source tree, returns
+dummy value "1.0".
+
+=item File() / PREFIX-File
+Returns the filename of the file being processed.
+
+=item PREFIX-Header
+Combination of: Project Ver File Date Branch:Revision
 
 =back
 

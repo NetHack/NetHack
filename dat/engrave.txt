@@ -1,4 +1,4 @@
-# NetHack 5.0  engrave.txt       $NHDT-Date: 1596498240 2020/08/03 23:44:00 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.5 $
+# $NHDT-Header: NetHack 5.0 engrave.txt 2026/06/20_22:55:28 NetHack-5.0:1.9 $
 # Copyright (c) 2015 by Pasi Kallinen
 # NetHack may be freely redistributed.  See license for details.
 # Random engravings on the floor

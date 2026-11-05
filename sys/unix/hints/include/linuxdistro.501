@@ -1,3 +1,6 @@
+# $NHDT-Header: NetHack 5.0 linuxdistro.501 2026/10/06_00:06:35 NetHack-5.0:1.4 $
+# Copyright (c) Michael Allison, 2026.
+# NetHack may be freely redistributed.  See license for details.
 # ===== linuxdistro ========
 
 LINUX_DISTRO=

@@ -1,4 +1,4 @@
-/* NetHack 5.0	pctiles.h	$NHDT-Date: 1596498272 2020/08/03 23:44:32 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.10 $ */
+/* $NHDT-Header: NetHack 5.0 pctiles.h 2026/04/26_14:47:48 NetHack-5.0:1.17 $ */
 /*   Copyright (c) NetHack PC Development Team 1993, 1994             */
 /*   NetHack may be freely redistributed.  See license for details.   */
 /*                                                                    */

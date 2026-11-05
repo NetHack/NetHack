@@ -1,4 +1,4 @@
-/* NetHack 5.0	mttypriv.h	$NHDT-Date: 1596498551 2020/08/03 23:49:11 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.10 $ */
+/* $NHDT-Header: NetHack 5.0 mttypriv.h 2026/09/30_14:47:34 NetHack-5.0:1.17 $ */
 /* Copyright (c) Jon W{tte 1993.					*/
 /* NetHack may be freely redistributed.  See license for details.	*/
 

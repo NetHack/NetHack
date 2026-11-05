@@ -1,4 +1,4 @@
-/* NetHack 5.0	hack.c	$NHDT-Date: 1781973050 2026/06/20 16:30:50 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.508 $ */
+/* $NHDT-Header: NetHack 5.0 hack.c 2026/06/20_16:30:50 NetHack-5.0:1.512 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2924,6 +2924,7 @@ domove_core(void)
                 /* could skip this since we're about to call u_on_newpos() */
                 if (u.usteed)
                     u.usteed->mx = u.ux, u.usteed->my = u.uy;
+                nomul(0);
             }
         }
     }  /* mtmp != NULL */

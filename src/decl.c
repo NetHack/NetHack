@@ -1,4 +1,4 @@
-/* NetHack 5.0	decl.c	$NHDT-Date: 1781973044 2026/06/20 16:30:44 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.368 $ */
+/* $NHDT-Header: NetHack 5.0 decl.c 2026/10/18_12:54:26 NetHack-5.0:1.374 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -831,7 +831,9 @@ static const struct instance_globals_w g_init_w = {
     UNDEFINED_PTR, /* wportal */
     /* new */
     { wdmode_traditional, NO_COLOR },       /* wsettings */
-    0L,                                     /* were.c, allmain.c */
+    /* were.c, allmain.c */
+    0L,                                     /* were_changes */
+    0L,                                     /* whitelist_shk */
     TRUE, /* havestate*/
 };
 

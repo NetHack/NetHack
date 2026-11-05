@@ -1,5 +1,5 @@
 #!/usr/bin/osascript
-# NetHack 5.0  NetHackGuidebook.applescript $NHDT-Date: 1596498328 2020/08/03 23:45:28 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.13 $
+# $NHDT-Header: NetHack 5.0 NetHackGuidebook.applescript 2026/06/20_22:55:28 NetHack-5.0:1.17 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2011
 # NetHack may be freely redistributed.  See license for details.
 

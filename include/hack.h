@@ -1,4 +1,4 @@
-/* NetHack 5.0	hack.h	$NHDT-Date: 1781973080 2026/06/20 16:31:20 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.299 $ */
+/* $NHDT-Header: NetHack 5.0 hack.h 2026/10/27_11:20:36 NetHack-5.0:1.309 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -805,6 +805,7 @@ struct sinfo {
     int in_role_selection;      /* role/race/&c selection menus in progress */
     int in_getlin;              /* inside interface getlin routine */
     int in_sanity_check;        /* for impossible() during sanity checking */
+    int in_idlecheckpoint;      /* an input timeout has triggered idlecheckpoint */
     int config_error_ready;     /* config_error_add is ready, available */
     int beyond_savefile_load;   /* set when past savefile loading */
     int savefile_completed;     /* savefile has completed writing */
@@ -977,15 +978,11 @@ struct xlock_s {
 #define FREEING      0x04
 #define CONVERTING   0x08
 #define UNCONVERTING 0x10
-#if 0
-/* operations of the various saveXXXchn & co. routines */
-#define perform_bwrite(nhfp) ((nhfp)->mode & (COUNTING | WRITING))
-#define release_data(nhfp) ((nhfp)->mode & FREEING)
-#endif
 
 /* operations of the various saveXXXchn & co. routines */
 #define update_file(nhfp) ((nhfp)->mode & (COUNTING | WRITING))
 #define release_data(nhfp) ((nhfp)->mode & FREEING)
+#define freeing_only(nhfp) ((nhfp)->mode == FREEING)
 
 enum saveformats {
     invalid = 0,
@@ -1436,6 +1433,9 @@ typedef uint32_t mmflags_nht;     /* makemon MM_ flags */
 #define MENU_COMBINATION 1
 #define MENU_FULL 2
 #define MENU_PARTIAL 3
+
+/* sizeof YYYYMMDDHHMMSS */
+#define NHDATELEN 14
 
 /* flags to control teleds() */
 #define TELEDS_NO_FLAGS   0

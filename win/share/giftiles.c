@@ -1,4 +1,4 @@
-/* NetHack 5.0    giftiles.c    $NHDT-Date: 1781973097 2026/06/20 16:31:37 $ $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.4 $ */
+/* $NHDT-Header: NetHack 5.0 giftiles.c 2026/06/20_16:31:37 NetHack-5.0:1.7 $ */
 /* Copyright (c) Ray Chason, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
 

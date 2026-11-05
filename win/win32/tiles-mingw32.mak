@@ -1,4 +1,4 @@
-#$NHDT-Date: 1524689255 2018/04/25 20:47:35 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.4 $
+# $NHDT-Header: NetHack 5.0 tiles-mingw32.mak 2018/11/30_01:59:03 NetHack-5.0:1.7 $
 # Copyright (c) 2002 by Michael Allison
 # NetHack may be freely redistributed.  See license for details.
 

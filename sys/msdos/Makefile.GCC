@@ -1,4 +1,4 @@
-# NetHack 5.0	Makefile.GCC	$NHDT-Date: 1596498268 2020/08/03 23:44:28 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.53 $
+# $NHDT-Header: NetHack 5.0 Makefile.GCC 2026/09/25_13:07:02 NetHack-5.0:1.97 $
 #	Copyright (c) NetHack PC Development Team 1996-2024.
 #	PC NetHack 5.0 Makefile for djgpp V2
 #

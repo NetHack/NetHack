@@ -1,9 +1,11 @@
 @echo off
-REM    NetHack 5.0 setup.bat   $NHDT-Date: 1596498274 2020/08/03 23:44:34 $ $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.18 $
+REM    $NHDT-Header: NetHack 5.0 setup.bat 2026/04/26_14:47:48 NetHack-5.0:1.23 $
+REM    Copyright (c) Michael Allison, 2026
 REM    Copyright (c) NetHack PC Development Team 1990 - 2019
 REM    NetHack may be freely redistributed.  See license for details.
 
 echo.
+echo   Copyright (c) Michael Allison, 2026
 echo   Copyright (c) NetHack PC Development Team 1990 - 2019
 echo   NetHack may be freely redistributed.  See license for details.
 echo.

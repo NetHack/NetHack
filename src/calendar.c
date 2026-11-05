@@ -1,4 +1,4 @@
-/* NetHack 5.0	calendar.c	$NHDT-Date: 1781973042 2026/06/20 16:30:42 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.3 $ */
+/* $NHDT-Header: NetHack 5.0 calendar.c 2026/06/20_22:26:43 NetHack-5.0:1.5 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
 /* Copyright (c) Robert Patrick Rankin, 1991                      */
@@ -95,7 +95,7 @@ char *
 yyyymmddhhmmss(time_t date)
 {
     long datenum;
-    static char datestr[15];
+    static char datestr[NHDATELEN + 1];
     struct tm *lt;
 
     if (date == 0)
@@ -124,7 +124,7 @@ time_from_yyyymmddhhmmss(char *buf)
     struct tm t, *lt;
     char *d, *p, y[5], mo[3], md[3], h[3], mi[3], s[3];
 
-    if (buf && strlen(buf) == 14) {
+    if (buf && strlen(buf) == NHDATELEN) {
         d = buf;
         p = y; /* year */
         for (k = 0; k < 4; ++k)

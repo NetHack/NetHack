@@ -1,4 +1,5 @@
-/* NetHack 5.0	macmenu.c	$NHDT-Date: 1432512797 2015/05/25 00:13:17 $  $NHDT-Branch: master $:$NHDT-Revision: 1.13 $ */
+/* $NHDT-Header: NetHack 5.0 macmenu.c 2015/05/25_00:13:17 NetHack-5.0:1.23 $ */
+/*	Copyright (c) Ingo Paschke, 2026. */
 /*      Copyright (c) Macintosh NetHack Port Team, 1993.          */
 /* NetHack may be freely redistributed.  See license for details. */
 

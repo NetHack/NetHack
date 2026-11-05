@@ -1,4 +1,4 @@
-/* NetHack 5.0	symbols.c	$NHDT-Date: 1781973069 2026/06/20 16:31:09 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.128 $ */
+/* $NHDT-Header: NetHack 5.0 symbols.c 2026/06/20_16:31:09 NetHack-5.0:1.133 $ */
 /* Copyright (c) NetHack Development Team 2020.                   */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -965,6 +965,11 @@ symparse_find(const void *bstr_, const void *rec_)
     for (i = 0; i < bstr->len; ++i) {
         char c1 = bstr->str[i];
         char c2 = (*rec)->name[i];
+
+        /* if c2=='\0' then 'rec' is a leading substring of 'bstr' */
+        if (!c2) /* i < bstr->len implies that c1 isn't '\0', so no match */
+            return 1; /* bstr > rec */
+
         if ('A' <= c1 && c1 <= 'Z') {
             c1 += 'a' - 'A';
         }
@@ -975,6 +980,10 @@ symparse_find(const void *bstr_, const void *rec_)
             return c1 - c2;
         }
     }
+    /* if 'rec' hasn't been exhausted, 'bstr' is a leading substring of it
+       rather than a match */
+    if ((*rec)->name[i])
+        return -1; /* bstr < rec */
 
     return 0;
 }

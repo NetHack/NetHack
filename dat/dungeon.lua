@@ -1,5 +1,5 @@
--- NetHack 3.6	dungeon dungeon.lua	$NHDT-Date: 1781994881 2026/06/20 22:34:41 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.11 $
--- Copyright (c) 1990-95 by M. Stephenson
+-- $NHDT-Header: NetHack 5.0 dungeon.lua 2026/06/20_22:35:38 NetHack-5.0:1.13 $
+-- Copyright (c) 1990-1995 by M. Stephenson
 -- NetHack may be freely redistributed.  See license for details.
 --
 -- The dungeon description file.

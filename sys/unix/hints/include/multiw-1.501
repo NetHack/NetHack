@@ -1,5 +1,7 @@
 #==============================================================================
-# NetHack 5.0  multiw-1 $NHDT-Date: 1791741358 2026/10/11 17:55:58 $  $NHDT-Branch: NetHack-5.0 $ $NHDT-Revision: 1.7 $
+# $NHDT-Header: NetHack 5.0 multiw-1.501 2026/10/11_17:56:42 NetHack-5.0:1.10 $
+# Copyright (c) Michael Allison, 2026.
+# NetHack may be freely redistributed.  See license for details.
 
 # 1. Which windowing interface(s) should be included in this binary?
 # One or more of these can be manually uncommented and/or can be specified

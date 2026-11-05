@@ -1,4 +1,4 @@
-/* NetHack 3.6	amistack.c	$NHDT-Date: 1432512795 2015/05/25 00:13:15 $  $NHDT-Branch: master $:$NHDT-Revision: 1.8 $ */
+/* $NHDT-Header: NetHack 5.0 amistack.c 2015/05/25_00:13:15 NetHack-5.0:1.17 $ */
 /* Copyright (c) Janne Salmijärvi, Tampere, Finland, 2000		*/
 /* NetHack may be freely redistributed.  See license for details.	*/
 

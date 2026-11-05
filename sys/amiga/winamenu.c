@@ -1,4 +1,4 @@
-/* NetHack 3.6	winamenu.c	$NHDT-Date: 1432512796 2015/05/25 00:13:16 $  $NHDT-Branch: master $:$NHDT-Revision: 1.7 $ */
+/* $NHDT-Header: NetHack 5.0 winamenu.c 2026/09/30_14:47:34 NetHack-5.0:1.31 $ */
 /* Copyright (c) Gregg Wonderly, Naperville, Illinois,  1991,1992,1993,1996.
  */
 /* NetHack may be freely redistributed.  See license for details. */

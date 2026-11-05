@@ -1,7 +1,8 @@
-#	Makefile for NetHack's utility programs.
-# NetHack 5.0  util Makefile.vms    $NHDT-Date: 1602258295 2020/10/09 15:44:55 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.53 $
+# $NHDT-Header$
 # Copyright (c) 2018 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
+
+# Makefile for NetHack's utility programs.
 
 # Root of source tree relative to here:
 NHSROOT=[-]

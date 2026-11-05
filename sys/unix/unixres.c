@@ -1,4 +1,5 @@
-/* NetHack 5.0	unixres.c	$NHDT-Date: 1596498298 2020/08/03 23:44:58 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.14 $ */
+/* $NHDT-Header: NetHack 5.0 unixres.c 2026/04/26_14:41:11 NetHack-5.0:1.21 $ */
+/* Copyright (c) Michael Allison, 2026. */
 /* Copyright (c) Slash'EM development team, 2001. */
 /* NetHack may be freely redistributed.  See license for details. */
 

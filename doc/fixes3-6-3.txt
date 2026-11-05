@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.197 $ $NHDT-Date: 1575173931 2019/12/01 04:18:51 $
+$NHDT-Header: NetHack 5.0 fixes3-6-3.txt 2022/01/29_21:28:06 NetHack-5.0:1.205 $
 
 This fixes36.3 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.2 in May 2019. Please note, however,

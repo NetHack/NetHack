@@ -1,7 +1,8 @@
-#	NetHack Makefile (VMS) - for building nethack itself.
-#	NetHack 5.0	Makefile.src	$NHDT-Date: 1683748060 2023/05/10 19:47:40 $	$NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.60 $
+# $NHDT-Header: NetHack 5.0 Makefile.src 2026/09/25_13:07:53 NetHack-5.0:1.74 $
 # Copyright (c) 2011 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
+
+# NetHack Makefile (VMS) - for building nethack itself.
 
 #  Copy this file to [.src]Makefile. and then edit it as needed.
 #  The default configuration is for building with DEC C (aka Compaq C,

@@ -1,4 +1,4 @@
-/* NetHack 5.0	invent.c	$NHDT-Date: 1781973052 2026/06/20 16:30:52 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.563 $ */
+/* $NHDT-Header: NetHack 5.0 invent.c 2026/06/20 16:30:52 NetHack-5.0:1.569 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -5444,16 +5444,15 @@ cinv_doname(struct obj *obj)
 {
     char *result = doname(obj);
 
-    /*
-     * If obj->tknown ever gets implemented, doname() will handle this.
-     * Assumes that probing reveals the trap prior to calling us.  Since
-     * we lack that flag, hero forgets about it as soon as we're done....
-     */
+    /* doname() includes "trapped" when the trap status is known; only
+       insert it here when doname() couldn't, to avoid "trapped trapped" */
 
     /* 'result' is an obuf[] but might point into the middle (&buf[PREFIX])
        rather than the beginning and we don't have access to that;
        assume that there is at least QBUFSZ available when reusing it */
-    if (obj->otrapped && strlen(result) + sizeof "trapped " <= QBUFSZ) {
+    if (obj->otrapped
+        && !(Is_box(obj) && obj->tknown && obj->dknown)
+        && strlen(result) + sizeof "trapped " <= QBUFSZ) {
         /* obj->lknown has been set before calling us so either "locked" or
            "unlocked" should always be present (for a trapped container) */
         char *p = strstri(result, " locked"),

@@ -1,4 +1,4 @@
-$NHDT-Branch$:$NHDT-Revision$ $NHDT-Date$
+$NHDT-Header: NetHack 5.0 fixesX-X-X.txt 2025/03/13_16:48:07 NetHack-5.0:1.4 $
 
 General Fixes and Modified Features
 -----------------------------------

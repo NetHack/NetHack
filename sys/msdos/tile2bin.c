@@ -1,4 +1,4 @@
-/* NetHack 5.0	tile2bin.c	$NHDT-Date: 1596498275 2020/08/03 23:44:35 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.11 $ */
+/* $NHDT-Header: NetHack 5.0 tile2bin.c 2026/04/26_14:47:48 NetHack-5.0:1.20 $ */
 /*   Copyright (c) NetHack PC Development Team 1993, 1994, 1995     */
 /*   NetHack may be freely redistributed.  See license for details. */
 

@@ -1,4 +1,4 @@
-/* NetHack 5.0	mac68ksound.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* $NHDT-Header: NetHack 5.0 mac68ksound.c 2026/09/30_14:47:34 NetHack-5.0:1.2 $ */
 /* Copyright (c) NetHack Mac 68k port, 2026. */
 /* NetHack may be freely redistributed.  See license for details. */
 

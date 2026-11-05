@@ -1,4 +1,4 @@
-/* NetHack 5.0	gr_rect.c	$NHDT-Date: 1432512810 2015/05/25 00:13:30 $  $NHDT-Branch: master $:$NHDT-Revision: 1.7 $ */
+/* $NHDT-Header: NetHack 5.0 gr_rect.c 2026/09/30_14:47:34 NetHack-5.0:1.12 $ */
 /* Copyright (c) Christian Bressler, 2001 */
 /* NetHack may be freely redistributed.  See license for details. */
 /* This is an almost exact copy of qt_clust.cpp */

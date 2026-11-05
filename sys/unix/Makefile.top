@@ -1,7 +1,7 @@
-#      NetHack Top-level Makefile.
-# NetHack 5.0  Makefile.top    $NHDT-Date: 1722119081 2024/07/27 22:24:41 $  $NHDT-Branch: keni-fetchlua $:$NHDT-Revision: 1.109 $
+# $NHDT-Header: NetHack 5.0 Makefile.top 2024/07/27_22:24:41 NetHack-5.0:1.143 $
 # Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
+#      NetHack Top-level Makefile.
 
 #	Root of source tree:  (Note: dot is after setup.sh has been used
 #	to create the active Makefiles from sys/unix/Makefile.*.

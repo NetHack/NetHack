@@ -1,4 +1,4 @@
--- NetHack yendor fakewiz1.lua	$NHDT-Date: 1781994881 2026/06/20 22:34:41 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.4 $
+-- $NHDT-Header: NetHack 5.0 fakewiz1.lua 2026/06/20_22:35:38 NetHack-5.0:1.6 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1992 by M. Stephenson and Izchak Miller
 -- NetHack may be freely redistributed.  See license for details.

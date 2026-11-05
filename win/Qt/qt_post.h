@@ -1,4 +1,4 @@
-/* NetHack 5.0	qt_post.h	$NHDT-Date: 1781973096 2026/06/20 16:31:36 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.5 $ */
+/* $NHDT-Header: NetHack 5.0 qt_post.h 2026/06/20_22:26:43 NetHack-5.0:1.7 $ */
 
 /*
  * qt_post.h -- reverse part of qt_pre.h.

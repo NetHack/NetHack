@@ -1,5 +1,8 @@
 #!/bin/sh
-
+# $NHDT-Header: NetHack 5.0 fetch.sh 2026/09/25_13:07:02 NetHack-5.0:1.5 $
+# Copyright (c) Michael Allison, 2024
+# NetHack may be freely redistributed.  See license for details.
+ 
 if [ ! -d lib ]; then
 mkdir -p lib
 fi

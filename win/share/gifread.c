@@ -13,7 +13,7 @@
 /* +-------------------------------------------------------------------+ */
 
 /*
- * $NHDT-Date: 1432512803 2015/05/25 00:13:23 $  $NHDT-Branch: master $:$NHDT-Revision: 1.5 $
+ * $NHDT-Header: NetHack 5.0 gifread.c 2024/02/19_21:30:07 NetHack-5.0:1.10 $
  */
 
 #include "config.h"

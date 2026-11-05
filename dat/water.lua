@@ -1,4 +1,4 @@
--- NetHack endgame water.lua	$NHDT-Date: 1781994890 2026/06/20 22:34:50 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.2 $
+-- $NHDT-Header: NetHack 5.0 water.lua 2026/06/20_22:35:38 NetHack-5.0:1.4 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1992,1993 by Izchak Miller, David Cohrs,
 --                      and Timo Hakulinen
