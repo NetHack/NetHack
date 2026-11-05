@@ -11,6 +11,9 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-04
+Stepping on a Hinnom power lever now always asks to throw it, with no extra trap warning and no chance to slip past it.
+
+2026-11-04
 Michael and two angels now storm the throne room and go after Moloch when the field falls, while four other angels take the foyer.
 
 2026-11-04

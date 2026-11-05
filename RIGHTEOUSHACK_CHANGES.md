@@ -1455,6 +1455,8 @@ The disguise-broken screen is not shown with it.
 
 When the power field falls, Michael the Archangel and two angels are placed in the throne room and now make straight for Moloch (a Hinnom-only goal in m_move, marked by a new mstrategy bit). Four other angels take the foyer; extra angels are made if fewer than six are left. The foyer spots are inside the real room walls.
 
+Power levers no longer trigger the paranoid "Really step onto that power lever?" question and are no longer skipped by the 1-in-5 "You escape" roll; walking onto one always asks "Throw the ... lever?". Flyers and levitators still pass over. All other traps are unchanged.
+
 ### Knight conduct (2026-11-04)
 
 `check_caitiff()` in `src/uhitm.c` is the Knight penalty for striking

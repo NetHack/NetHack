@@ -2578,6 +2578,8 @@ avoid_trap_andor_region(coordxy x, coordxy y)
         && (!svc.context.nopick || svc.context.run)
         /* check for discovered trap */
         && (trap = t_at(x, y)) != 0 && trap->tseen
+        /* a Hinnom power lever asks its own "Throw" question */
+        && trap->ttyp != POWER_LEVER
         /* check whether attempted move will be viable */
         && test_move(u.ux, u.uy, u.dx, u.dy, TEST_MOVE)
         /* override confirmation if the trap is harmless to the hero */

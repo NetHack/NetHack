@@ -3052,7 +3052,8 @@ dotrap(struct trap *trap, unsigned trflags)
             return;
         }
         if (already_seen && !Fumbling && !undestroyable_trap(ttype)
-            && ttype != ANTI_MAGIC && !forcebungle && !plunged
+            && ttype != ANTI_MAGIC && ttype != POWER_LEVER
+            && !forcebungle && !plunged
             && !conj_pit && !adj_pit
             && (!rn2(5) || (is_pit(ttype) && is_clinger(gy.youmonst.data)))) {
                 You("escape %s %s.", (ttype == ARROW_TRAP && !trap->madeby_u)
