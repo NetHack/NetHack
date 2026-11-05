@@ -1446,6 +1446,13 @@ same alarm: standing next to a fortress inhabitant or gate guard
 (`src/monmove.c`), and asking a gate guard to pass. Before, those
 turned only that one monster hostile.
 
+When the fifth lever drops the field, a blackout screen shows the
+field breaking and the Host charging. It is shown from
+`hinnom_field_down()`, which runs once, since the levers go dead with
+the field. It replaces the two placeholder lines "The hum dies. The
+barrier falls." and "Michael and his angels charge the fortress!".
+The disguise-broken screen is not shown with it.
+
 ### Knight conduct (2026-11-04)
 
 `check_caitiff()` in `src/uhitm.c` is the Knight penalty for striking

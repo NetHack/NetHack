@@ -410,8 +410,6 @@ move_angels_to_gate(void)
             mnexto(mtmp, RLOC_NOMSG);
         i++;
     }
-    pline("%s and his angels charge the fortress!",
-          pmname(&mons[PM_MICHAEL], MALE)); /* PLACEHOLDER */
 }
 
 static void
@@ -425,7 +423,19 @@ hinnom_field_down(void)
                 levl[x][y].typ = ROOM;
                 newsym(x, y);
             }
-    pline("The hum dies. The barrier falls."); /* PLACEHOLDER */
+    /* Once: the bars are gone now, and the levers go dead. */
+    {
+        static const char *const para[] = {
+            "The last lever falls into place. Deep beneath your feet, something groans and breaks.",
+            "The air shudders. With a sound like a great sheet of glass shattering, the unholy field around the fortress flickers, cracks, and vanishes.",
+            "For one breathless moment, all is silent.",
+            "Then trumpets sound from the heavens. Light pours over the walls like the dawn breaking, and through it comes the Host of Heaven, with Michael the Archangel at its head and his sword blazing like the sun.",
+            "\"NOW!\" his voice thunders across the valley. \"For the LORD and for the children!\"",
+            "All around you, Moloch's servants shriek and scatter as the battle for Hinnom begins.",
+        };
+
+        hinnom_screen(para, SIZE(para));
+    }
     hinnom_alarm_fortress();
     move_angels_to_gate();
 }
