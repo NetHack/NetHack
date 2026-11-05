@@ -548,6 +548,7 @@ struct _hitmon_data {
     boolean dryit;
     boolean doreturn;
     boolean retval;
+    boolean obj_gone; /* obj was used up; the helpers get it by value */
     char saved_oname[BUFSZ];
 };
 
