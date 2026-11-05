@@ -1428,6 +1428,14 @@ arrival screen with "good sir" / "good lady" is unchanged. The
 window code in `src/hinnom.c` is now one helper, `hinnom_screen()`,
 shared with the Berachah arrival text.
 
+Before the field falls, each of the four angels around Michael has
+three lines of his own, one picked at random on each #chat. The angels
+are told apart by creation order (`m_id`), which follows
+`dat/hinnom.lua`: angel 1 is northwest of Michael, 2 northeast, 3
+southwest, 4 southeast. They still hold their squares until the
+assault (`hinnom_host_hold()`), and the Berachah victory lines are
+separate and unchanged.
+
 ### Knight conduct (2026-11-04)
 
 `check_caitiff()` in `src/uhitm.c` is the Knight penalty for striking

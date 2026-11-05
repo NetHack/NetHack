@@ -1042,6 +1042,37 @@ angel_victory_line(struct monst *speaker)
     return angel_victory[0];
 }
 
+/* Before the assault, the four angels beside Michael. Placed in
+   dat/hinnom.lua order, so the lowest four m_ids are angels 1-4.
+   A later arrival takes the lines of angel (its place mod 4). */
+static const char *const angel_eve[4][3] = {
+    { "Today the fires of Hinnom go out forever!",
+      "My sword has waited long for this hour.",
+      "Strike true, and we will be right behind you." },
+    { "Fear not! The LORD of hosts is with us.",
+      "When that field falls, Heaven itself will charge.",
+      "Every child in that place will see the morning." },
+    { "Moloch has never faced the Host in battle. He will learn.",
+      "Be bold in there. Be clever. Then be quick.",
+      "I can almost hear the trumpets already." },
+    { "Walk in faith, champion. You are not alone.",
+      "Their master trembles, though he does not know it yet.",
+      "This is the day the LORD has given us. Rejoice in it!" },
+};
+
+static const char *
+angel_eve_line(struct monst *speaker)
+{
+    struct monst *mtmp;
+    int place = 0;
+
+    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
+        if (!DEADMONSTER(mtmp) && mtmp != speaker
+            && mtmp->data == &mons[PM_ANGEL] && mtmp->m_id < speaker->m_id)
+            place++;
+    return angel_eve[place % 4][rn2(3)];
+}
+
 /* After the Tears have been given. Six children stand on Berachah,
    so the first six lines are used. A seventh would take line seven. */
 static const char *const child_thanks[] = {
@@ -1271,6 +1302,13 @@ hinnom_chat(struct monst *mtmp)
     if (Is_berachah_level(&u.uz) && mtmp->data == &mons[PM_ANGEL]) {
         SetVoice(mtmp, 0, 80, 0);
         verbalize("%s", angel_victory_line(mtmp));
+        return TRUE;
+    }
+
+    if (mtmp->data == &mons[PM_ANGEL] && hinnom_field_up()
+        && mtmp->mpeaceful) {
+        SetVoice(mtmp, 0, 80, 0);
+        verbalize("%s", angel_eve_line(mtmp));
         return TRUE;
     }
 

@@ -11,6 +11,10 @@ with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
 2026-11-04
+The four angels beside Michael each have three lines of their own
+before the battle.
+
+2026-11-04
 Michael gives a full briefing, addressed to the hero by rank, every
 time he is spoken to before the field falls.
 
