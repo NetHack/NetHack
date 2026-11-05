@@ -2689,9 +2689,10 @@ in_container(struct obj *obj)
         }
         do_boh_explosion(gc.current_container, floor_container);
 
+        /* the blast may have moved the hero off the bag's spot */
         if (!floor_container)
             useup(gc.current_container);
-        else if (obj_here(gc.current_container, u.ux, u.uy))
+        else if (gc.current_container->where == OBJ_FLOOR)
             useupf(gc.current_container, gc.current_container->quan);
         else
             panic("in_container:  bag not found.");
