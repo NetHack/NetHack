@@ -30,6 +30,13 @@ des.map({ halign = "left", valign = "top", map = [[
 des.non_diggable(selection.area(0, 0, 78, 20))
 des.region({ region = {1, 1, 13, 6}, lit = 1, type = "ordinary" })
 des.region({ region = {1, 14, 13, 19}, lit = 0, type = "ordinary" })
+-- Lit rooms: throne room, foyer, lab, lever room, and the ground
+-- outside the gate. A lit region also lights its bounding walls.
+des.region({ region = {65, 8, 73, 12}, lit = 1, type = "ordinary" })
+des.region({ region = {45, 8, 49, 12}, lit = 1, type = "ordinary" })
+des.region({ region = {55, 5, 60, 6}, lit = 1, type = "ordinary" })
+des.region({ region = {55, 14, 62, 15}, lit = 1, type = "ordinary" })
+des.region({ region = {34, 7, 40, 13}, lit = 1, type = "ordinary" })
 des.stair("up", 4, 17)
 des.stair("down", 69, 15)
 des.teleport_region({ region = {1, 14, 13, 19}, dir = "down" })

@@ -1461,6 +1461,8 @@ Michael the Archangel is now LVL(49, 16, -20, 80, 15) with three 4d10 weapon att
 
 Balance check (prophet mode, no code change): six fights after the field fell, with Michael and two angels placed beside Moloch and the hero away from the throne. Without the raze (Moloch 198 of 198 hit points) Moloch died within 1 to 2 turns in all three fights. With the raze (Moloch 49 of 198) he died within 2 to 3 turns in all three. Michael (level 48, 187 to 259 hit points, AC -22, Demonbane +3 to +6) lost no hit points in any fight, and no angel died.
 
+Hinnom lighting: lit des regions now cover Moloch's throne room, the foyer, the doctor's lab, the lever room, and the ground outside the gate (each lit region also lights its surrounding walls). Michael's portal room stays lit and everything else stays dark. The foyer region uses the real room interior (columns 45-49). Berachah is built from its own file, which lights the whole map, so it is unchanged.
+
 ### Knight conduct (2026-11-04)
 
 `check_caitiff()` in `src/uhitm.c` is the Knight penalty for striking
