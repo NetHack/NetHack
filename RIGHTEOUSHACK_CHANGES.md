@@ -1459,6 +1459,8 @@ Power levers no longer trigger the paranoid "Really step onto that power lever?"
 
 Michael the Archangel is now LVL(49, 16, -20, 80, 15) with three 4d10 weapon attacks plus his 2d6 spell, and m_initweap always gives him a blessed silver mace, named Demonbane, for extra damage against demons. His resistances are unchanged and Moloch is unchanged. (A base level of 50 or more would use the special-demon hit point rule and give him only 88 hit points, so 49 is used.)
 
+Balance check (prophet mode, no code change): six fights after the field fell, with Michael and two angels placed beside Moloch and the hero away from the throne. Without the raze (Moloch 198 of 198 hit points) Moloch died within 1 to 2 turns in all three fights. With the raze (Moloch 49 of 198) he died within 2 to 3 turns in all three. Michael (level 48, 187 to 259 hit points, AC -22, Demonbane +3 to +6) lost no hit points in any fight, and no angel died.
+
 ### Knight conduct (2026-11-04)
 
 `check_caitiff()` in `src/uhitm.c` is the Knight penalty for striking
