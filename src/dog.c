@@ -832,7 +832,9 @@ keepdogs(
                 mtmp->mtrapped = 0;       /* escape trap */
                 mtmp->meating = 0;        /* terminate eating */
                 mdrop_special_objs(mtmp); /* drop Amulet */
-            } else if (mtmp->meating || mtmp->mtrapped) {
+            } else if ((mtmp->meating || mtmp->mtrapped)
+                       /* Level teleportation bypasses eating and trapping. */
+                       && !(u.utotype & UTOTYPE_LEVEL_TELE)) {
                 if (canseemon(mtmp))
                     pline_mon(mtmp, "%s is still %s.", Monnam(mtmp),
                              mtmp->meating ? "eating" : "trapped");
