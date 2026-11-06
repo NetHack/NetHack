@@ -1,4 +1,6 @@
-
+/* $NHDT-Header: NetHack 5.0 mcastu.h 2026/04/01_14:59:22 NetHack-5.0:1.3 $ */
+/* Copyright (c) Pasi Kallinen 2026. */
+/* NetHack may be freely redistributed.  See license for details. */
 
 #define MCF_NONE     0x0000
 #define MCF_INDIRECT 0x0001 /* untargeted/indirect spell */

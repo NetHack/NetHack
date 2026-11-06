@@ -1,4 +1,5 @@
-/* $NHDT-Header: NetHack 5.0 nhregex.h 2026/06/20_22:26:43 NetHack-5.0:1.5 $ */
+/* $NHDT-Header: NetHack 5.0 nhregex.h 2026/10/31_22:59:35 NetHack-5.0:1.6 $ */
+/* Copyright (c) Michael Allison 2024. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifndef NHREGEX_H

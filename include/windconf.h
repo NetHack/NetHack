@@ -1,4 +1,5 @@
-/* $NHDT-Header: NetHack 5.0 windconf.h 2026/08/19_12:00:15 NetHack-5.0:1.137 $ */
+/* $NHDT-Header: NetHack 5.0 windconf.h 2026/10/31_22:59:35 NetHack-5.0:1.138 $ */
+/* Copyright (c) Michael Allison 2026. */
 /* Copyright (c) NetHack PC Development Team 1993, 1994.  */
 /* NetHack may be freely redistributed.  See license for details. */
 
