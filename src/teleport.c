@@ -1432,6 +1432,8 @@ level_tele(void)
         }
     }
 
+    if (hinnom_dest_clamp(&newlevel))
+        return;
     schedule_goto(&newlevel, UTOTYPE_NONE, (char *) 0,
                   flags.verbose ? "You materialize on a different level!"
                                 : (char *) 0);

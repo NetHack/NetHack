@@ -723,6 +723,7 @@ static struct level_map {
                   { "orcus", &orcus_level },
                   { "rogue", &rogue_level },
                   { "sanctum", &sanctum_level },
+                  { "hinnom", &hinnom_level },
                   { "valley", &valley_level },
                   { "water", &water_level },
                   { "wizard1", &wiz1_level },
@@ -1456,6 +1457,15 @@ Is_special(d_level *lev)
     return (s_level *) 0;
 }
 
+/* The one-room level above the Sokoban prize. */
+boolean
+on_jacobs_ladder(d_level *lev)
+{
+    s_level *sp = Is_special(lev);
+
+    return (boolean) (sp && !strcmp(sp->proto, "jacob"));
+}
+
 /*
  * Is this a multi-dungeon branch level?  If so, return a pointer to the
  * branch.  Otherwise, return null.
@@ -2149,6 +2159,9 @@ lev_by_name(const char *nam)
         } else if (!strcmpi(nam, "sodom") || !strcmpi(nam, "tyre")
                    || !strcmpi(nam, "sodom and tyre")) {
             nam = "medusa-1";
+        } else if (!strcmpi(nam, "babel") || !strcmpi(nam, "jacob")
+                   || !strcmpi(nam, "ladder")) {
+            nam = "jacob";
         } else if (!strcmpi(nam, "vibrating") || !strcmpi(nam, "gates")) {
             d_level inv;
 
@@ -2329,6 +2342,9 @@ visible_level_tag(const char *proto)
         return "minesend";
     if (!strcmp(proto, "sanctum"))
         return "Sanctum of the Great Dragon";
+    if (!strcmp(proto, "hinnom"))
+        return u.uevent.berachah ? "The Valley of Berachah"
+                                 : "The Battle of Hinnom";
     return proto;
 }
 
@@ -3643,7 +3659,11 @@ print_mapseen(
          * how important they are.
          */
         if (mptr->feat.nshop > 0) {
-            if (mptr->feat.nshop > 1)
+            if (u.uevent.berachah && on_level(&mptr->lev, &hinnom_level))
+                Sprintf(eos(buf),
+                        "%sthe Scribes of Ezra, the Library of the Prophets, the Sheep Gate Market",
+                        COMMA);
+            else if (mptr->feat.nshop > 1)
                 ADDNTOBUF("shop", mptr->feat.nshop);
             else
                 Sprintf(eos(buf), "%s%s", COMMA,
@@ -3714,6 +3734,10 @@ print_mapseen(
         Sprintf(buf, "%sMines' End.", PREFIX);
     } else if (on_level(&mptr->lev, &medusa_level)) {
         Sprintf(buf, "%sSodom and Tyre.", PREFIX);
+    } else if (on_level(&mptr->lev, &hinnom_level)) {
+        Sprintf(buf, "%s%s.", PREFIX,
+                u.uevent.berachah ? "The Valley of Berachah"
+                                  : "The Battle of Hinnom");
     } else if (mptr->flags.valley) {
         Sprintf(buf, "%sValley of the Dead.", PREFIX);
     } else if (mptr->flags.vibrating_square) {

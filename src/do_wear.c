@@ -390,6 +390,8 @@ Cloak_on(void)
     case ALCHEMY_SMOCK:
         EAcid_resistance |= WORN_CLOAK;
         break;
+    case HIGH_PRIEST_CLOAK:
+        break;
     default:
         impossible(unknown_type, c_cloak, uarmc->otyp);
     }
@@ -410,6 +412,8 @@ Cloak_off(void)
     svc.context.takeoff.mask &= ~W_ARMC;
     /* For mummy wrapping, taking it off first resets `Invisible'. */
     setworn((struct obj *) 0, W_ARMC);
+    if (otyp == HIGH_PRIEST_CLOAK)
+        hinnom_alarm_fortress();
     switch (otyp) {
     case ORCISH_CLOAK:
     case DWARVISH_CLOAK:
@@ -444,6 +448,8 @@ Cloak_off(void)
     /* Alchemy smock gives poison _and_ acid resistance */
     case ALCHEMY_SMOCK:
         EAcid_resistance &= ~WORN_CLOAK;
+        break;
+    case HIGH_PRIEST_CLOAK:
         break;
     default:
         impossible(unknown_type, c_cloak, otyp);

@@ -751,6 +751,12 @@ xname_flags(
         break;
     case FOOD_CLASS:
         /* we could include partly-eaten-hack on fruit but don't need to */
+        if (is_berachah_bread(obj)) {
+            Strcpy(buf, pluralize ? "loaves of Bread of Berachah"
+                                  : "Bread of Berachah");
+            pluralize = FALSE;
+            break;
+        }
         if (typ == SLIME_MOLD) {
             struct fruit *f = fruit_from_indx(obj->spe);
 
@@ -875,6 +881,10 @@ xname_flags(
         }
         break;
     case POTION_CLASS:
+        if (typ == POT_TEARS_OF_CHILDREN) {
+            Strcpy(buf, "Tears of the Children");
+            break;
+        }
         if (dknown && obj->odiluted)
             Strcpy(buf, "diluted ");
         if (nn || un || !dknown) {
@@ -1043,7 +1053,7 @@ xname_flags(
         }
     }
 
-    if (has_oname(obj) && dknown) {
+    if (has_oname(obj) && dknown && !is_berachah_bread(obj)) {
         Concat(buf, 0, " named ");
 
         /* jump directly here if obj passes the has-personal-name test */

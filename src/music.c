@@ -422,11 +422,12 @@ do_earthquake(int force)
                 if ((amsk & AM_SANCTUM) != 0)
                     break;
                 algn = Amask2align(amsk & AM_MASK);
-                if (cansee(x, y))
-                    pline_The("%s altar falls%s.",
-                              align_str(algn), into_a_chasm);
-                pline("placeholder for desecrate_altar");
-                do_pit(x, y, tu_pit);
+                if (algn == A_LAWFUL) {
+                    if (cansee(x, y))
+                        pline("The altar of the Lord stands firm."); /* PLACEHOLDER */
+                    break;
+                }
+                raze_altar(x, y, FALSE);
                 break;
             case GRAVE:
                 if (cansee(x, y))
@@ -456,8 +457,9 @@ do_earthquake(int force)
                 FALLTHROUGH;
                 /*FALLTHRU*/
             case DOOR: /* make the door collapse */
-                if (peters_closet_door(x, y) || sodom_house_barred(x, y)) {
-                    if (cansee(x, y))
+                if (peters_closet_door(x, y) || sodom_house_barred(x, y)
+                    || hinnom_blocks(x, y)) {
+                    if (cansee(x, y) && !hinnom_impassable_door(x, y))
                         pline("This door will not yield.");
                     break;
                 }

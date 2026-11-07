@@ -10,6 +10,185 @@ RighteousHack will eventually replace lawful, neutral, and chaotic
 with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
+2026-11-06
+The spare Key to the Sanctum is in a chest in the northeast tower of the town of Berachah, at (73,5). It is not on the Hinnom battlefield. Moloch still carries the other key.
+
+2026-11-06
+Passing Greed empty-handed shows a blackout screen, and the verse engraving is no longer on the square where your items return.
+
+2026-11-06
+The Rod of Frozen Power's burst is half as long. Its damage and reach are the same.
+
+2026-11-06
+On Hinnom, cloaked guards address you as High Priest, and the other court lines say Your Dread Eminence. Fortress children far-look as a scared child. The Sword of the Spirit stays in hand if something tries to yank it.
+
+2026-11-06
+Michael has a random line for each stage before the valley, and a greeting once Berachah exists. The welcome presses three loaves of Bread of Berachah into your hand.
+
+2026-11-06
+The Valley of Berachah is fully lit and has a varied village: baker, smith, priest, tailor, farmer, carpenter, scribe, and a steward in the house the village gives you. The two chests in that house are ordinary level objects, so what you store there stays. Moloch cannot fall until you have hit him twice, and Michael still cannot fall. A second Key to the Sanctum is in the northeast tower chest. A power lever can be thrown while flying, levitating, or mounted.
+
+2026-11-04
+Razing Moloch's altar while he lives now shows a full screen, and every angel on the level makes for Moloch.
+
+2026-11-04
+In Hinnom, Moloch's throne room, the foyer, the lab, the lever room and the ground outside the gate are now lit.
+
+2026-11-04
+Michael the Archangel is now far stronger: about level 49, AC -20, three heavy weapon blows, and he always carries Demonbane.
+
+2026-11-04
+Stepping on a Hinnom power lever now always asks to throw it, with no extra trap warning and no chance to slip past it.
+
+2026-11-04
+Michael and two angels now storm the throne room and go after Moloch when the field falls, while four other angels take the foyer.
+
+2026-11-04
+When the last lever drops the field, a screen shows the Host of Heaven
+charging the fortress.
+
+2026-11-04
+When the disguise breaks on Hinnom, a screen says so, and being seen
+next to the fortress folk without the cloak now wakes the whole
+fortress.
+
+2026-11-04
+The four angels beside Michael each have three lines of their own
+before the battle.
+
+2026-11-04
+Michael gives a full briefing, addressed to the hero by rank, every
+time he is spoken to before the field falls.
+
+2026-11-04
+Orcus Town no longer crashes the game when it is first built. Hinnom
+has no way down while Moloch lives.
+
+2026-11-04
+Moloch has four lines of his own on #chat, and he may say
+one the first time he actually attacks. His blows and the
+raze are unchanged.
+
+2026-11-04
+While the High Priest of Moloch's cloak holds the peace,
+everyone in his fortress has something to say. The doctor
+still gives the first lever, and then one of his own lines.
+The captive children on Hinnom speak of him. The Valley
+children are unchanged.
+
+2026-11-04
+After the Tears of the Children are given, each child in
+the Valley of Berachah thanks the hero in his own words.
+A town elder stands just inside the gate. His greeting is
+still a placeholder.
+
+2026-11-04
+After the victory at Hinnom, each angel on the Valley of
+Berachah gives his own congratulation. Michael keeps his
+own words. The first time the hero arrives in the Valley,
+a text window tells how the place was renamed. That window
+is shown once and is remembered in the save.
+
+2026-11-04
+The three shops in the Valley of Berachah never contain mimics.
+Other shops still have the usual chance that a square is a
+mimic instead of an item.
+
+2026-11-04
+The Battle of Hinnom and the Valley of Berachah keep the
+authored orientation. Neither is mirrored left-right or
+top-bottom, including when Hinnom is rebuilt as Berachah.
+Michael's "to the north" stays to the north.
+
+2026-11-04
+On the Battle of Hinnom, a random monster such as an invisible
+stalker no longer appears inside the closed fortress and attacks.
+Hitting one does not turn the garrison hostile. The peace still
+breaks only when you attack the fortress, approach the gate
+without the cloak, take the cloak off, force the gate, or drop
+the field.
+
+2026-11-04
+Michael stays on his square in the portal room, meditating, until
+the force field drops or the peace around him breaks. The angels
+with him do the same; they were leaving that room before the
+assault. His name is shown as "Michael the Archangel". The
+monster number is unchanged, so an old save still has him.
+
+2026-11-04
+Each of the six Sokoban builders has a different ancient
+Near Eastern name: Akkadian, Sumerian, Hebrew, Canaanite,
+Egyptian, and Elamite. Canaanite, Egyptian, and Elamite do
+not yet speak a line in their own language.
+
+2026-11-04
+Jacob's Ladder is a garden. Its fountains are living water,
+the same full cure as the Wilderness garden. A magic portal
+there returns to the Sokoban level where you first arrive,
+on the stair you came in by. Six builders stand in the
+corners of the Sokoban prize room, off that room's stair.
+
+2026-11-04
+Riding the fiery steed down stairs no longer throws you. The
+saddle is the Knight's quest artifact, and changing levels was
+taking that saddle off, which is what knocks the rider loose.
+A worn saddle now stays on the steed. The monster's name is
+"fiery".
+
+2026-11-04
+A Knight no longer hears "You caitiff!" or loses alignment for
+striking a hostile enemy who is fleeing, asleep, or unable to
+move. A peaceful creature is unchanged.
+
+2026-11-04
+On the Battle of Hinnom, #chat with a priest or priestess of the
+Great Dragon while the High Priest of Moloch's cloak is worn
+keeps them peaceful and gives their line. A temple priest
+anywhere else is unchanged. Killing any priest of the Great
+Dragon, or a fortress guard or the doctor, is not murder.
+
+2026-11-04
+Everyone inside the Hinnom fortress starts peaceful and
+meditating, and stays on their square until the peace breaks.
+With the cloak on, the doctor, an inside guard, and a priestess
+give the first three lever clues. The fourth is burned into the
+lab floor against the north wall, and the fifth against the
+south wall of the lever room. Random objects are not left on
+the fortress floor.
+
+2026-11-04
+The High Priest of Moloch's cloak can be worn and taken off.
+The field gate's drawbridge really lowers. The two gate guards
+outside the field start meditating. The steed of the Heavenly
+Host is spelled "fiery", and riding it down stairs does not
+throw you. The power levers are safe to walk, fly, or ride over.
+
+2026-11-03
+The Battle of Hinnom is the level under Baalzebub. Michael meets
+you there. The altar of Moloch can be razed with #raze. When
+Moloch is dead and that altar is razed, leaving the level turns
+it into the Valley of Berachah.
+
+2026-11-03
+#raze takes five turns on an altar that is not lawful and not a
+high altar. A lawful altar is refused. Prayer on an altar that
+is not lawful is refused. A priest of such an altar starts
+hostile.
+
+2026-11-03
+Peter's key opens the Valley stair into Gehennom. The Key to
+the Sanctum opens the revealed stairs, now called the Gate of
+the Sanctum.
+
+2026-11-03
+The fountains in the Valley of Berachah, and the Wilderness
+garden fountains, are living water. They restore you and do not
+dry up. A child in Berachah gives the Tears of the Children.
+
+2026-11-03
+Killing a priest of the Great Dragon is not murder. There is no
+"You murderer!", and Favor is not lost for it.
+
 2026-11-03
 Offering the real Amulet of Yendor on the Sanctum high altar
 prints "You feel ashamed." The Amulet is not used up, you live,
@@ -168,6 +347,18 @@ Stepping on a Wilderness verse shows only the verse. The Sword of
 the Spirit opens a portal home. The rod of frozen power is the
 cold rod. Finger of execution on Pride is never easier than it is
 elsewhere, and never better than 30 percent.
+
+2026-11-01
+At the end of Sokoban, eight confused builders stand in the
+prize room. They speak of pride and of knowledge grown too
+great. Three of them also speak a line of Biblical Hebrew,
+Akkadian, or Sumerian, each marked for verification. A ladder
+there climbs to Jacob's dream. No monsters are generated on
+that level. The angel says "You seek what was taken from you,
+though you know it not." and gives a blessed +2 Gospel of
+Peace, then steps aside. The chest holds a diamond named
+PLACEHOLDER main-quest artifact. The floor is engraved with
+Genesis 28:12.
 
 2026-11-01
 The quest object is your own soul, in a chest on the Sanctum

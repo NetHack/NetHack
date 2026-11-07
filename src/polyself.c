@@ -1568,6 +1568,7 @@ dospinweb(void)
         case LEVEL_TELEP:
         case MAGIC_PORTAL:
         case VIBRATING_SQUARE:
+        case POWER_LEVER:
             Your("webbing vanishes!");
             return ECMD_OK;
         case WEB:

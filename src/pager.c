@@ -396,6 +396,9 @@ look_at_object(
                      ? distant_name(otmp, otmp->dknown ? doname_with_price
                                                        : doname_vague_quan)
                      : obj_descr[STRANGE_OBJECT].oc_name);
+        if (is_berachah_bread(otmp))
+            Strcat(buf,
+                   " (A freshly baked loaf, given in gratitude by the people of Berachah.)");
         if (fakeobj) {
             otmp->where = OBJ_FREE; /* object_from_map set it to OBJ_FLOOR */
             dealloc_obj(otmp), otmp = NULL; /* has no contents */
@@ -806,6 +809,11 @@ lookat(coordxy x, coordxy y, char *buf, char *monbuf)
             }
             amsk = altarmask_at(x, y);
             algn = Amask2align(amsk & AM_MASK);
+            if (Is_hinnom_level(&u.uz) && !u.uevent.berachah
+                && algn == A_NONE) {
+                Strcpy(buf, "altar of Moloch");
+                break;
+            }
             Sprintf(buf, "%s %saltar",
                     /* like endgame high priests, endgame high altars
                        are only recognizable when immediately adjacent */

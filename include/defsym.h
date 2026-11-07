@@ -180,6 +180,7 @@
     PCHAR( 71, '~',  S_vibrating_square, "vibrating square", CLR_MAGENTA)
     PCHAR( 72, '^',  S_trapped_door, "trapped door", CLR_ORANGE)
     PCHAR( 73, '^',  S_trapped_chest, "trapped chest", CLR_ORANGE)
+    PCHAR( 74, '^',  S_power_lever, "power lever", CLR_YELLOW)
     /* end traps                                                       */
     /* end cmap B */
     /*                                                                   */
@@ -187,24 +188,24 @@
     /*                                                                   */
     /* zap colors are changed by reset_glyphmap() to match type of beam */
     /*                                                                   */
-    PCHAR2(74, '|',  S_vbeam, "vertical beam", "", CLR_GRAY)
-    PCHAR2(75, '-',  S_hbeam, "horizontal beam", "", CLR_GRAY)
-    PCHAR2(76, '\\', S_lslant, "left slant beam", "", CLR_GRAY)
-    PCHAR2(77, '/',  S_rslant, "right slant beam", "", CLR_GRAY)
+    PCHAR2(75, '|',  S_vbeam, "vertical beam", "", CLR_GRAY)
+    PCHAR2(76, '-',  S_hbeam, "horizontal beam", "", CLR_GRAY)
+    PCHAR2(77, '\\', S_lslant, "left slant beam", "", CLR_GRAY)
+    PCHAR2(78, '/',  S_rslant, "right slant beam", "", CLR_GRAY)
     /* start cmap C */
-    PCHAR2(78, '*',  S_digbeam, "dig beam", "", CLR_WHITE)
-    PCHAR2(79, '!',  S_flashbeam, "flash beam", "", CLR_WHITE)
-    PCHAR2(80, ')',  S_boomleft, "boom left", "", HI_WOOD)
-    PCHAR2(81, '(',  S_boomright, "boom right", "", HI_WOOD)
+    PCHAR2(79, '*',  S_digbeam, "dig beam", "", CLR_WHITE)
+    PCHAR2(80, '!',  S_flashbeam, "flash beam", "", CLR_WHITE)
+    PCHAR2(81, ')',  S_boomleft, "boom left", "", HI_WOOD)
+    PCHAR2(82, '(',  S_boomright, "boom right", "", HI_WOOD)
     /* 4 magic shield symbols                                          */
-    PCHAR2(82, '0',  S_ss1, "shield1", "", HI_ZAP)
-    PCHAR2(83, '#',  S_ss2, "shield2", "", HI_ZAP)
-    PCHAR2(84, '@',  S_ss3, "shield3", "", HI_ZAP)
-    PCHAR2(85, '*',  S_ss4, "shield4", "", HI_ZAP)
-    PCHAR( 86, '#',  S_poisoncloud, "poison cloud", CLR_BRIGHT_GREEN)
+    PCHAR2(83, '0',  S_ss1, "shield1", "", HI_ZAP)
+    PCHAR2(84, '#',  S_ss2, "shield2", "", HI_ZAP)
+    PCHAR2(85, '@',  S_ss3, "shield3", "", HI_ZAP)
+    PCHAR2(86, '*',  S_ss4, "shield4", "", HI_ZAP)
+    PCHAR( 87, '#',  S_poisoncloud, "poison cloud", CLR_BRIGHT_GREEN)
     /* for a time S_goodpos was a question mark, but dollar sign is the
        default keystroke for getpos() to toggle goodpos glyphs on or off */
-    PCHAR( 87, '$',  S_goodpos, "valid position", HI_ZAP)
+    PCHAR( 88, '$',  S_goodpos, "valid position", HI_ZAP)
     /* end cmap C */
     /*                                                             */
     /* The 8 swallow symbols.  Do NOT separate.                    */
@@ -218,14 +219,14 @@
     /*      4 5 6                                                  */
     /*      7 8 9                                                  */
     /*                                                             */
-    PCHAR2(88, '/',  S_sw_tl, "swallow top left", "", CLR_GREEN)      /*1*/
-    PCHAR2(89, '-',  S_sw_tc, "swallow top center", "", CLR_GREEN)    /*2*/
-    PCHAR2(90, '\\', S_sw_tr, "swallow top right", "", CLR_GREEN)     /*3*/
-    PCHAR2(91, '|',  S_sw_ml, "swallow middle left", "", CLR_GREEN)   /*4*/
-    PCHAR2(92, '|',  S_sw_mr, "swallow middle right", "", CLR_GREEN)  /*6*/
-    PCHAR2(93, '\\', S_sw_bl, "swallow bottom left", "", CLR_GREEN)   /*7*/
-    PCHAR2(94, '-',  S_sw_bc, "swallow bottom center", "", CLR_GREEN) /*8*/
-    PCHAR2(95, '/',  S_sw_br, "swallow bottom right", "", CLR_GREEN)  /*9*/
+    PCHAR2(89, '/',  S_sw_tl, "swallow top left", "", CLR_GREEN)      /*1*/
+    PCHAR2(90, '-',  S_sw_tc, "swallow top center", "", CLR_GREEN)    /*2*/
+    PCHAR2(91, '\\', S_sw_tr, "swallow top right", "", CLR_GREEN)     /*3*/
+    PCHAR2(92, '|',  S_sw_ml, "swallow middle left", "", CLR_GREEN)   /*4*/
+    PCHAR2(93, '|',  S_sw_mr, "swallow middle right", "", CLR_GREEN)  /*6*/
+    PCHAR2(94, '\\', S_sw_bl, "swallow bottom left", "", CLR_GREEN)   /*7*/
+    PCHAR2(95, '-',  S_sw_bc, "swallow bottom center", "", CLR_GREEN) /*8*/
+    PCHAR2(96, '/',  S_sw_br, "swallow bottom right", "", CLR_GREEN)  /*9*/
     /*                                                             */
     /* explosion colors are changed by reset_glyphmap() to match   */
     /* the type of expl.                                           */
@@ -236,15 +237,15 @@
     /*      |@|                                                    */
     /*      \-/                                                    */
     /*                                                             */
-    PCHAR2(96, '/',  S_expl_tl, "explosion top left", "", CLR_ORANGE)
-    PCHAR2(97, '-',  S_expl_tc, "explosion top center", "", CLR_ORANGE)
-    PCHAR2(98, '\\', S_expl_tr, "explosion top right", "", CLR_ORANGE)
-    PCHAR2(99, '|',  S_expl_ml, "explosion middle left", "", CLR_ORANGE)
-    PCHAR2(100, ' ',  S_expl_mc, "explosion middle center", "", CLR_ORANGE)
-    PCHAR2(101, '|',  S_expl_mr, "explosion middle right", "", CLR_ORANGE)
-    PCHAR2(102, '\\', S_expl_bl, "explosion bottom left", "", CLR_ORANGE)
-    PCHAR2(103, '-', S_expl_bc, "explosion bottom center", "", CLR_ORANGE)
-    PCHAR2(104, '/', S_expl_br, "explosion bottom right", "", CLR_ORANGE)
+    PCHAR2(97, '/',  S_expl_tl, "explosion top left", "", CLR_ORANGE)
+    PCHAR2(98, '-',  S_expl_tc, "explosion top center", "", CLR_ORANGE)
+    PCHAR2(99, '\\', S_expl_tr, "explosion top right", "", CLR_ORANGE)
+    PCHAR2(100, '|',  S_expl_ml, "explosion middle left", "", CLR_ORANGE)
+    PCHAR2(101, ' ',  S_expl_mc, "explosion middle center", "", CLR_ORANGE)
+    PCHAR2(102, '|',  S_expl_mr, "explosion middle right", "", CLR_ORANGE)
+    PCHAR2(103, '\\', S_expl_bl, "explosion bottom left", "", CLR_ORANGE)
+    PCHAR2(104, '-', S_expl_bc, "explosion bottom center", "", CLR_ORANGE)
+    PCHAR2(105, '/', S_expl_br, "explosion bottom right", "", CLR_ORANGE)
 #undef PCHAR
 #undef PCHAR2
 #endif /* PCHAR_S_ENUM || PCHAR_PARSE || PCHAR_DRAWING || PCHAR_TILES

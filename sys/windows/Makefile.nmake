@@ -761,6 +761,8 @@ LUA_FILES = $(DAT)asmodeus.lua $(DAT)baalz.lua $(DAT)bigrm-1.lua \
 	$(DAT)Pht-loca.lua $(DAT)Pht-strt.lua \
 	$(DAT)his-treasure-1.lua \
 	$(DAT)gibeon.lua \
+	$(DAT)hinnom.lua \
+	$(DAT)berachah.lua \
 	$(DAT)Adv-fila.lua $(DAT)Adv-filb.lua $(DAT)Adv-goal.lua \
 	$(DAT)Adv-loca.lua $(DAT)Adv-strt.lua \
 	$(DAT)Chp-fila.lua $(DAT)Chp-filb.lua $(DAT)Chp-goal.lua \
@@ -873,7 +875,8 @@ COREOBJTTY = \
 	$(OTTY)drawing.o  $(OTTY)dungeon.o  $(OTTY)earlyarg.o $(OTTY)eat.o \
 	$(OTTY)end.o      $(OTTY)engrave.o  $(OTTY)exper.o    $(OTTY)explode.o \
 	$(OTTY)extralev.o $(OTTY)files.o    $(OTTY)fountain.o $(OTTY)getpos.o \
-	$(OTTY)glyphs.o   $(OTTY)iactions.o $(OTTY)hack.o     $(OTTY)insight.o \
+	$(OTTY)glyphs.o   $(OTTY)iactions.o $(OTTY)hack.o     $(OTTY)hinnom.o \
+	$(OTTY)insight.o \
 	$(OTTY)invent.o   $(OTTY)isaac64.o  $(OTTY)light.o    $(OTTY)lock.o \
 	$(OTTY)mail.o     $(OTTY)makemon.o  $(OTTY)mcastu.o   $(OTTY)mhitm.o \
 	$(OTTY)mhitu.o    $(OTTY)minion.o   $(OTTY)mklev.o    $(OTTY)mkmap.o \
@@ -936,7 +939,8 @@ COREOBJGUI = \
 	$(OGUI)drawing.o  $(OGUI)dungeon.o  $(OGUI)earlyarg.o $(OGUI)eat.o \
 	$(OGUI)end.o      $(OGUI)engrave.o  $(OGUI)exper.o    $(OGUI)explode.o \
 	$(OGUI)extralev.o $(OGUI)files.o    $(OGUI)fountain.o $(OGUI)getpos.o \
-	$(OGUI)glyphs.o   $(OGUI)iactions.o $(OGUI)hack.o     $(OGUI)insight.o \
+	$(OGUI)glyphs.o   $(OGUI)iactions.o $(OGUI)hack.o     $(OGUI)hinnom.o \
+	$(OGUI)insight.o \
 	$(OGUI)invent.o   $(OGUI)isaac64.o  $(OGUI)light.o    $(OGUI)lock.o \
 	$(OGUI)mail.o     $(OGUI)makemon.o  $(OGUI)mcastu.o   $(OGUI)mhitm.o \
 	$(OGUI)mhitu.o    $(OGUI)minion.o   $(OGUI)mklev.o    $(OGUI)mkmap.o \
@@ -3271,6 +3275,7 @@ $(OTTY)fountain.o: fountain.c $(HACK_H)
 $(OTTY)getpos.o: getpos.c $(HACK_H)
 $(OTTY)glyphs.o: glyphs.c $(HACK_H)
 $(OTTY)hack.o: hack.c $(HACK_H)
+$(OTTY)hinnom.o: hinnom.c $(HACK_H)
 $(OTTY)hacklib.o: hacklib.c $(HACK_H)
 $(OTTY)iactions.o: iactions.c $(HACK_H)
 $(OTTY)insight.o: insight.c $(HACK_H)
@@ -3652,6 +3657,7 @@ $(OGUI)fountain.o: fountain.c $(HACK_H)
 $(OGUI)getpos.o: getpos.c $(HACK_H)
 $(OGUI)glyphs.o: glyphs.c $(HACK_H)
 $(OGUI)hack.o: hack.c $(HACK_H)
+$(OGUI)hinnom.o: hinnom.c $(HACK_H)
 $(OGUI)hacklib.o: hacklib.c $(HACK_H)
 $(OGUI)iactions.o: iactions.c $(HACK_H)
 $(OGUI)insight.o: insight.c $(HACK_H)

@@ -89,8 +89,9 @@ enum trap_types {
        to avoid other such doors [not implemented] */
     TRAPPED_DOOR = 24, /* part of door; not present on map as a trap */
     TRAPPED_CHEST = 25, /* part of object; not on map */
+    POWER_LEVER = 26, /* Hinnom generator. Not random. */
 
-    TRAPNUM = 26
+    TRAPNUM = 27
 };
 
 /* some trap-related function return results */

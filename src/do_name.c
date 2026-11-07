@@ -1179,6 +1179,28 @@ distant_monnam(
         && Is_astralevel(&u.uz) && !m_next2u(mon)) {
         Strcpy(outbuf, article == ARTICLE_THE ? "the " : "");
         Strcat(outbuf, mon->female ? "high priestess" : "high priest");
+    } else if (!Hallucination && mon->data == &mons[PM_CHILD]
+               && Is_hinnom_level(&u.uz) && !u.uevent.berachah
+               && hinnom_inside_field(mon->mx, mon->my)) {
+        /* Captives in Moloch's fortress, not the children of the Valley. */
+        Strcpy(outbuf, "scared child");
+    } else if (!Hallucination && has_mgivenname(mon)
+               && Is_berachah_level(&u.uz)
+               && !strcmp(MGIVENNAME(mon), "town elder")) {
+        Strcpy(outbuf, "town elder");
+    } else if (!Hallucination && has_mgivenname(mon)
+               && Is_berachah_level(&u.uz)
+               && mon->data->mlet == S_HUMAN
+               && (!strcmp(MGIVENNAME(mon), "baker")
+                   || !strcmp(MGIVENNAME(mon), "blacksmith")
+                   || !strcmp(MGIVENNAME(mon), "priest")
+                   || !strcmp(MGIVENNAME(mon), "tailor")
+                   || !strcmp(MGIVENNAME(mon), "farmer")
+                   || !strcmp(MGIVENNAME(mon), "carpenter")
+                   || !strcmp(MGIVENNAME(mon), "scribe")
+                   || !strcmp(MGIVENNAME(mon), "steward"))) {
+        /* Far look uses called=TRUE, which would say "prisoner called baker". */
+        Strcpy(outbuf, MGIVENNAME(mon));
     } else {
         Strcpy(outbuf, x_monnam(mon, article, (char *) 0, 0, TRUE));
     }

@@ -200,6 +200,8 @@ watchman_warn_fountain(struct monst *mtmp)
 void
 dryup(coordxy x, coordxy y, boolean isyou)
 {
+    if (living_water_at(x, y))
+        return;
     if (IS_FOUNTAIN(levl[x][y].typ)
         && (!rn2(3) || FOUNTAIN_IS_WARNED(x, y))) {
         if (isyou && in_town(x, y) && !FOUNTAIN_IS_WARNED(x, y)) {
@@ -245,17 +247,10 @@ drinkfountain(void)
     /* What happens when you drink from a fountain? */
     boolean mgkftn = (levl[u.ux][u.uy].blessedftn == 1);
 
-    /* Garden fountains of living water. Always beneficial. */
-    if (in_wilderness() && dunlev(&u.uz) == 5) {
+    /* Garden and Berachah fountains of living water. */
+    if (living_water_here()) {
         pline("The water is living. It restores you.");
-        if (Upolyd)
-            u.mh = u.mhmax;
-        else
-            u.uhp = u.uhpmax;
-        if (u.uhunger < 1000)
-            u.uhunger = 1000;
-        newuhs(FALSE);
-        disp.botl = TRUE;
+        living_water_restore();
         return;
     }
     int fate = rnd(30);
@@ -410,7 +405,7 @@ dipfountain(struct obj *obj)
     int er = ER_NOTHING;
     boolean is_hands = (obj == &hands_obj);
 
-    if (in_wilderness() && dunlev(&u.uz) == 5) {
+    if (living_water_here()) {
         pline("The living water does no harm.");
         return;
     }

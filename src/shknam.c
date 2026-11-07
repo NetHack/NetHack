@@ -467,7 +467,11 @@ mkshobj_at(const struct shclass *shp, int sx, int sy, boolean mkspecl)
         return;
     }
 
-    if (rn2(100) < depth(&u.uz) && !MON_AT(sx, sy)
+    /* One shop square in depth(&u.uz) percent is a mimic instead of
+       an item. The Valley of Berachah's three shops are goods only.
+       Every other shop keeps this chance. */
+    if (!Is_berachah_level(&u.uz)
+        && rn2(100) < depth(&u.uz) && !MON_AT(sx, sy)
         && (ptr = mkclass(S_MIMIC, 0)) != 0
         && (mtmp = makemon(ptr, sx, sy, NO_MM_FLAGS)) != 0) {
         /* nothing */
@@ -686,7 +690,14 @@ shkinit(const struct shclass *shp, struct mkroom *sroom)
         (shp->shknms == shkrings && rn2(2)) ||
         (shp->shknms == shkgeneral && rn2(5)))
         (void) mongets(shk, SCR_CHARGING);
-    nameshk(shk, shp->shknms);
+    if (Is_berachah_level(&u.uz)) {
+        const char *one[2];
+
+        one[0] = berachah_keeper(sroom->rtype);
+        one[1] = (const char *) 0;
+        nameshk(shk, one);
+    } else
+        nameshk(shk, shp->shknms);
 
     return sh;
 }

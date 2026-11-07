@@ -3177,6 +3177,11 @@ use_whip(struct obj *obj)
                 mon_hand = 0; /* lint suppression */
 
             You("wrap your bullwhip around %s.", yname(otmp));
+            if (gotit && otmp->oartifact == ART_SWORD_OF_THE_SPIRIT) {
+                pline("%s stays in %s %s.", Yname2(otmp), mhis(mtmp),
+                      mon_hand);
+                gotit = FALSE;
+            }
             if (gotit && mwelded(otmp)) {
                 pline("%s welded to %s %s%c",
                       (otmp->quan == 1L) ? "It is" : "They are", mhis(mtmp),
@@ -4314,6 +4319,8 @@ doapply(void)
     case SKELETON_KEY:
     case KEY_TO_BABYLON:
     case KEY_TO_GATES:
+    case KEY_TO_HINNOM_GATE:
+    case KEY_TO_SANCTUM:
         res = (pick_lock(obj, 0, 0, NULL) != 0) ? ECMD_TIME : ECMD_OK;
         break;
     case PICK_AXE:
@@ -4832,7 +4839,7 @@ apply_blanket_of_the_heavenly_host(struct obj *saddle )
     }
 
     /* Prevent transformation if already a Winged White Horse */
-    if (mtmp->data == &mons[PM_FIREY_STEED_OF_HEAVEN]) {
+    if (mtmp->data == &mons[PM_FIERY_STEED_OF_HEAVEN]) {
         You("put the saddle on %s.", mon_nam(mtmp));
         if (saddle->owornmask)
             remove_worn_item(saddle, FALSE);
@@ -4842,7 +4849,7 @@ apply_blanket_of_the_heavenly_host(struct obj *saddle )
     }
 
     /* Transform horse into Winged White Horse of Heaven */
-    if (newcham(mtmp, &mons[PM_FIREY_STEED_OF_HEAVEN], NC_SHOW_MSG )) {
+    if (newcham(mtmp, &mons[PM_FIERY_STEED_OF_HEAVEN], NC_SHOW_MSG )) {
         mtmp->mhp += 100; /* HP buff */
         mtmp->mhpmax += 100;
         if (mtmp->mhp > mtmp->mhpmax) mtmp->mhp = mtmp->mhpmax;

@@ -1047,7 +1047,7 @@
         M1_ANIMAL | M1_NOHANDS | M1_HERBIVORE,
         M2_WANDER | M2_STRONG | M2_DOMESTIC, M3_INFRAVISIBLE,
         9, CLR_BROWN, WARHORSE),
-    MON(NAM("firey steed of the Heavenly Host"), S_UNICORN,
+    MON(NAM("fiery steed of the Heavenly Host"), S_UNICORN,
       LVL(19, 24, -5, 90, 10), (G_NOHELL | G_NOGEN),
       A(ATTK(AT_KICK, AD_PHYS, 3, 4), ATTK(AT_BUTT, AD_PHYS, 3, 8),
         NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
@@ -1055,7 +1055,7 @@
       MR_POISON | MR_FIRE | MR_ELEC | MR_DISINT | MR_STONE | MR_ACID , 0,
       M1_ANIMAL | M1_NOHANDS | M1_HERBIVORE | M1_FLY | M1_SEE_INVIS,
       M2_PEACEFUL | M2_STRONG, M3_INFRAVISION, 
-      9, CLR_WHITE, FIREY_STEED_OF_HEAVEN),
+      9, CLR_WHITE, FIERY_STEED_OF_HEAVEN),
     /*
      * vortices
      */
@@ -1272,6 +1272,22 @@
             | M2_COLLECT | M2_MAGIC,
         M3_INFRAVISIBLE | M3_INFRAVISION,
         26, HI_LORD, ARCHON),
+    /* Michael the Archangel waits in the portal room. He cannot die.
+       The token stays MICHAEL: saves store the monster number, not
+       this string. M2_PNAME keeps the article off the front, so the
+       name is not "the Michael the Archangel". */
+    MON(NAM("Michael the Archangel"), S_ANGEL,
+        LVL(49, 16, -20, 80, 15), (G_NOGEN | G_UNIQ | G_NOCORPSE),
+        A(ATTK(AT_WEAP, AD_PHYS, 4, 10), ATTK(AT_WEAP, AD_PHYS, 4, 10),
+          ATTK(AT_WEAP, AD_PHYS, 4, 10), ATTK(AT_MAGC, AD_MAGM, 2, 6),
+          NO_ATTK, NO_ATTK),
+        SIZ(WT_HUMAN, 400, MS_HUMANOID, MZ_LARGE),
+        MR_FIRE | MR_COLD | MR_ELEC | MR_SLEEP | MR_POISON, 0,
+        M1_FLY | M1_HUMANOID | M1_SEE_INVIS | M1_REGEN,
+        M2_NOPOLY | M2_MINION | M2_STALK | M2_STRONG | M2_NASTY | M2_LORD
+            | M2_COLLECT | M2_MAGIC | M2_PNAME | M2_PEACEFUL | M2_MALE,
+        M3_INFRAVISIBLE | M3_INFRAVISION,
+        26, HI_LORD, MICHAEL),
     /*
      * Bats and birds
      */
@@ -2753,6 +2769,35 @@
         M2_NOPOLY | M2_HUMAN | M2_PEACEFUL | M2_PNAME | M2_MALE,
         M3_INFRAVISIBLE,
         13, HI_ZAP, ORACLE),
+    /* Hinnom. The children never move. The guards are placed peaceful. */
+    MON(NAM("child"), S_HUMAN,
+        LVL(0, 0, 10, 0, 0), (G_NOGEN | G_NOCORPSE),
+        A(ATTK(AT_NONE, AD_PHYS, 0, 0),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(300, 100, MS_HUMANOID, MZ_SMALL), 0, 0,
+        M1_HUMANOID | M1_OMNIVORE,
+        M2_NOPOLY | M2_HUMAN | M2_PEACEFUL,
+        M3_INFRAVISIBLE,
+        1, HI_DOMESTIC, CHILD),
+    MON(NAM("fortress guard"), S_HUMAN,
+        LVL(12, 10, 10, 15, 0), G_NOGEN,
+        A(ATTK(AT_WEAP, AD_PHYS, 3, 4), ATTK(AT_WEAP, AD_PHYS, 3, 4),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(WT_HUMAN, 400, MS_SOLDIER, MZ_HUMAN), 0, 0,
+        M1_HUMANOID | M1_OMNIVORE,
+        M2_NOPOLY | M2_HUMAN | M2_MERC | M2_STALK | M2_STRONG | M2_COLLECT,
+        M3_INFRAVISIBLE,
+        14, CLR_GRAY, FORTRESS_GUARD),
+    /* PLACEHOLDER name. Shown as "the doctor". */
+    MON(NAM("doctor"), S_HUMAN,
+        LVL(14, 12, 8, 10, 0), (G_NOGEN | G_UNIQ),
+        A(ATTK(AT_WEAP, AD_PHYS, 1, 6),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(WT_HUMAN, 400, MS_HUMANOID, MZ_HUMAN), 0, 0,
+        M1_FLY | M1_HUMANOID | M1_OMNIVORE,
+        M2_NOPOLY | M2_HUMAN | M2_STRONG,
+        M3_INFRAVISIBLE,
+        16, HI_DOMESTIC, DOCTOR),
     /* aligned priests always have the epri extension attached;
        individual instantiations should always have either ispriest
        or isminion set; role monster priests are separate (below) */
@@ -3148,6 +3193,18 @@
             | M2_PRINCE | M2_MALE,
         M3_WANTSAMUL | M3_INFRAVISIBLE | M3_INFRAVISION,
         57, HI_LORD, DEMOGORGON),
+    /* After Demogorgon so the prince/lord summon ranges do not include him. */
+    MON(NAM("Moloch"), S_DEMON,
+        LVL(105, 14, -8, 92, -20), (G_HELL | G_NOCORPSE | G_NOGEN | G_UNIQ),
+        A(ATTK(AT_WEAP, AD_FIRE, 6, 6), ATTK(AT_MAGC, AD_FIRE, 8, 6),
+          ATTK(AT_CLAW, AD_FIRE, 4, 8), ATTK(AT_CLAW, AD_FIRE, 4, 8),
+          NO_ATTK, NO_ATTK),
+        SIZ(1500, 500, MS_GROWL, MZ_HUGE), MR_FIRE | MR_COLD | MR_POISON, 0,
+        M1_SEE_INVIS | M1_HUMANOID | M1_POIS,
+        M2_NOPOLY | M2_DEMON | M2_STALK | M2_HOSTILE | M2_PNAME
+            | M2_STRONG | M2_NASTY | M2_PRINCE | M2_MALE,
+        M3_WAITFORU | M3_INFRAVISIBLE | M3_INFRAVISION,
+        55, HI_LORD, MOLOCH),
     /* Riders -- the Four Horsemen of the Apocalypse ("War" == player);
      * depicted with '&' but do not have M2_DEMON set.
      */

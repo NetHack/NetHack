@@ -841,14 +841,25 @@ u_entered_shop(char *enterstring)
     } else {
         if (!Deaf && !muteshk(shkp)) {
             set_voice(shkp, 0, 80, 0);
-            verbalize("%s, %s!  Welcome%s to %s %s!", Hello(shkp), svp.plname,
-                      eshkp->visitct++ ? " again" : "",
-                      s_suffix(shkname(shkp)), shtypes[rt - SHOPBASE].name);
+            if (Is_berachah_level(&u.uz))
+                verbalize("Welcome to %s!",
+                          berachah_shop_sign(rt)); /* PLACEHOLDER */
+            else
+                verbalize("%s, %s!  Welcome%s to %s %s!", Hello(shkp),
+                          svp.plname, eshkp->visitct++ ? " again" : "",
+                          s_suffix(shkname(shkp)),
+                          shtypes[rt - SHOPBASE].name);
+            if (Is_berachah_level(&u.uz))
+                eshkp->visitct++;
         } else {
-            You("enter %s %s%s!",
-                s_suffix(shkname(shkp)),
-                shtypes[rt - SHOPBASE].name,
-                eshkp->visitct++ ? " again" : "");
+            if (Is_berachah_level(&u.uz))
+                You("enter %s%s!", berachah_shop_sign(rt),
+                    eshkp->visitct++ ? " again" : "");
+            else
+                You("enter %s %s%s!",
+                    s_suffix(shkname(shkp)),
+                    shtypes[rt - SHOPBASE].name,
+                    eshkp->visitct++ ? " again" : "");
         }
     }
     /* can't do anything about blocking if teleported in */

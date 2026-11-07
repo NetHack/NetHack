@@ -451,6 +451,15 @@ steal(struct monst *mtmp, char *objnambuf)
         otmp = uarm;
 
  gotobj:
+    if (otmp->oartifact == ART_SWORD_OF_THE_SPIRIT
+        && (otmp == uwep || otmp == uswapwep)) {
+        if (!retrycnt++)
+            goto retry;
+        pline("The Sword of the Spirit stays in your %s.",
+              bimanual(otmp) ? makeplural(body_part(HAND))
+                             : body_part(HAND));
+        return 1;
+    }
     if (otmp->o_id == gs.stealoid)
         return 0;
 

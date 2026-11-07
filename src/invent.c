@@ -4077,6 +4077,9 @@ dfeature_at(coordxy x, coordxy y, char *buf)
             /* an() leaves a leading "the " alone, so look-here reads
                "There is the Altar at Gibeon here." */
             dfeature = "the Altar at Gibeon";
+        } else if (Is_hinnom_level(&u.uz) && !u.uevent.berachah
+                   && Amask2align(lev->altarmask & AM_MASK) == A_NONE) {
+            dfeature = "altar of Moloch";
         } else {
             Sprintf(altbuf, "%saltar to %s (%s)",
                     (lev->altarmask & AM_SANCTUM) ? "high " : "",

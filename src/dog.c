@@ -825,10 +825,22 @@ keepdogs(
             if (mtmp->mtrapped)
                 (void) mintrap(mtmp, NO_TRAP_FLAGS); /* try to escape */
             if (mtmp == u.usteed) {
+                struct obj *obj, *otmp;
+
                 /* make sure steed is eligible to accompany hero */
                 mtmp->mtrapped = 0;       /* escape trap */
                 mtmp->meating = 0;        /* terminate eating */
-                mdrop_special_objs(mtmp); /* drop Amulet */
+                /* Drop the Amulet and the invocation tools. Leave a worn
+                   saddle. For a Knight that saddle is the quest artifact,
+                   and taking it off throws the rider before the level
+                   change has finished. */
+                for (obj = mtmp->minvent; obj; obj = otmp) {
+                    otmp = obj->nobj;
+                    if ((obj->owornmask & W_SADDLE) != 0L)
+                        continue;
+                    if (obj_resists(obj, 0, 0) || is_quest_artifact(obj))
+                        mdrop_obj(mtmp, obj, FALSE);
+                }
             } else if (mtmp->meating || mtmp->mtrapped) {
                 if (canseemon(mtmp))
                     pline_mon(mtmp, "%s is still %s.", Monnam(mtmp),

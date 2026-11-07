@@ -1075,6 +1075,7 @@ floor_trigger(int ttyp)
     case SPIKED_PIT:
     case HOLE:
     case TRAPDOOR:
+    case POWER_LEVER: /* floor switch; the hero can throw it in the air */
         return TRUE;
     default:
         return FALSE;
@@ -1178,6 +1179,8 @@ m_harmless_trap(struct monst *mtmp, struct trap *ttmp)
         break;
     case VIBRATING_SQUARE:
         return TRUE;
+    case POWER_LEVER:
+        return TRUE; /* monsters ignore it */
     default:
         impossible("m_harmless_trap: unknown trap %i", ttmp->ttyp);
         break;
@@ -2926,6 +2929,16 @@ immune_to_trap(struct monst *mon, unsigned ttype)
     case VIBRATING_SQUARE:
         /* no adverse effects */
         return TRAP_CLEARLY_IMMUNE;
+    case POWER_LEVER:
+        /* The hero can throw it on foot, in the air, or mounted.
+           Monsters still ignore it. */
+        if (!is_you)
+            return TRAP_CLEARLY_IMMUNE;
+        return TRAP_NOT_IMMUNE;
+    case TRAPPED_DOOR:
+    case TRAPPED_CHEST:
+        /* not map traps; nothing here is standing on them */
+        return TRAP_CLEARLY_IMMUNE;
     default:
         impossible("immune_to_trap: bad ttype %u", ttype);
         break;
@@ -2984,6 +2997,10 @@ trapeffect_selector(
         return trapeffect_rolling_boulder_trap(mtmp, trap, trflags);
     case VIBRATING_SQUARE:
         return trapeffect_vibrating_square(mtmp, trap, trflags);
+    case POWER_LEVER:
+        if (mtmp != &gy.youmonst)
+            return Trap_Effect_Finished;
+        return hinnom_pull_lever(trap);
     default:
         impossible("%s encountered a strange trap of type %d.",
                    (mtmp == &gy.youmonst) ? "You" : "Some monster",
@@ -3023,7 +3040,11 @@ dotrap(struct trap *trap, unsigned trflags)
               trapname(ttype, TRUE)); /* do force "pit" while hallucinating */
         /* then proceed to normal trap effect */
     } else if (!forcetrap) {
-        if (floor_trigger(ttype) && check_in_air(&gy.youmonst, trflags)) {
+        /* A power lever is a floor switch, but the hero can throw it
+           while flying, levitating, or riding a flying steed. Every
+           other floor trap still lets them pass over. */
+        if (ttype != POWER_LEVER
+            && floor_trigger(ttype) && check_in_air(&gy.youmonst, trflags)) {
             if (already_seen) {
                 You("%s over %s %s.", u_locomotion("step"),
                     (ttype == ARROW_TRAP && !trap->madeby_u)
@@ -3033,7 +3054,8 @@ dotrap(struct trap *trap, unsigned trflags)
             return;
         }
         if (already_seen && !Fumbling && !undestroyable_trap(ttype)
-            && ttype != ANTI_MAGIC && !forcebungle && !plunged
+            && ttype != ANTI_MAGIC && ttype != POWER_LEVER
+            && !forcebungle && !plunged
             && !conj_pit && !adj_pit
             && (!rn2(5) || (is_pit(ttype) && is_clinger(gy.youmonst.data)))) {
                 You("escape %s %s.", (ttype == ARROW_TRAP && !trap->madeby_u)
@@ -4825,6 +4847,8 @@ water_damage(
             update_inventory();
         return ER_DAMAGED;
     } else if (obj->oclass == POTION_CLASS) {
+        if (obj->otyp == POT_TEARS_OF_CHILDREN)
+            return ER_NOTHING;
         if (obj->otyp == POT_ACID) {
             pot_acid_damage(obj, in_invent, described);
             return ER_DESTROYED;

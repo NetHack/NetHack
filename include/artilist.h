@@ -281,7 +281,7 @@ static NEARDATA struct artifact artilist[] = {
       RIDING BLANKET OF THE HEAVENLY HOST
     * Quest reward for Knight
     * 100HP Buff to Horse
-    * Transforms a horse into a firey steed of the heavenly host
+    * Transforms a horse into a fiery steed of the heavenly host
     * Enables jousting and pounding while mounted for the 
     * following weapon types: Long Sword, Mace, Hammer, Silver Saber
     * #invoke tames any horses (including unicorns) in a 5x5 area

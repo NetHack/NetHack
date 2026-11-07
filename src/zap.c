@@ -2666,11 +2666,12 @@ frozen_power_show(void)
         /* curs_on_u() flushes the glyphs. Force the 50 ms timed delay
            for this burst only (curses and the Unix tty skip it when
            timed_delay is off). The Windows console tty and the Windows
-           GUI always wait about 50 ms per call. Thirty calls past the
-           old two are about 1500 ms extra, 1600 ms in all. */
+           GUI always wait about 50 ms per call. Sixteen calls are about
+           half of the old thirty-two, so the burst lasts about 800 ms.
+           Damage, range, and who is frozen are unchanged. */
         flags.nap = TRUE;
         curs_on_u();
-        for (i = 0; i < 32; i++)
+        for (i = 0; i < 16; i++)
             nh_delay_output();
         flags.nap = save_nap;
         tmp_at(DISP_END, 0);
@@ -5580,9 +5581,12 @@ zap_over_floor(
             break;
         }
         if (new_doormask >= 0) { /* door gets broken */
-            if (peters_closet_door(x, y) || sodom_house_barred(x, y)) {
-                if (see_it)
+            if (peters_closet_door(x, y) || sodom_house_barred(x, y)
+                || hinnom_impassable_door(x, y)) {
+                if (see_it && !hinnom_impassable_door(x, y))
                     pline("This door will not yield.");
+                else if (hinnom_impassable_door(x, y) && see_it)
+                    (void) hinnom_blocks(x, y);
                 new_doormask = -1;
             }
         }
@@ -6177,6 +6181,8 @@ destroy_items(
     while ((obj = nxt_unbypassed_obj(*objchn)) != 0) {
         if (!destroyable(obj, dmgtyp))
             continue; /* this dmg type can't destroy this obj */
+        if (obj->otyp == POT_TEARS_OF_CHILDREN)
+            continue;
 
         /* obj is eligible; maybe add it to items_to_destroy */
         i = (elig_stacks < limit) ? elig_stacks : rn2(elig_stacks);
@@ -6532,6 +6538,10 @@ wish_from_text(char *buf, boolean last_try)
             || otmp->otyp == PETER_NET
             || otmp->otyp == KEY_TO_BABYLON
             || otmp->otyp == KEY_TO_GATES
+            || otmp->otyp == KEY_TO_HINNOM_GATE
+            || otmp->otyp == KEY_TO_SANCTUM
+            || otmp->otyp == HIGH_PRIEST_CLOAK
+            || otmp->otyp == POT_TEARS_OF_CHILDREN
             || otmp->otyp == SCR_SCHOLARS_SCROLL
             || otmp->otyp == SCR_PETERS_SCROLL
             || otmp->otyp == ROCK_WITH_KEYHOLE

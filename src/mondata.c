@@ -1025,6 +1025,8 @@ name_to_monplus(
             { "djinn", PM_DJINNI, NEUTRAL },
             { "mumakil", PM_MUMAK, NEUTRAL },
             { "erinyes", PM_ERINYS, NEUTRAL },
+            /* Former type name. The displayed name is the longer one. */
+            { "Michael", PM_MICHAEL, MALE },
             /* end of list */
             { 0, NON_PM, NEUTRAL }
         };

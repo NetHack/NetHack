@@ -1245,11 +1245,15 @@ dodown(void)
     /* The stairs exist once the square has been revealed. They stay
        shut until Peter's key is used on them. */
     if (stairs_down && invocation_pos(u.ux, u.uy) && !u.uevent.invoked) {
-        pline("The gates stay shut. The key Peter gave you will open them.");
+        pline("The Gate of the Sanctum stays shut. The Key to the Sanctum will open it."); /* PLACEHOLDER */
         return ECMD_OK;
     }
 
     if (on_level(&valley_level, &u.uz) && !u.uevent.gehennom_entered) {
+        if (!carrying(KEY_TO_GATES)) {
+            pline("The gates of Gehennom stay shut. The key Peter gave you will open them."); /* PLACEHOLDER */
+            return ECMD_OK;
+        }
         You("are standing at the gate to Gehennom.");
         pline("Unspeakable cruelty and harm lurk down there.");
         if (y_n("Are you sure you want to enter?") != 'y')
@@ -1643,6 +1647,8 @@ goto_level(
         pride_leave_lures(FALSE);
         pride_unlearn_execution();
     }
+    if (hinnom_dest_clamp(newlevel))
+        return;
     if (newdungeon) {
         if (In_endgame(newlevel)) { /* 1st Endgame Level !!! */
             if (!u.uhave.amulet)
@@ -1830,7 +1836,10 @@ goto_level(
     }
     save_mode = nhfp->mode;
     nhfp->mode = cant_go_back ? FREEING : (WRITING | FREEING);
+    hinnom_begin_swap();
     savelev(nhfp, ledger_no(&u.uz));
+    if (hinnom_swap_pending())
+        hinnom_finish_swap();
     nhfp->mode = save_mode;
     close_nhfile(nhfp);
     if (cant_go_back) {
@@ -1929,6 +1938,21 @@ goto_level(
                    after already getting expelled once. The portal back
                    doesn't exist anymore - see expulsion(). */
                 u_on_rndspot(0);
+            } else if (on_jacobs_ladder(&u.uz0)
+                       && u.uz.dnum == sokoban_dnum
+                       && dunlev(&u.uz)
+                              == svd.dungeons[sokoban_dnum].entry_lev) {
+                /* One-way portal. Land on the stair where Sokoban is
+                   first entered, not on a second portal. */
+                stairway *stway;
+
+                for (stway = gs.stairs; stway; stway = stway->next)
+                    if (stway->tolev.dnum != u.uz.dnum)
+                        break;
+                if (stway)
+                    u_on_newpos(stway->sx, stway->sy);
+                else
+                    u_on_rndspot(0);
             } else {
                 if (!iflags.debug_fuzzer)
                     impossible("goto_level: no corresponding portal!");
@@ -1968,7 +1992,10 @@ goto_level(
                 u_on_upstairs();
             if (!u.dz) {
                 ; /* stayed on same level? (no transit effects) */
-            } else if (Flying) {
+            } else if (Flying
+                       || (u.usteed && is_flyer(u.usteed->data))) {
+                /* A flying steed carries the hero down. Do not take the
+                   fall-and-dismount path used for a grounded mount. */
                 if (flags.verbose)
                     You("fly down %s.",
                         ga.at_ladder ? "along the ladder" : "the stairs");
@@ -2008,6 +2035,8 @@ goto_level(
     if (Punished)
         placebc();
     obj_delivery(FALSE);
+    if (new && Is_berachah_level(&u.uz))
+        berachah_fix_objects();
     losedogs();
     kill_genocided_monsters(); /* for those wiped out while in limbo */
     /*
@@ -2057,7 +2086,19 @@ goto_level(
 
         if (slev && !strcmp(slev->proto, "capernaum"))
             capernaum_arrival();
+        if (Is_hinnom_level(&u.uz) && !u.uevent.berachah) {
+            winid win = create_nhwindow(NHW_TEXT);
+
+            putstr(win, 0, flags.female
+                ? "Huzzah! To the north, good lady! I'm in need of your aid!"
+                : "Huzzah! To the north, good sir! I'm in need of your aid!");
+            display_nhwindow(win, TRUE);
+            destroy_nhwindow(win);
+        }
     }
+    /* First entrance to the Valley. The swap itself runs while the
+       hero is leaving, so this waits for the arrival. */
+    berachah_intro();
 
     /* Check whether we just entered Gehennom. */
     if (!In_hell(&u.uz0) && Inhell) {
@@ -2073,9 +2114,8 @@ goto_level(
 
         record_achievement(ACH_HELL); /* reached Gehennom */
     }
-    /* in case we've managed to bypass the Valley's stairway down */
-    if (Inhell && !Is_valley(&u.uz))
-        u.uevent.gehennom_entered = 1;
+    /* The Valley down stair is the only first entrance. Jumps are
+       sent back there until that stair has been used. */
 
     if (familiar)
         familiar_level_msg();

@@ -333,7 +333,10 @@ check_caitiff(struct monst *mtmp)
     if (u.ualign.record <= -10)
         return;
 
+    /* Hostile enemies are fair game, even stunned, helpless, or fleeing.
+       Peaceful creatures are unchanged. */
     if (Role_if(PM_KNIGHT) && u.ualign.type == A_LAWFUL
+        && mtmp->mpeaceful
         && !is_undead(mtmp->data)
         && (helpless(mtmp)
             || (mtmp->mflee && !mtmp->mavenge))) {
@@ -520,6 +523,12 @@ do_attack(struct monst *mtmp)
     gn.notonhead = (gb.bhitpos.x != mtmp->mx || gb.bhitpos.y != mtmp->my);
     if (attack_checks(mtmp, uwep))
         return TRUE;
+    if (mtmp->data == &mons[PM_MICHAEL]) {
+        pline("You cannot bring yourself to strike %s.", mon_nam(mtmp)); /* PLACEHOLDER */
+        return TRUE;
+    }
+    if (fortress_monster(mtmp))
+        hinnom_alarm_fortress();
 
     if (Upolyd && noattacks(gy.youmonst.data)) {
         /* certain "pacifist" monsters don't attack */
@@ -1887,6 +1896,11 @@ hmon_hitmon(
             first_weapon_hit(obj);
         if (!is_peter(mon))
             mon->mhp -= hmd.dmg;
+        /* Floor first, then count, so the first two blows cannot
+           finish him. The third blow is unrestricted. */
+        moloch_hold_line(mon);
+        if (hmd.dmg > 0)
+            moloch_note_hero_hit(mon);
     }
     /* adjustments might have made tmp become less than what
        a level-draining artifact has already done to max HP */
@@ -4914,6 +4928,9 @@ damageum(
         mhm.damage = 0;
     } else
         mdef->mhp -= mhm.damage;
+    moloch_hold_line(mdef);
+    if (mhm.damage > 0)
+        moloch_note_hero_hit(mdef);
     if (DEADMONSTER(mdef)) {
         /* troll killed by Trollsbane won't auto-revive; FIXME? same when
            Trollsbane is wielded as primary and two-weaponing kills with

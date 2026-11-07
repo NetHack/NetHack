@@ -1779,6 +1779,8 @@ struct ext_func_tab extcmdlist[] = {
               docallcmd, IFBURIED | AUTOCOMPLETE | GENERALCMD, NULL },
     { M('o'), "offer", "offer a sacrifice to the gods",
               dosacrifice, AUTOCOMPLETE | CMD_M_PREFIX, NULL },
+    { M('z'), "raze", "raze an altar of evil to the ground",
+              doraze, AUTOCOMPLETE, NULL },
     { 'o',    "open", "open a door",
               doopen, 0, NULL },
     /* 'm #options' runs doset() */

@@ -329,7 +329,9 @@ m_initweap(struct monst *mtmp)
     case S_ANGEL:
         if (humanoid(ptr)) {
             /* create minion stuff; bypass mongets */
-            int typ = rn2(3) ? LONG_SWORD : SILVER_MACE;
+            /* Michael the Archangel always bears Demonbane */
+            int typ = (ptr != &mons[PM_MICHAEL] && rn2(3)) ? LONG_SWORD
+                                                            : SILVER_MACE;
             const char *nam = (typ == LONG_SWORD) ? "Sunsword" : "Demonbane";
 
             otmp = mksobj(typ, FALSE, FALSE);
@@ -623,6 +625,9 @@ m_initinv(struct monst *mtmp)
                 break;
             case PM_WATCH_CAPTAIN:
                 mac = -2;
+                break;
+            case PM_FORTRESS_GUARD:
+                mac = 0;
                 break;
             default:
                 impossible("odd mercenary %d?", monsndx(ptr));
@@ -1091,6 +1096,11 @@ makemon_rnd_goodpos(
         ny = rn2(ROWNO);
         good = (!gi.in_mklev && cansee(nx,ny)) ? FALSE
                                               : goodpos(nx, ny, mon, gpflags);
+        if (good && Is_hinnom_level(&u.uz) && hinnom_portal_room(nx, ny))
+            good = FALSE;
+        /* The closed fortress is filled by the level, not by wandering. */
+        if (good && hinnom_fortress_closed() && hinnom_inside_field(nx, ny))
+            good = FALSE;
     } while ((++tryct < 50) && !good);
 
     if (!good) {
@@ -1111,7 +1121,11 @@ makemon_rnd_goodpos(
                     ny = ((dy + yofs) % (ROWNO - 1)) + 1;
                     if (bl == 0 && cansee(nx,ny))
                         continue;
-                    if (goodpos(nx, ny, mon, gpflags))
+                    if (goodpos(nx, ny, mon, gpflags)
+                        && !(Is_hinnom_level(&u.uz)
+                             && hinnom_portal_room(nx, ny))
+                        && !(hinnom_fortress_closed()
+                             && hinnom_inside_field(nx, ny)))
                         goto gotgood;
                 }
             if (bl == 0 && (!mon || mon->data->mmove)) {

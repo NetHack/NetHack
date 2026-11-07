@@ -37,7 +37,9 @@ des.door("closed", 12, 12)
 des.door("closed", 55, 10)
 des.engraving({ x=2, y=10, type="verse", degrade=false, text="For what is a man profited, if he shall gain the whole world, and lose his own soul? or what shall a man give in exchange for his soul?" })
 des.engraving({ x=54, y=10, type="verse", degrade=false, text="And said, Naked came I out of my mother's womb, and naked shall I return thither: the LORD gave, and the LORD hath taken away; blessed be the name of the LORD." })
-des.engraving({ x=58, y=10, type="verse", degrade=false, text="But seek ye first the kingdom of God, and his righteousness; and all these things shall be added unto you." })
+-- One square west of the restore pile at (58,10), so the verse is not
+-- sitting on the items.
+des.engraving({ x=57, y=10, type="verse", degrade=false, text="But seek ye first the kingdom of God, and his righteousness; and all these things shall be added unto you." })
 
 local pillars = { {36,1},{42,2},{26,3},{39,3},{43,3},{25,4},{50,4},{18,5},{35,5},{49,5},{23,6},{33,6},{34,6},{43,6},{45,6},{22,7},{35,7},{41,7},{20,8},{26,8},{43,8},{54,8},{16,9},{19,9},{49,9},{51,11},{19,12},{21,12},{33,12},{41,12},{16,13},{47,13},{50,13},{23,14},{40,14},{42,14},{19,17},{26,17},{16,18},{29,19},{42,19} }
 local ispill = {}

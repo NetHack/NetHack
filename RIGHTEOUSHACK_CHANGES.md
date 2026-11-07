@@ -6,7 +6,7 @@ This file was written **before** merging tag `NetHack-5.0.0_Released`
 (`16ff591153`) so the upgrade can be checked against it.
 
 Spellings below are the owner's, including `elixer`, `exlier`,
-`doubled-edged`, `trusty sandles`, `firey`, `wiggy gain ability`,
+`doubled-edged`, `trusty sandles`, `wiggy gain ability`,
 and `PSALM 91`. They are intentional content (or at least content the
 owner shipped) and must not be "corrected" back to vanilla NetHack.
 
@@ -70,7 +70,7 @@ does **not** match the code. The code wins.
 
 | ID | Item | Where |
 |----|------|-------|
-| ID-030 | `firey steed of the Heavenly Host` (`FIREY_STEED_OF_HEAVEN`), unicorn class, flying, peaceful | `include/monsters.h` |
+| ID-030 | `fiery steed of the Heavenly Host` (`FIERY_STEED_OF_HEAVEN`), unicorn class, flying, peaceful | `include/monsters.h` |
 | ID-031 | Unique human `Zenodotus` (`ZENODOTUS`), Historian quest leader | `include/monsters.h` |
 
 No other monster names were changed. Vanilla monsters for removed roles
@@ -319,7 +319,7 @@ Helpers: `IS_STAFF_OF_WONDERS`, `IS_GOLDEN_CENSER`.
 | ID | Artifact | Base | Role gate in `artilist.h` | Behavior |
 |----|----------|------|---------------------------|----------|
 | ID-200 | Apostolic Writing Kit | writing tablet (`MAGIC_MARKER`) | `PM_ARCHEOLOGIST` | Unlimited writing (`src/write.c`); invoke gives paper |
-| ID-201 | Riding Blanket of the Heavenly Host | saddle | `PM_KNIGHT` | Apply transforms a horse into the firey steed; invoke tames nearby horses (`src/apply.c`, `src/artifact.c`) |
+| ID-201 | Riding Blanket of the Heavenly Host | saddle | `PM_KNIGHT` | Apply transforms a horse into the fiery steed; invoke tames nearby horses (`src/apply.c`, `src/artifact.c`) |
 | ID-202 | Handkerchief of the Apostle Paul | torn piece of cloth | `PM_KNIGHT` in `artilist.h`, but the Healer quest reward in `src/role.c` | Carry grants disease resistance; invoke heals and pushes monsters (`mhurtle_giant` in `src/dothrow.c`) |
 | ID-203 | Golden Censer of Incense | thurible | `PM_CLERIC` | Prayer timeout, light radius 5 with no burnout (`src/timeout.c`), invoke engraves and teleports |
 | ID-204 | Scarlet Cord of Rahab | rope | `PM_ROGUE` | Apply climbs; invoke toggles invisibility. Climb/fall messages in `src/hack.c` |
@@ -1213,6 +1213,66 @@ already shown for a prophecy's category: spiritual warfare,
 healing, discernment, blessing, prayer, deliverance, and creation.
 They stay lowercase, with no "spells" suffix.
 
+### Babel and Jacob's Ladder (2026-11-01)
+
+Sokoban still climbs from the entrance (soko4) to the prize
+(soko1). That prize room is the end. It no longer fills with a
+zoo, and the level does not generate random monsters. The two
+mimics on the map are still placed. Six peaceful confused
+humans wait there. A branch stair in that room climbs to
+Jacob's Ladder, one lit garden, with no generation. Trees
+ring the room. Six fountains are living water: the same
+restore as the Wilderness garden (full HP and power, ailments
+cleared). A seen magic portal returns to the Sokoban entry
+level, on the stair where that branch is first entered. The
+portal's destination is stored on the trap, so a save keeps it.
+Six builders stand toward the corners of the prize room.
+None stands on the branch stair. Two of the original eight
+were removed.
+
+### Jacob's garden (2026-11-04)
+
+The room above Sokoban is a garden: trees, and six fountains of
+living water. Drinking one does what the Wilderness garden
+fountains do. A seen magic portal on that level goes to the
+Sokoban entry level and puts the hero on the stair where that
+branch is entered. The destination is kept on the portal trap.
+
+Every builder says "We built to reach heaven, and forgot what
+we had already lost." Then one of these:
+
+- "The higher we climbed, the less we remembered why."
+- "We called the work our own, and the work called us proud."
+- "Man's knowledge grew great, and his heart grew small."
+- "We were making a name, and losing the Name that made us."
+- "Every new course of stone was another reason not to kneel."
+- "We could measure the height. We could not measure ourselves."
+
+None of them says "AI".
+
+The six names are Akkadian, Sumerian, Hebrew, Canaanite,
+Egyptian, and Elamite. No two share a name.
+
+Three also speak before the English line. These are for
+verification, not a certified translation:
+
+- Hebrew builder: הבה נבנה לנו עיר ומגדל
+  (meant as unpointed Genesis 11:4, "come, let us build ourselves a city and a tower")
+- Akkadian builder: šarrum dannum
+  (meant as "mighty king")
+- Sumerian builder: e2 an-še3
+  (meant as "house toward heaven")
+
+Canaanite, Egyptian, and Elamite say only the English lines.
+No ancient phrase was added for them.
+
+The angel says "You seek what was taken from you, though you know it not."
+The first time, a blessed +2 Gospel of Peace is given, and the
+angel steps two squares toward the chest. The chest holds a
+diamond named "PLACEHOLDER main-quest artifact". It does
+nothing. The engraving is Genesis 28:12 KJV. The plan names
+Jacob's dream and does not quote that verse.
+
 ### The soul in the Sanctum of the Great Dragon (2026-11-01)
 
 The Amulet of Yendor is not given to the high priest. A chest on
@@ -1234,7 +1294,10 @@ speak and you are not deaf, that priest says "Welcome, we have
 long awaited thee. Look thou within the chest, and receive thy
 reward." The welcome leaves the priest peaceful. Attacking
 still asks the ordinary question, then she turns hostile and the
-smite is unchanged. The
+smite is unchanged. Killing that priest, or any priest of the
+Great Dragon, is not murder: no "You murderer!", and no Favor
+loss. The
+
 lead-in "The high priest intones:" still appears on its old
 timer, and on the Sanctum it names the priest of the Great Dragon.
 An endgame temple still does not name the altar's owner. Other
@@ -1337,11 +1400,304 @@ player's own deity names as opposing each other.
 | ID-070 | Anointing oil of gain ability is still named "wiggy gain ability". |
 | ID-212 | Handkerchief of the Apostle Paul is the Healer quest artifact in `src/role.c`, and `include/artilist.h` still gates it to `PM_KNIGHT`. |
 | ID-213 | Champion's quest artifact is still the Orb of Fate. |
-| ID-223 | `desecrate_altar` is gone. `src/dig.c` and `src/music.c` print `placeholder for desecrate_altar`. |
+| ID-223 | Resolved: a broken rod or the drum of earthquake no longer prints the placeholder. A lawful altar stands. An evil altar is razed. |
 | ID-224 | Resolved: anointing says "the Servant of the Lord". The gift is a placeholder. |
 | (new) | Resolved: the owner named the 5.0 stasis rod "stillness" (`WAN_STILLNESS`, "rod of stillness", Psalm 46:10). |
 | ID-084 | Healer's oil rows are tagged `POTION_CLASS` even though the objects are `ANOINTING_CLASS`. Creation uses `trotyp`, so the game start still works. |
 | ID-017 | Only human is playable. `src/u_init.c` still has tables for the removed roles. |
+
+### Hinnom battle batch (2026-11-04)
+
+The crash after razing Moloch's altar was the Orcus Town level file,
+not Hinnom. `dat/orcus.lua` still asked for `"magic marker"`, which
+is the writing tablet here, so half the time building that level
+panicked with "Unknown object id". Orcus Town can be the level
+under Hinnom, and the raze is what opens the way down. The file now
+asks for `"writing tablet"`. While Moloch is alive, Hinnom also has
+no way down: `hinnom_dest_clamp()` refuses any level change to a
+deeper level (stairs, a fall, level teleport, prophet mode too) with
+"You cannot go down until Moloch is defeated." (placeholder). The up
+stairs and every route inside the level are unchanged.
+
+Every #chat with Michael on Hinnom while the field stands now opens a
+blackout text window with his briefing (placeholder text), addressed
+"Hear me, <rank> of the Most High." The rank is the hero's current
+rank title for the hero's gender, from `rank_of()`. His usual line
+follows: the cloak on the first talk, the field line after that. The
+arrival screen with "good sir" / "good lady" is unchanged. The
+window code in `src/hinnom.c` is now one helper, `hinnom_screen()`,
+shared with the Berachah arrival text.
+
+Before the field falls, each of the four angels around Michael has
+three lines of his own, one picked at random on each #chat. The angels
+are told apart by creation order (`m_id`), which follows
+`dat/hinnom.lua`: angel 1 is northwest of Michael, 2 northeast, 3
+southwest, 4 southeast. They still hold their squares until the
+assault (`hinnom_host_hold()`), and the Berachah victory lines are
+separate and unchanged.
+
+The first time the fortress's peace breaks while the field still
+stands, a blackout screen says the disguise is broken. It is shown
+from `hinnom_alarm_fortress()`, which sets the alarm bit, so it can
+only show once. When the field falls the alarm is raised after the
+bars are gone, so that screen is skipped and the battle screen is the
+one shown. Two ways of being caught without the cloak now raise the
+same alarm: standing next to a fortress inhabitant or gate guard
+(`src/monmove.c`), and asking a gate guard to pass. Before, those
+turned only that one monster hostile.
+
+When the fifth lever drops the field, a blackout screen shows the
+field breaking and the Host charging. It is shown from
+`hinnom_field_down()`, which runs once, since the levers go dead with
+the field. It replaces the two placeholder lines "The hum dies. The
+barrier falls." and "Michael and his angels charge the fortress!".
+The disguise-broken screen is not shown with it.
+
+When the power field falls, Michael the Archangel and two angels are placed in the throne room and now make straight for Moloch (a Hinnom-only goal in m_move, marked by a new mstrategy bit). Four other angels take the foyer; extra angels are made if fewer than six are left. The foyer spots are inside the real room walls.
+
+Power levers no longer trigger the paranoid "Really step onto that power lever?" question and are no longer skipped by the 1-in-5 "You escape" roll; walking onto one always asks "Throw the ... lever?". Flyers and levitators still pass over. All other traps are unchanged.
+
+Michael the Archangel is now LVL(49, 16, -20, 80, 15) with three 4d10 weapon attacks plus his 2d6 spell, and m_initweap always gives him a blessed silver mace, named Demonbane, for extra damage against demons. His resistances are unchanged and Moloch is unchanged. (A base level of 50 or more would use the special-demon hit point rule and give him only 88 hit points, so 49 is used.)
+
+Balance check (prophet mode, no code change): six fights after the field fell, with Michael and two angels placed beside Moloch and the hero away from the throne. Without the raze (Moloch 198 of 198 hit points) Moloch died within 1 to 2 turns in all three fights. With the raze (Moloch 49 of 198) he died within 2 to 3 turns in all three. Michael (level 48, 187 to 259 hit points, AC -22, Demonbane +3 to +6) lost no hit points in any fight, and no angel died.
+
+Hinnom lighting: lit des regions now cover Moloch's throne room, the foyer, the doctor's lab, the lever room, and the ground outside the gate (each lit region also lights its surrounding walls). Michael's portal room stays lit and everything else stays dark. The foyer region uses the real room interior (columns 45-49). Berachah is built from its own file, which lights the whole map, so it is unchanged.
+
+When Moloch's altar is razed while Moloch lives, the approved altar-razed screen is shown once (it replaces the short "Moloch staggers" line), and Michael the Archangel and every angel of the Host on the level are marked to make for Moloch. While the field is still up they stay held behind it and go when it falls; angels made when the field falls after the raze are marked too. If Moloch is already dead, only the existing short message is shown.
+
+### Knight conduct (2026-11-04)
+
+`check_caitiff()` in `src/uhitm.c` is the Knight penalty for striking
+someone who is asleep, paralyzed, or fleeing without vengeance. It
+prints "You caitiff!" and takes one alignment point. It does not
+change Favor. A hostile monster no longer triggers it, whether that
+monster is fleeing or helpless. A peaceful monster still does. The
+same function is used for a kick, a polearm, and a grappling hook.
+
+### Valley, Greed, and the lever (2026-11-06)
+
+Passing the Greed gate with an empty pack shows a blackout screen:
+"Your trial is complete. The grip of greed is broken." and "Your
+items appear directly in front of you. Step forward to reclaim
+them." The verse that used to sit on the restore square (58,10)
+is one square west, at (57,10). Dropped items still return to
+(59,10) in the game, which is map column 58.
+
+The Rod of Frozen Power waits 16 timed delays instead of 32.
+Damage, range, and who is frozen are unchanged.
+
+While the High Priest of Moloch's cloak holds, the gate guards
+say "Pass, High Priest." An inside guard's lever clue addresses
+the hero as High Priest. Every other "Your Holiness" in the
+court lines is "Your Dread Eminence."
+
+Far look on a child inside the Hinnom field says "scared child."
+On the Valley, the town elder and the eight named villagers
+far-look as their given names, not as prisoners. Michael's
+#chat before the Valley is one random line for the stage: field
+down and Moloch alive, Moloch dead and the altar standing, or
+the altar razed. In the Valley he uses one of three greetings.
+Those lines, and the villager service lines, are marked
+PLACEHOLDER until Jon confirms the wording.
+
+The Valley welcome gives three food rations named Bread of
+Berachah. Each has the nutrition of a lembas wafer (800). Far
+look adds "A freshly baked loaf, given in gratitude by the
+people of Berachah." The baker sells one more for 10 gold.
+The priest refills Power only, for 50 gold. The smith repairs
+weapon erosion for 40 gold and does not enchant. The tailor
+repairs cloth armor and cloaks for 30 gold. The farmer's food
+and the carpenter's quarterstaff are once each. The carpenter
+will set a carried Staff of Wonders to +2 if it is below that,
+and will not lower a higher one. The 50, 40, and 30 gold fees
+are placeholders.
+
+The village map is the varied layout: distinct houses around a
+green, the elder in the gatehouse at (45,12), the gatehouse
+angel at (46,8), and the hall angel in Michael's court at
+(71,9). The gateway at (34,10) is open floor. The steward
+stands in the gifted house. Its two chests are created empty
+by the level and are never refilled; leaving, saving, and
+returning loads the saved level. `berachah_setup` lights every
+square. Hinnom's lamps are unchanged.
+
+Moloch's hit points cannot fall below a quarter of his maximum
+until the hero has landed two blows. Angel and Michael damage
+is held at that floor. The third hero blow is unrestricted.
+Michael still cannot die: `michael_stands` restores him.
+Moloch still carries a Key to the Sanctum on the battlefield.
+The spare is not there. It is in a chest at (73,5) in the
+northeast tower of the town of Berachah, placed when that
+level is built, so it is there even if the hero never took
+Moloch's key.
+
+A power lever can be thrown while flying, levitating, or riding
+a flying mount. The hero does not have to dismount. Other traps
+still pass under a flyer.
+
+### Hinnom follow-ups (2026-11-04)
+
+The map is placed one column to the right of the numbers in
+`dat/hinnom.lua`, and the level does not flip. The gate, the
+drawbridge span, the levers, and the back room use that shift,
+so the drawbridge actually lowers when a cloaked hero is passed
+or the key is used.
+
+`#chat` with a priest or priestess of the Great Dragon, while the
+High Priest of Moloch's cloak is worn and the fortress is not
+alarmed, stays on the Hinnom lines and does not call the temple
+anger in `priest_talk()`. A priest anywhere else is unchanged.
+Killing a priest of the Great Dragon, a roving one as well as a
+temple one, or a fortress guard or the doctor, does not print
+"You murderer!" and does not take the murder Favor loss.
+
+The cloak has a case in `Cloak_on()` and `Cloak_off()`, so wearing
+it does not print "Unknown type of cloak". Every fortress
+inhabitant, and the two gate guards outside the field, starts
+peaceful and meditating. They stay on their square until they
+are attacked, the alarm sounds, or the hero steps next to them
+without the cloak. With the cloak on, the doctor gives the first
+lever, an inside guard the second, and a priest or priestess the
+third. The fourth clue is a burn engraving on the lab floor
+against the north wall (map column 55, row 5). The fifth is the
+same, against the south wall of the lever room (map column 58,
+row 15). The engraving glyph shows once that square is seen, and
+the text does not fade. Random floor objects inside the field
+are removed after level fill. The lab supplies and the keys stay.
+The steed's name is "fiery steed of the Heavenly Host"
+(`FIERY_STEED_OF_HEAVEN`; the old spelling was only in the
+display name and comments, so existing saves keep the same
+monster number). Going down stairs on that steed flies down.
+The saddle is the Knight's quest artifact. Changing levels used
+to drop every quest artifact a monster carried, and dropping the
+worn saddle threw the rider before the stair message. A worn
+saddle stays on the steed; the Amulet and the invocation tools
+are still dropped. A power lever is a floor trap. Walking, flying, levitating, or
+riding a flying steed can throw it, with no escape roll and no
+"Really step onto" prompt. Every other floor trap still lets a
+flyer pass over.
+
+### The Battle of Hinnom and the Valley of Berachah (2026-11-03)
+
+EDITLEVEL is 10. New monsters: Michael the Archangel, Moloch, child, fortress
+guard, doctor. New objects: High Priest of Moloch's cloak, Key to
+Hinnom's Gate, Key to the Sanctum, Tears of the Children. New trap:
+power lever. New event bits: hinnom_cloak, hinnom_alarm,
+hinnom_razed, berachah, berachah_tears. Files: dat/hinnom.lua,
+dat/berachah.lua, src/hinnom.c. The level is chained under baalz.
+The overview name is The Battle of Hinnom, then The Valley of
+Berachah after the swap.
+
+#raze (M-z) is a five-turn occupation on an altar that is not
+lawful and not a high altar. Success is +5 alignment, +1 Favor,
+the raze line, and Deuteronomy 7:5. A lawful altar and a high
+altar are refused and take no time. Prayer on an altar that is
+not lawful is refused and does not start a prayer. A priest
+created on such an altar starts hostile. A broken rod of digging
+and the drum of earthquake leave a lawful altar and a high altar
+standing, and raze an evil altar.
+
+Peter's Key to the Gates of Hell is required at the Valley down
+stair. Other ways into Gehennom before that stair are sent to the
+Valley. The revealed stairs are the Gate of the Sanctum and open
+with the Key to the Sanctum. Peter's key does not fit that gate.
+The verses on that use are unchanged.
+
+A shop square is a mimic, instead of an item, with probability
+equal to the dungeon depth (`mkshobj_at` in `shknam.c`). Berachah
+is deep, so that used to fill the Scribes of Ezra, the Library
+of the Prophets, and the Sheep Gate Market. That roll is skipped
+only when the level is Berachah. No other shop is changed, and
+mimics outside shops are unchanged.
+
+Hinnom's level file has `noflip`. Berachah's does too. The
+loader's flip is also refused while that dungeon level is being
+built or is current, so a rebuild, `nh.flip_level`, or
+`#wizfliplevel` cannot mirror it. The up stair stays at the
+bottom left and the fortress stays on the east. The arrival
+line "To the north" matches that layout.
+
+Hinnom does not grow random monsters inside the field while the
+fortress is still closed. A wanderer that is already inside, or
+that tries to walk in, is put back outside and does not attack
+the disguised hero. Only the placed garrison counts as the
+fortress, so striking a stalker does not raise the alarm. The
+alarm is still the hero's own act: attacking that garrison,
+standing next to them without the cloak, taking the cloak off,
+forcing the gate, or dropping the field.
+
+Hinnom: Michael the Archangel gives the cloak once. He and the
+angels with him meditate in the portal room and do not leave
+their squares until the force field drops, or until that one is
+hurt, hostile, or under conflict. The displayed name is
+"Michael the Archangel". Saves store his monster number, which
+did not move, so an older save still has him. Wearing the cloak, the fortress
+inside the field stays peaceful until the cloak comes off, you
+attack, the field falls, or the gate key is used. The two gate
+guards open the field gate and lower the drawbridge if the cloak
+holds. Without it, only those two turn hostile. Five power levers
+must be thrown in a random order. A wrong pull is 4d6 shock,
+blocked by shock resistance, and resets the levers. The right
+order drops the iron bars. Razing the altar of Moloch stops
+random monsters on the level, unlocks the back room, and cuts
+Moloch's current hit points to a quarter if he is on the level.
+Leaving with Moloch dead and the altar razed replaces the level
+with Berachah. Living children on the way out give +1 Favor and
++1 alignment each. A child who dies on Hinnom costs 5 alignment
+and 2 Favor.
+
+The six angels on Berachah each speak one of Jon's victory
+lines, in the order they were placed. Michael's Valley lines
+are the three greetings in `michael_berachah`. A seventh angel would take
+the first line again, unless that angel is standing next to
+one who already has it. The Valley's arrival text is a
+full-screen window, the same kind the quest intro uses. The
+swap runs while the hero is leaving, so the window waits
+for the first step back into the Valley. `berachah_intro`
+remembers that showing. The bit sits in padding that was
+already part of `struct u_event`, so the save size is the
+same.
+
+Berachah has no random monsters. Three shops: the Scribes of Ezra
+(Baruch), the Library of the Prophets (Nathan), the Sheep Gate
+Market (Lydia). The first #chat with a child gives the Tears of
+the Children, once. After that gift, each of the six children
+has his own thank-you. Quaffing the Tears grants a level. They
+do not break, dilute, dip, or curse. The two fountains, and the
+Wilderness garden fountains, are living water.
+
+On Hinnom, with the High Priest of Moloch's cloak worn and
+the peace unbroken, #chat reaches every fortress creature.
+The outside guards say "Pass, High Priest." The
+inside guard and the clerics still give their lever clues
+and nothing else. The doctor gives his lever clue on every
+chat, and then one of six lines of his own, so the clue is
+never the one that failed to come up. The other nine (both
+horned devils, both barbed devils, the bone devil, the ice
+devil, the nalfeshnee, and both pit fiends) share eight
+court lines. The first eight each have their own. The ninth
+repeats the first, and that repeat is not next to the
+creature who already has it. Moloch is not in that set. On
+#chat he picks one of four lines of his own. The first time
+an attack of his actually proceeds, he may say one of them
+once. The swing,
+the damage, and the raze are the same. Horned, barbed,
+bone, and ice devils are silent in
+the rest of the game; this chat is allowed before that
+check. The six captive children, before the Valley, each
+pick one of six lines about the doctor. After the Tears,
+the Valley children still use their own thank-yous.
+
+A male prisoner named "town elder" stands one square inside the
+open gate (map 43,10). He is not a shopkeeper and not a priest.
+A guide was not used: killing a guide also applies the
+quest-guardian penalty. While the elder is peaceful he stays
+on that square. #chat picks one of four lines; those lines are
+still PLACEHOLDER. Killing him is murder, the same as any
+other peaceful human.
+
+Lines Jon has not written are marked PLACEHOLDER in the source.
+The list is in the pull request.
 
 ### Not lost
 

@@ -2594,6 +2594,9 @@ breaktest(struct obj *obj)
 {
     int nonbreakchance = 1; /* chance for non-artifacts to resist */
 
+    if (obj->otyp == POT_TEARS_OF_CHILDREN)
+        return FALSE;
+
     /* this may need to be changed if actual glass armor gets added someday;
        for now, it affects crystal plate mail and helm of brilliance;
        either of them will have to be cracked 4 times before breaking */

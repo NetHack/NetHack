@@ -99,7 +99,8 @@ SPEC_LEVS = asmodeus.lua baalz.lua bigrm-*.lua castle.lua fakewiz?.lua \
 	tower?.lua valley.lua wizard?.lua nhcore.lua nhlib.lua themerms.lua \
 	astral.lua air.lua earth.lua fire.lua water.lua hellfill.lua tut-?.lua \
 	his-treasure-1.lua gibeon.lua wild1.lua wild2.lua wild3.lua \
-	wild4-1.lua wild4-2.lua wild4-3.lua wild5.lua
+	wild4-1.lua wild4-2.lua wild4-3.lua wild5.lua jacob.lua \
+	hinnom.lua berachah.lua
 QUEST_LEVS = ???-goal.lua ???-fil?.lua ???-loca.lua ???-strt.lua
 
 DATNODLB = $(VARDATND) license symbols

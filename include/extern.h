@@ -877,6 +877,7 @@ extern void insert_branch(branch *, boolean) NONNULLARG1;
 extern void init_dungeons(void);
 extern s_level *find_level(const char *) NONNULLARG1;
 extern s_level *Is_special(d_level *) NONNULLARG1;
+extern boolean on_jacobs_ladder(d_level *) NONNULLARG1;
 extern branch *Is_branchlev(d_level *) NONNULLARG1;
 extern boolean builds_up(d_level *) NONNULLARG1;
 extern xint16 ledger_no(d_level *) NONNULLARG1;
@@ -4101,6 +4102,54 @@ extern void port_insert_pastebuf(char *);
 #endif
 extern void get_nhuuid(void);
 extern void free_nhuuid(void);
+
+/* Battle of Hinnom and the Valley of Berachah */
+extern boolean altar_is_good(coordxy, coordxy);
+extern void raze_altar(coordxy, coordxy, boolean);
+extern int doraze(void);
+extern boolean hinnom_portal_room(coordxy, coordxy);
+extern void hinnom_host_hold(struct monst *);
+extern boolean hinnom_host_goal(struct monst *, coordxy *, coordxy *);
+extern boolean hinnom_field_up(void);
+extern boolean hinnom_inside_field(coordxy, coordxy);
+extern boolean hinnom_fortress_closed(void);
+extern boolean hinnom_staff(struct monst *);
+extern boolean fortress_monster(struct monst *);
+extern boolean hinnom_keep_intruder_out(struct monst *);
+extern void hinnom_relocate_intruder(struct monst *);
+extern boolean serves_great_dragon(struct monst *);
+extern boolean moloch_disguise_holds(void);
+extern void hinnom_alarm_fortress(void);
+extern void hinnom_forced_entry(void);
+extern boolean hinnom_gate_square(coordxy, coordxy);
+extern boolean hinnom_backroom_door(coordxy, coordxy);
+extern boolean hinnom_impassable_door(coordxy, coordxy);
+extern boolean hinnom_blocks(coordxy, coordxy);
+extern int hinnom_pull_lever(struct trap *);
+extern void hinnom_setup(void);
+extern void hinnom_strip_floor_clutter(void);
+extern void hinnom_altar_razed(void);
+extern boolean hinnom_dest_clamp(d_level *);
+extern void hinnom_begin_swap(void);
+extern void hinnom_finish_swap(void);
+extern boolean hinnom_swap_pending(void);
+extern void berachah_setup(void);
+extern void berachah_fix_objects(void);
+extern void berachah_intro(void);
+extern void berachah_elder_hold(struct monst *);
+extern void moloch_opening_taunt(struct monst *);
+extern boolean living_water_here(void);
+extern boolean living_water_at(coordxy, coordxy);
+extern void living_water_restore(void);
+extern boolean hinnom_chat(struct monst *);
+extern void hinnom_child_died(struct monst *);
+extern boolean michael_stands(struct monst *);
+extern void moloch_note_hero_hit(struct monst *);
+extern void moloch_hold_line(struct monst *);
+extern boolean moloch_stands(struct monst *);
+extern boolean is_berachah_bread(struct obj *);
+extern const char *berachah_shop_sign(int);
+extern const char *berachah_keeper(int);
 
 #endif /* !MAKEDEFS_C && !MDLIB_C */
 

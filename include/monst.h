@@ -183,7 +183,12 @@ struct monst {
 #define STRAT_PLAYER    0x01000000L
 #define STRAT_NONE      0x00000000L
 #define STRAT_STRATMASK 0x0f000000L
-    /* mstrategy unused 0x00ffff00L */
+    /* mstrategy unused 0x00fffc00L */
+    /* Portal host (Michael or an angel with him) has left meditation.
+       Lives in the unused range, so the monster record is unchanged. */
+#define STRAT_HINNOM_RELEASED 0x00000100L
+    /* One of the Host making for Moloch once the field is down. */
+#define STRAT_HINNOM_THRONE   0x00000200L
 #define STRAT_GOAL      0x000000ffL
 
     coord mgoal;           /* monster strategy, target location */

@@ -77,8 +77,15 @@ struct u_event {
     Bitfield(sanctum_doom, 2);      /* NO: attack turns still to come */
     Bitfield(wilderness_intro, 5);  /* which Wilderness floors have shown the intro */
     Bitfield(sanctum_sword, 1);     /* Sanctum glow screen has been shown */
-    /* 58 bits; this one fits in the spare bits of the last word,
-       so the earlier flags do not move and EDITLEVEL stays 9 */
+    Bitfield(hinnom_cloak, 1);      /* Michael gave the cloak */
+    Bitfield(hinnom_alarm, 1);      /* the fortress is hostile for good */
+    Bitfield(hinnom_razed, 1);      /* altar of Moloch razed */
+    Bitfield(berachah, 1);          /* Hinnom is now the Valley of Berachah */
+    Bitfield(berachah_tears, 1);    /* a child gave the Tears */
+    Bitfield(berachah_intro, 1);    /* the Valley arrival text has been shown */
+    /* 64 bits. berachah_intro fills spare padding in the last
+       unsigned unit, so the saved size of this struct is unchanged.
+       The five Hinnom flags need EDITLEVEL 10. */
 };
 
 /*

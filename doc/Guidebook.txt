@@ -1694,6 +1694,10 @@
      #quiver
           Select ammunition for quiver.  Default key is `Q'.
 
+     #raze
+          Stand on an altar of evil and raze it.  A lawful altar and a
+          high altar are refused.  Default key is `M-z'.
+
      #read
           Read  a  scroll,  a spellbook, or something else.  Default key is
           `r'.
@@ -2219,6 +2223,8 @@
      M-p  #pray
 
      M-r  #rub
+
+     M-z  #raze
 
      M-R  #ride
 

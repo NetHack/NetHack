@@ -4,7 +4,7 @@
 --
 des.level_init({ style = "solidfill", fg = " " });
 
-des.level_flags("mazelevel", "noteleport", "premapped", "sokoban", "solidify");
+des.level_flags("mazelevel", "noteleport", "premapped", "sokoban", "solidify", "nomongen");
 des.map([[
 --------------------------
 |........................|
@@ -97,7 +97,19 @@ des.door("closed", 17, 11);
 des.door("closed", 17, 13);
 des.door("closed", 17, 15);
 
-des.region({ region={18,10, 22,16}, lit = 1, type = "zoo", filled = 1, irregular = 1 });
+des.region({ region={18,10, 22,16}, lit = 1, type = "zoo", filled = 0, irregular = 1 });
+-- The ladder up is the branch to Jacob's dream. Builders stand in
+-- the corners of this room, not on that stair.
+des.levregion({ type = "branch", region = {20,12,20,12} })
+local builders = {
+   {18,10,"Akkadian builder"}, {22,10,"Sumerian builder"},
+   {18,16,"Hebrew builder"}, {22,16,"Canaanite builder"},
+   {18,11,"Egyptian builder"}, {22,15,"Elamite builder"},
+}
+for _, b in ipairs(builders) do
+   des.monster({ id = "human", x = b[1], y = b[2], peaceful = 1,
+                 confused = true, waiting = 1, name = b[3] })
+end
 
 local pt = selection.rndcoord(place);
 if percent(75) then

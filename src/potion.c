@@ -1514,6 +1514,10 @@ peffects(struct obj *otmp)
     case POT_WATER:
         peffect_water(otmp);
         break;
+    case POT_TEARS_OF_CHILDREN:
+        pline("You feel the love of the children lift you up."); /* PLACEHOLDER */
+        pluslvl(FALSE);
+        break;
     case POT_BOOZE:
         peffect_booze(otmp);
         break;
@@ -2627,6 +2631,11 @@ potion_dip(struct obj *obj, struct obj *potion)
     if (obj == &hands_obj) {
         You("can't fit your %s into the mouth of the bottle!",
             body_part(HAND));
+        return ECMD_OK;
+    }
+    if (potion->otyp == POT_TEARS_OF_CHILDREN
+        || obj->otyp == POT_TEARS_OF_CHILDREN) {
+        pline1(nothing_happens);
         return ECMD_OK;
     }
 

@@ -515,6 +515,17 @@ mattacku(struct monst *mtmp)
     /* Sanctum: the hosts move, then freeze. Neither phase fights. */
     if (sanctum_no_hostility())
         return 0;
+    if (moloch_disguise_holds() && fortress_monster(mtmp))
+        return 0;
+    /* After the checks that call off the swing. The blow itself
+       is the same. */
+    moloch_opening_taunt(mtmp);
+    /* A wanderer does not get to open the fight while the disguise holds
+       and the hero has not broken the peace. */
+    if (hinnom_keep_intruder_out(mtmp)
+        && (hinnom_inside_field(mtmp->mx, mtmp->my)
+            || hinnom_inside_field(u.ux, u.uy)))
+        return 0;
     if (Underwater && !is_swimmer(mtmp->data))
         return 0;
 

@@ -1082,6 +1082,7 @@ mdamagem(
         return mhm.hitflags;
 
     mdef->mhp -= mhm.damage;
+    moloch_hold_line(mdef);
     if (mdef->mhp < 1) {
         if (m_at(mdef->mx, mdef->my) == magr) { /* see gulpmm() */
             remove_monster(mdef->mx, mdef->my);
@@ -1176,6 +1177,7 @@ mon_poly(struct monst *magr, struct monst *mdef, int dmg)
             dmg += (mdef->mhpmax + 1) / 2;
             if (!peter_unhurt(mdef))
                 mdef->mhp -= dmg;
+            moloch_hold_line(mdef);
             dmg = 0;
             if (DEADMONSTER(mdef)) {
                 if (magr == &gy.youmonst)
@@ -1461,7 +1463,9 @@ passivemm(
         tmp = 0;
 
  assess_dmg:
-    if ((magr->mhp -= tmp) <= 0) {
+    magr->mhp -= tmp;
+    moloch_hold_line(magr);
+    if (magr->mhp <= 0) {
         monkilled(magr, "", (int) mddat->mattk[i].adtyp);
         return (mdead | mhit | M_ATTK_AGR_DIED);
     }

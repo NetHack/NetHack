@@ -1037,7 +1037,8 @@ test_move(
                 && still_chewing(x, y)) {
                 return FALSE;
             }
-            if (!(Passes_walls || passes_bars(gy.youmonst.data))) {
+            if (!(Passes_walls || (passes_bars(gy.youmonst.data)
+                                    && !hinnom_field_up()))) {
                 if (mode == DO_MOVE && flags.mention_walls)
                     You("cannot pass through the bars.");
                 return FALSE;
@@ -2577,6 +2578,8 @@ avoid_trap_andor_region(coordxy x, coordxy y)
         && (!svc.context.nopick || svc.context.run)
         /* check for discovered trap */
         && (trap = t_at(x, y)) != 0 && trap->tseen
+        /* a Hinnom power lever asks its own "Throw" question */
+        && trap->ttyp != POWER_LEVER
         /* check whether attempted move will be viable */
         && test_move(u.ux, u.uy, u.dx, u.dy, TEST_MOVE)
         /* override confirmation if the trap is harmless to the hero */
@@ -3810,6 +3813,21 @@ fear_protected(void)
     return (boolean) (levl[u.ux][u.uy].typ == STAIRS);
 }
 
+/* Blackout, once the gate lets an empty-handed hero through.
+   The verse engraving is one square west of the pile at (59,10). */
+static void
+greed_trial_screen(void)
+{
+    winid win = create_nhwindow(NHW_TEXT);
+
+    putstr(win, 0, "Your trial is complete. The grip of greed is broken.");
+    putstr(win, 0, "");
+    putstr(win, 0,
+           "Your items appear directly in front of you. Step forward to reclaim them.");
+    display_nhwindow(win, TRUE);
+    destroy_nhwindow(win);
+}
+
 static void
 wilderness_check(void)
 {
@@ -3899,7 +3917,7 @@ wilderness_check(void)
                     otmp = next;
                 }
                 newsym(59, 10);
-                pline("But seek ye first the kingdom of God, and his righteousness; and all these things shall be added unto you.");
+                greed_trial_screen();
             }
         }
     }

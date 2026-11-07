@@ -709,6 +709,23 @@ dochug(struct monst *mtmp)
     /* Frozen hosts stay where they are. They can still be killed. */
     if (Is_sanctum(&u.uz) && u.uevent.sanctum_frozen)
         return 0;
+    if (mtmp->data == &mons[PM_CHILD]) {
+        mtmp->mstrategy |= STRAT_WAITFORU;
+        mtmp->mpeaceful = 1;
+        return 0;
+    }
+    if (mtmp->data == &mons[PM_DOCTOR] && mtmp->mhp * 2 < mtmp->mhpmax)
+        mtmp->mflee = 1;
+    /* A random monster inside the closed fortress is not the garrison.
+       Move it out before it can strike, and before a blow against it
+       could be read as an attack on the fortress. */
+    if (hinnom_keep_intruder_out(mtmp)
+        && hinnom_inside_field(mtmp->mx, mtmp->my)) {
+        hinnom_relocate_intruder(mtmp);
+        return 0;
+    }
+    if (moloch_disguise_holds() && fortress_monster(mtmp))
+        mtmp->mpeaceful = 1;
 
     if (mtmp->mstrategy & STRAT_ARRIVE) {
         res = m_arrival(mtmp);
@@ -719,6 +736,39 @@ dochug(struct monst *mtmp)
     if ((mtmp->mstrategy & STRAT_WAITFORU)
         && (m_canseeu(mtmp) || mtmp->mhp < mtmp->mhpmax))
         mtmp->mstrategy &= ~STRAT_WAITFORU;
+
+    /* Fortress inhabitants, and the two guards outside the field,
+       meditate until the peace breaks: an attack (mpeaceful already
+       cleared), the alarm, or the hero stepping next to them with
+       the cloak off. With the cloak on they stay on their square. */
+    if (Is_hinnom_level(&u.uz) && !u.uevent.berachah
+        && (fortress_monster(mtmp)
+            || mtmp->data == &mons[PM_FORTRESS_GUARD]
+            || mtmp->data == &mons[PM_DOCTOR]
+            || mtmp->data == &mons[PM_ALIGNED_CLERIC]
+            || mtmp->data == &mons[PM_HIGH_CLERIC]
+            || mtmp->data == &mons[PM_MOLOCH])) {
+        if (u.uevent.hinnom_alarm || !mtmp->mpeaceful) {
+            mtmp->mstrategy &= ~STRAT_WAITFORU;
+        } else if (moloch_disguise_holds()
+                   || distmin(mtmp->mx, mtmp->my, u.ux, u.uy) > 1) {
+            mtmp->mstrategy |= STRAT_WAITFORU;
+            mtmp->mpeaceful = 1;
+            mtmp->msleeping = 0;
+        } else {
+            mtmp->mpeaceful = 0;
+            set_malign(mtmp);
+            mtmp->mstrategy &= ~STRAT_WAITMASK;
+            /* Seen without the cloak: the whole fortress wakes. */
+            hinnom_alarm_fortress();
+        }
+    }
+
+    /* Michael and the angels in the portal room. Re-applied after the
+       wait bit is cleared by seeing the hero or by #chat. */
+    hinnom_host_hold(mtmp);
+    berachah_elder_hold(mtmp);
+    moloch_hold_line(mtmp);
 
     /* King Solomon stays on the platform at Gibeon, and stays peaceful. */
     if (has_mgivenname(mtmp) && !strcmp(MGIVENNAME(mtmp), "King Solomon")) {
@@ -737,6 +787,14 @@ dochug(struct monst *mtmp)
        is entered, is left awake so it can attack inside. */
     if (is_sodom_dweller(mtmp) && mtmp->mpeaceful)
         mtmp->mstrategy |= STRAT_WAITFORU;
+    if (has_mgivenname(mtmp)
+        && (strstri(MGIVENNAME(mtmp), "builder")
+            || !strcmp(MGIVENNAME(mtmp), "Angel of the Ladder"))) {
+        mtmp->mstrategy |= STRAT_WAITFORU;
+        mtmp->mpeaceful = 1;
+        if (strstri(MGIVENNAME(mtmp), "builder"))
+            mtmp->mconf = 1;
+    }
     if (has_mgivenname(mtmp) && !strcmp(MGIVENNAME(mtmp), "your reflection")
         && distmin(mtmp->mx, mtmp->my, u.ux, u.uy) <= 5) {
         /* Level and drain both stop at 4. */
@@ -1598,6 +1656,8 @@ postmov(
                 here->doormask &= ~D_TRAPPED;
                 btrapped = FALSE;
             }
+            if (hinnom_impassable_door(nix, niy))
+                return MMOVE_NOTHING;
             if ((here->doormask & (D_LOCKED | D_CLOSED)) != 0
                 && amorphous(ptr)) {
                 if (flags.verbose && canseemon(mtmp))
@@ -1772,7 +1832,7 @@ m_move(struct monst *mtmp, int after)
     xint16 chcnt;
     boolean can_tunnel = 0;
     boolean can_open = 0, can_unlock = 0 /*, doorbuster = 0 */;
-    boolean getitems = FALSE;
+    boolean getitems = FALSE, charging;
     boolean avoid = FALSE;
     boolean better_with_displacing = FALSE;
     unsigned seenflgs;
@@ -1944,7 +2004,14 @@ m_move(struct monst *mtmp, int after)
         }
     }
 
-    if ((!mtmp->mpeaceful || !rn2(10)) && (!Is_rogue_level(&u.uz))) {
+    /* Hinnom: Michael and the angels sent to the throne make for
+       Moloch instead of the hero, and do not stop for loot. */
+    charging = hinnom_host_goal(mtmp, &ggx, &ggy);
+    if (charging)
+        appr = 1;
+
+    if (!charging && (!mtmp->mpeaceful || !rn2(10))
+        && (!Is_rogue_level(&u.uz))) {
         boolean in_line = (lined_up(mtmp)
              && (distmin(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy)
                  <= (throws_rocks(gy.youmonst.data) ? 20
@@ -2098,6 +2165,12 @@ m_move(struct monst *mtmp, int after)
         if (!m_in_out_region(mtmp, nix, niy))
             return MMOVE_DONE;
 
+        /* The closed fortress is not a wandering ground. */
+        if (hinnom_keep_intruder_out(mtmp)
+            && hinnom_inside_field(nix, niy)
+            && !hinnom_inside_field(mtmp->mx, mtmp->my))
+            return MMOVE_DONE;
+
         /* The Philistine Champion fights anyone who comes in, and
            does not step off the floor of his room. */
         if (ptr == &mons[PM_PHILISTINE_CHAMPION]
@@ -2234,6 +2307,8 @@ can_hide_under_obj(struct obj *obj)
 void
 dissolve_bars(coordxy x, coordxy y)
 {
+    if (hinnom_field_up())
+        return;
     levl[x][y].typ = (levl[x][y].edge == 1) ? DOOR
         : (Is_special(&u.uz) || *in_rooms(x, y, 0)) ? ROOM : CORR;
     levl[x][y].flags = 0; /* doormask = D_NODOOR */

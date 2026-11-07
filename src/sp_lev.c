@@ -552,6 +552,11 @@ flip_level(
     /* nothing to do unless (flp & 1) or (flp & 2) or both */
     if ((flp & 3) == 0)
         return;
+    /* Authored north stays north. The des file also says noflip.
+       This covers level creation, the Berachah rebuild, nh.flip_level,
+       and #wizfliplevel. */
+    if (Is_hinnom_level(&u.uz))
+        return;
 
     get_level_extends(&minx, &miny, &maxx, &maxy);
     /* get_level_extends() returns -1,-1 to COLNO,ROWNO at max */
@@ -1167,6 +1172,7 @@ rndtrap(void)
         case HOLE: /* no random holes on special levels */
         case VIBRATING_SQUARE:
         case MAGIC_PORTAL:
+        case POWER_LEVER:
             rtrap = NO_TRAP;
             break;
         case TRAPDOOR:
@@ -4383,6 +4389,7 @@ static const struct {
                    { "anti magic", ANTI_MAGIC },
                    { "polymorph", POLY_TRAP },
                    { "vibrating square", VIBRATING_SQUARE },
+                   { "power lever", POWER_LEVER },
                    { "random", -1 },
                    { 0, NO_TRAP } };
 

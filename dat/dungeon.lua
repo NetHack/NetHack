@@ -144,6 +144,12 @@ dungeon = {
             range = 4
          },
          {
+            name = "hinnom",
+            bonetag = "M",
+            chainlevel = "baalz",
+            base = 1
+         },
+         {
             name = "asmodeus",
             bonetag = "A",
             base = 2,
@@ -241,6 +247,14 @@ dungeon = {
       alignment = "neutral",
       flags = { "mazelike" },
       entry = -1,
+      branches = {
+         {
+            -- soko1 is the far end of the upward branch.
+            name = "Jacob's Ladder",
+            base = 1,
+            direction = "up"
+         }
+      },
       levels = {
          {
             name = "soko1",
@@ -262,6 +276,18 @@ dungeon = {
             base = 4,
             nlevels = 2
          },
+      }
+   },
+   {
+      name = "Jacob's Ladder",
+      base = 1,
+      alignment = "unaligned",
+      flags = { "mazelike" },
+      levels = {
+         {
+            name = "jacob",
+            base = 1
+         }
       }
    },
    {
