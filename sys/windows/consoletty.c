@@ -1242,8 +1242,7 @@ xputc(int ch)
 {
     int x = ttyDisplay->curx, y = ttyDisplay->cury;
     if (x < console.width && y < console.height) {
-        if (!ttyDisplay->topl_utf8)
-            set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
+        set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
         xputc_core(ch);
     }
     return 0;
