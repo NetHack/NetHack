@@ -3152,6 +3152,8 @@ mondead(struct monst *mtmp)
         return;
     if (michael_stands(mtmp))
         return;
+    if (moloch_stands(mtmp))
+        return;
 
     /* potential pet message; always clear global flag */
     be_sad = iflags.sad_feeling;
@@ -3479,6 +3481,8 @@ monkilled(
 
     if (peter_unhurt(mdef))
         return;
+    if (moloch_stands(mdef))
+        return;
     mptr = mdef->data;
 
     if (fltxt && (mdef->wormno ? worm_known(mdef)
@@ -3592,6 +3596,8 @@ xkilled(
             noconduct = (xkill_flags & XKILL_NOCONDUCT) != 0;
 
     if (peter_unhurt(mtmp))
+        return;
+    if (moloch_stands(mtmp))
         return;
 
     /* potential pet message; always clear global flag */

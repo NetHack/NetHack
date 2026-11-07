@@ -1896,6 +1896,11 @@ hmon_hitmon(
             first_weapon_hit(obj);
         if (!is_peter(mon))
             mon->mhp -= hmd.dmg;
+        /* Floor first, then count, so the first two blows cannot
+           finish him. The third blow is unrestricted. */
+        moloch_hold_line(mon);
+        if (hmd.dmg > 0)
+            moloch_note_hero_hit(mon);
     }
     /* adjustments might have made tmp become less than what
        a level-draining artifact has already done to max HP */
@@ -4923,6 +4928,9 @@ damageum(
         mhm.damage = 0;
     } else
         mdef->mhp -= mhm.damage;
+    moloch_hold_line(mdef);
+    if (mhm.damage > 0)
+        moloch_note_hero_hit(mdef);
     if (DEADMONSTER(mdef)) {
         /* troll killed by Trollsbane won't auto-revive; FIXME? same when
            Trollsbane is wielded as primary and two-weaponing kills with

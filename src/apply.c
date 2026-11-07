@@ -3177,6 +3177,11 @@ use_whip(struct obj *obj)
                 mon_hand = 0; /* lint suppression */
 
             You("wrap your bullwhip around %s.", yname(otmp));
+            if (gotit && otmp->oartifact == ART_SWORD_OF_THE_SPIRIT) {
+                pline("%s stays in %s %s.", Yname2(otmp), mhis(mtmp),
+                      mon_hand);
+                gotit = FALSE;
+            }
             if (gotit && mwelded(otmp)) {
                 pline("%s welded to %s %s%c",
                       (otmp->quan == 1L) ? "It is" : "They are", mhis(mtmp),

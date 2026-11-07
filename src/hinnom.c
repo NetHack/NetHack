@@ -8,6 +8,7 @@ static coordxy raze_x, raze_y;
 
 static void put_wrapped(winid, const char *);
 static void hinnom_screen(const char *const *, int);
+static boolean berachah_job_chat(struct monst *);
 
 static const char *const lever_metal[5] = {
     "iron", "copper", "brass", "silver", "gold"
@@ -518,10 +519,8 @@ hinnom_pull_lever(struct trap *trap)
 
     if (!trap || trap->ttyp != POWER_LEVER)
         return Trap_Effect_Finished;
-    if (Levitation || Flying) {
-        You("cannot reach the floor.");
-        return Trap_Effect_Finished;
-    }
+    /* Flying, levitating, and a flying mount can still throw it.
+       dotrap() no longer steps over this trap type in the air. */
     metal = (trap->launch.y >= 0 && trap->launch.y <= 4)
                 ? lever_metal[trap->launch.y] : "iron";
     if (!hinnom_field_up()) {
@@ -631,6 +630,14 @@ void
 berachah_setup(void)
 {
     struct monst *mtmp;
+    coordxy x, y;
+
+    /* The whole Valley, including rooms the one lit region might
+       leave dim behind a wall. Hinnom never calls this. */
+    for (x = 0; x < COLNO; x++)
+        for (y = 0; y < ROWNO; y++)
+            if (isok(x, y))
+                levl[x][y].lit = 1;
 
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         if (DEADMONSTER(mtmp))
@@ -931,6 +938,31 @@ michael_briefing(void)
     hinnom_screen(text, SIZE(text));
 }
 
+/* Three loaves, once, when the welcome says bread is pressed into
+   the hero's hand. Nutrition matches a lembas wafer: a food ration
+   is 800 as well. The name and the look text are the loaf. */
+static void
+give_berachah_bread(long quan, boolean announce)
+{
+    struct obj *otmp;
+
+    otmp = mksobj(FOOD_RATION, FALSE, FALSE);
+    if (!otmp)
+        return;
+    otmp->quan = quan;
+    otmp->owt = weight(otmp);
+    uncurse(otmp);
+    otmp = oname(otmp, "Bread of Berachah", ONAME_NO_FLAGS);
+    if (!otmp)
+        return;
+    otmp->dknown = otmp->known = otmp->bknown = 1;
+    (void) hold_another_object(otmp, "Oops!  %s to the floor!",
+                               The(aobjnam(otmp, "slip")),
+                               (const char *) 0);
+    if (announce)
+        pline("A freshly baked loaf, given in gratitude by the people of Berachah.");
+}
+
 /* Once. The swap sets berachah while the hero is still recorded on
    the level, but that call is the departure: the Valley map is
    created on the way back in. Showing the text here, on arrival,
@@ -951,6 +983,7 @@ berachah_intro(void)
         return;
     u.uevent.berachah_intro = 1;
     hinnom_screen(para, SIZE(para));
+    give_berachah_bread(3L, TRUE);
 }
 
 void
@@ -1240,15 +1273,15 @@ is_town_elder(struct monst *mtmp)
                       && !strcmp(MGIVENNAME(mtmp), "town elder"));
 }
 
-/* A male prisoner named "town elder". He stays inside the gate
-   while he is peaceful. An attack releases him. A guide would
-   add the quest-guardian penalty on top of ordinary murder. */
+/* Named prisoners on the Valley: the elder and the eight jobs.
+   They stay put while peaceful. An attack releases that one.
+   A guide would add the quest-guardian penalty on top of murder. */
 void
 berachah_elder_hold(struct monst *mtmp)
 {
     if (!mtmp || !Is_berachah_level(&u.uz) || !mtmp->mpeaceful)
         return;
-    if (!is_town_elder(mtmp))
+    if (mtmp->data != &mons[PM_PRISONER] || !has_mgivenname(mtmp))
         return;
     mtmp->mstrategy |= STRAT_WAITFORU;
     mtmp->msleeping = 0;
@@ -1259,13 +1292,13 @@ berachah_elder_hold(struct monst *mtmp)
    one line. The ninth repeats the first, and that repeat is not
    on a square next to the creature who already has it. */
 static const char *const fortress_court[] = {
-    "Your Holiness honors us with a visit.",
-    "The fires burn hot today, Your Holiness.",
-    "Forgive me, Your Holiness. I did not see you there.",
-    "All is quiet at my post, Your Holiness.",
+    "Your Dread Eminence honors us with a visit.",
+    "The fires burn hot today, Your Dread Eminence.",
+    "Forgive me, Your Dread Eminence. I did not see you there.",
+    "All is quiet at my post, Your Dread Eminence.",
     "The master grows restless. Will you speak with him?",
     "I keep to my meditations, as you commanded.",
-    "May your shadow never shorten, Your Holiness.",
+    "May your shadow never shorten, Your Dread Eminence.",
     "The servants of the Dragon await your word.",
 };
 #define FORTRESS_COURT_N SIZE(fortress_court)
@@ -1376,6 +1409,65 @@ fortress_court_line(struct monst *speaker)
     return fortress_court[0];
 }
 
+/* PLACEHOLDER until Jon confirms these lines. */
+static const char *const michael_stage_a[] = {
+    "Huzzah! The field is broken! Forward, and let us put an end to Moloch!",
+    "Take heart! His walls could not save him, and neither shall his throne. To battle!",
+    "For the LORD and for the children! Stand with me, and let us finish this!",
+};
+static const char *const michael_stage_b[] = {
+    "Moloch is fallen, but his altar remains. Raze that seat of evil, that its fires may never burn again!",
+    "The battle is won, but our work is not yet finished. Break his altar, and let this place be cleansed!",
+};
+static const char *const michael_stage_c[] = {
+    "Well fought! Moloch is fallen, his altar lies in ruin, and the children are free. You have served the LORD faithfully this day.",
+    "Rejoice! The fires are quenched, and this place shall know the cries of children no more. Go to them now, and let them see their deliverer.",
+    "You stood firm in the hour of trial. Look upon these broken walls and remember: evil shall not have the final word.",
+};
+static const char *const michael_berachah[] = {
+    "Welcome back, friend! Moloch is fallen, the children are safe, and Berachah is home again. Thanks be to the LORD!",
+    "Rejoice with us! Where fire and fear once ruled, there is bread and laughter. The LORD has done great things, and we are grateful you stood with us.",
+    "Hail, champion of Berachah! Moloch's reign is ended and these families are whole once more. Give thanks to the LORD, and rest here among friends.",
+};
+
+static boolean
+moloch_still_here(void)
+{
+    struct monst *mtmp;
+
+    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
+        if (!DEADMONSTER(mtmp) && mtmp->data == &mons[PM_MOLOCH])
+            return TRUE;
+    return FALSE;
+}
+
+/* Field down, before the Valley exists. A: Moloch lives. B: he is
+   dead and the altar stands. C: the altar is razed. */
+static void
+michael_stage_line(void)
+{
+    const char *const *lines;
+    int n;
+
+    if (moloch_still_here()) {
+        lines = michael_stage_a;
+        n = SIZE(michael_stage_a);
+    } else if (!u.uevent.hinnom_razed) {
+        lines = michael_stage_b;
+        n = SIZE(michael_stage_b);
+    } else {
+        lines = michael_stage_c;
+        n = SIZE(michael_stage_c);
+    }
+    verbalize("%s", lines[rn2(n)]); /* PLACEHOLDER */
+}
+
+static void
+michael_berachah_line(void)
+{
+    verbalize("%s", michael_berachah[rn2(SIZE(michael_berachah))]); /* PLACEHOLDER */
+}
+
 boolean
 hinnom_chat(struct monst *mtmp)
 {
@@ -1393,19 +1485,22 @@ hinnom_chat(struct monst *mtmp)
     if (mtmp->data == &mons[PM_MICHAEL]) {
         SetVoice(mtmp, 0, 80, 0);
         if (Is_berachah_level(&u.uz)) {
-            verbalize("Well done. Rest here a while."); /* PLACEHOLDER */
+            michael_berachah_line();
             return TRUE;
         }
         if (!Is_hinnom_level(&u.uz))
             return FALSE;
-        if (hinnom_field_up())
+        if (hinnom_field_up()) {
             michael_briefing();
-        if (!u.uevent.hinnom_cloak) {
-            verbalize("Wear this, and the fortress will take you for its high priest."); /* PLACEHOLDER */
-            give_cloak();
-        } else {
-            verbalize("The field must fall before my host can enter."); /* PLACEHOLDER */
+            if (!u.uevent.hinnom_cloak) {
+                verbalize("Wear this, and the fortress will take you for its high priest."); /* PLACEHOLDER */
+                give_cloak();
+            } else {
+                verbalize("The field must fall before my host can enter."); /* PLACEHOLDER */
+            }
+            return TRUE;
         }
+        michael_stage_line();
         return TRUE;
     }
 
@@ -1445,7 +1540,12 @@ hinnom_chat(struct monst *mtmp)
         }
     }
 
-    if (!Is_hinnom_level(&u.uz) || u.uevent.berachah)
+    if (Is_berachah_level(&u.uz)) {
+        if (berachah_job_chat(mtmp))
+            return TRUE;
+        return FALSE;
+    }
+    if (!Is_hinnom_level(&u.uz))
         return FALSE;
 
     if (mtmp->data == &mons[PM_FORTRESS_GUARD]
@@ -1458,7 +1558,7 @@ hinnom_chat(struct monst *mtmp)
             return TRUE;
         }
         if (moloch_disguise_holds()) {
-            verbalize("Pass, Your Holiness."); /* PLACEHOLDER */
+            verbalize("Pass, High Priest.");
             open_field_gate();
         } else {
             verbalize("You are not one of us!"); /* PLACEHOLDER */
@@ -1489,7 +1589,7 @@ hinnom_chat(struct monst *mtmp)
             return TRUE;
         }
         if (mtmp->data == &mons[PM_FORTRESS_GUARD]) {
-            Sprintf(buf, "After the first, they pull the %s one.",
+            Sprintf(buf, "High Priest, after the first, they pull the %s one.",
                     metal_of_rank(2));
             say_clue(mtmp, buf);
             return TRUE;
@@ -1506,6 +1606,329 @@ hinnom_chat(struct monst *mtmp)
         return TRUE;
     }
     return FALSE;
+}
+
+/* PLACEHOLDER fees. The baker's 10 gold is the one Jon set. */
+#define BERACHAH_FEE_BREAD  10L
+#define BERACHAH_FEE_POWER  50L
+#define BERACHAH_FEE_SMITH  40L
+#define BERACHAH_FEE_TAILOR 30L
+
+static boolean
+named_job(struct monst *mtmp, const char *job)
+{
+    return (boolean) (mtmp && has_mgivenname(mtmp)
+                      && !strcmp(MGIVENNAME(mtmp), job));
+}
+
+/* PLACEHOLDER until Jon confirms the fees and the service lines. */
+static boolean
+berachah_pay(struct monst *mtmp, long cost)
+{
+    struct obj *gold = findgold(gi.invent);
+
+    if (!gold || gold->quan < cost) {
+        verbalize("Bring %ld gold in your pack, and I will see to it.", cost);
+        return FALSE;
+    }
+    (void) money2mon(mtmp, cost);
+    return TRUE;
+}
+
+/* apply FALSE only counts. The fee is taken before the repair. */
+static int
+touch_erosion(boolean weapons, boolean apply)
+{
+    struct obj *obj;
+    int n = 0;
+
+    for (obj = gi.invent; obj; obj = obj->nobj) {
+        boolean match;
+
+        if (weapons)
+            match = (obj->oclass == WEAPON_CLASS);
+        else
+            match = (is_cloak(obj)
+                     || (obj->oclass == ARMOR_CLASS
+                         && objects[obj->otyp].oc_material == CLOTH));
+        if (!match || (!obj->oeroded && !obj->oeroded2))
+            continue;
+        if (apply) {
+            obj->oeroded = 0;
+            obj->oeroded2 = 0;
+        }
+        n++;
+    }
+    return n;
+}
+
+/* PLACEHOLDER until Jon confirms the village lines. */
+static const char *const villager_thanks[] = {
+    "You saved our children and our home. There will always be a place for you here.",
+    "We once feared every footstep outside our doors. Now we open them to welcome you.",
+    "My family is together again because you came. Thank you.",
+    "These houses stood in darkness. Now there is bread baking and children laughing.",
+    "May the LORD bless you for what you have done for us.",
+    "Stay awhile, friend. Tonight, you need not fight for anyone. Rest among us.",
+};
+static const char *const steward_lines[] = {
+    "Welcome home! I have dusted everything except the things that looked liable to bite.",
+    "Your belongings are exactly where you left them. I considered organizing them, then thought better of it.",
+    "The roof is sound, the floor is swept, and no devils have applied for tenancy.",
+    "I have prepared your usual chair. Sitting in it remains entirely your responsibility.",
+};
+static const char *const scribe_advice[] = {
+    "The way below is Gehennom. Carry light, food, and a weapon you trust.",
+    "The Sanctum is the Dragon's own hall. Do not go there tired or empty-handed.",
+    "Prayer is heard. Do not spend the last of your Power on nothing.",
+    "What you leave behind in this valley, you will wish for in the dark.",
+    "Evil is loud down there. It does not get the last word.",
+};
+
+static void
+give_fresh_food(void)
+{
+    struct obj *otmp;
+    int i;
+
+    for (i = 0; i < 2; i++) {
+        otmp = mksobj(FOOD_RATION, FALSE, FALSE);
+        if (!otmp)
+            continue;
+        uncurse(otmp);
+        otmp->dknown = otmp->known = otmp->bknown = 1;
+        (void) hold_another_object(otmp, "Oops!  %s to the floor!",
+                                   The(aobjnam(otmp, "slip")),
+                                   (const char *) 0);
+    }
+    for (i = 0; i < 2; i++) {
+        otmp = mksobj(APPLE, FALSE, FALSE);
+        if (!otmp)
+            continue;
+        uncurse(otmp);
+        otmp->dknown = otmp->known = otmp->bknown = 1;
+        (void) hold_another_object(otmp, "Oops!  %s to the floor!",
+                                   The(aobjnam(otmp, "slip")),
+                                   (const char *) 0);
+    }
+}
+
+static struct obj *
+carried_staff_of_wonders(void)
+{
+    struct obj *obj;
+
+    for (obj = gi.invent; obj; obj = obj->nobj)
+        if (IS_STAFF_OF_WONDERS(obj) && obj->spe < 2)
+            return obj;
+    for (obj = gi.invent; obj; obj = obj->nobj)
+        if (IS_STAFF_OF_WONDERS(obj))
+            return obj;
+    return (struct obj *) 0;
+}
+
+static boolean
+berachah_job_chat(struct monst *mtmp)
+{
+    struct obj *staff;
+
+    if (!named_job(mtmp, "baker") && !named_job(mtmp, "blacksmith")
+        && !named_job(mtmp, "priest") && !named_job(mtmp, "tailor")
+        && !named_job(mtmp, "farmer") && !named_job(mtmp, "carpenter")
+        && !named_job(mtmp, "scribe") && !named_job(mtmp, "steward"))
+        return FALSE;
+
+    SetVoice(mtmp, 0, 80, 0);
+    if (named_job(mtmp, "steward")) {
+        verbalize("%s", steward_lines[rn2(SIZE(steward_lines))]); /* PLACEHOLDER */
+        return TRUE;
+    }
+
+    verbalize("%s", villager_thanks[rn2(SIZE(villager_thanks))]); /* PLACEHOLDER */
+
+    if (named_job(mtmp, "baker")) {
+        verbalize("Another loaf is %ld gold.", BERACHAH_FEE_BREAD); /* PLACEHOLDER */
+        if (y_n("Buy a loaf of Bread of Berachah?") != 'y') /* PLACEHOLDER */
+            return TRUE;
+        if (!berachah_pay(mtmp, BERACHAH_FEE_BREAD))
+            return TRUE;
+        give_berachah_bread(1L, FALSE);
+        verbalize("Fresh from the oven."); /* PLACEHOLDER */
+        return TRUE;
+    }
+    if (named_job(mtmp, "priest")) {
+        verbalize("I can fill your Power for %ld gold. I do not treat wounds.",
+                  BERACHAH_FEE_POWER); /* PLACEHOLDER */
+        if (u.uen >= u.uenmax) {
+            verbalize("Your Power is already full."); /* PLACEHOLDER */
+            return TRUE;
+        }
+        if (y_n("Have your Power restored?") != 'y') /* PLACEHOLDER */
+            return TRUE;
+        if (!berachah_pay(mtmp, BERACHAH_FEE_POWER))
+            return TRUE;
+        u.uen = u.uenmax;
+        disp.botl = TRUE;
+        verbalize("Be renewed, and spend it well."); /* PLACEHOLDER */
+        return TRUE;
+    }
+    if (named_job(mtmp, "blacksmith")) {
+        verbalize("I can hammer the wear out of your weapons for %ld gold. I do not enchant them.",
+                  BERACHAH_FEE_SMITH); /* PLACEHOLDER */
+        if (y_n("Have your weapons repaired?") != 'y') /* PLACEHOLDER */
+            return TRUE;
+        if (!touch_erosion(TRUE, FALSE)) {
+            verbalize("Nothing you are carrying needs the hammer."); /* PLACEHOLDER */
+            return TRUE;
+        }
+        if (!berachah_pay(mtmp, BERACHAH_FEE_SMITH))
+            return TRUE;
+        (void) touch_erosion(TRUE, TRUE);
+        verbalize("There. Solid again, and no shinier than before."); /* PLACEHOLDER */
+        return TRUE;
+    }
+    if (named_job(mtmp, "tailor")) {
+        verbalize("Cloth armor and cloaks, mended for %ld gold.",
+                  BERACHAH_FEE_TAILOR); /* PLACEHOLDER */
+        if (y_n("Have your cloth and cloaks repaired?") != 'y') /* PLACEHOLDER */
+            return TRUE;
+        if (!touch_erosion(FALSE, FALSE)) {
+            verbalize("I see no worn cloth that needs a needle."); /* PLACEHOLDER */
+            return TRUE;
+        }
+        if (!berachah_pay(mtmp, BERACHAH_FEE_TAILOR))
+            return TRUE;
+        (void) touch_erosion(FALSE, TRUE);
+        verbalize("Wear it without worrying about the threads."); /* PLACEHOLDER */
+        return TRUE;
+    }
+    if (named_job(mtmp, "farmer")) {
+        if (mtmp->mspare1) {
+            verbalize("The beds are picked for now. Come back another season."); /* PLACEHOLDER */
+            return TRUE;
+        }
+        verbalize("Take this from the beds. It is fresh."); /* PLACEHOLDER */
+        give_fresh_food();
+        mtmp->mspare1 = 1;
+        return TRUE;
+    }
+    if (named_job(mtmp, "carpenter")) {
+        if (!(mtmp->mspare1 & 1)) {
+            struct obj *otmp = mksobj(QUARTERSTAFF, FALSE, FALSE);
+
+            verbalize("A plain staff, cut this morning. It is yours."); /* PLACEHOLDER */
+            if (otmp) {
+                uncurse(otmp);
+                otmp->dknown = otmp->known = otmp->bknown = 1;
+                (void) hold_another_object(otmp, "Oops!  %s to the floor!",
+                                           The(aobjnam(otmp, "slip")),
+                                           (const char *) 0);
+                mtmp->mspare1 |= 1;
+            }
+        }
+        if (mtmp->mspare1 & 2) {
+            verbalize("The staff I set for you will stay as I left it."); /* PLACEHOLDER */
+            return TRUE;
+        }
+        staff = carried_staff_of_wonders();
+        if (!staff) {
+            verbalize("If you carry the Staff of Wonders, I can set it to +2."); /* PLACEHOLDER */
+            return TRUE;
+        }
+        if (staff->spe >= 2) {
+            verbalize("That staff is already at least +2. I will not take any of it away."); /* PLACEHOLDER */
+            mtmp->mspare1 |= 2;
+            return TRUE;
+        }
+        if (y_n("Set your Staff of Wonders to +2?") != 'y') /* PLACEHOLDER */
+            return TRUE;
+        staff->spe = 2;
+        staff->known = 1;
+        mtmp->mspare1 |= 2;
+        verbalize("There. +2, and no more than that."); /* PLACEHOLDER */
+        return TRUE;
+    }
+    if (named_job(mtmp, "scribe")) {
+        verbalize("%s", scribe_advice[rn2(SIZE(scribe_advice))]); /* PLACEHOLDER */
+        return TRUE;
+    }
+    return TRUE;
+}
+
+/* Two hero blows, then the floor lifts. Stored in spare strategy
+   bits so a save during the fight keeps the count. */
+#define MOLOCH_HIT_SHIFT 10
+#define MOLOCH_HIT_MASK  0x00000c00L
+
+static int
+moloch_hero_hits(struct monst *mtmp)
+{
+    return (int) ((mtmp->mstrategy & MOLOCH_HIT_MASK) >> MOLOCH_HIT_SHIFT);
+}
+
+static void
+moloch_set_hits(struct monst *mtmp, int n)
+{
+    if (n > 3)
+        n = 3;
+    mtmp->mstrategy = (mtmp->mstrategy & ~MOLOCH_HIT_MASK)
+                      | ((unsigned long) n << MOLOCH_HIT_SHIFT);
+}
+
+static boolean
+moloch_guarded(struct monst *mtmp)
+{
+    if (!mtmp || mtmp->data != &mons[PM_MOLOCH])
+        return FALSE;
+    if (!Is_hinnom_level(&u.uz) || u.uevent.berachah)
+        return FALSE;
+    return (boolean) (moloch_hero_hits(mtmp) < 2);
+}
+
+void
+moloch_note_hero_hit(struct monst *mtmp)
+{
+    if (!moloch_guarded(mtmp) && !(mtmp && mtmp->data == &mons[PM_MOLOCH]
+                                   && Is_hinnom_level(&u.uz)
+                                   && !u.uevent.berachah))
+        return;
+    if (!mtmp || mtmp->data != &mons[PM_MOLOCH])
+        return;
+    if (!Is_hinnom_level(&u.uz) || u.uevent.berachah)
+        return;
+    moloch_set_hits(mtmp, moloch_hero_hits(mtmp) + 1);
+}
+
+void
+moloch_hold_line(struct monst *mtmp)
+{
+    int floor_hp;
+
+    if (!moloch_guarded(mtmp))
+        return;
+    floor_hp = mtmp->mhpmax / 4;
+    if (floor_hp < 1)
+        floor_hp = 1;
+    if (mtmp->mhp < floor_hp)
+        mtmp->mhp = floor_hp;
+}
+
+/* Called from the death routines. Restores the floor and refuses
+   the kill until the hero has landed two blows. */
+boolean
+moloch_stands(struct monst *mtmp)
+{
+    if (!moloch_guarded(mtmp))
+        return FALSE;
+    moloch_hold_line(mtmp);
+    return TRUE;
+}
+
+boolean
+is_berachah_bread(struct obj *obj)
+{
+    return (boolean) (obj && obj->otyp == FOOD_RATION && has_oname(obj)
+                      && !strcmp(ONAME(obj), "Bread of Berachah"));
 }
 
 void

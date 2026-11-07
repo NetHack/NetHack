@@ -2578,6 +2578,10 @@ use_misc(struct monst *mtmp)
                 pline("%s fails to wrap around %s.", The_whip, the_weapon);
                 return 1;
             }
+            if (obj->oartifact == ART_SWORD_OF_THE_SPIRIT) {
+                pline("The Sword of the Spirit stays in your %s.", hand_buf);
+                return 1;
+            }
             urgent_pline("%s wraps around %s you're wielding!", The_whip,
                          the_weapon);
             if (welded(obj)) {

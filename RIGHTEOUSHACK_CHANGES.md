@@ -1474,6 +1474,67 @@ change Favor. A hostile monster no longer triggers it, whether that
 monster is fleeing or helpless. A peaceful monster still does. The
 same function is used for a kick, a polearm, and a grappling hook.
 
+### Valley, Greed, and the lever (2026-11-06)
+
+Passing the Greed gate with an empty pack shows a blackout screen:
+"Your trial is complete. The grip of greed is broken." and "Your
+items appear directly in front of you. Step forward to reclaim
+them." The verse that used to sit on the restore square (58,10)
+is one square west, at (57,10). Dropped items still return to
+(59,10) in the game, which is map column 58.
+
+The Rod of Frozen Power waits 16 timed delays instead of 32.
+Damage, range, and who is frozen are unchanged.
+
+While the High Priest of Moloch's cloak holds, the gate guards
+say "Pass, High Priest." An inside guard's lever clue addresses
+the hero as High Priest. Every other "Your Holiness" in the
+court lines is "Your Dread Eminence."
+
+Far look on a child inside the Hinnom field says "scared child."
+On the Valley, the town elder and the eight named villagers
+far-look as their given names, not as prisoners. Michael's
+#chat before the Valley is one random line for the stage: field
+down and Moloch alive, Moloch dead and the altar standing, or
+the altar razed. In the Valley he uses one of three greetings.
+Those lines, and the villager service lines, are marked
+PLACEHOLDER until Jon confirms the wording.
+
+The Valley welcome gives three food rations named Bread of
+Berachah. Each has the nutrition of a lembas wafer (800). Far
+look adds "A freshly baked loaf, given in gratitude by the
+people of Berachah." The baker sells one more for 10 gold.
+The priest refills Power only, for 50 gold. The smith repairs
+weapon erosion for 40 gold and does not enchant. The tailor
+repairs cloth armor and cloaks for 30 gold. The farmer's food
+and the carpenter's quarterstaff are once each. The carpenter
+will set a carried Staff of Wonders to +2 if it is below that,
+and will not lower a higher one. The 50, 40, and 30 gold fees
+are placeholders.
+
+The village map is the varied layout: distinct houses around a
+green, the elder in the gatehouse at (45,12), the gatehouse
+angel at (46,8), and the hall angel in Michael's court at
+(71,9). The gateway at (34,10) is open floor. The steward
+stands in the gifted house. Its two chests are created empty
+by the level and are never refilled; leaving, saving, and
+returning loads the saved level. `berachah_setup` lights every
+square. Hinnom's lamps are unchanged.
+
+Moloch's hit points cannot fall below a quarter of his maximum
+until the hero has landed two blows. Angel and Michael damage
+is held at that floor. The third hero blow is unrestricted.
+Michael still cannot die: `michael_stands` restores him.
+Moloch still carries a Key to the Sanctum on the battlefield.
+The spare is not there. It is in a chest at (73,5) in the
+northeast tower of the town of Berachah, placed when that
+level is built, so it is there even if the hero never took
+Moloch's key.
+
+A power lever can be thrown while flying, levitating, or riding
+a flying mount. The hero does not have to dismount. Other traps
+still pass under a flyer.
+
 ### Hinnom follow-ups (2026-11-04)
 
 The map is placed one column to the right of the numbers in
@@ -1511,9 +1572,10 @@ The saddle is the Knight's quest artifact. Changing levels used
 to drop every quest artifact a monster carried, and dropping the
 worn saddle threw the rider before the stair message. A worn
 saddle stays on the steed; the Amulet and the invocation tools
-are still dropped. A power lever is a floor trap: walking can
-throw it, and flying or riding a flyer passes over it without
-`immune_to_trap: bad ttype`.
+are still dropped. A power lever is a floor trap. Walking, flying, levitating, or
+riding a flying steed can throw it, with no escape roll and no
+"Really step onto" prompt. Every other floor trap still lets a
+flyer pass over.
 
 ### The Battle of Hinnom and the Valley of Berachah (2026-11-03)
 
@@ -1585,8 +1647,8 @@ with Berachah. Living children on the way out give +1 Favor and
 and 2 Favor.
 
 The six angels on Berachah each speak one of Jon's victory
-lines, in the order they were placed. Michael still says
-"Well done. Rest here a while." A seventh angel would take
+lines, in the order they were placed. Michael's Valley lines
+are the three greetings in `michael_berachah`. A seventh angel would take
 the first line again, unless that angel is standing next to
 one who already has it. The Valley's arrival text is a
 full-screen window, the same kind the quest intro uses. The
@@ -1606,7 +1668,7 @@ Wilderness garden fountains, are living water.
 
 On Hinnom, with the High Priest of Moloch's cloak worn and
 the peace unbroken, #chat reaches every fortress creature.
-The outside guards still say "Pass, Your Holiness." The
+The outside guards say "Pass, High Priest." The
 inside guard and the clerics still give their lever clues
 and nothing else. The doctor gives his lever clue on every
 chat, and then one of six lines of his own, so the clue is

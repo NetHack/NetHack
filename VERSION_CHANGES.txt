@@ -10,6 +10,24 @@ RighteousHack will eventually replace lawful, neutral, and chaotic
 with two alignments, good and evil. Alignment still works as it
 does now until that change is made.
 
+2026-11-06
+The spare Key to the Sanctum is in a chest in the northeast tower of the town of Berachah, at (73,5). It is not on the Hinnom battlefield. Moloch still carries the other key.
+
+2026-11-06
+Passing Greed empty-handed shows a blackout screen, and the verse engraving is no longer on the square where your items return.
+
+2026-11-06
+The Rod of Frozen Power's burst is half as long. Its damage and reach are the same.
+
+2026-11-06
+On Hinnom, cloaked guards address you as High Priest, and the other court lines say Your Dread Eminence. Fortress children far-look as a scared child. The Sword of the Spirit stays in hand if something tries to yank it.
+
+2026-11-06
+Michael has a random line for each stage before the valley, and a greeting once Berachah exists. The welcome presses three loaves of Bread of Berachah into your hand.
+
+2026-11-06
+The Valley of Berachah is fully lit and has a varied village: baker, smith, priest, tailor, farmer, carpenter, scribe, and a steward in the house the village gives you. The two chests in that house are ordinary level objects, so what you store there stays. Moloch cannot fall until you have hit him twice, and Michael still cannot fall. A second Key to the Sanctum is in the northeast tower chest. A power lever can be thrown while flying, levitating, or mounted.
+
 2026-11-04
 Razing Moloch's altar while he lives now shows a full screen, and every angel on the level makes for Moloch.
 

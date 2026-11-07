@@ -1,29 +1,30 @@
--- The Valley of Berachah. Same geometry as Hinnom, redeemed.
+-- The Valley of Berachah. Fortress geometry as Hinnom, with the
+-- varied village in columns 16-33. The whole level is lit in code.
 des.level_init({ style = "solidfill", fg = " " })
 
 des.level_flags("mazelevel", "nomongen", "noteleport", "hardfloor", "noflip")
 
 des.map({ halign = "left", valign = "top", map = [[
 -------------------------------------------------------------------------------
-|T...........T|.|T|T........|....T||....|TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT|
-|.............|.|.---.-----.|.|.---|....|TPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPT|
-|..T.......T..+.|.|...|.....|T|...||....|TP-----PPPPPPPPPPPPPPPPPPPPPPP-----PT|
-|.............|.|.|.---.-.-------.|--+---TP|...|-----------------------|...|PT|
-|.............|...|...|...........|....|.TP|...|......|......|T.T.T.T.T|...|PT|
-|T...........T|.|.---.-----------.|..TT|.TP|...|......|......|.........|...|PT|
--------+-------.|.....|.........|.|..{...TP--+--+-----------+------+-----+--PT|
-|T......TTTTTT|.------T.-------.|.|.T---.TPP|.....|..|..|..|....|.........|PPT|
-|T.TTTTTTTTTTT|.|....T|...|...|T|.|......TPP|.....|-+--+--+--+--|.........|PPT|
-|T...........T|.|.|.---.|.|.|.---.|......+........+.............+.........|PPT|
-|TTTTTTTTTTT.T|.|.|...|.|...|...|........TPP|.....|--+------+---|.........|PPT|
-|TTTTTT......T|.|.---.|.-------.|.|--|...TPP|.....|.............|.........|PPT|
--------+-------.|.|T|...|.....|...|..|.T.TP--+-----+------+---------+----+--PT|
-|T...........T|.|.|.-----.---.-----.T.T..TP|...|......|T......T|.......|...|PT|
-|.............|.........|...|...|T|......TP|...|......|T..{...T|.......|...|PT|
-|.............|.-------.---.---.|.|---+--TP|...|-----------------------|...|PT|
-|.............|.|....T|...|.|...|.||....|TP-----PPPPPPPPPPPPPPPPPPPPPPP-----PT|
-|.............|.|.-------.|.|.---.||....|TPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPT|
-|T...........T|.|...........|.....||....|TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT|
+|T...........T|.-----.....-------.||....|TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT|
+|.............|.|...+.....|.....|.-|....|TPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPT|
+|..T.......T..+.|...|.....|.....|.||....|TP-----PPPPPPPPPPPPPPPPPPPPPPP-----PT|
+|.............|.-----.....---+---.|--+---TP|...|-----------------------|...|PT|
+|.............|...................|....|.TP|...|......|......|T.T.T.T.T|...|PT|
+|T...........T|.-----.......------|..TT|.TP|...|......|......|.........|...|PT|
+-------+-------.|...|.......|....||..{...TP--+--+-----------+------+-----+--PT|
+|T......TTTTTT|.|...+.......+....||.T---.TPP|.....|..|..|..|....|.........|PPT|
+|T.TTTTTTTTTTT|.|...|...{...|....||......TPP|.....|-+--+--+--+--|.........|PPT|
+|T...........T|.|...|.......------.......+........+.............+.........|PPT|
+|TTTTTTTTTTT.T|.-----....................TPP|.....|--+------+---|.........|PPT|
+|TTTTTT......T|...................|--|...TPP|.....|.............|.........|PPT|
+-------+-------...............----|..|.T.TP--+-----+------+---------+----+--PT|
+|T...........T|.......|-----..|..|-.T.T..TP|...|......|T......T|.......|...|PT|
+|.............|.--+--.|....+..-+--|......TP|...|......|T..{...T|.......|...|PT|
+|.............|.|...|.|.|---......|---+--TP|...|-----------------------|...|PT|
+|.............|.-----.|.|....-----||....|TP-----PPPPPPPPPPPPPPPPPPPPPPP-----PT|
+|.............|.......---....+...|||....|TPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPT|
+|T...........T|..............-----||....|TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT|
 -------------------------------------------------------------------------------
 ]] })
 
@@ -62,16 +63,26 @@ des.door("closed", 67, 7)
 des.door("closed", 68, 13)
 des.door("broken", 37, 4)
 des.door("broken", 38, 16)
+-- Village doors. Open, so the lane and the houses are not a maze.
+des.door("open", 20, 2)
+des.door("open", 29, 4)
+des.door("open", 20, 8)
+des.door("open", 28, 8)
+des.door("open", 18, 15)
+des.door("open", 27, 15)
+des.door("open", 31, 15)
+des.door("open", 29, 18)
 
 des.monster({ id = "Michael the Archangel", x = 72, y = 10, peaceful = 1 })
 des.monster({ id = "Angel", x = 40, y = 9, peaceful = 1 })
 des.monster({ id = "Angel", x = 40, y = 11, peaceful = 1 })
-des.monster({ id = "Angel", x = 46, y = 10, peaceful = 1 })
--- Male prisoner, shown as "town elder", just inside the open gate.
+des.monster({ id = "Angel", x = 46, y = 8, peaceful = 1 })
+-- Male prisoner, shown as "town elder". Off the bridge, in the gatehouse,
+-- so the road from the court to the green stays clear.
 -- A guide would add the quest-guardian death penalty on top of murder.
-des.monster({ id = "prisoner", name = "town elder", x = 43, y = 10,
+des.monster({ id = "prisoner", name = "town elder", x = 45, y = 12,
               peaceful = 1, waiting = 1, female = false })
-des.monster({ id = "Angel", x = 57, y = 10, peaceful = 1 })
+des.monster({ id = "Angel", x = 71, y = 9, peaceful = 1 })
 des.monster({ id = "Angel", x = 73, y = 8, peaceful = 1 })
 des.monster({ id = "Angel", x = 73, y = 12, peaceful = 1 })
 des.monster({ id = "child", x = 66, y = 8, peaceful = 1, waiting = 1 })
@@ -80,3 +91,30 @@ des.monster({ id = "child", x = 70, y = 8, peaceful = 1, waiting = 1 })
 des.monster({ id = "child", x = 66, y = 12, peaceful = 1, waiting = 1 })
 des.monster({ id = "child", x = 68, y = 12, peaceful = 1, waiting = 1 })
 des.monster({ id = "child", x = 70, y = 12, peaceful = 1, waiting = 1 })
+-- Eight jobs. Prisoners, not shopkeepers: the work is #chat, not a shop.
+-- The two chests in the gifted house start empty. Their contents are the
+-- level's own objects, so a later visit loads them and does not refill them.
+des.monster({ id = "prisoner", name = "baker", x = 18, y = 2,
+              peaceful = 1, waiting = 1 })
+des.monster({ id = "prisoner", name = "blacksmith", x = 28, y = 2,
+              peaceful = 1, waiting = 1 })
+des.monster({ id = "prisoner", name = "priest", x = 18, y = 8,
+              peaceful = 1, waiting = 1 })
+des.monster({ id = "prisoner", name = "tailor", x = 31, y = 14,
+              peaceful = 1, waiting = 1 })
+des.monster({ id = "prisoner", name = "farmer", x = 18, y = 16,
+              peaceful = 1, waiting = 1 })
+des.monster({ id = "prisoner", name = "carpenter", x = 25, y = 15,
+              peaceful = 1, waiting = 1 })
+des.monster({ id = "prisoner", name = "scribe", x = 31, y = 18,
+              peaceful = 1, waiting = 1 })
+des.monster({ id = "prisoner", name = "steward", x = 30, y = 8,
+              peaceful = 1, waiting = 1 })
+des.object({ id = "chest", x = 32, y = 7, locked = 0, trapped = 0 })
+des.object({ id = "chest", x = 32, y = 9, locked = 0, trapped = 0 })
+-- Spare Key to the Sanctum, in the northeast tower of the town.
+-- Moloch may already have dropped the other during the battle.
+des.object({ id = "chest", x = 73, y = 5, locked = 0, trapped = 0,
+             contents = function()
+                des.object("Key to the Sanctum")
+             end })

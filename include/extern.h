@@ -4144,6 +4144,10 @@ extern void living_water_restore(void);
 extern boolean hinnom_chat(struct monst *);
 extern void hinnom_child_died(struct monst *);
 extern boolean michael_stands(struct monst *);
+extern void moloch_note_hero_hit(struct monst *);
+extern void moloch_hold_line(struct monst *);
+extern boolean moloch_stands(struct monst *);
+extern boolean is_berachah_bread(struct obj *);
 extern const char *berachah_shop_sign(int);
 extern const char *berachah_keeper(int);
 

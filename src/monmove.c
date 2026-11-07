@@ -768,6 +768,7 @@ dochug(struct monst *mtmp)
        wait bit is cleared by seeing the hero or by #chat. */
     hinnom_host_hold(mtmp);
     berachah_elder_hold(mtmp);
+    moloch_hold_line(mtmp);
 
     /* King Solomon stays on the platform at Gibeon, and stays peaceful. */
     if (has_mgivenname(mtmp) && !strcmp(MGIVENNAME(mtmp), "King Solomon")) {

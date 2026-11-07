@@ -3813,6 +3813,21 @@ fear_protected(void)
     return (boolean) (levl[u.ux][u.uy].typ == STAIRS);
 }
 
+/* Blackout, once the gate lets an empty-handed hero through.
+   The verse engraving is one square west of the pile at (59,10). */
+static void
+greed_trial_screen(void)
+{
+    winid win = create_nhwindow(NHW_TEXT);
+
+    putstr(win, 0, "Your trial is complete. The grip of greed is broken.");
+    putstr(win, 0, "");
+    putstr(win, 0,
+           "Your items appear directly in front of you. Step forward to reclaim them.");
+    display_nhwindow(win, TRUE);
+    destroy_nhwindow(win);
+}
+
 static void
 wilderness_check(void)
 {
@@ -3902,7 +3917,7 @@ wilderness_check(void)
                     otmp = next;
                 }
                 newsym(59, 10);
-                pline("But seek ye first the kingdom of God, and his righteousness; and all these things shall be added unto you.");
+                greed_trial_screen();
             }
         }
     }

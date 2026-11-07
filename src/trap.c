@@ -1075,7 +1075,7 @@ floor_trigger(int ttyp)
     case SPIKED_PIT:
     case HOLE:
     case TRAPDOOR:
-    case POWER_LEVER: /* floor switch; flyers and riders pass over it */
+    case POWER_LEVER: /* floor switch; the hero can throw it in the air */
         return TRUE;
     default:
         return FALSE;
@@ -2930,11 +2930,9 @@ immune_to_trap(struct monst *mon, unsigned ttype)
         /* no adverse effects */
         return TRAP_CLEARLY_IMMUNE;
     case POWER_LEVER:
-        /* A floor switch. Flying, levitation, and a flying steed pass
-           over it. On foot it can be thrown, so it is not harmless. */
-        if (is_floater(pm) || is_flyer(pm))
-            return TRAP_CLEARLY_IMMUNE;
-        if (is_you && (Levitation || Flying))
+        /* The hero can throw it on foot, in the air, or mounted.
+           Monsters still ignore it. */
+        if (!is_you)
             return TRAP_CLEARLY_IMMUNE;
         return TRAP_NOT_IMMUNE;
     case TRAPPED_DOOR:
@@ -3042,7 +3040,11 @@ dotrap(struct trap *trap, unsigned trflags)
               trapname(ttype, TRUE)); /* do force "pit" while hallucinating */
         /* then proceed to normal trap effect */
     } else if (!forcetrap) {
-        if (floor_trigger(ttype) && check_in_air(&gy.youmonst, trflags)) {
+        /* A power lever is a floor switch, but the hero can throw it
+           while flying, levitating, or riding a flying steed. Every
+           other floor trap still lets them pass over. */
+        if (ttype != POWER_LEVER
+            && floor_trigger(ttype) && check_in_air(&gy.youmonst, trflags)) {
             if (already_seen) {
                 You("%s over %s %s.", u_locomotion("step"),
                     (ttype == ARROW_TRAP && !trap->madeby_u)
