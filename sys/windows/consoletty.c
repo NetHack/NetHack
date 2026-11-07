@@ -1455,7 +1455,7 @@ win32con_topl_fixup(const char *str)
         uint8 seq[7];
         const char *c = str;
 
-        for (i = 0; i < 6 && *c && *c != ' '; ++i) {
+        for (i = 0; i < sizeof seq - 1 && *c && *c != ' '; ++i) {
             seq[i] = (uint8) *c;
             c++;
             str++;
