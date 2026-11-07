@@ -1,4 +1,9 @@
-/* gem_rsc.h -- object/tree indices for win/gem/gem_rsc.rsc
+/*
+ * $NHDT-Header: NetHack 5.0 gem_rsc.h 2026/09/30_14:47:34 NetHack-5.0:1.4 $
+ * Copyright (c) Ingo Paschke 2026.
+ * NetHack may be freely redistributed.  See license for details.
+ *
+ * gem_rsc.h -- object/tree indices for win/gem/gem_rsc.rsc
  * Hand-maintained alongside the RSC binary. Both must be kept in sync:
  * when editing gem_rsc.rsc with an RCS editor, regenerate the indices
  * here. The .rsc binary is shipped from win/gem/ into the package by

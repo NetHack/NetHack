@@ -1,4 +1,4 @@
-/* $NHDT-Header: NetHack 5.0 wincurs.h 1970/01/01_00:00:00 NetHack-5.0:1.61 $ */
+/* $NHDT-Header: NetHack 5.0 wincurs.h 2026/10/03_12:08:42 NetHack-5.0:1.62 $ */
 /* Copyright (c) Karl Garrison, 2010. */
 /* NetHack may be freely redistributed.  See license for details. */
 

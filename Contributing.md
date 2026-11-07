@@ -10,6 +10,5 @@ and the body. This helps Git tools correctly parse the message.
 
 
 <!-- $NHDT-Header: NetHack 5.0 Contributing.md 2026/05/29_10:31:01 NetHack-5.0:1.8 $ -->
-<!-- NetHack may be freely redistributed.  See license for details.-->
-
-
+<!-- Copyright (c) Michael Allison 2026. -->
+<!-- NetHack may be freely redistributed.  See license for details. -->

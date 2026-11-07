@@ -1,4 +1,4 @@
-/* $NHDT-Header: NetHack 5.0 mac68kconf.h 1970/01/01_00:00:00 NetHack-5.0:1.27 $ */
+/* $NHDT-Header: NetHack 5.0 mac68kconf.h 2026/10/01_11:01:04 NetHack-5.0:1.28 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kevin Hugo, 2004. */
 /* NetHack may be freely redistributed.  See license for details. */

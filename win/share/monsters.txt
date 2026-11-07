@@ -1,3 +1,6 @@
+# $NHDT-Header: NetHack 5.0 monsters.txt 2025/01/13_04:57:56 NetHack-5.0:1.32 $
+# Copyright (c) Michael Allison 2002.
+# NetHack may be freely redistributed.  See license for details.
 # monsters.txt - tile definitions for monsters
 #  Note: lines beginning with '# tile ' are not comments; other
 #  lines beginning with '#' are.

@@ -1,3 +1,7 @@
+# $NHDT-Header: NetHack 5.0 other.txt 2024/02/29_04:15:56 NetHack-5.0:1.33 $
+# Copyright (c) Michael Allison 2021.
+# NetHack may be freely redistributed.  See license for details.
+#
 # other.txt - tile definitions for 'other' (walls, furniture, explosions)
 #  Note: lines beginning with '# tile ' are not comments; other
 #  lines beginning with '#' are.
