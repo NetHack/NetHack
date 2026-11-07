@@ -2202,6 +2202,9 @@ extern int set_keyhandling_via_option(void);
 extern void tty_utf8graphics_fixup(void);
 extern void tty_ibmgraphics_fixup(void);
 #endif /* ENHANCED_SYMBOLS */
+#ifdef WIN32CON
+extern const char *win32con_topl_fixup(const char *);
+#endif
 #endif /* WIN32 */
 
 /* ### o_init.c ### */
