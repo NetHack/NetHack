@@ -546,7 +546,8 @@ sub Date {
 	}
     } elsif($opt{m}) {
 	    #author keni <keni@his.com> 1429884677 -0400
-	chomp($now = `git cat-file -p $hash | awk '/author/{print \$4}'`);
+	    #author Patric Mueller <bhaak@gmx.net> 1791023129 +0200
+	chomp($now = `git show --no-patch --format=%ct $hash`);
     }
 
     my $fmt = length $val ? $val : "%Y/%m/%d_%H:%M:%S";
