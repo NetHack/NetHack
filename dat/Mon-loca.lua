@@ -16,8 +16,11 @@ des.region(selection.area(00,00,78,20), "lit")
 des.non_diggable(selection.area(00,00,75,20))
 
 
+
+local formations = {
+
 -- wu wei
-local formation = [[
+[[
 ......................xxxx
 ..L............L...L....xx
 ..LLLLLLLLL.....L..L.....x
@@ -31,11 +34,33 @@ local formation = [[
 ..L.L..L..L.....L.L.L...L.
 .L...L..L..L...L..L....LL.
 ..........................
-]];
+]],
+
+[[
+..........................
+.LLLLL.L...........LLLLL..
+...L...LLLLL.......L......
+...L...L..L....LLLLLLLLLL.
+..L..L.L..L....L...L....L.
+.LLLL.L.L.L....L.LLLLLL...
+...L....L.L....L...L...L..
+...L.....L.....L...LLLL...
+.LLLLL...L.....L.L.L.L.L..
+...L....L.L....L.LLL.LLL..
+...LLL..L.L...L....L.L....
+.LLL...L...L..L.LLLLLLLLL.
+..........................
+]],
+
+};
 
 des.map({ halign = "center", valign = "center",
-          map = formation, lit = 1,
+          map = formations[math.random(#formations)], lit = 1,
           contents = function() end });
+
+if (percent(75)) then
+   des.replace_terrain({ selection = selection.negate(), fromterrain ="L", toterrain = "P" });
+end
 
 des.wallify();
 

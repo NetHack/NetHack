@@ -347,6 +347,9 @@ topl_putsym(char c)
 void
 putsyms(const char *str)
 {
+#ifdef WIN32CON
+    str = win32con_topl_fixup(str);
+#endif
     while (*str)
         topl_putsym(*str++);
 }

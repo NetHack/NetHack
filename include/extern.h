@@ -885,6 +885,7 @@ extern void restore_dungeon(NHFILE *) NONNULLARG1;
 extern void insert_branch(branch *, boolean) NONNULLARG1;
 extern void init_dungeons(void);
 extern s_level *find_level(const char *) NONNULLARG1;
+extern s_level *find_level_substr(const char *) NONNULLARG1;
 extern s_level *Is_special(d_level *) NONNULLARG1;
 extern branch *Is_branchlev(d_level *) NONNULLARG1;
 extern boolean builds_up(d_level *) NONNULLARG1;
@@ -2201,6 +2202,9 @@ extern int set_keyhandling_via_option(void);
 extern void tty_utf8graphics_fixup(void);
 extern void tty_ibmgraphics_fixup(void);
 #endif /* ENHANCED_SYMBOLS */
+#ifdef WIN32CON
+extern const char *win32con_topl_fixup(const char *);
+#endif
 #endif /* WIN32 */
 
 /* ### o_init.c ### */

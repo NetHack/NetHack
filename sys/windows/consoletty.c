@@ -1434,8 +1434,36 @@ g_pututf8(uint8 *sequence)
     Snprintf((char *) cell.utf8str, sizeof cell.utf8str, "%s",
              (char *) sequence);
     buffer_write(console.back_buffer, &cell, console.cursor);
+    if (ttyDisplay->topl_utf8 && (windowprocs.wincap2 & WC2_U_UTF8STR)) {
+        if (console.cursor.X < console.width - 1) {
+            console.cursor.X++;
+            ttyDisplay->curx++;
+        }
+    }
 #endif /* UTF8_FROM_CORE */
 #endif
+}
+
+const char *
+win32con_topl_fixup(const char *str)
+{
+#ifdef ENHANCED_SYMBOLS
+    if (ttyDisplay->topl_utf8 && (windowprocs.wincap2 & WC2_U_UTF8STR)
+        && SYMHANDLING(H_UTF8)) {
+        int i;
+        uint8 seq[7];
+        const char *c = str;
+
+        for (i = 0; i < sizeof seq - 1 && *c && *c != ' '; ++i) {
+            seq[i] = (uint8) *c;
+            c++;
+            str++;
+        }
+        seq[i] = '\0';
+        g_pututf8(seq);
+    }
+#endif
+    return str;
 }
 
 void
