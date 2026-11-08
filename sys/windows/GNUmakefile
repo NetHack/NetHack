@@ -1,4 +1,4 @@
-# NetHack 5.0	GNUmakefile
+# $NHDT-Header: NetHack 5.0 GNUmakefile 2026/10/05_18:14:01 NetHack-5.0:1.104 $
 # Copyright (c) 2022 by Feiyun Wang
 #-Copyright (c) 2022 by Michael Allison
 # NetHack may be freely redistributed.  See license for details.

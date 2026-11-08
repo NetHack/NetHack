@@ -1,4 +1,4 @@
-# $NHDT-Header$
+# $NHDT-Header: NetHack 5.0 nethackrc.template 2026/10/30_21:48:07 NetHack-5.0:1.52 $
 # Copyright (c) 2006 by Michael Allison
 # NetHack may be freely redistributed.  See license for details.
 
@@ -10,8 +10,6 @@
 #
 # To change the configuration, comment out the unwanted lines, and
 # uncomment the configuration you want.
-#
-# $NHDT-Date: 1524689357 2018/04/25 20:49:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.32 $
 
 # *** OPTIONS ***
 #

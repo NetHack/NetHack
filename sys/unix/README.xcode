@@ -1,3 +1,7 @@
+# $NHDT-Header: NetHack 5.0 README.xcode 2021/02/04_01:10:49 NetHack-5.0:1.2 $
+# Copyright (c) Bart House 2026.
+# NetHack may be freely redistributed.  See license for details.
+
 This README provides the instructions for building the unofficial Mac
 binaries using the Apple provided developer IDE named XCode.
 

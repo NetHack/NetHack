@@ -1,8 +1,9 @@
 Makefile.* NHSUBST
 Install.unx NHSUBST
 NewInstall.unx NHSUBST
-README.linux NHSUBST
+README.* NHSUBST
 depend.awk NHSUBST
+*.m NHSUBST
 sysconf NHSUBST
 *shr NH_header=no
 * NH_filestag=(file%s_for_UNIX_versions)

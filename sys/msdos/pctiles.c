@@ -1,4 +1,5 @@
 /* $NHDT-Header: NetHack 5.0 pctiles.c 2026/04/26_14:47:48 NetHack-5.0:1.19 $ */
+/*   Copyright (c) Michael Allison 1993.                            */
 /*   Copyright (c) NetHack PC Development Team 1993, 1994           */
 /*   NetHack may be freely redistributed.  See license for details. */
 /*                                                                  */

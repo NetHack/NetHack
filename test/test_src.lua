@@ -1,3 +1,6 @@
+-- $NHDT-Header: NetHack 5.0 test_src.lua 2026/01/23_15:43:54 NetHack-5.0:1.7 $
+-- Copyright (c) Pasi Kallinen 2021.
+-- NetHack may be freely redistributed.  See license for details.
 
 -- Test different src functions
 

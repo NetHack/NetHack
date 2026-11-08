@@ -1,0 +1,69 @@
+[4mDLB[24m(6)                           Games Manual                           [4mDLB[24m(6)
+
+[1mNAME[0m
+       dlb - NetHack data librarian
+
+[1mSYNOPSIS[0m
+       [1mdlb [22m{ [1mxct [22m} [ [1mvfIC [22m] arguments...  [ [1mfiles...  [22m]
+
+[1mDESCRIPTION[0m
+       [4mDlb[24m  is  a file archiving tool in the spirit (and tradition) of tar for
+       NetHack version 3.1 and higher.  It is used  to  maintain  the  archive
+       files  from which NetHack reads special level files and other read-only
+       information.  Note that like tar the command and option specifiers  are
+       specified  as  a  continuous  string  and are followed by any arguments
+       required in the same order as the option specifiers.
+
+       ^?ALLDOCS This facility is optional and may be excluded during  NetHack
+       configuration.   ^:  ^?DLB This facility is optional but is included in
+       this NetHack configuration.  ^:  This  facility  is  optional  and  was
+       excluded from this NetHack configuration.  ^.  ^.
+
+[1mCOMMANDS[0m
+       The  [1mx  [22mcommand  causes [4mdlb[24m to extract the contents of the archive into
+       the current directory.
+
+       The [1mc [22mcommand causes [4mdlb[24m to create a new archive from files in the cur-
+       rent directory.
+
+       The [1mt [22mcommand lists the files in the archive.
+
+[1mOPTIONS AND ARGUMENTS[0m
+       [1mv               [22mverbose output
+
+       [1mf [4m[22marchive[24m      specify the archive.  Default if f not specified is LIB-
+       FILE (usually the nhdat file in the playground).
+
+       [1mI [4m[22mlfile[24m        specify the file containing the list of files to put  in
+       to  or  extract  from the archive if no files are listed on the command
+       line.  Default for archive creation if no files are listed is  LIBLIST-
+       FILE.
+
+       [1mC  [4m[22mdir[24m           change  directory.  Changes directory before trying to
+       read any files (including the archive and the lfile).
+
+[1mEXAMPLES[0m
+       Create the default archive from the default file list:
+                   dlb c
+
+       List the contents of the archive 'foo':
+                   dlb tf foo
+
+[1mAUTHOR[0m
+       Kenneth Lorber
+
+[1mSEE ALSO[0m
+       nethack(6), tar(1)
+
+[1mBUGS[0m
+       Not a good tar emulation; - does not  mean  stdin  or  stdout.   Should
+       include  an optional compression facility.  Not all read-only files for
+       NetHack can be read out of an archive; examining the source is the only
+       way to know which files can be.
+
+[1mCOPYRIGHT[0m
+       This file is Copyright (C) Kenneth Lorber, 2024 for  version  keni-git-
+       set:1.13.   NetHack  may  be  freely  redistributed.   See  license for
+       details.
+
+NETHACK                        25 December 2024                         [4mDLB[24m(6)

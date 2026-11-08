@@ -1,3 +1,4 @@
+// $NHDT-Header: NetHack 5.0 qt_streq.h 2020/11/05_22:36:13 NetHack-5.0:1.2 $
 // Copyright (c) Warwick Allison, 1999.
 // Qt4 conversion copyright (c) Ray Chason, 2012-2014.
 // NetHack may be freely redistributed.  See license for details.

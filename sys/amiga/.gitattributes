@@ -1,2 +1,5 @@
 *.p NHSUBST
+*.c NHSUBST
+nethack.cnf NHSUBST
+README.amiga NHSUBST
 * NH_filestag=(file%s_for_Amiga_versions)

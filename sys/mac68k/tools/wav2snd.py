@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# $NHDT-Header: NetHack 5.0 wav2snd.py 2026/09/30_14:47:34 NetHack-5.0:1.1 $
+# Copyright (c) Ingo Paschke 2026.
+# NetHack may be freely redistributed.  See license for details.
 """Convert sound/wav/*.uu (uuencoded WAV) into classic Mac 'snd ' resources.
 
 Emits a raw resource fork containing one named 'snd ' (format 1,

@@ -1,4 +1,9 @@
-/* nhvers.r: 'vers' resources for the Finder's Get Info window.
+/*
+ * $NHDT-Header: NetHack 5.0 nhvers.r 2026/09/30_14:47:34 NetHack-5.0:1.3 $
+ * Copyright (c) Ingo Paschke 2026.
+ * NetHack may be freely redistributed.  See license for details.
+ *
+ * nhvers.r: 'vers' resources for the Finder's Get Info window.
  * vers 1 = this file's version; vers 2 = product family line.
  */
 #include "Multiverse.r"

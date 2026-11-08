@@ -1,4 +1,7 @@
 #!/bin/bash
+# $NHDT-Header: NetHack 5.0 fetch-cross-compiler.sh 2026/09/25_13:07:53 NetHack-5.0:1.49 $
+# Copyright (c) Micheal Allison 2020.
+# NetHack may be freely redistributed.  See license for details.
 
 if [ ! -z "${TF_BUILD}" ]; then
 	set -x

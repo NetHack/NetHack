@@ -1,4 +1,7 @@
 #
+# $NHDT-Header: NetHack 5.0 uu2wav.cmd 2023/02/04_19:28:59 NetHack-5.0:1.2 $
+# Copyright (c) Michael Allison 2023.
+# NetHack may be freely redistributed.  See license for details.
 # Windows file to decode the .uu files in this folder into .wav files
 #
 

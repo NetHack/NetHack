@@ -1,3 +1,6 @@
+// $NHDT-Header: NetHack 5.0 qt_xpms.h 2024/02/29_04:15:56 NetHack-5.0:1.9 $
+// Copyright (c) Robert Patrick Rankin 2019.
+// NetHack may be freely redistributed.  See license for details.
 // qt_xpms.h - static xpm arrays for use in status display
 //
 // In alphabetical order by array name.  Probably not the best ordering...

@@ -1,3 +1,4 @@
 tile.doc NHSUBST
 *.lua NHSUBST
+*.txt NHSUBST
 * NH_filestag=(file%s_for_versions_using_optional_tiles)

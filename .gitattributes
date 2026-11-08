@@ -3,8 +3,11 @@
 *.sh NHSUBST
 *.pl NHSUBST
 *.md NHSUBST
+*.yml NHSUBST
+Contributing.md NHSUBST
 Porting NHSUBST
 README NHSUBST
+Cross-compiling NHSUBST
 * text=auto
 *.hqx -text
 *.sln -text

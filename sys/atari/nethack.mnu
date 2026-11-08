@@ -1,3 +1,7 @@
+# $NHDT-Header: NetHack 5.0 nethack.mnu 2026/09/30_14:47:34 NetHack-5.0:1.3 $
+# Copyright (c) Janet Walz 2002.
+# NetHack may be freely redistributed.  See license for details. 
+
 # Sample .mnu file for NetHack
 # This will work only with MINIWIN v1.1
 # or TOSWIN v2.0 (or better)

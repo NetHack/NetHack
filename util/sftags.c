@@ -1,4 +1,4 @@
-/* NetHack 3.6	sftags.c	$Date$ $Revision$	          */
+/* $NHDT-Header: NetHack 5.0 sftags.c 2026/04/04_11:52:06 NetHack-5.0:1.8 $ */
 /* Copyright (c) Michael Allison, 2025                            */
 /* NetHack may be freely redistributed.  See license for details. */
 

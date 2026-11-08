@@ -1,4 +1,6 @@
-$NHDT-Header: NetHack 5.0 fixes3-0.txt 2022/01/30_03:57:22 NetHack-5.0:1.10 $
+$NHDT-Header: NetHack 5.0 fixes3-0.txt 2022/01/30_03:57:22 NetHack-5.0:1.11 $
+Copyright (c) Michael Allison 2022.
+NetHack may be freely redistributed.  See license for details.
 
 [This is a partial list supplied by Ken Arromdee long after the fact]
 

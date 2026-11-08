@@ -1,0 +1,6 @@
+.\".ie t foo
+.\".el bar
+.\"baz
+
+.if n \{ foo \}
+baz

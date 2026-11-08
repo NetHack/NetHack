@@ -1,3 +1,7 @@
+# $NHDT-Header: NetHack 5.0 unx2atar.sed 2026/09/30_14:47:34 NetHack-5.0:1.3 $
+# Copyright (c) Michael Allison 2020.
+# NetHack may be freely redistributed.  See license for details.
+
 : loop
 /\\$/N
 /\\$/b loop

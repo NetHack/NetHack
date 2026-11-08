@@ -1,4 +1,5 @@
-/* $NHDT-Header: NetHack 5.0 msdos.c 2020/08/03_23:44:29 NetHack-5.0:1.30 $ */
+/* $NHDT-Header: NetHack 5.0 msdos.c 2026/07/10_13:08:55 NetHack-5.0:1.32 $ */
+/* Copyright (c) Michael Allison 2002 */
 /* Copyright (c) NetHack PC Development Team 1990 */
 /* NetHack may be freely redistributed.  See license for details.         */
 

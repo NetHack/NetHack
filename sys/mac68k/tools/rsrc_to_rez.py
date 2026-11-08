@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# $NHDT-Header: NetHack 5.0 rsrc_to_rez.py 2026/09/30_14:47:34 NetHack-5.0:1.1 $
+# Copyright (c) Ingo Paschke 2026.
+# NetHack may be freely redistributed.  See license for details.
+
 """Transcribe MENU, STR# and MNU# resources from a Mac resource fork
 into Rez source.
 

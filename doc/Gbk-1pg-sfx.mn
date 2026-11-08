@@ -1,3 +1,7 @@
-.\" suffux to Guidebook.mn for 'roff version of Guidebook written as one page
+.\" $NHDT-Header: NetHack 5.0 Gbk-1pg-sfx.mn 2023/11/06_20:43:50 NetHack-5.0:1.2 $
+.\" Copyright (c) Robert Patrick Rankin 2020.
+.\" NetHack may be freely redistributed.  See license for details.
+.\"
+.\" append to Guidebook.mn for 'roff version of Guidebook written as one page
 .br
 .pl \n(nlu

@@ -1,4 +1,5 @@
 #!/usr/bin/env lua
+--   $NHDT-Header: NetHack 5.0 makefont.lua 2026/06/11_03:14:09 NetHack-5.0:1.4 $
 --   Copyright (c) 2016, 2022 Ray Chason
 --   NetHack may be freely redistributed.  See license for details.
 

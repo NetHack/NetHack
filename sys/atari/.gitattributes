@@ -1,2 +1,5 @@
 * NH_filestag=(file%s_for_Atari_version)
 *.sh NHSUBST
+unx2atar.sed NHSUBST
+nethack.cnf NHSUBST
+nethack.mnu NHSUBST

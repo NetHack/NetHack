@@ -1,4 +1,6 @@
-$NHDT-Header: NetHack 5.0 fixes3-6-2.txt 2022/01/29_21:28:06 NetHack-5.0:1.322 $
+$NHDT-Header: NetHack 5.0 fixes3-6-2.txt 2022/01/29_21:28:06 NetHack-5.0:1.322
+Copyright (c) Robert Patrick Rankin 2019.
+NetHack may be freely redistributed.  See license for details.
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
 lineage following the release of 3.6.1 in April 2018. Please note, however,

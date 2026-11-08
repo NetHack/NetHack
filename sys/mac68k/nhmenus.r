@@ -1,4 +1,9 @@
-/* nhmenus.r -- menu resources (MENU, STR#, MNU#) for the
+/*
+ * $NHDT-Header: NetHack 5.0 nhmenus.r 2026/09/30_14:47:34 NetHack-5.0:1.13 $
+ * Copyright (c) Ingo Paschke 2026.
+ * NetHack may be freely redistributed.  See license for details.
+ *
+ * nhmenus.r -- menu resources (MENU, STR#, MNU#) for the
  * Mac 68k port.  Transcribed from the historic NHrsrc.hqx by
  * tools/rsrc_to_rez.py; see macmenu.c for the MNU# format and
  * the STR# keystroke-dispatch convention ('\0xA5' = comment/

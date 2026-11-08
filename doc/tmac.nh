@@ -1,4 +1,6 @@
-.\" $NHDT-Header$
+.\" $NHDT-Header: NetHack 5.0 tmac.nh 2026/05/29_10:27:02 NetHack-5.0:1.13 $
+.\" Copyright (c) Robert Patrick Rankin 2018.
+.\" NetHack may be freely redistributed.  See license for details.
 .
 .\"   Miscellaneous tmac.n-style macros specifically for nethack's Guidebook.
 .\"

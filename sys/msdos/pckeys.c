@@ -1,4 +1,5 @@
 /* $NHDT-Header: NetHack 5.0 pckeys.c 2020/08/03_23:44:30 NetHack-5.0:1.24 $ */
+/* Copyright (c) Michael Allison 2002.                            */
 /* Copyright (c) NetHack PC Development Team 1996                 */
 /* NetHack may be freely redistributed.  See license for details. */
 

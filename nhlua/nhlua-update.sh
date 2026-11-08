@@ -1,4 +1,7 @@
 #!/bin/sh
+# $NHDT-Header: NetHack 5.0 nhlua-update.sh 2026/09/25_13:07:02 NetHack-5.0:1.0 $
+# Copyright (c) Kenneth Lorber, 2026.
+# NetHack may be freely redistributed.  See license for details.
 
 # Update nhlua from a new Lua tar.gz file.
 #

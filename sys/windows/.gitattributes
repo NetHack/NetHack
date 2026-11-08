@@ -1,7 +1,10 @@
 Install.windows NHSUBST
 Makefile.* NHSUBST
+GNUmakefile* NHSUBST
 defaults.nh NHSUBST
-sysconf NHSUBST
+*.template NHSUBST
+*.txt NHSUBST
+*.cmd NHSUBST
 *.rc NHSUBST
 *.bat NHSUBST
 *.def NH_header=no

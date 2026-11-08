@@ -1,4 +1,4 @@
-/* NetHack 5.0	macmap.c	*/
+/* $NHDT-Header: NetHack 5.0 macmap.c 2026/09/30_14:47:34 NetHack-5.0:1.16 $ */
 /* Copyright (c) Ingo Paschke, 2026. */
 /* NetHack may be freely redistributed.  See license for details. */
 /* macmap.c: separate map window for the Mac 68k port. See macmap.h. */

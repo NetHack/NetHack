@@ -1,6 +1,9 @@
-/* xpm2iff_host.c - host-side .xpm -> Amiga BMAP IFF converter.
+/*
+ * $NHDT-Header: NetHack 5.0 xpm2iff_host.c 2026/05/12_13:18:44 NetHack-5.0:1.1 $
  * Copyright (c) 2026 by Ingo Paschke.
  * NetHack may be freely redistributed.  See license for details.
+ *
+ * xpm2iff_host.c - host-side .xpm -> Amiga BMAP IFF converter.
  *
  * Adapted from sys/amiga/xpm2iff.c, Copyright (c) 1995 by Gregg Wonderly.
  * Rewritten for host-side cross-compilation using POSIX file I/O with

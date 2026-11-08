@@ -1,7 +1,8 @@
-#	NetHack Copyright (c) NetHack PC Development Team 1993 - 2006
+# $NHDT-Header: NetHack 5.0 NetHack.cnf 2018/04/25_19:21:52 NetHack-5.0:1.21 $
+#	Copyright (c) Michael Allison 2002.
+#	Copyright (c) NetHack PC Development Team 1993 - 2006
 #	NetHack may be freely redistributed.  See license for details.
 #
-# $NHDT-Header: NetHack 5.0 NetHack.cnf 2018/04/25_19:21:52 NetHack-5.0:1.21 $
 #
 # A '#' at the beginning of a line means the rest of the line is a comment.
 #

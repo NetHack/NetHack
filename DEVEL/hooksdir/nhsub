@@ -534,6 +534,9 @@ sub Date {
 	# in this case, used -f -m and here: f7943a0f6b8facc05fd3b2558aa8529cec0127e6^
     #my $rev = $::revopt . '--' if($::revopt);
     my $rev;
+	# Sometimes we need first entry not author keni
+	# NB: requires git compiled with perl regex
+	#$rev=q/--perl-regexp --author='^((?!nhkeni).*)$'/;
     chomp(my $hash = `git log -1 '--format=format:%H' $rev $::current_file`);
     $now = $^T;
 

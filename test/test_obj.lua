@@ -1,3 +1,6 @@
+-- $NHDT-Header: NetHack 5.0 test_obj.lua 2026/01/27_15:33:08 NetHack-5.0:1.4 $
+-- Copyright (c) Pasi Kallinen 2021.
+-- NetHack may be freely redistributed.  See license for details.
 
 local o = obj.new("rock");
 o:placeobj(u.ux, u.uy);

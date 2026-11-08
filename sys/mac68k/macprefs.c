@@ -1,4 +1,5 @@
-/* NetHack 5.0	macprefs.c	*/
+/* $NHDT-Header: NetHack 5.0 macprefs.c 2026/09/30_14:47:34 NetHack-5.0:1.7 $ */
+/* Copyright (c) Ingo Paschke 2026. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* Preferences dialog: UI settings (map mode, hitpointbar, statuslines,
