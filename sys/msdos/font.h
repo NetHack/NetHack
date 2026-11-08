@@ -1,3 +1,9 @@
+/* 
+ * $NHDT-Header: NetHack 5.0 font.h 2023/04/05_15:49:09 NetHack-5.0:1.1 $
+ * Copyright (c) Michael Allison 2023
+ * NetHack may be freely redistributed.  See license for details.
+ */
+
 /* Maintain a data structure describing a monospaced bitmap font */
 
 #ifndef FONT_H

@@ -1,7 +1,9 @@
 /*
- * bmp2iff_host.c - Convert a BMP to Amiga BMAP IFF.
+ * $NHDT-Header: NetHack 5.0 bmp2iff_host.c 2026/10/01_11:32:39 NetHack-5.0:1.3 $
  * Copyright (c) 2026 by Ingo Paschke.
  * NetHack may be freely redistributed.  See license for details.
+ *
+ * bmp2iff_host.c - Convert a BMP to Amiga BMAP IFF.
  *
  * IFF BMAP format matches sys/amiga/xpm2iff.c by Gregg Wonderly.
  *

@@ -1,4 +1,6 @@
-$NHDT-Header: NetHack 5.0 fixes5-0-1.txt 2026/11/02_21:05:17 NetHack-5.0:1.105 $
+$NHDT-Header: NetHack 5.0 fixes5-0-1.txt 2026/11/06_18:21:11 NetHack-5.0:1.108 $
+Copyright (c) Michael Allison 2026.
+NetHack may be freely redistributed.  See license for details.
 	
 General Fixes and Modified Features
 -----------------------------------
@@ -113,6 +115,7 @@ fix aobjnam buffer overflow when adding a verb
 menu for interactively setting status fields to highlight listed
 	weapons/armor/terrain in the menu display than was used internally;
 	picking one affected the others
+fix #therecmdmenu directional inputs and when used with mouse
 
 
 Platform- and/or Interface-Specific Fixes

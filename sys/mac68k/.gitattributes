@@ -1,2 +1,4 @@
 NHDeflts NHSUBST
+Install.mw NHSUBST
+*.r NHSUBST
 * NH_filestag=(file%s_for_68K_Macintosh_versions)

@@ -1,1 +1,4 @@
 * NH_filestag=(file%s_for_GEM_versions)
+Install.gem NHSUBST
+*.c NHSUBST
+*.h NHSUBST

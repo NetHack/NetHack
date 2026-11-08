@@ -1,0 +1,36 @@
+\{
+foo
+bar
+baz
+\}
+
+
+NOT interpreted in copy mode - above is "foo bar baz"
+
+Any spaces between the condition and the beginning of anything are
+skipped over. The anything can be either a single input line (text,
+macro, or whatever) or a number of input lines. In the multi-line
+case, the first line must begin with a left delimiter \{ and the
+last line must end with a right delimiter \}.
+
+diversion? no, diversion has local state, but anything doesn't
+
+anything should not be read in copy mode, \{ just causes reading across
+ line boundaries, \} terminates the block.
+
+BUT if-el can be nested, so we need some kind of reading stack??????
+
+maybe tokenizer needs to know what the current command is?
+no necessarily: \{ is junk when not in if, so parser COULD collect
+ it as a single token - BUT it needs to know when to skip it and when to
+ re-read it.  TBD
+
+
+
+VERY early on, if \{ then go into loop conting \{ and \} until balanced,
+ return an ANYTHING (all raw characters/tokens - no interpolation).
+ Does not include the leading/trailing \{ \}
+hitting an ANYTHING outside an if/ie/el just inserts the contents of the
+ ANYTHING
+hitting an ANYTHING in an if/ie/el checks the condition and discards or
+ inserts the contents of the ANYTHING

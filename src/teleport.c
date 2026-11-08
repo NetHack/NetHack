@@ -1219,7 +1219,7 @@ level_tele(void)
             } else if (!strcmp(buf, "\033")) { /* cancelled */
                 return;
             }
-            if (wizard && (protolev = find_level(buf)) != 0) {
+            if (wizard && (protolev = find_level_substr(buf)) != 0) {
                 newlevel.dnum = protolev->dlevel.dnum;
                 newlevel.dlevel = protolev->dlevel.dlevel;
                 newlev = depth(&u.uz);

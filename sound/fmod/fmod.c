@@ -1,4 +1,4 @@
-/* fmod.c */
+/* $NHDT-Header: NetHack 5.0 fmod.c 2023/12/08_17:31:49 NetHack-5.0:1.3 $ */
 /* Copyright (c) Taylor Daley, 2023. */
 /* NetHack may be freely redistributed.  See license for details. */
 

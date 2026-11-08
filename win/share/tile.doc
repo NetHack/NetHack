@@ -1,4 +1,6 @@
-$NHDT-Header: NetHack 5.0 tile.doc 2026/06/20_22:55:28 NetHack-5.0:1.13 $
+# $NHDT-Header: NetHack 5.0 tile.doc 2026/06/20_22:55:28 NetHack-5.0:1.14 $
+# Copyright (c) Michael Allison 2021.
+# NetHack may be freely redistributed.  See license for details.
 
 Window ports can optionally make use of the tiles (pictures for NetHack
 symbols) found in this directory.  They are distributed in a text format

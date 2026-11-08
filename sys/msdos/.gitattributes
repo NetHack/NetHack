@@ -2,6 +2,8 @@
 *.bat NHSUBST
 Makefile.* NHSUBST
 Install.* NHSUBST
+*.patch NHSUBST
+sysconf NHSUBST
 moveinit.pat NH_header=no
 vesa.h NH_header=no
 * NH_filestag=(file%s_for_MSDOS_version)

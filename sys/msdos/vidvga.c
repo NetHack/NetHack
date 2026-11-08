@@ -1,4 +1,5 @@
 /* $NHDT-Header: NetHack 5.0 vidvga.c 2020/11/30_19:40:16 NetHack-5.0:1.60 $ */
+/*   Copyright (c) Michael Allison 2002                             */
 /*   Copyright (c) NetHack PC Development Team 1995                 */
 /*   NetHack may be freely redistributed.  See license for details. */
 /*

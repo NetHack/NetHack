@@ -1,4 +1,5 @@
 /* $NHDT-Header: NetHack 5.0 tile2bmp.c 2026/07/30_00:47:50 NetHack-5.0:1.56 $ */
+/*   Copyright (c) Michael Allison 2002.                            */
 /*   Copyright (c) NetHack PC Development Team 1995                 */
 /*   NetHack may be freely redistributed.  See license for details. */
 

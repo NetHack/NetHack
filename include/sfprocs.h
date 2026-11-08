@@ -1,4 +1,5 @@
-/* NetHack 3.6 sfprocs.h	Tue Nov  6 19:38:48 2018 */
+/* $NHDT-Header: NetHack 5.0 sfprocs.h 2026/05/27_20:14:20 NetHack-5.0:1.4 $ */
+/* Copyright (c) Michael Allison 2026. */
 /* Copyright (c) NetHack Development Team 2025.                   */
 /* NetHack may be freely redistributed.  See license for details. */
 

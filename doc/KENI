@@ -1,0 +1,1 @@
+make Guidebook.dated.mn ; cat Guidebook.dated.mn | ../util/makedefs --grep --input - --output - | tbl tmac.n - | groff -Tpdf > Guidebook.pdf

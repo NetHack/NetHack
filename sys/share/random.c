@@ -33,7 +33,7 @@
  *      - cast result of pointer subtraction to long since ptrdiff_t could
  *      be bigger than that and trigger warnings when assigning to long
  *
- * $NHDT-Header
+ * $NHDT-Header: NetHack 5.0 random.c 2024/02/29_04:15:56 NetHack-5.0:1.17 $
  */
 
 #include "hack.h"

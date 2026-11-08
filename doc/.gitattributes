@@ -2,11 +2,13 @@
 *.tex	NHSUBST
 *.6	NHSUBST
 *.7	NHSUBST
+sound.txt	NHSUBST
+window.txt	NHSUBST
 fixes*	NHSUBST
 config.nh NHSUBST
 Guidebook.txt NH_header=no
 tmac.n NH_header=no
-tmac.nh NUSUBST
+tmac.nh NHSUBST
 fixes* NH_header=no
 *.txt NH_header=no
 * NH_filestag=(file%s_for_all_versions)

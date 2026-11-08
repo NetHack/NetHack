@@ -306,6 +306,25 @@ find_level(const char *s)
     return curr;
 }
 
+/* like find_level, but match partial file proto name,
+   eg. finds quest levels easier */
+s_level *
+find_level_substr(const char *s)
+{
+    s_level *curr = NULL;
+
+    if ((curr = find_level(s)) != 0) {
+        return curr;
+    } else {
+        char qbuf[QBUFSZ];
+
+        Snprintf(qbuf, sizeof qbuf, "%s-%s", gu.urole.filecode, s);
+        if ((curr = find_level(qbuf)) != 0)
+            return curr;
+    }
+    return NULL;
+}
+
 /* Find the branch that links the named dungeon. */
 staticfn int
 find_branch(

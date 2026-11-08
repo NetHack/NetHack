@@ -534,6 +534,9 @@ sub Date {
 	# in this case, used -f -m and here: f7943a0f6b8facc05fd3b2558aa8529cec0127e6^
     #my $rev = $::revopt . '--' if($::revopt);
     my $rev;
+	# Sometimes we need first entry not author keni
+	# NB: requires git compiled with perl regex
+	#$rev=q/--perl-regexp --author='^((?!nhkeni).*)$'/;
     chomp(my $hash = `git log -1 '--format=format:%H' $rev $::current_file`);
     $now = $^T;
 
@@ -546,7 +549,8 @@ sub Date {
 	}
     } elsif($opt{m}) {
 	    #author keni <keni@his.com> 1429884677 -0400
-	chomp($now = `git cat-file -p $hash | awk '/author/{print \$4}'`);
+	    #author Patric Mueller <bhaak@gmx.net> 1791023129 +0200
+	chomp($now = `git show --no-patch --format=%ct $hash`);
     }
 
     my $fmt = length $val ? $val : "%Y/%m/%d_%H:%M:%S";

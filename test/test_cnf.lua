@@ -1,3 +1,6 @@
+-- $NHDT-Header: NetHack 5.0 test_cnf.lua 2021/02/13_09:51:25 NetHack-5.0:1.2 $
+-- Copyright (c) Pasi Kallinen 2021.
+-- NetHack may be freely redistributed.  See license for details.
 
 local configtests = {
  { test = "OPTIONS=color",  -- config string to parse

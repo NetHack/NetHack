@@ -1,3 +1,9 @@
+/*
+ * $NHDT-Header: NetHack 5.0 colorwin.c 2026/09/30_14:47:34 NetHack-5.0:1.5 $
+ * Copyright (c) Ingo Paschke 2026.
+ * NetHack may be freely redistributed.  See license for details.
+ */
+
 SHORT Col_BorderVectors1[] = { 0, 0, 59, 0, 59, 12, 0, 12, 0, 0 };
 struct Border Col_Border1 = {
     -1, -1,             /* XY origin relative to container TopLeft */

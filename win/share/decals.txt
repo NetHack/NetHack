@@ -1,3 +1,7 @@
+# $NHDT-Header: NetHack 5.0 decals.txt 2026/07/30_00:47:50 NetHack-5.0:1.0 $
+# Copyright (c) Michael Allison 2026.
+# NetHack may be freely redistributed.  See license for details.
+#
 # decals.txt - definitions for 'decals'
 # to merge over top of another tile
 #

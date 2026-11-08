@@ -1,3 +1,4 @@
+// $NHDT-Header: NetHack 5.0 qt_main.h 2023/04/06_08:56:08 NetHack-5.0:1.15 $
 // Copyright (c) Warwick Allison, 1999.
 // Qt4 conversion copyright (c) Ray Chason, 2012-2014.
 // NetHack may be freely redistributed.  See license for details.

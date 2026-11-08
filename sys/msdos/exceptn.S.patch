@@ -1,3 +1,7 @@
+# $NHDT-Header: NetHack 5.0 exceptn.S.patch 2022/06/21_07:15:25 NetHack-5.0:1.0 $
+# Copyright (c) Michael Allison 2022.
+# NetHack may be freely redistributed.  See license for details.
+
 source https://www.vogons.org/viewtopic.php?f=61&t=71459
 --- orig/src/libc/go32/exceptn.S        2002-12-21 21:08:39.000000000 -0800
 +++ ./src/libc/go32/exceptn.S 2020-01-18 18:37:27.397176800 -0800

@@ -1,3 +1,6 @@
+-- $NHDT-Header: NetHack 5.0 test_des.lua 2026/01/26_16:00:33 NetHack-5.0:1.27 $
+-- Copyright (c) Pasi Kallinen 2021.
+-- NetHack may be freely redistributed.  See license for details.
 
 -- Test the des-file commands
 -- reset_level is only needed here, not in normal special level scripts.

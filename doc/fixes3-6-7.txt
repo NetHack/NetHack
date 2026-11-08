@@ -1,4 +1,6 @@
 $NHDT-Header: NetHack 5.0 fixes3-6-7.txt 2026/04/28_20:59:54 NetHack-5.0:1.4 $
+Copyright (c) Robert Patrick Rankin 2023.
+NetHack may be freely redistributed.  See license for details.
 
 fixes36.7 contains a summary of changes made to 3.6.6 in order to
 produce 3.6.7 as well as any post-release fixes in binaries.

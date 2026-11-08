@@ -1,3 +1,9 @@
+/*
+ * $NHDT-Header: NetHack 5.0 Files.r 2026/09/30_14:47:34 NetHack-5.0:1.6 $
+ * Copyright (c) Ingo Paschke 2026.
+ * NetHack may be freely redistributed.  See license for details.
+ */
+
 #include <MacTypes.r>
 #include "date.h"
 #include "patchlevel.h"

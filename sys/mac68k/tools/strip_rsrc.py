@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# $NHDT-Header: NetHack 5.0 strip_rsrc.py 2026/09/30_14:47:34 NetHack-5.0:1.1 $
+# Copyright (c) Ingo Paschke 2026.
+# NetHack may be freely redistributed.  See license for details.
 """Remove all resources of the given type(s) from a Mac resource fork.
 
 The output file is rebuilt from scratch (data area, map, type list,

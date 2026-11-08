@@ -1,4 +1,4 @@
-:$NHDT-Header$
+:$NHDT-Header: NetHack 5.0 fetch.cmd 2026/09/25_21:05:38 NetHack-5.0:1.5 $
 :Copyright (c) Michael Allison, 2024
 :NetHack may be freely redistributed.  See license for details.
 

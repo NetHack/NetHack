@@ -1,4 +1,4 @@
-/* macsound.m */
+/* $NHDT-Header: NetHack 5.0 macsound.m 2023/03/03_01:30:05 NetHack-5.0:1.18 $ */
 /* Copyright Michael Allison, 2023 */
 /* NetHack may be freely redistributed.  See license for details. */
 

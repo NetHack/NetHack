@@ -1,4 +1,9 @@
-/* nhtitle.r -- 'PICT' 6201: the NETHACK sword title from the
+/*
+ * $NHDT-Header: NetHack 5.0 nhtitle.r 2026/09/30_14:47:34 NetHack-5.0:1.2 $
+ * Copyright (c) Ingo Paschke 2026.
+ * NetHack may be freely redistributed.  See license for details.
+ *
+ *nhtitle.r -- 'PICT' 6201: the NETHACK sword title from the
  * Atari/GEM port (win/gem/title.uu), for the About dialog
  * (macmenu.c).  Straight crop of the title artwork with the original
  * background kept as-is, 2x nearest-neighbor upscale, 8-bit PICT v2

@@ -1,3 +1,6 @@
+-- $NHDT-Header: NetHack 5.0 test_sel.lua 2026/01/25_13:18:51 NetHack-5.0:1.23 $
+-- Copyright (c) Pasi Kallinen 2019.
+-- NetHack may be freely redistributed.  See license for details.
 
 -- Test the selection
 

@@ -1,4 +1,6 @@
-$NHDT-Header$
+$NHDT-Header: NetHack 5.0 sound.txt 2026/06/20_22:55:28 NetHack-5.0:1.15 $
+Copyright (c) Michael Allison, 2023.
+NetHack may be freely redistributed.  See license for details.
 
 Introduction
 

@@ -1,4 +1,10 @@
-/* nhmapwind.r: WIND resources for the dedicated map window.
+/*
+ * $NHDT-Header: NetHack 5.0 nhmapwind.r 2026/09/30_14:47:34 NetHack-5.0:1.3 $
+ * Copyright (c) Ingo Paschke 2026.
+ * NetHack may be freely redistributed.  See license for details.
+ *
+ * nhmapwind.r: WIND resources for the dedicated map window.
+ *
  * 200 = documentProc (resizable, for Quadra+ / large screens, small_screen=false).
  * 201 = plainDBox    (borderless, fixed, for SE/30 screens,  small_screen=true).
  *

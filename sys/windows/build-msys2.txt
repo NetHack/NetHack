@@ -1,4 +1,4 @@
-$NHDT-Header$
+$NHDT-Header: NetHack 5.0 build-msys2.txt 2026/09/30_15:33:28 NetHack-5.0:1.9 $
 Copyright (c) Michael Allison, 2024
 NetHack may be freely redistributed.  See license for details.
 

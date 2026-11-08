@@ -1,4 +1,4 @@
-/* macuuid.m */
+/* $NHDT-Header: NetHack 5.0 macuuid.m 2026/04/30_13:27:50 NetHack-5.0:1.3 $ */
 /* Copyright Michael Allison, 2023 */
 /* NetHack may be freely redistributed.  See license for details. */
 

@@ -3972,7 +3972,8 @@ getdir(const char *s)
     if (cmdq) {
         if (cmdq->typ == CMDQ_DIR) {
             if (!cmdq->dirz) {
-                dirsym = gc.Cmd.dirchars[xytodir(cmdq->dirx, cmdq->diry)];
+                dirsym = gc.Cmd.dirchars[xytodir(sgn(cmdq->dirx),
+                                                 sgn(cmdq->diry))];
             } else {
                 dirsym = gc.Cmd.dirchars[(cmdq->dirz > 0) ? DIR_DOWN
                                                           : DIR_UP];
@@ -4355,8 +4356,6 @@ dotherecmdmenu(void)
     coordxy x = gc.clicklook_cc.x;
     coordxy y = gc.clicklook_cc.y;
 
-    iflags.getdir_click = CLICK_1 | CLICK_2; /* allow 'far' click */
-
     if (isok(x, y)) {
         if (x == u.ux && y == u.uy)
             ch = here_cmd_menu();
@@ -4367,6 +4366,7 @@ dotherecmdmenu(void)
         return (ch && ch != '\033') ? ECMD_TIME : ECMD_OK;
     }
 
+    iflags.getdir_click = CLICK_1 | CLICK_2; /* allow 'far' click in getdir */
     dir = getdir((const char *) 0);
     click = iflags.getdir_click;
     iflags.getdir_click = 0;
@@ -4943,8 +4943,10 @@ click_to_cmd(coordxy x, coordxy y, int mod)
     gc.clicklook_cc.x = x;
     gc.clicklook_cc.y = y;
 
-    if (gc.Cmd.mousebtn[mod-1])
+    if (gc.Cmd.mousebtn[mod-1]) {
         cmdq_add_ec(CQ_CANNED, gc.Cmd.mousebtn[mod-1]->ef_funct);
+        iflags.getdir_click = mod;
+    }
 }
 
 staticfn int

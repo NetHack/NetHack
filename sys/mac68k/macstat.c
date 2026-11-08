@@ -1,4 +1,5 @@
-/* NetHack 5.0	macstat.c	*/
+/* $NHDT-Header: NetHack 5.0 macstat.c 2026/09/30_14:47:34 NetHack-5.0:1.9 $ */
+/* Copyright (c) Ingo Paschke 2026. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* Native status renderer: draws the two styled status lines into the

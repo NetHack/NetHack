@@ -1,4 +1,6 @@
 /* CC0 (Public domain) - see http://creativecommons.org/publicdomain/zero/1.0/ for details */
+/* $NHDT-Header: NetHack 5.0 isaac64.h 2024/09/06_20:08:07 NetHack-5.0:1.3 $ */
+
 #if !defined(_isaac64_H)
 # define _isaac64_H (1)
 

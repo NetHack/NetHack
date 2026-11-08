@@ -1,3 +1,7 @@
+# $NHDT-Header: NetHack 5.0 nethack.cnf 2026/10/01_11:32:39 NetHack-5.0:1.6 $
+# Copyright (c) Ingo Paschke 2026.
+# NetHack may be freely redistributed.  See license for details.
+
 # NetHack 5.0 - Atari ST/TT/Falcon Configuration
 #
 # Directory paths (relative to the game directory)

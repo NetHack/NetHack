@@ -1,3 +1,6 @@
+-- $NHDT-Header: NetHack 5.0 testmove.lua 2026/01/28_08:06:58 NetHack-5.0:1.11 $
+-- Copyright (c) Pasi Kallinen 2021.
+-- NetHack may be freely redistributed.  See license for details.
 
 -- Tests for moving the hero
 

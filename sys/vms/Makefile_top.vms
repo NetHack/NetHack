@@ -1,4 +1,4 @@
-# $NHDT-Header$
+# $NHDT-Header: NetHack 5.0 Makefile_top.vms 2026/10/10_01:09:44 NetHack-5.0:1.11 $
 # Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
 
@@ -22,7 +22,7 @@ NHSROOT=[]
 # MAKE = make
 
 
-# NetHack 5.0 Makefile.vms $NHDT-Date: 1654287121 2022/06/03 20:12:01 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.145 $
+# NetHack 5.0 Makefile.vms $NHDT-Date: 2026/10/10_01:09:44 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.11 $
 # Copyright (c) 2023 by Michael Allison
 # NetHack may be freely redistributed.  See license for details.
 #

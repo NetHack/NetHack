@@ -1,3 +1,7 @@
+# $NHDT-Header: NetHack 5.0 README_NHLUA 2026/09/25_21:05:38 NetHack-5.0:1.0 $
+# Copyright (c) Kenneth Lorber, 2026.
+# NetHack may be freely redistributed.  See license for details.
+
 WHAT'S HERE
     README_NHLUA    this file
     nhlua          The NetHack source tree for Lua.

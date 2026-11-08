@@ -1,4 +1,4 @@
-Makefile.* NHSUBST
+Makefile* NHSUBST
 *.com NHSUBST
 Install.vms NHSUBST
 Install*.vms NHSUBST
