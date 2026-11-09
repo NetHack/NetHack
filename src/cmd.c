@@ -2361,6 +2361,7 @@ handler_rebind_keys_add(boolean keyfirst)
     destroy_nhwindow(win);
     if (npick > 0) {
         struct Cmd_bind *prevcmd;
+        const struct ext_func_tab *prevec;
 
         i = picks->item.a_int;
         free((genericptr_t) picks);
@@ -2396,12 +2397,14 @@ handler_rebind_keys_add(boolean keyfirst)
         }
 
         prevcmd = cmdbind_get(key);
+        /* binding "nothing" frees prevcmd, so note its command first */
+        prevec = prevcmd ? prevcmd->cmd : (const struct ext_func_tab *) 0;
 
         if (bind_key(key, cmdstr, TRUE)) {
-            if (prevcmd && prevcmd->cmd != ec) {
+            if (prevec && prevec != ec) {
                 pline("Changed key '%s' from \"%s\" to \"%s\".",
-                      key2txt(key, buf2), prevcmd->cmd->ef_txt, cmdstr);
-            } else if (!prevcmd) {
+                      key2txt(key, buf2), prevec->ef_txt, cmdstr);
+            } else if (!prevec) {
                 pline("Bound key '%s' to \"%s\".",
                       key2txt(key, buf2), cmdstr);
             }
