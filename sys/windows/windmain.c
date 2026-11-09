@@ -225,6 +225,9 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
 
     program_state.early_options = 1;
 
+#ifdef WIN32CON
+    rcfile_only_this_option(opt_windowsterminal);
+#endif
 #if !defined(MSWIN_GRAPHICS)
     nethack_enter_consoletty();
     consoletty_open(1);

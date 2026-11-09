@@ -496,6 +496,11 @@ struct instance_flags {
     boolean wiz_error_flag;     /* flag for tracking failed wizmode auth */
     boolean explore_error_flag; /* ditto for explore mode */
     boolean obsolete;  /* obsolete options can point at this, it isn't used */
+#ifdef WIN32
+#ifdef WIN32CON
+    boolean windowsterminal;
+#endif
+#endif
 };
 
 /*

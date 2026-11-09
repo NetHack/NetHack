@@ -1034,6 +1034,10 @@ do_symset(boolean rogueflag)
             if (sl->handling == H_UTF8)
                 continue;
 #endif
+#ifdef WIN32CON
+            if ((sl->handling == H_UTF8) && !WindowsTerminalActive())
+                continue;
+#endif
             setcount++;
             /* find biggest name */
             thissize = sl->name ? (int) strlen(sl->name) : 0;
@@ -1070,6 +1074,10 @@ do_symset(boolean rogueflag)
 #endif
 #ifndef ENHANCED_SYMBOLS
             if (sl->handling == H_UTF8)
+                continue;
+#endif
+#ifdef WIN32CON
+            if ((sl->handling == H_UTF8) && !WindowsTerminalActive())
                 continue;
 #endif
             if (sl->name) {

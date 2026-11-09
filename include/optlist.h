@@ -898,6 +898,13 @@ static int optfn_##a(int, int, boolean, char *, char *);
                 No, Yes, Yes, No, NoAlias,
                 "the foreground/background colors of windows")
  /* NHOPTC(windowtype) -- moved to top */
+#ifdef WIN32
+#ifdef WIN32CON
+    NHOPTB(windowsterminal, Advanced, 0, opt_out, set_in_config,
+           On, Yes, No, No, NoAlias, &iflags.windowsterminal, Term_False,
+           (char *)0)
+#endif
+#endif
     NHOPTB(wizmgender, Advanced, 0, opt_in, set_wizonly,
            Off, Yes, No, No, NoAlias, &iflags.wizmgender, Term_False,
            (char *)0)

@@ -2033,7 +2033,8 @@ extern int dosuspend(void);
 extern void nt_regularize(char *);
 extern int(*nt_kbhit)(void);
 extern void Delay(int);
-boolean get_user_home_folder(char *, size_t);
+extern boolean get_user_home_folder(char *, size_t);
+extern boolean WindowsTerminalActive(void);
 # ifdef CRASHREPORT
 struct CRctxt;
 extern struct CRctxt *ctxp;
@@ -2205,6 +2206,7 @@ extern void tty_ibmgraphics_fixup(void);
 #ifdef WIN32CON
 extern const char *win32con_topl_fixup(const char *);
 #endif
+extern boolean wincon_WindowsTerminalActive(void);
 #endif /* WIN32 */
 
 /* ### o_init.c ### */
