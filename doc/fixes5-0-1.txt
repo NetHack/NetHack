@@ -116,6 +116,7 @@ menu for interactively setting status fields to highlight listed
 	weapons/armor/terrain in the menu display than was used internally;
 	picking one affected the others
 fix #therecmdmenu directional inputs and when used with mouse
+zombifying corpses are considered completely rotten when eaten
 
 
 Platform- and/or Interface-Specific Fixes
