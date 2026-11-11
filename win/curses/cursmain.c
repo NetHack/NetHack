@@ -1086,7 +1086,15 @@ int nh_poskey(coordxy *x, coordxy *y, int *mod)
 int
 curses_nh_poskey(coordxy *x, coordxy *y, int *mod)
 {
-    int key = curses_nhgetch();
+    int key = 0;
+
+    if (!activemenu)
+        curses_prehousekeeping();
+
+    key = curses_read_poskey();
+
+    if (!activemenu)
+        curses_posthousekeeping();
 
 #ifdef NCURSES_MOUSE_VERSION
     /* Mouse event if mouse_support is true */

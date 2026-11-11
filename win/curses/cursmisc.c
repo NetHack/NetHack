@@ -27,6 +27,7 @@ static boolean modifiers_available = FALSE;
 static int modified(int ch);
 static void update_modifiers(void);
 static int parse_escape_sequence(int, boolean *);
+static int curses_read_char_internal(boolean);
 
 #define SS3 M(C('O')) /* 8-bit escape sequence initiator for VT number pad */
 
@@ -65,9 +66,9 @@ curses_getch(void)
     return ch;
 }
 
-/* Read a character of input from the user */
-int
-curses_read_char(void)
+/* Read a character of input, or a mouse event */
+static int
+curses_read_char_internal(boolean allow_mouse)
 {
     int ch;
 
@@ -75,18 +76,39 @@ curses_read_char(void)
     curses_got_input();
 
     ch = curses_getch();
+#ifdef NCURSES_MOUSE_VERSION
+    if (!allow_mouse || ch != KEY_MOUSE) {
+        ch = curses_convert_keys(ch);
+    }
+#else
     ch = curses_convert_keys(ch);
+#endif
 
     if (ch == 0) {
         ch = '\033'; /* map NUL to ESC since nethack doesn't expect NUL */
     }
 
-    if (counting && !isdigit(ch)) { /* dismiss count window if necessary */
+    /* dismiss count window if necessary */
+    if (counting && (ch > 255 || !isdigit(ch))) {
         curses_count_window(NULL);
         curses_refresh_nethack_windows();
     }
 
     return ch;
+}
+
+/* Read a character of input from the user */
+int
+curses_read_char(void)
+{
+    return curses_read_char_internal(FALSE);
+}
+
+/* Read a key or a position input from the user */
+int
+curses_read_poskey(void)
+{
+    return curses_read_char_internal(TRUE);
 }
 
 boolean

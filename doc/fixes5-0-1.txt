@@ -195,6 +195,8 @@ curses on Windows: some early data is alloc'd for the windows console
 curses on Windows: dialogs pertaining to the need for self-recover
 	were not visible and therefore the player had no idea that
 	answers were expected or why
+curses: mouse clicks were ignored because the key code for mouse events
+	was rejected as being outside the normal character range
 gcc-16: tiletext.c [-Wdiscarded-qualifiers] warning suppression
 libnh: update get_nhuuid() for libnhmain
 libnh: sys/libnh/libnhmain.c: drop `static` on `whoami()`
