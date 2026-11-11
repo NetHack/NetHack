@@ -996,6 +996,7 @@ curses_get_mouse(coordxy *mousex, coordxy *mousey, int *mod)
 
 #ifdef NCURSES_MOUSE_VERSION
     MEVENT event;
+    int sx, sy, ex, ey;
 
     if (getmouse(&event) == OK) { /* True if user has clicked */
         if ((event.bstate & MOUSEBUTTONS) != 0) {
@@ -1018,6 +1019,11 @@ curses_get_mouse(coordxy *mousex, coordxy *mousey, int *mod)
                     (*mousex)--;
                     (*mousey)--;
                 }
+
+                /* Account for scroll offset */
+                (void) curses_map_borders(&sx, &sy, &ex, &ey, -1, -1);
+                *mousex += sx;
+                *mousey += sy;
 
                 *mod = ((event.bstate & (BUTTON1_CLICKED | BUTTON_CTRL))
                         == BUTTON1_CLICKED) ? CLICK_1 : CLICK_2;

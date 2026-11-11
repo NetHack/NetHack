@@ -197,6 +197,7 @@ curses on Windows: dialogs pertaining to the need for self-recover
 	answers were expected or why
 curses: mouse clicks were ignored because the key code for mouse events
 	was rejected as being outside the normal character range
+curses: mouse clicks on a scrolled map were reported at the wrong position
 gcc-16: tiletext.c [-Wdiscarded-qualifiers] warning suppression
 libnh: update get_nhuuid() for libnhmain
 libnh: sys/libnh/libnhmain.c: drop `static` on `whoami()`
