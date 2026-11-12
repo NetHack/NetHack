@@ -2075,9 +2075,12 @@ nethack_enter_consoletty(void)
                   GetWindowLong(console.hWnd, GWL_STYLE)
                      & ~WS_MAXIMIZEBOX & ~WS_SIZEBOX);
 #endif
-    if (iflags.windowsterminal && confirm_windows_terminal()) {
+    if ((iflags.wt_how == wt_not_in_config_at_all)
+        /* the default is WindowsTerminal now */
+        || (iflags.wt_how == wt_in_config_not_negated)) {
         console.WindowsTerminal = TRUE;
-    } else {
+    } else if ((iflags.wt_how == wt_in_config_negated)
+               || !confirm_windows_terminal()) {
         console.WindowsTerminal = FALSE;
     }
     console.ConsoleAPI = !console.WindowsTerminal;
