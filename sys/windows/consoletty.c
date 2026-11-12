@@ -421,7 +421,7 @@ void
 emit_hide_cursor(void)
 {
     static const char escseq[] = "\x1b[?25l";
-    static size_t sz = sizeof escseq - 1;
+    static const size_t sz = sizeof escseq - 1;
 
     buffer_write_wt((uint8_t *) escseq, sz);
 }
@@ -430,7 +430,7 @@ void
 emit_show_cursor(void)
 {
     static const char escseq[] = "\x1b[?25h";
-    static size_t sz = sizeof escseq - 1;
+    static const size_t sz = sizeof escseq - 1;
 
     buffer_write_wt((uint8_t *) escseq, sz);
 }
@@ -439,7 +439,7 @@ void
 emit_start_bold(void)
 {
     static const char escseq[] = "\x1b[1m";
-    static size_t sz = sizeof escseq - 1;
+    static const size_t sz = sizeof escseq - 1;
 
     buffer_write_wt((uint8_t *) escseq, sz);
 }
@@ -448,7 +448,7 @@ void
 emit_stop_bold(void)
 {
     static const char escseq[] = "\x1b[24m";
-    static size_t sz = sizeof escseq - 1;
+    static const size_t sz = sizeof escseq - 1;
 
     buffer_write_wt((uint8_t *) escseq, sz);
 }
@@ -457,7 +457,7 @@ void
 emit_start_dim(void)
 {
     static const char escseq[] = "\x1b[4m";
-    static size_t sz = sizeof escseq - 1;
+    static const size_t sz = sizeof escseq - 1;
 
     buffer_write_wt((uint8_t *) escseq, sz); 
 }
@@ -466,7 +466,7 @@ void
 emit_stop_dim(void)
 {
     static const char escseq[] = "\x1b[24m";
-    static size_t sz = sizeof escseq - 1;
+    static const size_t sz = sizeof escseq - 1;
 
     buffer_write_wt((uint8_t *) escseq, sz); 
 }
@@ -475,7 +475,7 @@ void
 emit_start_blink(void)
 {
     static const char escseq[] = "\x1b[5m";
-    static size_t sz = sizeof escseq - 1;
+    static const size_t sz = sizeof escseq - 1;
 
     buffer_write_wt((uint8_t *) escseq, sz);
 }
@@ -484,7 +484,7 @@ void
 emit_stop_blink(void)
 {
     static const char escseq[] = "\x1b[25m";
-    static size_t sz = sizeof escseq - 1;
+    static const size_t sz = sizeof escseq - 1;
 
     buffer_write_wt((uint8_t *) escseq, sz);
 }
@@ -493,7 +493,7 @@ void
 emit_start_underline(void)
 {
     static const char escseq[] = "\x1b[4m";
-    static size_t sz = sizeof escseq - 1;
+    static const size_t sz = sizeof escseq - 1;
 
     buffer_write_wt((uint8_t *) escseq, sz);
 }
@@ -502,7 +502,7 @@ void
 emit_stop_underline(void)
 {
     static const char escseq[] = "\x1b[24m";
-    static size_t sz = sizeof escseq - 1;
+    static const size_t sz = sizeof escseq - 1;
 
     buffer_write_wt((uint8_t *) escseq, sz);
 }
@@ -510,7 +510,7 @@ void
 emit_start_inverse(void)
 {
     static const char escseq[] = "\x1b[7m";
-    static size_t sz = sizeof escseq - 1;
+    static const size_t sz = sizeof escseq - 1;
 
     buffer_write_wt((uint8_t *) escseq, sz);
 }
@@ -519,7 +519,7 @@ void
 emit_stop_inverse(void)
 {
     static const char escseq[] = "\x1b[27m";
-    static size_t sz = sizeof escseq - 1;
+    static const size_t sz = sizeof escseq - 1;
 
     buffer_write_wt((uint8_t *) escseq, sz);
 }
@@ -554,7 +554,7 @@ void
 emit_default_color(void)
 {
     static char escseq[] = "\x1b[39m";
-    static size_t sz = sizeof escseq - 1;
+    static const size_t sz = sizeof escseq - 1;
 
     buffer_write_wt((uint8_t *) escseq, sz);
 }
@@ -562,7 +562,7 @@ void
 emit_return_to_default(void)
 {
     static char escseq[] = "\x1b[0m";
-    static size_t sz = sizeof escseq - 1;
+    static const size_t sz = sizeof escseq - 1;
 
     buffer_write_wt((uint8_t *) escseq, sz);
 }
@@ -605,7 +605,7 @@ void
 emit_cursor_left(void)
 {
     static char escseq[] = "\x1b[D";
-    static size_t sz = sizeof escseq - 1;
+    static const size_t sz = sizeof escseq - 1;
 
     buffer_write_wt((uint8_t *) escseq, sz);
 }
@@ -636,7 +636,7 @@ void
 emit_cursor_right(void)
 {
     static char escseq[] = "\x1b[C";
-    static size_t sz = sizeof escseq - 1;
+    static const size_t sz = sizeof escseq - 1;
 
     buffer_write_wt((uint8_t *) escseq, sz);
 }
@@ -645,10 +645,10 @@ void
 emit_cursor_goto(int x, int y)
 {
     static char escseq[] = "\x1b[%d;%dH";
-    static char buf[15];
+    static char buf[20];
     size_t sz;
 
-    sz = sprintf(buf, escseq, y, x);
+    sz = sprintf(buf, escseq, y + 1, x + 1);
     buffer_write_wt((uint8_t *) buf, sz);
 }
 
@@ -656,7 +656,7 @@ void
 emit_clear_screen(void)
 {
     static const char escseq[] = "\x1b[2J";
-    static size_t sz = sizeof escseq - 1;
+    static const size_t sz = sizeof escseq - 1;
 
     buffer_write_wt((uint8_t *) escseq, sz);
 }
@@ -665,7 +665,7 @@ void
 emit_home(void)
 {
     static const char escseq[] = "\x1b[H";
-    static size_t sz = sizeof escseq - 1;
+    static const size_t sz = sizeof escseq - 1;
 
     buffer_write_wt((uint8_t *) escseq, sz);
 }
@@ -674,7 +674,7 @@ void
 emit_clear_to_eol(void)
 {
     static const char escseq[] = "\x1b[K";
-    static size_t sz = sizeof escseq - 1;
+    static const size_t sz = sizeof escseq - 1;
 
     buffer_write_wt((uint8_t *) escseq, sz);
 }
@@ -682,7 +682,7 @@ void
 emit_TE(void)
 {
     static char escseq[] = "\x1b[?1049l";
-    static size_t sz = sizeof escseq - 1;
+    static const size_t sz = sizeof escseq - 1;
 
     buffer_write_wt((uint8_t *) escseq, sz);
 }
@@ -691,7 +691,7 @@ void
 emit_VE(void)
 {
     static char escseq[] = "\x1b[?25h";
-    static size_t sz = sizeof escseq - 1;
+    static const size_t sz = sizeof escseq - 1;
 
     buffer_write_wt((uint8_t *) escseq, sz);
 }
@@ -699,7 +699,7 @@ void
 emit_KS(void)
 {
     static char escseq[] = "\x1b[?1h";
-    static size_t sz = sizeof escseq - 1;
+    static const size_t sz = sizeof escseq - 1;
 
     buffer_write_wt((uint8_t *) escseq, sz);
 }
@@ -708,7 +708,7 @@ void
 emit_KE(void)
 {
     static char escseq[] = "\x1b[?1l";
-    static size_t sz = sizeof escseq - 1;
+    static const size_t sz = sizeof escseq - 1;
 
     buffer_write_wt((uint8_t *) escseq, sz);
 }
@@ -717,7 +717,7 @@ void
 emit_TI(void)
 {
     static char escseq[] = "\x1b[?1049h";
-    static size_t sz = sizeof escseq - 1;
+    static const size_t sz = sizeof escseq - 1;
 
     buffer_write_wt((uint8_t *) escseq, sz);
 }
@@ -726,7 +726,7 @@ void
 emit_VS(void)
 {
     static char escseq[] = "\x1b[?12;25h";
-    static size_t sz = sizeof escseq - 1;
+    static const size_t sz = sizeof escseq - 1;
 
     buffer_write_wt((uint8_t *) escseq, sz);
 }
@@ -735,7 +735,7 @@ void
 emit_AS(void)
 {
     static char escseq[] = "\x1b[11m";
-    static size_t sz = sizeof escseq - 1;
+    static const size_t sz = sizeof escseq - 1;
 
     buffer_write_wt((uint8_t *) escseq, sz);
 }
@@ -744,7 +744,7 @@ void
 emit_AE(void)
 {
     static char escseq[] = "\x1b[10m";
-    static size_t sz = sizeof escseq - 1;
+    static const size_t sz = sizeof escseq - 1;
 
     buffer_write_wt((uint8_t *) escseq, sz);
 }
@@ -753,7 +753,7 @@ void
 emit_HE(void)
 {
     static char escseq[] = "\x1b[0m";
-    static size_t sz = sizeof escseq - 1;
+    static const size_t sz = sizeof escseq - 1;
 
     buffer_write_wt((uint8_t *) escseq, sz);
 }
@@ -762,7 +762,7 @@ void
 emit_ND(void)
 {
     static char escseq[] = "\x1b[C";
-    static size_t sz = sizeof escseq - 1;
+    static const size_t sz = sizeof escseq - 1;
 
     buffer_write_wt((uint8_t *) escseq, sz);
 }
@@ -771,7 +771,7 @@ void
 emit_ts(void)
 {
     static char escseq[] = "\x1b]0";
-    static size_t sz = sizeof escseq - 1;
+    static const size_t sz = sizeof escseq - 1;
 
     buffer_write_wt((uint8_t *) escseq, sz);
 }
@@ -1318,7 +1318,7 @@ cl_eos(void)
 {
     if (console.WindowsTerminal) {
         static const char escseq[] = "\x1b[J";
-        static size_t sz = sizeof escseq - 1;
+        static const size_t sz = sizeof escseq - 1;
 
         buffer_write_wt((uint8_t *) escseq, sz);
     } else {
@@ -1608,7 +1608,7 @@ void
 term_end_extracolor(void)
 {
     static char escseq[] = "\x1b[0m";
-    static size_t sz = sizeof escseq;
+    static const size_t sz = sizeof escseq;
 
     buffer_write_wt((uint8_t *) escseq, sz);
 }
@@ -2374,11 +2374,14 @@ DISABLE_WARNING_FORMAT_NONLITERAL
 static void 
 set_console_cursor(int x, int y)
 {
+
     if (console.WindowsTerminal) {
         static const char escseq[] = "\x1b[%d;%dH";
         char tmp[11];
         size_t sz = sizeof tmp - 1;
 
+        nhassert(x <= 999);
+        nhassert(y <= 999);
         tmp[0] = '\0';
         if (y < 1000 && y >= 0 && x < 1000 && x >= 0) {
             sz = sprintf(tmp, escseq, y, x);
@@ -2441,7 +2444,7 @@ raw_clear_screen(void)
 {
     if (console.WindowsTerminal) {
         static const char escseq[] = "\x1b[2J\x1b[H";
-        static size_t sz = sizeof escseq - 1;
+        static const size_t sz = sizeof escseq - 1;
 
         buffer_write_wt((uint8_t *) escseq, sz); 
     } else {
