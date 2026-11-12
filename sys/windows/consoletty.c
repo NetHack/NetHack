@@ -54,10 +54,6 @@ extern int redirect_stdout;
  * change.
  *
  */
-#define CONSOLE_CLEAR_ATTRIBUTE (FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE)
-#define CONSOLE_CLEAR_CHARACTER (' ')
-#define CONSOLE_UNDEFINED_CHARACTER ('\0')
-#define CONSOLE_UNDEFINED_ATTRIBUTE (0)
 
 enum console_attributes {
     atr_bold = 1,
@@ -66,45 +62,7 @@ enum console_attributes {
     atr_blink = 8,
     atr_inverse = 16
 };
-#define MAX_UTF8_SEQUENCE 7
 
-typedef struct {
-    /* these two are used only by console API */
-    WCHAR character_consoleAPI;
-    WORD  attribute_consoleAPI;
-    /* the following are used only by WindowsTerminal */
-    uint8 utf8str[MAX_UTF8_SEQUENCE];
-    WCHAR wcharacter;
-    WORD attr;
-    long color24;
-    int color256idx;
-    const char *bkcolorseq;
-    const char *colorseq;
-} cell_t;
-
-
-cell_t clear_cell = {
-    CONSOLE_CLEAR_CHARACTER,
-    CONSOLE_CLEAR_ATTRIBUTE,
-                { CONSOLE_CLEAR_CHARACTER, 0, 0, 0, 0, 0, 0 },
-                CONSOLE_CLEAR_CHARACTER,         /* wcharacter */
-                0,                               /* attr */
-                0L,                              /* color24 */
-                0,                               /* color256idx */
-                "\x1b[0m",                       /* bkcolorseq */
-                0                                /* colorseq */
-};
-cell_t undefined_cell = {
-    CONSOLE_UNDEFINED_CHARACTER,
-    CONSOLE_UNDEFINED_ATTRIBUTE,
-               { CONSOLE_UNDEFINED_CHARACTER, 0, 0, 0, 0, 0, 0 },
-                CONSOLE_UNDEFINED_CHARACTER,     /* wcharacter */
-                0,                               /* attr */
-                0L,                              /* color24 */
-                0,                               /* color256idx */
-                (const char *) 0,                /* bkcolorseq */
-                (const char *) 0                 /* colorseq */
-};
 
 /* Win32 Screen buffer,coordinate,console I/O information */
 COORD ntcoord;
@@ -161,16 +119,54 @@ typedef struct {
 static char nilstring[] = "";
 /*
  * Define the console_t data structs.
- *    console_t    track various Windows console-related data.
- *    tset_t       substruct of console_t, used twice (orig and active)
- *    cell_t       substruct of console_t, used twice (fg and bg)
+ *    cell_t        substruct of console_t, used twice (fg and bg) use
+ *                  by console.ConsoleAPI
+ *    console_t     track various Windows console-related data.
+ *    tset_t        substruct of console_t, used twice (orig and active)
+ *    console_api_t additional values used by console.ConsoleAPI
  */
+
+#define MAX_UTF8_SEQUENCE 7
+
+typedef struct {
+    /* these two are used only by console API */
+    WCHAR character_consoleAPI;
+    WORD attribute_consoleAPI;
+    /* the following are used only by WindowsTerminal */
+    uint8 utf8str[MAX_UTF8_SEQUENCE];
+    WCHAR wcharacter;
+    WORD attr;
+    const char *bkcolorseq;
+    const char *colorseq;
+} cell_t;
+
+#define CONSOLE_CLEAR_ATTRIBUTE \
+    (FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE)
+#define CONSOLE_CLEAR_CHARACTER (' ')
+#define CONSOLE_UNDEFINED_CHARACTER ('\0')
+#define CONSOLE_UNDEFINED_ATTRIBUTE (0)
+
+cell_t clear_cell = {
+    CONSOLE_CLEAR_CHARACTER,
+    CONSOLE_CLEAR_ATTRIBUTE,
+    { CONSOLE_CLEAR_CHARACTER, 0, 0, 0, 0, 0, 0 },
+    CONSOLE_CLEAR_CHARACTER, /* wcharacter */
+    0,                       /* attr */
+    "\x1b[0m",               /* bkcolorseq */
+    0                        /* colorseq */
+};
+cell_t undefined_cell = {
+    CONSOLE_UNDEFINED_CHARACTER,
+    CONSOLE_UNDEFINED_ATTRIBUTE,
+    { CONSOLE_UNDEFINED_CHARACTER, 0, 0, 0, 0, 0, 0 },
+    CONSOLE_UNDEFINED_CHARACTER, /* wcharacter */
+    0,                           /* attr */
+    (const char *) 0,            /* bkcolorseq */
+    (const char *) 0             /* colorseq */
+};
+
+
 struct tset_t {
-    int32_t color;
-    int32_t bkcolor;
-    int32_t colorflags;
-    int32_t attribute;
-    int32_t nhattr[ATR_INVERSE + 1];
     CONSOLE_SCREEN_BUFFER_INFO csbi;
     CONSOLE_FONT_INFOEX font_info;
     char *localestr;
@@ -178,6 +174,26 @@ struct tset_t {
     DWORD in_cmode;
     DWORD out_cmode;
     boolean QuickEdit;
+};
+
+struct console_api_t {
+    int32_t color;
+    int32_t bkcolor;
+    int32_t attribute;
+    int32_t nhattr[ATR_INVERSE + 1];
+    /*
+     * Console Buffer Flipping Support
+     *
+     * To minimize the number of calls into the WriteConsoleOutputXXX methods,
+     * we implement a notion of a console back buffer which keeps the next
+     * frame of console output as it is being composed.  When ready to show
+     * the new frame, we compare this next frame to what is currently being
+     * output and only call WriteConsoleOutputXXX for those console values
+     * that need to change.
+     *
+     */
+    cell_t *front_buffer;
+    cell_t *back_buffer;
 };
 
 struct console_t {
@@ -195,24 +211,10 @@ struct console_t {
     int buffer_size;
     boolean has_unicode;
     boolean font_changed;
-    long color24;
-    int color256idx;
     WCHAR cpMap[256];
     struct tset_t orig;
     struct tset_t active;
-    /*
-     * Console Buffer Flipping Support
-     *
-     * To minimize the number of calls into the WriteConsoleOutputXXX methods,
-     * we implement a notion of a console back buffer which keeps the next
-     * frame of console output as it is being composed.  When ready to show
-     * the new frame, we compare this next frame to what is currently being
-     * output and only call WriteConsoleOutputXXX for those console values
-     * that need to change.
-     *
-     */
-    cell_t *front_buffer;
-    cell_t *back_buffer;
+    struct console_api_t api;
     /* */
 } console = {
     FALSE, /* is_ready */
@@ -229,17 +231,8 @@ struct console_t {
     0,                                                     /* buffer_size */
     FALSE,                                                 /* has_unicode */
     FALSE,                                                 /* font_changed */
-    0L,                                                    /* color24 */
-    0,                                                     /* color256idx */
     { 0 },                                                 /* cpMap */
     {
-        (FOREGROUND_GREEN | FOREGROUND_BLUE
-         | FOREGROUND_RED), /* orig.color */
-        (FOREGROUND_GREEN | FOREGROUND_BLUE
-         | FOREGROUND_RED),      /* orig.bkcolor */
-        0,                       /* orig.colorflags */
-        0,                       /* orig.attribute */
-        { 0, 0, 0, 0, 0, 0, 0 }, /* orig.nhattr */
         { { 0, 0 }, { 0, 0 }, 0, { 0, 0, 0, 0 }, { 0, 0 } }, /* orig.cbsi */
         { 0UL, 0, { 0, 0 }, 0U, 0U, { 0 } }, /* orig.font_info */
         NULL,                                /* orig.localestr */
@@ -249,13 +242,6 @@ struct console_t {
         FALSE,                               /* orig.QuickEdit */
     },
     {
-        (FOREGROUND_GREEN | FOREGROUND_BLUE
-         | FOREGROUND_RED), /* active.color */
-        (FOREGROUND_GREEN | FOREGROUND_BLUE
-         | FOREGROUND_RED),      /* active.bkcolor */
-        0,                       /* active.colorflags */
-        0,                       /* active.attribute */
-        { 0, 0, 0, 0, 0, 0, 0 }, /* active.nhattr */
         { { 0, 0 }, { 0, 0 }, 0, { 0, 0, 0, 0 }, { 0, 0 } }, /* active.cbsi */
         { 0UL, 0, { 0, 0 }, 0U, 0U, { 0 } }, /* active.font_info */
         NULL,                                /* active.localestr */
@@ -264,8 +250,14 @@ struct console_t {
         0,                                   /* active.out_cmode */
         FALSE,                               /* active.QuickEdit */
     },
-    NULL, /* front_buffer */
-    NULL, /* back_buffer */
+    {
+        (FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_RED), /* api.color */
+        (FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_RED), /* api.bkcolor */
+        0,                       /* api.attribute */
+        { 0, 0, 0, 0, 0, 0, 0 }, /* api.nhattr[] */
+        NULL, /* api.front_buffer */
+        NULL, /* api.back_buffer */
+    }
 };
 
 const char *const legal_key_handling[] = {
@@ -912,7 +904,7 @@ term_end_screen(void)
         /* console.ConsoleAPI */
         term_clear_screen();
         really_move_cursor();
-        buffer_fill_to_end_ConsoleAPI(console.back_buffer, &clear_cell, 0,
+        buffer_fill_to_end_ConsoleAPI(console.api.back_buffer, &clear_cell, 0,
                                       0);
         back_buffer_flip_ConsoleAPI();
         FlushConsoleInputBuffer(console.hConIn);
@@ -1030,7 +1022,6 @@ xputc_core_wt(int ch, int xcwflags)
     DWORD ccount = 0;
     WCHAR wch[2];
     static uint8 utf8str[MAX_UTF8_SEQUENCE];
-    int32_t last_color = -1, last_bkcolor = -1;
 
     // emit_show_cursor();
     if (console.has_unicode && xcwflags == 0) {
@@ -1065,20 +1056,6 @@ xputc_core_wt(int ch, int xcwflags)
         ccount = 1;
     }
     if (ccount) {
-        if (xcwflags == 0) {
-            if (last_color != console.active.color) {
-                buffer_write_wt(
-                    (uint8_t *) esc_seq_colors[console.active.color],
-                    strlen(esc_seq_colors[console.active.color]));
-                last_color = console.active.color;
-            }
-            if (last_bkcolor != console.active.bkcolor) {
-                buffer_write_wt(
-                    (uint8_t *) esc_seq_bkcolors[console.active.bkcolor],
-                    strlen(esc_seq_bkcolors[console.active.bkcolor]));
-                last_bkcolor = console.active.bkcolor;
-            }
-        }
         buffer_write_wt(utf8str, ccount);
     }
 }
@@ -1112,19 +1089,19 @@ xputc_core_ConsoleAPI(char ch)
         }
         break;
     default:
-        inverse = (console.active.nhattr[ATR_INVERSE] && iflags.wc_inverse);
-        console.active.attribute = (inverse)
-                                       ? ttycolors_inv[console.active.color]
-                                       : ttycolors[console.active.color];
-        if (console.active.nhattr[ATR_BOLD])
-            console.active.attribute |=
+        inverse = (console.api.nhattr[ATR_INVERSE] && iflags.wc_inverse);
+        console.api.attribute = (inverse)
+                                       ? ttycolors_inv[console.api.color]
+                                       : ttycolors[console.api.color];
+        if (console.api.nhattr[ATR_BOLD])
+            console.api.attribute |=
                 (inverse) ? BACKGROUND_INTENSITY : FOREGROUND_INTENSITY;
 
-        cell.attribute_consoleAPI = console.active.attribute;
+        cell.attribute_consoleAPI = console.api.attribute;
         cell.character_consoleAPI =
             (console.has_unicode ? console.cpMap[ch] : ch);
         if (ccount) {
-            buffer_write_ConsoleAPI(console.back_buffer, &cell,
+            buffer_write_ConsoleAPI(console.api.back_buffer, &cell,
                                     console.cursor);
             if (console.cursor.X == console.width - 1) {
                 if (console.cursor.Y < console.height - 1) {
@@ -1203,17 +1180,17 @@ console_g_putch(int in_ch)
     } else {
         /* old ConsoleAPI */
         set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
-        inverse = (console.active.nhattr[ATR_INVERSE] && iflags.wc_inverse);
-        console.active.attribute =
-            (console.active.nhattr[ATR_INVERSE] && iflags.wc_inverse)
-                ? ttycolors_inv[console.active.color]
-                : ttycolors[console.active.color];
-        if (console.active.nhattr[ATR_BOLD])
-            console.active.attribute |=
+        inverse = (console.api.nhattr[ATR_INVERSE] && iflags.wc_inverse);
+        console.api.attribute =
+            (console.api.nhattr[ATR_INVERSE] && iflags.wc_inverse)
+                ? ttycolors_inv[console.api.color]
+                : ttycolors[console.api.color];
+        if (console.api.nhattr[ATR_BOLD])
+            console.api.attribute |=
                 (inverse) ? BACKGROUND_INTENSITY : FOREGROUND_INTENSITY;
-        cell.attribute_consoleAPI = console.active.attribute;
+        cell.attribute_consoleAPI = console.api.attribute;
         cell.character_consoleAPI = (console.has_unicode ? cp437[ch] : ch);
-        buffer_write_ConsoleAPI(console.back_buffer, &cell, console.cursor);
+        buffer_write_ConsoleAPI(console.api.back_buffer, &cell, console.cursor);
     }
 }
 
@@ -1231,25 +1208,12 @@ g_pututf8(uint8 *sequence)
     static uint8 utf8str[MAX_UTF8_SEQUENCE];
 
     if (console.WindowsTerminal) {
-        static int32_t last_color = -1, last_bkcolor = -1;
 #ifdef UTF8_FROM_CORE
         ccount = snprintf((char *) utf8str, sizeof utf8str, "%s",
                           (char *) sequence);
 
         if (ttyDisplay->topl_utf8 && (windowprocs.wincap2 & WC2_U_UTF8STR)) {
             ttyDisplay->curx++;
-        }
-        if (last_color != console.active.color) {
-            buffer_write_wt(
-                (uint8_t *) esc_seq_colors[console.active.color],
-                strlen(esc_seq_colors[console.active.color]));
-            last_color = console.active.color;
-        }
-        if (last_bkcolor != console.active.bkcolor) {
-            buffer_write_wt(
-                (uint8_t *) esc_seq_bkcolors[console.active.bkcolor],
-                strlen(esc_seq_bkcolors[console.active.bkcolor]));
-            last_bkcolor = console.active.bkcolor;
         }
         buffer_write_wt(utf8str, ccount);
 #endif /* UTF8_FROM_CORE */
@@ -1289,7 +1253,7 @@ cl_end(void)
             && ttyDisplay->cury < console.height) {
             set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
             buffer_clear_to_eol_ConsoleAPI(
-                console.back_buffer, console.cursor.X, console.cursor.Y);
+                console.api.back_buffer, console.cursor.X, console.cursor.Y);
             tty_curs(BASE_WINDOW, (int) ttyDisplay->curx + 1,
                      (int) ttyDisplay->cury);
         }
@@ -1305,7 +1269,7 @@ term_clear_screen(void)
         erase_tty_screen();
     } else {
         /* console.ConsoleAPI */
-        buffer_fill_to_end_ConsoleAPI(console.back_buffer, &clear_cell, 0, 0);
+        buffer_fill_to_end_ConsoleAPI(console.api.back_buffer, &clear_cell, 0, 0);
         home();
     }
 }
@@ -1418,7 +1382,7 @@ cl_eos(void)
 
         buffer_write_wt((uint8_t *) escseq, sz);
     } else {
-        buffer_fill_to_end_ConsoleAPI(console.back_buffer, &clear_cell,
+        buffer_fill_to_end_ConsoleAPI(console.api.back_buffer, &clear_cell,
                                       ttyDisplay->curx, ttyDisplay->cury);
         tty_curs(BASE_WINDOW, (int) ttyDisplay->curx + 1,
                  (int) ttyDisplay->cury);
@@ -1516,22 +1480,22 @@ term_start_attr(int attrib)
             /* console.ConsoleAPI */
             switch (attrib) {
             case ATR_INVERSE:
-                console.active.attribute |= atr_inverse;
+                console.api.attribute |= atr_inverse;
                 break;
             case ATR_ULINE:
-                console.active.attribute |= atr_uline;
+                console.api.attribute |= atr_uline;
                 break;
             case ATR_BLINK:
-                console.active.attribute |= atr_blink;
+                console.api.attribute |= atr_blink;
                 break;
             case ATR_BOLD:
-                console.active.attribute |= atr_bold;
+                console.api.attribute |= atr_bold;
                 break;
             }
-            console.active.nhattr[attrib] = TRUE;
+            console.api.nhattr[attrib] = TRUE;
         }
     } else {
-        console.active.nhattr[ATR_NONE] = FALSE;
+        console.api.nhattr[ATR_NONE] = FALSE;
     }
 }
 
@@ -1549,24 +1513,24 @@ term_end_attr(int attrib)
 
         switch (attrib) {
         case ATR_INVERSE:
-            console.active.attribute &= ~atr_inverse;
+            console.api.attribute &= ~atr_inverse;
             break;
         case ATR_ULINE:
-            console.active.attribute &= ~atr_uline;
+            console.api.attribute &= ~atr_uline;
             break;
         case ATR_BLINK:
-            console.active.attribute &= ~atr_blink;
+            console.api.attribute &= ~atr_blink;
             break;
         case ATR_BOLD:
-            console.active.attribute &= ~atr_bold;
+            console.api.attribute &= ~atr_bold;
             break;
         }
-        console.active.nhattr[attrib] = FALSE;
-        console.active.nhattr[ATR_NONE] = TRUE;
+        console.api.nhattr[attrib] = FALSE;
+        console.api.nhattr[ATR_NONE] = TRUE;
         /* re-evaluate all attr now for performance at output time */
         for (k = ATR_NONE; k <= ATR_INVERSE; ++k) {
-            if (console.active.nhattr[k])
-                console.active.nhattr[ATR_NONE] = FALSE;
+            if (console.api.nhattr[k])
+                console.api.nhattr[ATR_NONE] = FALSE;
         }
     }
 }
@@ -1596,9 +1560,9 @@ term_start_color(int color)
         if (color == NO_COLOR) {
             term_end_color();
         } else if (color >= 0 && color < CLR_MAX) {
-            console.active.color = color;
+            console.api.color = color;
         } else {
-            console.active.color = NO_COLOR;
+            console.api.color = NO_COLOR;
         }
     }
 }
@@ -1615,9 +1579,9 @@ term_start_bgcolor(int color)
     } else {
         /* console.ConsoleAPI */
         if (color != NO_COLOR && (color >= 0 && color < CLR_MAX)) {
-            console.active.bkcolor = color;
+            console.api.bkcolor = color;
         } else {
-            console.active.bkcolor = NO_COLOR;
+            console.api.bkcolor = NO_COLOR;
         }
     }
 }
@@ -1631,10 +1595,10 @@ term_end_color(void)
         /* console.ConsoleAPI */
         console.foreground = DEFTEXTCOLOR;
         if (console.ConsoleAPI)
-            console.active.attribute =
+            console.api.attribute =
                 (console.foreground | console.background);
-        console.active.color = NO_COLOR;
-        console.active.bkcolor = NO_COLOR;
+        console.api.color = NO_COLOR;
+        console.api.bkcolor = NO_COLOR;
     }
 }
 
@@ -1862,12 +1826,12 @@ enum did_flags {
 static void
 back_buffer_flip_ConsoleAPI(void)
 {
-    cell_t *back = console.back_buffer;
-    cell_t *front = console.front_buffer;
+    cell_t *back = console.api.back_buffer;
+    cell_t *front = console.api.front_buffer;
     COORD pos;
     DWORD unused;
 
-    if (!console.is_ready || !console.back_buffer || !console.front_buffer)
+    if (!console.is_ready || !console.api.back_buffer || !console.api.front_buffer)
         return;
 
     for (pos.Y = 0; pos.Y < console.height; pos.Y++) {
@@ -1897,7 +1861,7 @@ back_buffer_flip_ConsoleAPI(void)
 void
 buffer_fill_to_end_ConsoleAPI(cell_t *buffer, cell_t *fill, int x, int y)
 {
-    if (!console.is_ready || !console.back_buffer || !console.front_buffer)
+    if (!console.is_ready || !console.api.back_buffer || !console.api.front_buffer)
         return;
 
     nhassert(x >= 0 && x < console.width);
@@ -1910,7 +1874,7 @@ buffer_fill_to_end_ConsoleAPI(cell_t *buffer, cell_t *fill, int x, int y)
         *dst++ = *fill;
 
     if ((iflags.debug.immediateflips || !program_state.in_moveloop)
-        && buffer == console.back_buffer) {
+        && buffer == console.api.back_buffer) {
         back_buffer_flip_ConsoleAPI();
     }
 }
@@ -1919,7 +1883,7 @@ static void
 buffer_clear_to_eol_ConsoleAPI(cell_t *buffer, int x, int y)
 {
 
-    if (!console.is_ready || !console.back_buffer || !console.front_buffer)
+    if (!console.is_ready || !console.api.back_buffer || !console.api.front_buffer)
     return;
 
     nhassert(x >= 0 && x < console.width);
@@ -1940,7 +1904,7 @@ void
 buffer_write_ConsoleAPI(cell_t *buffer, cell_t *cell, COORD pos)
 {
 
-    if (!console.is_ready || !console.back_buffer || !console.front_buffer)
+    if (!console.is_ready || !console.api.back_buffer || !console.api.front_buffer)
         return;
 
     if (console.WindowsTerminal) {
@@ -1955,7 +1919,7 @@ buffer_write_ConsoleAPI(cell_t *buffer, cell_t *cell, COORD pos)
         nhassert(pos.Y >= 0 && pos.Y < console.height);
 
         if ((iflags.debug.immediateflips || !program_state.in_moveloop)
-            && buffer == console.back_buffer) {
+            && buffer == console.api.back_buffer) {
             back_buffer_flip_ConsoleAPI();
         }
     }
@@ -2169,12 +2133,12 @@ nethack_enter_consoletty(void)
         /* setup front and back buffers */
         int buffer_size_bytes = sizeof(cell_t) * console.buffer_size;
 
-        console.front_buffer = (cell_t *) alloc(buffer_size_bytes);
-        buffer_fill_to_end_ConsoleAPI(console.front_buffer, &undefined_cell,
+        console.api.front_buffer = (cell_t *) alloc(buffer_size_bytes);
+        buffer_fill_to_end_ConsoleAPI(console.api.front_buffer, &undefined_cell,
                                       0, 0);
 
-        console.back_buffer = (cell_t *) alloc(buffer_size_bytes);
-        buffer_fill_to_end_ConsoleAPI(console.back_buffer, &clear_cell, 0, 0);
+        console.api.back_buffer = (cell_t *) alloc(buffer_size_bytes);
+        buffer_fill_to_end_ConsoleAPI(console.api.back_buffer, &clear_cell, 0, 0);
     }
     /* determine whether OS version has unicode support */
     /* console.has_unicode = (IsWindows8OrGreater()); */
@@ -2259,10 +2223,13 @@ nethack_enter_consoletty(void)
             set_altkeyhandling("ray");
         }
     }
-    if (console.WindowsTerminal)
+    if (console.WindowsTerminal) {
         init_custom_colors();
-    console.active.color = NO_COLOR;
-    console.active.bkcolor = 0;
+    } else {
+        /* console.ConsoleAPI */
+        console.api.color = NO_COLOR;
+        console.api.bkcolor = 0;
+    }
     console.is_ready = TRUE;
     nhUse(apisuccess);
 }
@@ -2359,11 +2326,11 @@ void
 console_exit(void)
 {
     free_custom_colors();
-    if (console.front_buffer)
-        free((genericptr_t) console.front_buffer);
-    if (console.back_buffer)
-        free((genericptr_t) console.back_buffer);
-    console.front_buffer = console.back_buffer = 0;
+    if (console.api.front_buffer)
+        free((genericptr_t) console.api.front_buffer);
+    if (console.api.back_buffer)
+        free((genericptr_t) console.api.back_buffer);
+    console.api.front_buffer = console.api.back_buffer = 0;
     if (console.active.localestr)
         free((genericptr_t) console.active.localestr), console.active.localestr = 0;
     if (console.orig.localestr)
@@ -2540,8 +2507,8 @@ raw_clear_screen(void)
     } else {
         /* console.ConsoleAPI */
         if (WINDOWPORT(tty)) {
-            cell_t *back = console.back_buffer;
-            cell_t *front = console.front_buffer;
+            cell_t *back = console.api.back_buffer;
+            cell_t *front = console.api.front_buffer;
             COORD pos;
             DWORD unused;
 
