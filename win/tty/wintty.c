@@ -2264,13 +2264,15 @@ tty_putstr(winid window, int attr, const char *str)
         int suppress_history = (attr & ATR_NOHISTORY),
             urgent_message = (attr & ATR_URGENT);
 
-#if defined(ASCIIGRAPH) && !defined(NO_TERMS)
+#if defined(ASCIIGRAPH)
+#if !defined(NO_TERMS) || defined(WIN32CON)
         /* if ^C occurs, player is prompted with "Really quit?" and that
            prompt is issued via tty_putstr(WIN_MESSAGE); if ^C happens
            while writing DECgraphics chars, the prompt text would be
            rendered as VT line-drawing characters unless we do this;
            also, if color was in progress it wouldn't be switched off */
         end_glyphout();
+#endif
 #endif
         /* if message is designated 'urgent' don't suppress it if user has
            typed ESC at --More-- prompt when dismissing an earlier message;
@@ -3727,11 +3729,13 @@ void
 end_glyphout(void)
 {
     HUPSKIP();
-#if defined(ASCIIGRAPH) && !defined(NO_TERMS)
+#if defined(ASCIIGRAPH)
+#if !defined(NO_TERMS) || defined(WIN32CON)
     if (GFlag) {
         GFlag = FALSE;
         graph_off();
     }
+#endif
 #endif
     if (ttyDisplay->color != NO_COLOR) {
         term_end_color();
@@ -3886,8 +3890,8 @@ tty_print_glyph(
 
     print_vt_code3(AVTC_GLYPH_START, glyphinfo->gm.tileidx, special);
 
-#ifndef NO_TERMS
-    if (ul_hack && ch == '_') { /* non-destructive underscore */
+#if !defined(NO_TERMS)
+    if (ul_hack && ch == '_' ) { /* non-destructive underscore */
         (void) putchar((char) ' ');
         backsp();
     }

@@ -325,14 +325,16 @@ topl_putsym(char c)
         ttyDisplay->cury++;
         cw->cury = ttyDisplay->cury;
 #ifdef WIN32CON
-        (void) putchar(c);
+        if (!wincon_WindowsTerminalActive())
+            (void) putchar(c);
 #endif
         break;
     default:
         if (ttyDisplay->curx == CO - 1)
             topl_putsym('\n'); /* 1 <= curx < CO; avoid CO */
 #ifdef WIN32CON
-        (void) putchar(c);
+        if (!wincon_WindowsTerminalActive())
+            (void) putchar(c);
 #endif
         ttyDisplay->curx++;
     }
@@ -341,6 +343,9 @@ topl_putsym(char c)
         cl_end();
 #ifndef WIN32CON
     (void) putchar(c);
+#else
+    if (wincon_WindowsTerminalActive())
+        (void) putchar(c);
 #endif
 }
 

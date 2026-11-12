@@ -106,48 +106,10 @@ cell_t undefined_cell = {
                 (const char *) 0                 /* colorseq */
 };
 
-/*
- * The following WIN32 Console API routines are used in this file.
- *
- * CreateFile
- * GetConsoleScreenBufferInfo
- * GetStdHandle
- * SetConsoleCursorPosition
- * SetConsoleTextAttribute
- * SetConsoleCtrlHandler
- * PeekConsoleInput
- * ReadConsoleInput
- * GetConsoleOutputCP
- * WriteConsoleOutputCharacter
- * FillConsoleOutputAttribute
- */
-
-static BOOL CtrlHandler(DWORD);
-static void xputc_core_ConsoleAPI(char);
-static void xputc_core(int);
-void cmov(int, int);
-void nocmov(int, int);
-int process_keystroke(INPUT_RECORD *, boolean *, uchar numberpad,
-                      int portdebug);
-static void init_ttycolor(void);
-static void really_move_cursor(void);
-static void check_and_set_font(void);
-static boolean check_font_widths(void);
-static void set_known_good_console_font(void);
-static void restore_original_console_font(void);
-void tty_ibmgraphics_fixup(void);
-extern void (*ibmgraphics_mode_callback)(void);  /* symbols.c */
-extern void (*utf8graphics_mode_callback)(void); /* symbols.c */
-
-static boolean OnWindows95_98_Me(void);
-
-static void init_custom_colors(void);
-static void free_custom_colors(void);
-
 /* Win32 Screen buffer,coordinate,console I/O information */
 COORD ntcoord;
 INPUT_RECORD gbl_ir;
-
+static boolean settty_needed = FALSE;
 /* Support for changing console font if existing glyph widths are too wide */
 
 /* Flag for whether NetHack was launched via the GUI, not the command line.
@@ -164,6 +126,39 @@ static boolean init_ttycolor_completed;
 static boolean display_cursor_info = FALSE;
 #endif
 
+static char tgotobuf[20];
+#define tgoto(fmt, x, y) (Sprintf(tgotobuf, fmt, y + 1, x + 1), tgotobuf)
+/* Mapping data for the six terminfo colors that resolve to pairs of nethack
+ * colors.  Black and white are handled specially.
+ */
+
+#ifndef COLOR_BLACK
+enum curses_colors {
+    COLOR_BLACK,
+    COLOR_RED,
+    COLOR_GREEN,
+    COLOR_YELLOW,
+    COLOR_BLUE,
+    COLOR_MAGENTA,
+    COLOR_CYAN,
+    COLOR_WHITE
+};
+#endif
+
+const struct {
+    int ti_color, nh_color, nh_bright_color;
+} ti_map[6] = { { COLOR_RED, CLR_RED, CLR_ORANGE },
+                { COLOR_GREEN, CLR_GREEN, CLR_BRIGHT_GREEN },
+                { COLOR_YELLOW, CLR_BROWN, CLR_YELLOW },
+                { COLOR_BLUE, CLR_BLUE, CLR_BRIGHT_BLUE },
+                { COLOR_MAGENTA, CLR_MAGENTA, CLR_BRIGHT_MAGENTA },
+                { COLOR_CYAN, CLR_CYAN, CLR_BRIGHT_CYAN } };
+
+typedef struct {
+    unsigned char r, g, b;
+} RGB;
+
+static char nilstring[] = "";
 /*
  * Define the console_t data structs.
  *    console_t    track various Windows console-related data.
@@ -175,7 +170,7 @@ struct tset_t {
     int32_t bkcolor;
     int32_t colorflags;
     int32_t attribute;
-    int32_t nhattr[ATR_INVERSE+1];
+    int32_t nhattr[ATR_INVERSE + 1];
     CONSOLE_SCREEN_BUFFER_INFO csbi;
     CONSOLE_FONT_INFOEX font_info;
     char *localestr;
@@ -184,7 +179,6 @@ struct tset_t {
     DWORD out_cmode;
     boolean QuickEdit;
 };
-
 
 struct console_t {
     boolean is_ready;
@@ -217,53 +211,52 @@ struct console_t {
      * that need to change.
      *
      */
-    cell_t * front_buffer;
-    cell_t * back_buffer;
+    cell_t *front_buffer;
+    cell_t *back_buffer;
+    /* */
 } console = {
-    FALSE,                                   /* is_ready */
-    FALSE,                                   /* WindowsTerminal */
-    FALSE,                                   /* ConsoleAPI */
-    0,                                       /* hWnd */
+    FALSE, /* is_ready */
+    FALSE, /* WindowsTerminal */
+    FALSE, /* ConsoleAPI */
+    0,     /* hWnd */
     (FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_RED), /* background */
     (FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_RED), /* foreground */
-    { 0, 0 },                                /* cursor */
-    NULL,                                    /* hConIn */
-    NULL,                                    /* hConOut*/
-    0,                                       /* width */
-    0,                                       /* height */
-    0,                                       /* buffer_size */
-    FALSE,                                   /* has_unicode */
-    FALSE,                                   /* font_changed */
-    0L,                                      /* color24 */
-    0 ,                                      /* color256idx */
-    { 0 },                                   /* cpMap */
+    { 0, 0 },                                              /* cursor */
+    NULL,                                                  /* hConIn */
+    NULL,                                                  /* hConOut*/
+    0,                                                     /* width */
+    0,                                                     /* height */
+    0,                                                     /* buffer_size */
+    FALSE,                                                 /* has_unicode */
+    FALSE,                                                 /* font_changed */
+    0L,                                                    /* color24 */
+    0,                                                     /* color256idx */
+    { 0 },                                                 /* cpMap */
     {
-      (FOREGROUND_GREEN | FOREGROUND_BLUE
-       | FOREGROUND_RED),                    /* orig.color */
-      (FOREGROUND_GREEN | FOREGROUND_BLUE
-       | FOREGROUND_RED),                    /* orig.bkcolor */
-      0,                                     /* orig.colorflags */
-      0,                                     /* orig.attribute */
-      {0, 0, 0, 0, 0, 0, 0},                 /* orig.nhattr */
-      { { 0, 0}, { 0, 0}, 0,
-       { 0, 0, 0, 0 }, { 0, 0 } },           /* orig.cbsi */
-      {0UL, 0, {0, 0}, 0U, 0U, {0}},         /* orig.font_info */
-      NULL,                                  /* orig.localestr */
-      0U,                                    /* orig.code_page */
-      0,                                     /* orig.in_cmode */
-      0,                                     /* orig.out_cmode */
-      FALSE,                                 /* orig.QuickEdit */
+        (FOREGROUND_GREEN | FOREGROUND_BLUE
+         | FOREGROUND_RED), /* orig.color */
+        (FOREGROUND_GREEN | FOREGROUND_BLUE
+         | FOREGROUND_RED),      /* orig.bkcolor */
+        0,                       /* orig.colorflags */
+        0,                       /* orig.attribute */
+        { 0, 0, 0, 0, 0, 0, 0 }, /* orig.nhattr */
+        { { 0, 0 }, { 0, 0 }, 0, { 0, 0, 0, 0 }, { 0, 0 } }, /* orig.cbsi */
+        { 0UL, 0, { 0, 0 }, 0U, 0U, { 0 } }, /* orig.font_info */
+        NULL,                                /* orig.localestr */
+        0U,                                  /* orig.code_page */
+        0,                                   /* orig.in_cmode */
+        0,                                   /* orig.out_cmode */
+        FALSE,                               /* orig.QuickEdit */
     },
     {
         (FOREGROUND_GREEN | FOREGROUND_BLUE
-         | FOREGROUND_RED),                  /* active.color */
+         | FOREGROUND_RED), /* active.color */
         (FOREGROUND_GREEN | FOREGROUND_BLUE
-         | FOREGROUND_RED),                  /* active.bkcolor */
-        0,                                   /* active.colorflags */
-        0,                                   /* active.attribute */
-        { 0, 0, 0, 0, 0, 0, 0 },             /* active.nhattr */
-        { { 0, 0 }, { 0, 0 }, 0,
-         { 0, 0, 0, 0 }, { 0, 0 } },         /* active.cbsi */
+         | FOREGROUND_RED),      /* active.bkcolor */
+        0,                       /* active.colorflags */
+        0,                       /* active.attribute */
+        { 0, 0, 0, 0, 0, 0, 0 }, /* active.nhattr */
+        { { 0, 0 }, { 0, 0 }, 0, { 0, 0, 0, 0 }, { 0, 0 } }, /* active.cbsi */
         { 0UL, 0, { 0, 0 }, 0U, 0U, { 0 } }, /* active.font_info */
         NULL,                                /* active.localestr */
         0U,                                  /* active.code_page */
@@ -271,8 +264,8 @@ struct console_t {
         0,                                   /* active.out_cmode */
         FALSE,                               /* active.QuickEdit */
     },
-    NULL,                                    /* front_buffer */
-    NULL,                                    /* back_buffer */
+    NULL, /* front_buffer */
+    NULL, /* back_buffer */
 };
 
 const char *const legal_key_handling[] = {
@@ -282,39 +275,33 @@ const char *const legal_key_handling[] = {
     "340",
 };
 
-enum windows_key_handling keyh[] = { no_keyhandling, default_keyhandling, ray_keyhandling,
-                                     nh340_keyhandling };
-
+enum windows_key_handling keyh[] = { no_keyhandling, default_keyhandling,
+                                     ray_keyhandling, nh340_keyhandling };
 int default_processkeystroke(HANDLE, INPUT_RECORD *, boolean *, uchar, int);
 int default_kbhit(HANDLE, INPUT_RECORD *);
-int default_checkinput(HANDLE, INPUT_RECORD *, DWORD *, uchar,
-                       int, int *, coord *);
+int default_checkinput(HANDLE, INPUT_RECORD *, DWORD *, uchar, int, int *,
+                       coord *);
 
 int ray_processkeystroke(HANDLE, INPUT_RECORD *, boolean *, uchar, int);
 int ray_kbhit(HANDLE, INPUT_RECORD *);
-int ray_checkinput(HANDLE, INPUT_RECORD *, DWORD *, uchar,
-                       int, int *, coord *);
+int ray_checkinput(HANDLE, INPUT_RECORD *, DWORD *, uchar, int, int *,
+                   coord *);
 
 int nh340_processkeystroke(HANDLE, INPUT_RECORD *, boolean *, uchar, int);
 int nh340_kbhit(HANDLE, INPUT_RECORD *);
-int nh340_checkinput(HANDLE, INPUT_RECORD *, DWORD *, uchar,
-                       int, int *, coord *);
+int nh340_checkinput(HANDLE, INPUT_RECORD *, DWORD *, uchar, int, int *,
+                     coord *);
 
 struct keyboard_handling_t {
     enum windows_key_handling khid;
-    int (*pProcessKeystroke)(HANDLE, INPUT_RECORD *, boolean *,
-                                          uchar, int);
+    int (*pProcessKeystroke)(HANDLE, INPUT_RECORD *, boolean *, uchar, int);
     int (*pNHkbhit)(HANDLE, INPUT_RECORD *);
-    int (*pCheckInput)(HANDLE, INPUT_RECORD *, DWORD *, uchar,
-                                   int, int *, coord *);
-} keyboard_handling = {
-    no_keyhandling,
-    default_processkeystroke,
-    default_kbhit,
-    default_checkinput
-};
+    int (*pCheckInput)(HANDLE, INPUT_RECORD *, DWORD *, uchar, int, int *,
+                       coord *);
+} keyboard_handling = { no_keyhandling, default_processkeystroke,
+                        default_kbhit, default_checkinput };
 
-static DWORD ccount;
+// static DWORD ccount;
 #ifndef CLR_MAX
 #define CLR_MAX 16
 #endif
@@ -353,8 +340,1378 @@ int32 customcolors[CLR_MAX];
 const char *esc_seq_colors[CLR_MAX] = { 0 };
 const char *esc_seq_bkcolors[CLR_MAX] = { 0 };
 
-void buffer_fill_to_end(cell_t * buffer, cell_t * fill, int x, int y);
-void buffer_write(cell_t * buffer, cell_t * cell, COORD pos);
+
+/* function prototypes */
+
+static BOOL CtrlHandler(DWORD);
+static void xputc_core_ConsoleAPI(char);
+static void xputc_core_wt(int, int);
+void cmov(int, int);
+void nocmov(int, int);
+int process_keystroke(INPUT_RECORD *, boolean *, uchar numberpad,
+                      int portdebug);
+static void init_ttycolor(void);
+static void really_move_cursor(void);
+static void check_and_set_font(void);
+static boolean check_font_widths(void);
+static void set_known_good_console_font(void);
+static void restore_original_console_font(void);
+void tty_ibmgraphics_fixup(void);
+extern void (*ibmgraphics_mode_callback)(void);  /* symbols.c */
+extern void (*utf8graphics_mode_callback)(void); /* symbols.c */
+
+static boolean OnWindows95_98_Me(void);
+
+static void init_custom_colors(void);
+static void free_custom_colors(void);
+static void buffer_write_wt(uint8_t *buffer, size_t sz);
+static char *s_atr2str(int);
+static char *e_atr2str(int);
+static void buffer_fill_to_end_ConsoleAPI(cell_t *buffer, cell_t *fill,
+                                          int x, int y);
+static void back_buffer_flip_ConsoleAPI(void);
+static void buffer_write_ConsoleAPI(cell_t *buffer, cell_t *cell, COORD pos);
+static void buffer_clear_to_eol_ConsoleAPI(cell_t *buffer, int x, int y);
+static void set_console_cursor(int x, int y);
+
+/*
+ * termcap-like support for Windows Terminal
+ */
+void emit_start_bold(void);
+void emit_stop_bold(void);
+void emit_start_dim(void);
+void emit_stop_dim(void);
+void emit_start_blink(void);
+void emit_stop_blink(void);
+void emit_start_underline(void);
+void emit_stop_underline(void);
+void emit_start_inverse(void);
+void emit_stop_inverse(void);
+void emit_start_24bitcolor(long color24bit);
+void emit_start_256color(int u256coloridx);
+void emit_default_color(void);
+void emit_return_to_default(void);
+void emit_hide_cursor(void);
+void emit_show_cursor(void);
+void emit_cursor_down(int);
+void emit_cursor_horizontal_pos(int);
+void emit_cursor_left(void);
+void emit_cursor_left_n(int);
+void emit_cursor_right(void);
+void emit_cursor_right_n(int);
+void emit_cursor_goto(int, int);
+void emit_clear_screen(void);
+void emit_home(void);
+void emit_clear_to_eol(void);
+void emit_VE(void);
+void emit_TE(void);
+void emit_KS(void);
+void emit_KE(void);
+void emit_TI(void);
+void emit_ts(void);
+void emit_AS(void);
+void emit_AE(void);
+void emit_HE(void);
+void emit_ND(void);
+static void emit24bit(long mcolor);
+static void emit256(int u256coloridx);
+
+/**************************************************************
+ * termcap alternatives
+ **************************************************************/
+
+#if defined(ASCIIGRAPH)
+static boolean GFlag = FALSE;
+static boolean HE_resets_AS; /* see termcap.c */
+#endif
+
+#define tcfmtstr "\033[38;2;%ld;%ld;%ldm"
+#define tcfmtstr256 "\033[38;5;%dm"
+#define tcfmtstr24bit "\x1b[38;2;%ld;%ld;%ldm"
+
+void
+emit_hide_cursor(void)
+{
+    //    DWORD unused;
+    static const char escseq[] = "\x1b[?25l";
+    static size_t sz = sizeof escseq - 1;
+
+    buffer_write_wt((uint8_t *) escseq, sz);
+    //    WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int)
+    //    strlen(escseq),
+    //                  &unused, NULL);
+}
+
+void
+emit_show_cursor(void)
+{
+    //   DWORD unused;
+    static const char escseq[] = "\x1b[?25h";
+    static size_t sz = sizeof escseq - 1;
+
+    buffer_write_wt((uint8_t *) escseq, sz);
+    //    WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int)
+    //    strlen(escseq),
+    //                  &unused, NULL);
+}
+
+void
+emit_start_bold(void)
+{
+    //    DWORD unused;
+    static const char escseq[] = "\x1b[1m";
+    static size_t sz = sizeof escseq - 1;
+
+    buffer_write_wt((uint8_t *) escseq, sz);
+    //   WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
+    //                 &unused, NULL);
+}
+
+void
+emit_stop_bold(void)
+{
+    //   DWORD unused;
+    static const char escseq[] = "\x1b[24m";
+    static size_t sz = sizeof escseq - 1;
+
+    buffer_write_wt((uint8_t *) escseq, sz);
+    //    WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int)
+    //    strlen(escseq),
+    //                  &unused, NULL);
+}
+
+void
+emit_start_dim(void)
+{
+    static const char escseq[] = "\x1b[4m";
+    static size_t sz = sizeof escseq - 1;
+
+    buffer_write_wt((uint8_t *) escseq, sz); 
+}
+
+void
+emit_stop_dim(void)
+{
+    static const char escseq[] = "\x1b[24m";
+    static size_t sz = sizeof escseq - 1;
+
+    buffer_write_wt((uint8_t *) escseq, sz); 
+}
+
+void
+emit_start_blink(void)
+{
+    //    DWORD unused;
+    static const char escseq[] = "\x1b[5m";
+    static size_t sz = sizeof escseq - 1;
+
+    buffer_write_wt((uint8_t *) escseq, sz);
+    //    WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int)
+    //    strlen(escseq),
+    //                  &unused, NULL);
+}
+
+void
+emit_stop_blink(void)
+{
+    //    DWORD unused;
+    static const char escseq[] = "\x1b[25m";
+    static size_t sz = sizeof escseq - 1;
+
+    buffer_write_wt((uint8_t *) escseq, sz);
+    //   WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
+    //                 &unused, NULL);
+}
+
+void
+emit_start_underline(void)
+{
+    //    DWORD unused;
+    static const char escseq[] = "\x1b[4m";
+    static size_t sz = sizeof escseq - 1;
+
+    buffer_write_wt((uint8_t *) escseq, sz);
+    //   WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
+    //                 &unused, NULL);
+}
+
+void
+emit_stop_underline(void)
+{
+    //    DWORD unused;
+    static const char escseq[] = "\x1b[24m";
+    static size_t sz = sizeof escseq - 1;
+
+    buffer_write_wt((uint8_t *) escseq, sz);
+    //    WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int)
+    //    strlen(escseq),
+    //                  &unused, NULL);
+}
+void
+emit_start_inverse(void)
+{
+    //    DWORD unused;
+    static const char escseq[] = "\x1b[7m";
+    static size_t sz = sizeof escseq - 1;
+
+    buffer_write_wt((uint8_t *) escseq, sz);
+    //    WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int)
+    //    strlen(escseq),
+    //                  &unused, NULL);
+}
+
+void
+emit_stop_inverse(void)
+{
+    //    DWORD unused;
+    static const char escseq[] = "\x1b[27m";
+    static size_t sz = sizeof escseq - 1;
+
+    buffer_write_wt((uint8_t *) escseq, sz);
+    //    WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int)
+    //    strlen(escseq),
+    //                  &unused, NULL);
+}
+
+void
+emit_start_256color(int u256coloridx)
+{
+    //    DWORD unused;
+    static char tcolorbuf[QBUFSZ];
+    Snprintf(tcolorbuf, sizeof tcolorbuf, tcfmtstr256, (long) u256coloridx);
+    size_t sz = strlen(tcolorbuf);
+
+    buffer_write_wt((uint8_t *) tcolorbuf, sz);
+    //    WriteConsoleA(console.hConOut, (LPCSTR) tcolorbuf,
+    //                  (int) strlen(tcolorbuf), &unused, NULL);
+}
+
+void
+emit_start_24bitcolor(long color24bit)
+{
+    //    DWORD unused;
+    static char tcolorbuf[QBUFSZ];
+    uint32 mcolor = COLORVAL(color24bit);
+    size_t sz;
+
+    Snprintf(tcolorbuf, sizeof tcolorbuf, tcfmtstr24bit,
+             (long) ((mcolor >> 16) & 0xFF), /* red */
+             (long) ((mcolor >> 8) & 0xFF),  /* green */
+             (long) ((mcolor >> 0) & 0xFF)); /* blue */
+    sz = strlen(tcolorbuf);
+
+    buffer_write_wt((uint8_t *) tcolorbuf, sz);
+    //   WriteConsoleA(console.hConOut, (LPCSTR) tcolorbuf,
+    //                 (int) strlen(tcolorbuf), &unused, NULL);
+}
+
+void
+emit_default_color(void)
+{
+    //    DWORD unused;
+    static char escseq[] = "\x1b[39m";
+    static size_t sz = sizeof escseq - 1;
+
+    buffer_write_wt((uint8_t *) escseq, sz);
+    //   WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
+    //                 &unused, NULL);
+}
+void
+emit_return_to_default(void)
+{
+    //    DWORD unused;
+    static char escseq[] = "\x1b[0m";
+    static size_t sz = sizeof escseq - 1;
+
+    buffer_write_wt((uint8_t *) escseq, sz);
+    //   WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
+    //                 &unused, NULL);
+}
+
+DISABLE_WARNING_FORMAT_NONLITERAL
+
+void
+emit_cursor_up(int nlines)
+{
+    static char escseq[] = "\x1b[%dA";
+    static char buf[11];
+    size_t sz;
+
+    sz = sprintf(buf, escseq, nlines);
+    buffer_write_wt((uint8_t *) buf, sz);
+}
+void
+emit_cursor_down(int nlines)
+{
+    static char escseq[] = "\x1b[%dB";
+    static char buf[11];
+    size_t sz;
+
+    sz = sprintf(buf, escseq, nlines);
+    buffer_write_wt((uint8_t *) buf, sz);
+}
+
+void
+emit_cursor_horizontal_pos(int pos)
+{
+    static char escseq[] = "\x1b[%dG";
+    static char buf[11];
+    size_t sz;
+
+    sz = sprintf(buf, escseq, pos);
+    buffer_write_wt((uint8_t *) buf, sz);
+}
+
+void
+emit_cursor_left(void)
+{
+    static char escseq[] = "\x1b[D";
+    static size_t sz = sizeof escseq - 1;
+
+    buffer_write_wt((uint8_t *) escseq, sz);
+}
+
+void
+emit_cursor_left_n(int cnt)
+{
+    static char escseq[] = "\x1b[%dD";
+    static char buf[11];
+    size_t sz;
+
+    sz = sprintf(buf, escseq, cnt);
+    buffer_write_wt((uint8_t *) buf, sz);
+}
+
+void
+emit_cursor_right_n(int cnt)
+{
+    static char escseq[] = "\x1b[%dC";
+    static char buf[11];
+    size_t sz;
+
+    sz = sprintf(buf, escseq, cnt);
+    buffer_write_wt((uint8_t *) buf, sz);
+}
+
+void
+emit_cursor_right(void)
+{
+    static char escseq[] = "\x1b[C";
+    static size_t sz = sizeof escseq - 1;
+
+    buffer_write_wt((uint8_t *) escseq, sz);
+}
+
+void
+emit_cursor_goto(int x, int y)
+{
+    static char escseq[] = "\x1b[%d;%dH";
+    static char buf[15];
+    size_t sz;
+
+    sz = sprintf(buf, escseq, y, x);
+    buffer_write_wt((uint8_t *) buf, sz);
+}
+
+void
+emit_clear_screen(void)
+{
+    static const char escseq[] = "\x1b[2J";
+    static size_t sz = sizeof escseq - 1;
+
+    buffer_write_wt((uint8_t *) escseq, sz);
+}
+
+void
+emit_home(void)
+{
+    static const char escseq[] = "\x1b[H";
+    static size_t sz = sizeof escseq - 1;
+
+    buffer_write_wt((uint8_t *) escseq, sz);
+}
+
+void
+emit_clear_to_eol(void)
+{
+    static const char escseq[] = "\x1b[K";
+    static size_t sz = sizeof escseq - 1;
+
+    buffer_write_wt((uint8_t *) escseq, sz);
+}
+void
+emit_TE(void)
+{
+    static char escseq[] = "\x1b[?1049l";
+    static size_t sz = sizeof escseq - 1;
+
+    buffer_write_wt((uint8_t *) escseq, sz);
+}
+
+void
+emit_VE(void)
+{
+    static char escseq[] = "\x1b[?25h";
+    static size_t sz = sizeof escseq - 1;
+
+    buffer_write_wt((uint8_t *) escseq, sz);
+}
+void
+emit_KS(void)
+{
+    static char escseq[] = "\x1b[?1h";
+    static size_t sz = sizeof escseq - 1;
+
+    buffer_write_wt((uint8_t *) escseq, sz);
+}
+
+void
+emit_KE(void)
+{
+    static char escseq[] = "\x1b[?1l";
+    static size_t sz = sizeof escseq - 1;
+
+    buffer_write_wt((uint8_t *) escseq, sz);
+}
+
+void
+emit_TI(void)
+{
+    static char escseq[] = "\x1b[?1049h";
+    static size_t sz = sizeof escseq - 1;
+
+    buffer_write_wt((uint8_t *) escseq, sz);
+}
+
+void
+emit_VS(void)
+{
+    static char escseq[] = "\x1b[?12;25h";
+    static size_t sz = sizeof escseq - 1;
+
+    buffer_write_wt((uint8_t *) escseq, sz);
+}
+
+void
+emit_AS(void)
+{
+    static char escseq[] = "\x1b[11m";
+    static size_t sz = sizeof escseq - 1;
+
+    buffer_write_wt((uint8_t *) escseq, sz);
+}
+
+void
+emit_AE(void)
+{
+    static char escseq[] = "\x1b[10m";
+    static size_t sz = sizeof escseq - 1;
+
+    buffer_write_wt((uint8_t *) escseq, sz);
+}
+
+void
+emit_HE(void)
+{
+    static char escseq[] = "\x1b[0m";
+    static size_t sz = sizeof escseq - 1;
+
+    buffer_write_wt((uint8_t *) escseq, sz);
+}
+
+void
+emit_ND(void)
+{
+    static char escseq[] = "\x1b[C";
+    static size_t sz = sizeof escseq - 1;
+
+    buffer_write_wt((uint8_t *) escseq, sz);
+}
+
+void
+emit_ts(void)
+{
+    static char escseq[] = "\x1b]0";
+    static size_t sz = sizeof escseq - 1;
+
+    buffer_write_wt((uint8_t *) escseq, sz);
+}
+RESTORE_WARNING_FORMAT_NONLITERAL
+
+void
+term_startup(int *wid, int *hgt)
+{
+    *wid = console.width;
+    *hgt = console.height;
+    set_option_mod_status("mouse_support", set_in_game);
+}
+
+void
+term_shutdown(void)
+{
+    console_exit();
+}
+
+void
+tty_number_pad(int state)
+{
+    if (console.WindowsTerminal) {
+        switch (state) {
+        case -1: /* activate keypad mode (escape sequences) */
+            emit_KS();
+            break;
+        case 1: /* activate numeric mode for keypad (digits) */
+            emit_KE();
+            break;
+        case 0: /* don't need to do anything--leave terminal as-is */
+        default:
+            break;
+        }
+    }
+}
+
+void
+term_start_screen(void)
+{
+    if (console.WindowsTerminal) {
+        emit_TI();
+        emit_VS();
+#ifdef TERMLIB
+        if (SYMHANDLING(H_DEC))
+            tty_decgraphics_termcap_fixup();
+        /* set up callback in case option is not set yet but toggled later */
+        decgraphics_mode_callback = tty_decgraphics_termcap_fixup;
+#endif
+#ifdef ENHANCED_SYMBOLS
+        utf8graphics_mode_callback = tty_utf8graphics_fixup;
+#endif
+        if (gc.Cmd.num_pad)
+            tty_number_pad(1); /* make keypad send digits */
+    } else {
+        /* console.ConsoleAPI */
+        if (iflags.num_pad)
+            tty_number_pad(1); /* make keypad send digits */
+                               //   if (console.WindowsTerminal) {
+        ibmgraphics_mode_callback = tty_ibmgraphics_fixup;
+#ifdef ENHANCED_SYMBOLS
+#ifdef UTF8_FROM_CORE
+        utf8graphics_mode_callback = tty_utf8graphics_fixup;
+#endif
+#endif
+    }
+}
+
+void
+term_end_screen(void)
+{
+    if (console.WindowsTerminal) {
+        term_clear_screen();
+        emit_VE();
+        emit_TE();
+    } else {
+        /* console.ConsoleAPI */
+        term_clear_screen();
+        really_move_cursor();
+        buffer_fill_to_end_ConsoleAPI(console.back_buffer, &clear_cell, 0,
+                                      0);
+        back_buffer_flip_ConsoleAPI();
+        FlushConsoleInputBuffer(console.hConIn);
+    }
+}
+DISABLE_WARNING_FORMAT_NONLITERAL
+
+void
+nocmov(int x, int y)
+{
+    if (console.WindowsTerminal) {
+        if ((int) ttyDisplay->cury > y) {
+            while ((int) ttyDisplay->cury > y) { /* Go up. */
+                emit_cursor_up(1);
+                ttyDisplay->cury--;
+            }
+        } else if ((int) ttyDisplay->cury < y) { /* Go down. */
+            while ((int) ttyDisplay->cury < y) {
+                emit_cursor_down(1);
+                ttyDisplay->cury++;
+            }
+        }
+        if ((int) ttyDisplay->curx < x) { /* Go to the right. */
+            /* Go to the right. */
+            while ((int) ttyDisplay->curx < x) {
+                emit_ND();
+                ttyDisplay->curx++;
+            }
+        } else if ((int) ttyDisplay->curx > x) {
+            while ((int) ttyDisplay->curx > x) { /* Go to the left. */
+                emit_cursor_left();
+                ttyDisplay->curx--;
+            }
+        }
+    } else {
+        /* console.ConsoleAPI */
+        ttyDisplay->curx = x;
+        ttyDisplay->cury = y;
+
+        set_console_cursor(x, y);
+    }
+}
+
+void
+cmov(int x, int y)
+{
+    if (console.WindowsTerminal) {
+        static char escseq[] = "\x1b[%d;%dH";
+        size_t sz;
+
+        sz = sprintf(tgotobuf, escseq, y + 1, x + 1);
+        buffer_write_wt((uint8_t *) tgotobuf, sz);
+    } else {
+        /* console.ConsoleAPI */
+        if (x >= console.width)
+            x = console.width - 1;
+        if (y >= console.height)
+            y = console.height - 1;
+    }
+    ttyDisplay->cury = y;
+    ttyDisplay->curx = x;
+    if (console.ConsoleAPI) {
+        set_console_cursor(x, y);
+    }
+}
+
+RESTORE_WARNING_FORMAT_NONLITERAL
+
+void
+xputs(const char *s)
+{
+    int k;
+
+    if (s) {
+        if (console.WindowsTerminal) {
+            for (k = 0; s[k]; ++k)
+                xputc_core_wt(s[k], 0);
+        } else {
+            /* console.ConsoleAPI */
+            int slen = (int) strlen(s);
+
+            if (ttyDisplay)
+                set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
+            else
+                set_console_cursor(console.cursor.X, console.cursor.Y);
+            for (k = 0; k < slen && s[k]; ++k) {
+                xputc_core_ConsoleAPI((int) s[k]);
+            }
+        }
+    }
+}
+
+/* xputc_core() and g_putch() are the only routines that actually place
+   output. same signature as 'putchar()' with potential failure result ignored
+ */
+int
+xputc(int ch)
+{
+    if (console.WindowsTerminal) {
+        xputc_core_wt(ch, 0);
+    } else {
+        int x = ttyDisplay->curx, y = ttyDisplay->cury;
+
+        if (x < console.width && y < console.height) {
+            set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
+            xputc_core_ConsoleAPI((char) ch);
+        }
+    }
+    return ch;
+}
+
+void
+xputc_core_wt(int ch, int xcwflags)
+{
+    DWORD ccount = 0;
+    WCHAR wch[2];
+    static uint8 utf8str[MAX_UTF8_SEQUENCE];
+    int32_t last_color = -1, last_bkcolor = -1;
+
+    // emit_show_cursor();
+    if (console.has_unicode && xcwflags == 0) {
+        switch (ch) {
+        case '\n':
+            emit_cursor_down(1);
+            //            if (console.cursor.Y < console.height - 1)
+            //                console.cursor.Y++;
+            FALLTHROUGH;
+        /* FALLTHRU */
+        case '\r':
+            emit_cursor_horizontal_pos(1);
+            break;
+        case '\b':
+            emit_cursor_left();
+            break;
+        default:
+            wch[0] = (xcwflags == 0 && ch >= 0 && ch < SIZE(console.cpMap))
+                         ? console.cpMap[ch]
+                         : ch;
+            wch[1] = 0;
+            /* we have to convert it to UTF-8 for utf8str */
+            ccount =
+                WideCharToMultiByte(CP_UTF8, 0, wch, -1, (char *) utf8str,
+                                    (int) sizeof utf8str, NULL, NULL);
+        }
+    } else {
+        /* we can just use the UTF-8 utf8str field, since ascii is a
+           single-byte representation of a small subset of unicode */
+        utf8str[0] = ch;
+        utf8str[1] = 0;
+        ccount = 1;
+    }
+    if (ccount) {
+        if (xcwflags == 0) {
+            if (last_color != console.active.color) {
+                buffer_write_wt(
+                    (uint8_t *) esc_seq_colors[console.active.color],
+                    strlen(esc_seq_colors[console.active.color]));
+                last_color = console.active.color;
+            }
+            if (last_bkcolor != console.active.bkcolor) {
+                buffer_write_wt(
+                    (uint8_t *) esc_seq_bkcolors[console.active.bkcolor],
+                    strlen(esc_seq_bkcolors[console.active.bkcolor]));
+                last_bkcolor = console.active.bkcolor;
+            }
+        }
+        buffer_write_wt(utf8str, ccount);
+    }
+}
+
+void
+xputc_core_ConsoleAPI(char ch)
+{
+    DWORD ccount = 1; /* default to non-zero */
+    boolean inverse = FALSE;
+
+    nhassert(console.cursor.X >= 0 && console.cursor.X < console.width);
+    nhassert(console.cursor.Y >= 0 && console.cursor.Y < console.height);
+
+    cell_t cell;
+
+    switch (ch) {
+    case '\n':
+        if (console.cursor.Y < console.height - 1)
+            console.cursor.Y++;
+        FALLTHROUGH;
+    /* FALLTHRU */
+    case '\r':
+        console.cursor.X = 1;
+        break;
+    case '\b':
+        if (console.cursor.X > 1) {
+            console.cursor.X--;
+        } else if (console.cursor.Y > 0) {
+            console.cursor.X = console.width - 1;
+            console.cursor.Y--;
+        }
+        break;
+    default:
+        inverse = (console.active.nhattr[ATR_INVERSE] && iflags.wc_inverse);
+        console.active.attribute = (inverse)
+                                       ? ttycolors_inv[console.active.color]
+                                       : ttycolors[console.active.color];
+        if (console.active.nhattr[ATR_BOLD])
+            console.active.attribute |=
+                (inverse) ? BACKGROUND_INTENSITY : FOREGROUND_INTENSITY;
+
+        cell.attribute_consoleAPI = console.active.attribute;
+        cell.character_consoleAPI =
+            (console.has_unicode ? console.cpMap[ch] : ch);
+        if (ccount) {
+            buffer_write_ConsoleAPI(console.back_buffer, &cell,
+                                    console.cursor);
+            if (console.cursor.X == console.width - 1) {
+                if (console.cursor.Y < console.height - 1) {
+                    console.cursor.X = 1;
+                    console.cursor.Y++;
+                }
+            } else {
+                console.cursor.X++;
+            }
+        }
+    }
+    nhassert(console.cursor.X >= 0 && console.cursor.X < console.width);
+    nhassert(console.cursor.Y >= 0 && console.cursor.Y < console.height);
+}
+
+/*
+ * Overrides wintty.c function of the same name
+ * for win32. It is used for glyphs only, not text.
+ */
+#ifdef UTF8_FROM_CORE
+/* See g_pututf8() for a corresponding UTF-8 sequence
+ * version, rather than a single character.
+ */
+#endif
+
+void
+console_g_putch(int in_ch)
+{
+    unsigned char ch = (unsigned char) in_ch;
+    cell_t cell;
+    boolean inverse = FALSE;
+
+    if (console.WindowsTerminal) {
+        static int32_t last_color = -1, last_bkcolor = -1;
+        static uint8 utf8str[MAX_UTF8_SEQUENCE];
+
+#if defined(ASCIIGRAPH)
+        if (SYMHANDLING(H_UTF8)) {
+            (void) putchar(ch);
+        } else if (SYMHANDLING(H_IBM)
+                   /* for DECgraphics, lower-case letters with high bit set
+                      mean switch character set and render with high bit
+                      clear; might want 8-bits for other characters */
+                   || (iflags.eight_bit_tty
+                       && (!SYMHANDLING(H_DEC) || (in_ch & 0x7f) < 0x60))) {
+            /* IBM-compatible displays don't need other stuff */
+            xputc_core_wt(ch, 1);
+        } else if (ch & 0x80) {
+            if (!GFlag || HE_resets_AS) {
+                graph_on();
+                GFlag = TRUE;
+            }
+            xputc_core_wt((ch ^ 0x80), 1); /* Strip 8th bit */
+        } else {
+            if (GFlag
+#ifdef DECgraphicsOptimization
+                /* for DECgraphics, we only need to switch back from the
+                   line drawing character set to the normal one if 'ch' is
+                   a lowercase letter or one of a handful of punctuation
+                   characters (the range is contiguous but somewhat odd);
+                   deferring graph_off() now might allow skipping both it
+                   and next potential graph_on() */
+                && ch >= 0x5f && ch <= 0x7e
+#endif
+            ) {
+                graph_off();
+                GFlag = FALSE;
+            }
+            xputc_core_wt(ch, 1);
+        }
+#else /* ?ASCIIGRAPH */
+        xputc_core_wt(ch, 1);
+
+#endif /* ASCIIGRAPH */
+        return;
+    } else {
+        /* old ConsoleAPI */
+        set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
+        inverse = (console.active.nhattr[ATR_INVERSE] && iflags.wc_inverse);
+        console.active.attribute =
+            (console.active.nhattr[ATR_INVERSE] && iflags.wc_inverse)
+                ? ttycolors_inv[console.active.color]
+                : ttycolors[console.active.color];
+        if (console.active.nhattr[ATR_BOLD])
+            console.active.attribute |=
+                (inverse) ? BACKGROUND_INTENSITY : FOREGROUND_INTENSITY;
+        cell.attribute_consoleAPI = console.active.attribute;
+        cell.character_consoleAPI = (console.has_unicode ? cp437[ch] : ch);
+        buffer_write_ConsoleAPI(console.back_buffer, &cell, console.cursor);
+    }
+}
+
+/*
+ * Overrides wintty.c function of the same name
+ * for win32. It is used for glyphs only, not text and
+ * only when a UTF-8 sequence is involved for the
+ * representation. Single character representations
+ * use g_putch() instead.
+ */
+void
+g_pututf8(uint8 *sequence)
+{
+    DWORD ccount = 0;
+    static uint8 utf8str[MAX_UTF8_SEQUENCE];
+
+    if (console.WindowsTerminal) {
+        static int32_t last_color = -1, last_bkcolor = -1;
+#ifdef UTF8_FROM_CORE
+        ccount = snprintf((char *) utf8str, sizeof utf8str, "%s",
+                          (char *) sequence);
+
+        if (ttyDisplay->topl_utf8 && (windowprocs.wincap2 & WC2_U_UTF8STR)) {
+            ttyDisplay->curx++;
+        }
+        if (last_color != console.active.color) {
+            buffer_write_wt(
+                (uint8_t *) esc_seq_colors[console.active.color],
+                strlen(esc_seq_colors[console.active.color]));
+            last_color = console.active.color;
+        }
+        if (last_bkcolor != console.active.bkcolor) {
+            buffer_write_wt(
+                (uint8_t *) esc_seq_bkcolors[console.active.bkcolor],
+                strlen(esc_seq_bkcolors[console.active.bkcolor]));
+            last_bkcolor = console.active.bkcolor;
+        }
+        buffer_write_wt(utf8str, ccount);
+#endif /* UTF8_FROM_CORE */
+    }
+}
+
+const char *
+win32con_topl_fixup(const char *str)
+{
+#ifdef ENHANCED_SYMBOLS
+    if (ttyDisplay->topl_utf8 && (windowprocs.wincap2 & WC2_U_UTF8STR)
+        && SYMHANDLING(H_UTF8)) {
+        int i;
+        uint8 seq[7];
+        const char *c = str;
+
+        for (i = 0; i < sizeof seq - 1 && *c && *c != ' '; ++i) {
+            seq[i] = (uint8) *c;
+            c++;
+            str++;
+        }
+        seq[i] = '\0';
+        g_pututf8(seq);
+    }
+#endif
+    return str;
+}
+
+void
+cl_end(void)
+{
+    if (console.WindowsTerminal) {
+        emit_clear_to_eol();
+    } else {
+        /* console.ConsoleAPI */
+        if (ttyDisplay->curx < console.width
+            && ttyDisplay->cury < console.height) {
+            set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
+            buffer_clear_to_eol_ConsoleAPI(
+                console.back_buffer, console.cursor.X, console.cursor.Y);
+            tty_curs(BASE_WINDOW, (int) ttyDisplay->curx + 1,
+                     (int) ttyDisplay->cury);
+        }
+    }
+}
+void
+term_clear_screen(void)
+{
+    if (console.WindowsTerminal) {
+        emit_clear_screen();
+        home();
+        /* set remembered data to all spaces */
+        erase_tty_screen();
+    } else {
+        /* console.ConsoleAPI */
+        buffer_fill_to_end_ConsoleAPI(console.back_buffer, &clear_cell, 0, 0);
+        home();
+    }
+}
+
+void
+home(void)
+{
+    if (console.WindowsTerminal) {
+        emit_home();
+    } else {
+        /* console.ConsoleAPI */
+        set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
+    }
+    ttyDisplay->curx = ttyDisplay->cury = 0;
+}
+
+void
+standoutbeg(void)
+{
+    if (console.WindowsTerminal) {
+        emit_start_inverse();
+    } else {
+        /* console.ConsoleAPI */
+        term_start_attr(ATR_BOLD);
+    }
+}
+
+void
+standoutend(void)
+{
+    if (console.WindowsTerminal) {
+        emit_stop_inverse();
+    } else {
+        /* console.ConsoleAPI */
+        term_end_attr(ATR_BOLD);
+    }
+}
+
+void
+backsp(void)
+{
+    if (console.WindowsTerminal) {
+        emit_cursor_left();
+    } else {
+        /* console.ConsoleAPI */
+        set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
+        if (console.WindowsTerminal)
+            xputc_core_wt('\b', 0);
+        else
+            xputc_core_ConsoleAPI('\b');
+    }
+}
+
+void
+tty_nhbell(void)
+{
+    if (flags.silent || iflags.debug_fuzzer)
+        return;
+    Beep(8000, 500);
+}
+
+/* stub tcap replacements for linkage from wintty.c */
+
+#ifdef ASCIIGRAPH
+void
+graph_on(void)
+{
+    if (console.WindowsTerminal)
+        emit_AS();
+}
+
+void
+graph_off(void)
+{
+    if (console.WindowsTerminal)
+        emit_AE();
+}
+#endif
+
+volatile int junk; /* prevent optimizer from eliminating loop below */
+
+void
+tty_delay_output(void)
+{
+    /* delay 50 ms - uses ANSI C clock() function now */
+    clock_t goal;
+    int k;
+
+    if (console.WindowsTerminal) {
+        /* do nothing */
+    } else {
+        /* console.ConsoleAPI */
+        back_buffer_flip_ConsoleAPI();
+    }
+    if (iflags.debug_fuzzer)
+        return;
+    goal = 50 + clock();
+    while (goal > clock()) {
+        k = junk; /* Do nothing */
+    }
+    nhUse(k);
+}
+
+void
+cl_eos(void)
+{
+    if (console.WindowsTerminal) {
+        static const char escseq[] = "\x1b[J";
+        static size_t sz = sizeof escseq - 1;
+
+        buffer_write_wt((uint8_t *) escseq, sz);
+    } else {
+        buffer_fill_to_end_ConsoleAPI(console.back_buffer, &clear_cell,
+                                      ttyDisplay->curx, ttyDisplay->cury);
+        tty_curs(BASE_WINDOW, (int) ttyDisplay->curx + 1,
+                 (int) ttyDisplay->cury);
+    }
+}
+
+static char nulstr[] = "";
+static char ZH[] = "\x1b[3m", ZR[] = "\x1b[23m", MB[] = "\x1b[5m",
+            reset_MB[] = "\x1b[25m", nh_US[] = "\x1b[4m", UE[] = "\x1b[24m",
+            MD[] = "\x1b[1m", HE[] = "\x1b[21m", MR[] = "\x1b[7m",
+            reset_MR[] = "\x1b[27m", MH[] = "\x1b[2m",
+            reset_MH[] = "\x1b[22m", ME[] = "\x1b[0m";
+
+struct atr_s {
+    char *escseq;
+    size_t escseq_sz;
+};
+static struct atr_s atrtable[] = {
+    { ME, sizeof ME - 1 },       /* ATR_NONE    0 */
+    { MD, sizeof MD - 1 },       /* ATR_BOLD    1 */
+    { MH, sizeof MH - 1 },       /* ATR_DIM     2 */
+    { ZH, sizeof ZH - 1 },       /* ATR_ITALIC  3 */
+    { nh_US, sizeof nh_US - 1 }, /* ATR_ULINE   4 */
+    { MB, sizeof MB - 1 },       /* ATR_BLINK   5 */
+    { ME, sizeof ME - 1 },       /* filler      6 */
+    { MR, sizeof MR - 1 },       /* ATR_INVERSE 7 */
+};
+static struct atr_s atrtable_r[] = {
+    { ME, sizeof ME - 1 },             /* ATR_NONE    0 */
+    { HE, sizeof HE - 1 },             /* ATR_BOLD    1 */
+    { reset_MH, sizeof reset_MH - 1 }, /* ATR_DIM     2 */
+    { ZR, sizeof ZR - 1 },             /* ATR_ITALIC  3 */
+    { UE, sizeof UE - 1 },             /* ATR_ULINE   4 */
+    { reset_MB, sizeof reset_MB - 1 }, /* ATR_BLINK   5 */
+    { ME, sizeof ME - 1 },             /* filler      6 */
+    { reset_MR, sizeof reset_MR - 1 }, /* ATR_INVERSE 7 */
+};
+
+static char *
+s_atr2str(int n)
+{
+    if (n >= 0 && n < SIZE(atrtable))
+        return atrtable[n].escseq;
+    return nulstr;
+}
+
+static char *
+e_atr2str(int n)
+{
+    if (n >= 0 && n < SIZE(atrtable))
+        return atrtable_r[n].escseq;
+    return nulstr;
+}
+
+/* suppress nonfunctional highlights so render_status() might be able to
+   optimize more; keep this in sync with s_atr2str() */
+int
+term_attr_fixup(int attrmsk)
+{
+    if (console.WindowsTerminal) {
+        /* underline is converted to bold if its start sequence isn't
+         * available */
+        if ((attrmsk & HL_ULINE) && (!nh_US || !*nh_US)) {
+            attrmsk |= HL_BOLD;
+            attrmsk &= ~HL_ULINE;
+        }
+        /* blink used to be converted to bold unconditionally; now depends on
+         * MB
+         */
+        if ((attrmsk & HL_BLINK) && (!MB || !*MB)) {
+            attrmsk |= HL_BOLD;
+            attrmsk &= ~HL_BLINK;
+        }
+        /* dim is ignored if its start sequence isn't available */
+        if ((attrmsk & HL_DIM) && (!MH || !*MH)) {
+            attrmsk &= ~HL_DIM;
+        }
+        return attrmsk;
+    } else {
+        /* console.ConsoleAPI */
+        return attrmsk;
+    }
+}
+
+void
+term_start_attr(int attrib)
+{
+    if (attrib) {
+        if (console.WindowsTerminal) {
+            const char *astr = s_atr2str(attrib);
+
+            if (astr && *astr)
+                buffer_write_wt((uint8_t *) astr, strlen(astr));
+        } else {
+            /* console.ConsoleAPI */
+            switch (attrib) {
+            case ATR_INVERSE:
+                console.active.attribute |= atr_inverse;
+                break;
+            case ATR_ULINE:
+                console.active.attribute |= atr_uline;
+                break;
+            case ATR_BLINK:
+                console.active.attribute |= atr_blink;
+                break;
+            case ATR_BOLD:
+                console.active.attribute |= atr_bold;
+                break;
+            }
+            console.active.nhattr[attrib] = TRUE;
+        }
+    } else {
+        console.active.nhattr[ATR_NONE] = FALSE;
+    }
+}
+
+void
+term_end_attr(int attrib)
+{
+    if (console.WindowsTerminal) {
+        const char *astr = e_atr2str(attrib);
+
+        if (astr && *astr)
+            buffer_write_wt((uint8_t *) astr, strlen(astr));
+    } else {
+        /* console.ConsoleAPI */
+        int k;
+
+        switch (attrib) {
+        case ATR_INVERSE:
+            console.active.attribute &= ~atr_inverse;
+            break;
+        case ATR_ULINE:
+            console.active.attribute &= ~atr_uline;
+            break;
+        case ATR_BLINK:
+            console.active.attribute &= ~atr_blink;
+            break;
+        case ATR_BOLD:
+            console.active.attribute &= ~atr_bold;
+            break;
+        }
+        console.active.nhattr[attrib] = FALSE;
+        console.active.nhattr[ATR_NONE] = TRUE;
+        /* re-evaluate all attr now for performance at output time */
+        for (k = ATR_NONE; k <= ATR_INVERSE; ++k) {
+            if (console.active.nhattr[k])
+                console.active.nhattr[ATR_NONE] = FALSE;
+        }
+    }
+}
+
+void
+term_end_raw_bold(void)
+{
+    term_end_attr(ATR_BOLD);
+}
+
+void
+term_start_raw_bold(void)
+{
+    term_start_attr(ATR_BOLD);
+}
+
+void
+term_start_color(int color)
+{
+    if (console.WindowsTerminal) {
+        if (color == NO_COLOR)
+            emit_HE(); /* inline term_end_color() */
+        buffer_write_wt((uint8_t *) esc_seq_colors[color],
+                        strlen(esc_seq_colors[color]));
+    } else {
+        /* console.ConsoleAPI */
+        if (color == NO_COLOR) {
+            term_end_color();
+        } else if (color >= 0 && color < CLR_MAX) {
+            console.active.color = color;
+        } else {
+            console.active.color = NO_COLOR;
+        }
+    }
+}
+
+void
+term_start_bgcolor(int color)
+{
+    if (console.WindowsTerminal) {
+#if 0
+        Sprintf(tmp, "\033[%dm", ((color % 8) + 40));
+#endif
+        buffer_write_wt((uint8_t *) esc_seq_bkcolors[color],
+                        strlen(esc_seq_bkcolors[color]));
+    } else {
+        /* console.ConsoleAPI */
+        if (color != NO_COLOR && (color >= 0 && color < CLR_MAX)) {
+            console.active.bkcolor = color;
+        } else {
+            console.active.bkcolor = NO_COLOR;
+        }
+    }
+}
+
+void
+term_end_color(void)
+{
+    if (console.WindowsTerminal) {
+        emit_HE();
+    } else {
+        /* console.ConsoleAPI */
+        console.foreground = DEFTEXTCOLOR;
+        if (console.ConsoleAPI)
+            console.active.attribute =
+                (console.foreground | console.background);
+        console.active.color = NO_COLOR;
+        console.active.bkcolor = NO_COLOR;
+    }
+}
+
+void
+term_curs_set(int visibility)
+{
+    static int vis = -1;
+
+    if (vis == visibility)
+        return;
+
+    if (console.WindowsTerminal) {
+        if (visibility) {
+            emit_show_cursor();
+        } else {
+            emit_hide_cursor();
+        }
+    } else {
+        /* console.ConsoleAPI */
+        static CONSOLE_CURSOR_INFO cursorinfo = { 0, 0 };
+
+        if (!cursorinfo.dwSize) {
+            GetConsoleCursorInfo(console.hConOut, &cursorinfo);
+            vis = cursorinfo.bVisible ? 1 : 0;
+        }
+        cursorinfo.bVisible = visibility ? (BOOL) TRUE : (BOOL) FALSE;
+        SetConsoleCursorInfo(console.hConOut, &cursorinfo);
+    }
+    vis = visibility;
+}
+
+static void
+emit24bit(long mcolor)
+{
+    static char buf[QBUFSZ];
+    size_t sz;
+
+    sz =
+        snprintf(buf, sizeof buf, tcfmtstr, ((mcolor >> 16) & 0xFF), /* red */
+                 ((mcolor >> 8) & 0xFF),  /* green */
+                 ((mcolor >> 0) & 0xFF)); /* blue */
+    buffer_write_wt((uint8_t *) buf, sz);
+}
+
+static void
+emit256(int color256idx)
+{
+    static char buf[15];
+    size_t sz;
+
+    sz = sprintf(buf, tcfmtstr256, color256idx);
+    buffer_write_wt((uint8_t *) buf, sz);
+}
+
+void
+term_start_extracolor(uint32 customcolor, uint16 color256idx)
+{
+    /* color 0 has bit 0x1000000 set */
+    long mcolor = (customcolor & 0xFFFFFF);
+    if (iflags.colorcount == 256)
+        emit256(color256idx);
+    else
+        emit24bit(mcolor);
+}
+
+void
+term_end_extracolor(void)
+{
+    static char escseq[] = "\x1b[0m";
+    static size_t sz = sizeof escseq;
+
+    buffer_write_wt((uint8_t *) escseq, sz);
+}
+
+
+void buffer_fill_to_end_ConsoleAPI(cell_t * buffer, cell_t * fill, int x, int y);
+void buffer_write_ConsoleAPI(cell_t * buffer, cell_t * cell, COORD pos);
 static int32 rgbtable_to_int32(const struct nethack_color *tbl);
 void term_start_256color(int idx);
 void set_cp_map(void);
@@ -476,201 +1833,7 @@ free_custom_colors(void)
 #undef CLR_FREE
 }
 
-void emit_start_bold(void);
-void emit_stop_bold(void);
-void emit_start_dim(void);
-void emit_stop_dim(void);
-void emit_start_blink(void);
-void emit_stop_blink(void);
-void emit_start_underline(void);
-void emit_stop_underline(void);
-void emit_start_inverse(void);
-void emit_stop_inverse(void);
-void emit_start_24bitcolor(long color24bit);
-void emit_start_256color(int u256coloridx);
-void emit_default_color(void);
-void emit_return_to_default(void);
-void emit_hide_cursor(void);
-void emit_show_cursor(void);
-
-void
-emit_hide_cursor(void)
-{
-    DWORD unused;
-    static const char escseq[] = "\x1b[?25l";
-
-    WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
-                  &unused, NULL);
-}
-
-void
-emit_show_cursor(void)
-{
-    DWORD unused;
-    static const char escseq[] = "\x1b[?25h";
-
-    WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
-                  &unused, NULL);
-}
-
-void
-emit_start_bold(void)
-{
-    DWORD unused;
-    static const char escseq[] = "\x1b[1m";
-
-    WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
-                  &unused, NULL);
-}
-
-void
-emit_stop_bold(void)
-{
-    DWORD unused;
-    static const char escseq[] = "\x1b[24m";
-
-    WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
-                  &unused, NULL);
-}
-#if 0
-emit_start_dim(void)
-{
-    DWORD unused;
-    static const char escseq[] = "\x1b[4m";
-
-    WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
-                  &unused, NULL);
-}
-
-void
-emit_stop_dim(void)
-{
-    DWORD unused;
-    static const char escseq[] = "\x1b[24m";
-
-    WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
-                  &unused, NULL);
-}
-#endif
-
-void
-emit_start_blink(void)
-{
-    DWORD unused;
-    static const char escseq[] = "\x1b[5m";
-
-    WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
-                  &unused, NULL);
-}
-
-void
-emit_stop_blink(void)
-{
-    DWORD unused;
-    static const char escseq[] = "\x1b[25m";
-
-    WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
-                  &unused, NULL);
-}
-
-void
-emit_start_underline(void)
-{
-    DWORD unused;
-    static const char escseq[] = "\x1b[4m";
-
-    WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
-                  &unused, NULL);
-}
-
-void
-emit_stop_underline(void)
-{
-    DWORD unused;
-    static const char escseq[] = "\x1b[24m";
-
-    WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
-                  &unused, NULL);
-}
-void
-emit_start_inverse(void)
-{
-    DWORD unused;
-    static const char escseq[] = "\x1b[7m";
-
-    WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
-                  &unused, NULL);
-}
-
-void
-emit_stop_inverse(void)
-{
-    DWORD unused;
-    static const char escseq[] = "\x1b[27m";
-
-    WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
-                  &unused, NULL);
-}
-
-#if 0
-#define tcfmtstr "\x1b[38;2;%d;%d;%dm"
-#if 0
-#define tcfmtstr "\x1b[38:2:%d:%d:%dm"
-#endif
-#endif
-
-#ifndef SEP2
-#define tcfmtstr24bit "\x1b[38;2;%ld;%ld;%ldm"
-#define tcfmtstr256 "\x1b[38;5;%ldm"
-#else
-#define tcfmtstr24bit "\x1b[38:2:%ld:%ld:%ldm"
-#define tcfmtstr256 "\x1b[38:5:%ldm"
-#endif
-
-void
-emit_start_256color(int u256coloridx)
-{
-    DWORD unused;
-    static char tcolorbuf[QBUFSZ];
-    Snprintf(tcolorbuf, sizeof tcolorbuf, tcfmtstr256,
-             (long) u256coloridx);
-    WriteConsoleA(console.hConOut, (LPCSTR) tcolorbuf,
-                  (int) strlen(tcolorbuf), &unused, NULL);
-}
-
-void
-emit_start_24bitcolor(long color24bit)
-{
-    DWORD unused;
-    static char tcolorbuf[QBUFSZ];
-    uint32 mcolor = COLORVAL(color24bit);
-    Snprintf(tcolorbuf, sizeof tcolorbuf, tcfmtstr24bit,
-             (long) ((mcolor >> 16) & 0xFF),   /* red */
-             (long) ((mcolor >>  8) & 0xFF),   /* green */
-             (long) ((mcolor >>  0) & 0xFF));  /* blue */
-    WriteConsoleA(console.hConOut, (LPCSTR) tcolorbuf,
-                  (int) strlen(tcolorbuf), &unused, NULL);
-}
-
-void
-emit_default_color(void)
-{
-    DWORD unused;
-    static char escseq[] = "\x1b[39m";
-
-    WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
-                  &unused, NULL);
-}
-void
-emit_return_to_default(void)
-{
-    DWORD unused;
-    static char escseq[] = "\x1b[0m";
-
-    WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
-                  &unused, NULL);
-}
-
+    
 static boolean color24_on = TRUE;
 
 /* for debugging */
@@ -697,125 +1860,6 @@ enum did_flags {
 };
 
 static void
-back_buffer_flip(void)
-{
-    cell_t *back = console.back_buffer;
-    cell_t *front = console.front_buffer;
-    COORD pos;
-    DWORD unused;
-    unsigned do_anything, did_anything;
-
-    if (!console.is_ready)
-        return;
-
-    emit_hide_cursor();
-    for (pos.Y = 0; pos.Y < console.height; pos.Y++) {
-        for (pos.X = 0; pos.X < console.width; pos.X++) {
-            boolean pos_set = FALSE;
-            do_anything = did_anything = 0U;
-            if (back->color24 != front->color24)
-                do_anything |= do_color24;
-            if (back->colorseq != front->colorseq)
-                do_anything |= do_colorseq;
-            if (back->attr != front->attr)
-                do_anything |= do_newattr;
-            if (back->bkcolorseq != front->bkcolorseq)
-                do_anything |= do_bkcolorseq;
-#ifdef UTF8_FROM_CORE
-            if (!SYMHANDLING(H_UTF8)) {
-                if (console.has_unicode
-                    && (back->wcharacter != front->wcharacter))
-                    do_anything |= do_wide_content;
-            } else {
-#endif
-                if (back->utf8str[0] && front->utf8str[0]
-                    && strcmp((const char *) back->utf8str,
-                           (const char *) front->utf8str))
-                    do_anything |= do_utf8_content;
-#ifdef UTF8_FROM_CORE
-            }
-#endif
-            if (do_anything) {
-                SetConsoleCursorPosition(console.hConOut, pos);
-                pos_set = TRUE;
-                did_anything |= did_newattr;
-                if (back->attr) {
-                    if (back->attr & atr_bold)
-                        emit_start_bold();
-                    //  if (back->attr & atr_dim)
-                    //      emit_start_dim();
-                    if (back->attr & atr_uline)
-                        emit_start_underline();
-                    // if (back->attr & atr_blink)
-                    //    emit_start_blink();
-                    if (back->attr & atr_inverse)
-                        emit_start_inverse();
-                    // front->attr = back->attr; /* will happen below due
-                    // to did_newattr */
-                } else {
-                    emit_return_to_default();
-                }
-
-                if (color24_on && back->color24) {
-                    did_anything |= did_color24;
-                    if (back->color24) {
-                        if (!iflags.use_truecolor && iflags.colorcount == 256)
-                            emit_start_256color(back->color256idx);
-                        else
-                            emit_start_24bitcolor(back->color24);
-                    }
-                } else if (back->colorseq) {
-                    did_anything |= did_colorseq;
-                    WriteConsoleA(console.hConOut, back->colorseq,
-                                  (int) strlen(back->colorseq), &unused,
-                                  NULL);
-                }
-                if (back->bkcolorseq) {
-                    did_anything |= did_bkcolorseq;
-                    WriteConsoleA(console.hConOut, back->bkcolorseq,
-                                  (int) strlen(back->bkcolorseq), &unused,
-                                  NULL);
-                }
-                if ((did_anything & (did_colorseq | did_bkcolorseq | did_color24)) == 0) {
-                    did_anything &= ~(did_bkcolorseq | did_color24);
-                    did_anything |= did_colorseq;
-                    emit_default_color();
-                }
-                if (did_anything
-                    || (do_anything & (do_wide_content | do_utf8_content))) {
-#ifdef UTF8_FROM_CORE
-                    if (SYMHANDLING(H_UTF8) || !console.has_unicode) {
-                        WriteConsoleA(console.hConOut, (LPCSTR) back->utf8str,
-                                      (int) strlen((char *) back->utf8str),
-                                      &unused, NULL);
-                        did_anything |= did_utf8_content;
-                    } else {
-#endif
-                    WriteConsoleW(console.hConOut, &back->wcharacter, 1,
-                                  &unused, NULL);
-                    did_anything |= did_wide_content;
-#ifdef UTF8_FROM_CORE
-                    }
-#endif
-                }
-            }
-            if (did_anything) {
-                if (!pos_set) {
-                    SetConsoleCursorPosition(console.hConOut, pos);
-                    pos_set = TRUE;
-                }
-                emit_return_to_default();
-                *front = *back;
-            }
-            back++;
-            front++;
-        }
-    }
-    emit_show_cursor();
-}
-static void back_buffer_flip_ConsoleAPI(void);
-
-static void
 back_buffer_flip_ConsoleAPI(void)
 {
     cell_t *back = console.back_buffer;
@@ -823,7 +1867,7 @@ back_buffer_flip_ConsoleAPI(void)
     COORD pos;
     DWORD unused;
 
-    if (!console.is_ready)
+    if (!console.is_ready || !console.back_buffer || !console.front_buffer)
         return;
 
     for (pos.Y = 0; pos.Y < console.height; pos.Y++) {
@@ -851,8 +1895,11 @@ back_buffer_flip_ConsoleAPI(void)
 }
 
 void
-buffer_fill_to_end(cell_t *buffer, cell_t *fill, int x, int y)
+buffer_fill_to_end_ConsoleAPI(cell_t *buffer, cell_t *fill, int x, int y)
 {
+    if (!console.is_ready || !console.back_buffer || !console.front_buffer)
+        return;
+
     nhassert(x >= 0 && x < console.width);
     nhassert(y >= 0
              && ((y < console.height) || (y == console.height && x == 0)));
@@ -864,16 +1911,17 @@ buffer_fill_to_end(cell_t *buffer, cell_t *fill, int x, int y)
 
     if ((iflags.debug.immediateflips || !program_state.in_moveloop)
         && buffer == console.back_buffer) {
-        if (console.WindowsTerminal)
-            back_buffer_flip();
-        else
-            back_buffer_flip_ConsoleAPI();
+        back_buffer_flip_ConsoleAPI();
     }
 }
 
 static void
-buffer_clear_to_end_of_line(cell_t *buffer, int x, int y)
+buffer_clear_to_eol_ConsoleAPI(cell_t *buffer, int x, int y)
 {
+
+    if (!console.is_ready || !console.back_buffer || !console.front_buffer)
+    return;
+
     nhassert(x >= 0 && x < console.width);
     nhassert(y >= 0
              && ((y < console.height) || (y == console.height && x == 0)));
@@ -884,28 +1932,32 @@ buffer_clear_to_end_of_line(cell_t *buffer, int x, int y)
         *dst++ = clear_cell;
 
     if (iflags.debug.immediateflips || !program_state.in_moveloop) {
-        if (console.WindowsTerminal)
-            back_buffer_flip();
-        else
-            back_buffer_flip_ConsoleAPI();
+        back_buffer_flip_ConsoleAPI();
     }
 }
 
 void
-buffer_write(cell_t *buffer, cell_t *cell, COORD pos)
+buffer_write_ConsoleAPI(cell_t *buffer, cell_t *cell, COORD pos)
 {
-    nhassert(pos.X >= 0 && pos.X < console.width);
-    nhassert(pos.Y >= 0 && pos.Y < console.height);
 
-    cell_t *dst = buffer + (console.width * pos.Y) + pos.X;
-    *dst = *cell;
+    if (!console.is_ready || !console.back_buffer || !console.front_buffer)
+        return;
 
-    if ((iflags.debug.immediateflips || !program_state.in_moveloop)
-        && buffer == console.back_buffer) {
-        if (console.WindowsTerminal)
-            back_buffer_flip();
-        else
+    if (console.WindowsTerminal) {
+          /* do nothing */
+    } else {
+        /* console.ConsoleAPI */
+        cell_t *dst = buffer + (console.width * pos.Y) + pos.X;
+
+        *dst = *cell;
+
+        nhassert(pos.X >= 0 && pos.X < console.width);
+        nhassert(pos.Y >= 0 && pos.Y < console.height);
+
+        if ((iflags.debug.immediateflips || !program_state.in_moveloop)
+            && buffer == console.back_buffer) {
             back_buffer_flip_ConsoleAPI();
+        }
     }
 }
 
@@ -1023,11 +2075,13 @@ nethack_enter_consoletty(void)
                   GetWindowLong(console.hWnd, GWL_STYLE)
                      & ~WS_MAXIMIZEBOX & ~WS_SIZEBOX);
 #endif
-    if (iflags.windowsterminal && confirm_windows_terminal())
+    if (iflags.windowsterminal && confirm_windows_terminal()) {
         console.WindowsTerminal = TRUE;
-    else
+    } else {
         console.WindowsTerminal = FALSE;
+    }
     console.ConsoleAPI = !console.WindowsTerminal;
+    gn.no_terms = console.ConsoleAPI;
 
     CONSOLE_SCREEN_BUFFER_INFO csbi;
     if (GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi)) {
@@ -1105,15 +2159,20 @@ nethack_enter_consoletty(void)
         SetConsoleScreenBufferSize(console.hConOut, screen_size);
     }
 
-    /* setup front and back buffers */
-    int buffer_size_bytes = sizeof(cell_t) * console.buffer_size;
+    if (console.WindowsTerminal) {
+        //ring_buffer_init(&console.rb);
+    } else {
+        /* ConsoleAPI */
+        /* setup front and back buffers */
+        int buffer_size_bytes = sizeof(cell_t) * console.buffer_size;
 
-    console.front_buffer = (cell_t *) alloc(buffer_size_bytes);
-    buffer_fill_to_end(console.front_buffer, &undefined_cell, 0, 0);
+        console.front_buffer = (cell_t *) alloc(buffer_size_bytes);
+        buffer_fill_to_end_ConsoleAPI(console.front_buffer, &undefined_cell,
+                                      0, 0);
 
-    console.back_buffer = (cell_t *) alloc(buffer_size_bytes);
-    buffer_fill_to_end(console.back_buffer, &clear_cell, 0, 0);
-
+        console.back_buffer = (cell_t *) alloc(buffer_size_bytes);
+        buffer_fill_to_end_ConsoleAPI(console.back_buffer, &clear_cell, 0, 0);
+    }
     /* determine whether OS version has unicode support */
     /* console.has_unicode = (IsWindows8OrGreater()); */
     console.has_unicode = !OnWindows95_98_Me();
@@ -1215,99 +2274,33 @@ gettty(void)
     kill_char = 21; /* cntl-U */
     iflags.cbreak = TRUE;
     init_ttycolor();
+    settty_needed = TRUE;
 }
 
 /* reset terminal to original state */
 void
 settty(const char *s)
 {
-    cmov(ttyDisplay->curx, ttyDisplay->cury);
-    term_end_screen();
+#ifdef TTY_GRAPHICS
+    if (WINDOWPORT(tty))
+        term_end_screen();
+#endif
     if (s)
         raw_print(s);
     restore_original_console_font();
-    if (console.orig.QuickEdit) {
-        if (console.WindowsTerminal) {
-            DWORD cmode;
-
-            GetConsoleMode(console.hConIn, &cmode);
-            cmode |= (ENABLE_QUICK_EDIT_MODE | ENABLE_EXTENDED_FLAGS);
-            SetConsoleMode(console.hConIn, cmode);
-        } else {
-            GetConsoleMode(console.hConIn, &console.orig.in_cmode);
-            console.orig.in_cmode |= (ENABLE_QUICK_EDIT_MODE | ENABLE_EXTENDED_FLAGS);
-            SetConsoleMode(console.hConIn, console.orig.in_cmode);
-        }
-    }
+    SetConsoleMode(console.hConIn, console.orig.in_cmode);
+    SetConsoleMode(console.hConOut, console.orig.out_cmode);
+    settty_needed = FALSE;
 }
 
 /* called by init_nhwindows() and resume_nhwindows() */
 void
 setftty(void)
 {
-    term_start_screen();
-}
-
-void
-term_startup(int *wid, int *hgt)
-{
-    *wid = console.width;
-    *hgt = console.height;
-    set_option_mod_status("mouse_support", set_in_game);
-}
-
-void
-tty_number_pad(int state UNUSED)
-{
-    // do nothing
-}
-
-/* stub tcap replacements for linkage from wintty.c */
-
-void
-term_shutdown(void)
-{
-    console_exit();
-}
-
-#ifdef ASCIIGRAPH
-void
-graph_on(void)
-{
-}
-
-void
-graph_off(void)
-{
-}
+#ifdef TTY_GRAPHICS
+    if (WINDOWPORT(tty))
+        term_start_screen();
 #endif
-
-void
-term_end_screen(void)
-{
-    term_clear_screen();
-    really_move_cursor();
-    buffer_fill_to_end(console.back_buffer, &clear_cell, 0, 0);
-    if (console.WindowsTerminal)
-        back_buffer_flip();
-    else
-        back_buffer_flip_ConsoleAPI();
-    FlushConsoleInputBuffer(console.hConIn);
-}
-
-void
-term_start_screen(void)
-{
-    if (iflags.num_pad)
-        tty_number_pad(1); /* make keypad send digits */
-//   if (console.WindowsTerminal) {
-    ibmgraphics_mode_callback = tty_ibmgraphics_fixup;
-#ifdef ENHANCED_SYMBOLS
-#ifdef UTF8_FROM_CORE
-    utf8graphics_mode_callback = tty_utf8graphics_fixup;
-#endif
-#endif
-//   }
 }
 
 static BOOL
@@ -1466,529 +2459,137 @@ console_poskey(coordxy *x, coordxy *y, int *mod)
     return ch;
 }
 
-static void set_console_cursor(int x, int y)
-{
-    nhassert(x >= 0 && x < console.width);
-    nhassert(y >= 0 && y < console.height);
+DISABLE_WARNING_FORMAT_NONLITERAL
 
-    console.cursor.X = max(0, min(console.width - 1, x));
-    console.cursor.Y = max(0, min(console.height - 1, y));
+static void 
+set_console_cursor(int x, int y)
+{
+    if (console.WindowsTerminal) {
+        static const char escseq[] = "\x1b[%d;%dH";
+        char tmp[11];
+        size_t sz = sizeof tmp - 1;
+
+        tmp[0] = '\0';
+        if (y < 1000 && y >= 0 && x < 1000 && x >= 0) {
+            sz = sprintf(tmp, escseq, y, x);
+        }
+        buffer_write_wt((uint8_t *) tmp, sz);
+    } else {
+        /* console.ConsoleAPI) */
+        nhassert(x >= 0 && x < console.width);
+        nhassert(y >= 0 && y < console.height);
+
+        console.cursor.X = max(0, min(console.width - 1, x));
+        console.cursor.Y = max(0, min(console.height - 1, y));
+    }
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 static void
 really_move_cursor(void)
 {
-#ifdef PORT_DEBUG
-    char oldtitle[BUFSZ], newtitle[BUFSZ];
-    if (display_cursor_info && wizard) {
-        oldtitle[0] = '\0';
-        if (GetConsoleTitle(oldtitle, BUFSZ)) {
-            oldtitle[39] = '\0';
-        }
-        Snprintf(newtitle, sizeof newtitle,
-                 "%-55s tty=(%02d,%02d) consoletty=(%02d,%02d)",
-                 oldtitle,
-                 ttyDisplay->curx, ttyDisplay->cury,
-                 console.cursor.X, console.cursor.Y);
-        (void) SetConsoleTitle(newtitle);
-    }
-#endif
-    if (ttyDisplay)
-        set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
-
-    if (console.WindowsTerminal)
-        back_buffer_flip();
-    else
-        back_buffer_flip_ConsoleAPI();
-    SetConsoleCursorPosition(console.hConOut, console.cursor);
-}
-
-void
-cmov(int x, int y)
-{
-    if (x >= console.width)
-        x = console.width - 1;
-    if (y >= console.height)
-        y = console.height - 1;
-
-    ttyDisplay->cury = y;
-    ttyDisplay->curx = x;
-
-    set_console_cursor(x, y);
-}
-
-void
-nocmov(int x, int y)
-{
-    ttyDisplay->curx = x;
-    ttyDisplay->cury = y;
-
-    set_console_cursor(x, y);
-}
-
-void
-xputs(const char *s)
-{
-    int k;
-    int slen = (int) strlen(s);
-
-    if (ttyDisplay)
-        set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
-
-    if (s) {
-        for (k = 0; k < slen && s[k]; ++k) {
-            if (console.WindowsTerminal)
-                xputc_core(s[k]);
-            else
-                xputc_core_ConsoleAPI((int) s[k]);
-        }
-    }
-}
-
-/* xputc_core() and g_putch() are the only routines that actually place output.
-   same signature as 'putchar()' with potential failure result ignored */
-int
-xputc(int ch)
-{
-    int x = ttyDisplay->curx, y = ttyDisplay->cury;
-    if (x < console.width && y < console.height) {
-        set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
-        if (console.WindowsTerminal)
-            xputc_core(ch);
-        else
-            xputc_core_ConsoleAPI((char) ch);
-    }
-    return 0;
-}
-
-void
-xputc_core(int ch)
-{
-    ccount = 1; /* default to non-zero */
-    WCHAR wch[2];
-
-    nhassert(console.cursor.X >= 0 && console.cursor.X < console.width);
-    nhassert(console.cursor.Y >= 0 && console.cursor.Y < console.height);
-
-    cell_t cell;
-
-    switch (ch) {
-    case '\n':
-        if (console.cursor.Y < console.height - 1)
-            console.cursor.Y++;
-        FALLTHROUGH;
-    /* FALLTHRU */
-    case '\r':
-        console.cursor.X = 1;
-        break;
-    case '\b':
-        if (console.cursor.X > 1) {
-            console.cursor.X--;
-        } else if (console.cursor.Y > 0) {
-            console.cursor.X = console.width - 1;
-            console.cursor.Y--;
-        }
-        break;
-    default:
-        /* this causes way too much performance degradation */
-        /* cell.color24 = customcolors[console.active.color]; */
-        cell.colorseq = esc_seq_colors[console.active.color];
-        cell.bkcolorseq = esc_seq_bkcolors[console.active.bkcolor];
-        cell.attr = console.active.attribute;
-        // if (console.color24)
-        //    __debugbreak();
-        cell.color24 = 0L;
-        cell.color256idx = 0;
-        wch[1] = 0;
-        if (console.has_unicode) {
-            wch[0] = (ch >= 0 && ch < SIZE(console.cpMap)) ? console.cpMap[ch]
-                                                           : ch;
-#ifdef UTF8_FROM_CORE
-            if (SYMHANDLING(H_UTF8)) {
-                /* we have to convert it to UTF-8 for cell.utf8str */
-                ccount = WideCharToMultiByte(
-                    CP_UTF8, 0, wch, -1, (char *) cell.utf8str,
-                    (int) sizeof cell.utf8str, NULL, NULL);
-            } else {
-#endif
-            /* store the wide version here also, so we don't slow
-               down back_buffer_flip() with conversions */
-            cell.wcharacter = wch[0];
-#ifdef UTF8_FROM_CORE
-            }
-#endif
-        } else {
-            /* we can just use the UTF-8 utf8str field, since ascii is a
-               single-byte representation of a small subset of unicode */
-            cell.utf8str[0] = ch;
-            cell.utf8str[1] = 0;
-        }
-        if (ccount) {
-            buffer_write(console.back_buffer, &cell, console.cursor);
-            if (console.cursor.X == console.width - 1) {
-                if (console.cursor.Y < console.height - 1) {
-                    console.cursor.X = 1;
-                    console.cursor.Y++;
-                }
-            } else {
-                console.cursor.X++;
-            }
-        }
-    }
-    nhassert(console.cursor.X >= 0 && console.cursor.X < console.width);
-    nhassert(console.cursor.Y >= 0 && console.cursor.Y < console.height);
-}
-
-void
-xputc_core_ConsoleAPI(char ch)
-{
-    ccount = 1; /* default to non-zero */
-    boolean inverse = FALSE;
-
-    nhassert(console.cursor.X >= 0 && console.cursor.X < console.width);
-    nhassert(console.cursor.Y >= 0 && console.cursor.Y < console.height);
-
-    cell_t cell;
-
-    switch (ch) {
-    case '\n':
-        if (console.cursor.Y < console.height - 1)
-            console.cursor.Y++;
-        FALLTHROUGH;
-    /* FALLTHRU */
-    case '\r':
-        console.cursor.X = 1;
-        break;
-    case '\b':
-        if (console.cursor.X > 1) {
-            console.cursor.X--;
-        } else if (console.cursor.Y > 0) {
-            console.cursor.X = console.width - 1;
-            console.cursor.Y--;
-        }
-        break;
-    default:
-        inverse = (console.active.nhattr[ATR_INVERSE] && iflags.wc_inverse);
-        console.active.attribute = (inverse)
-                                       ? ttycolors_inv[console.active.color]
-                                       : ttycolors[console.active.color];
-        if (console.active.nhattr[ATR_BOLD])
-            console.active.attribute |=
-                (inverse) ? BACKGROUND_INTENSITY : FOREGROUND_INTENSITY;
-
-        cell.attribute_consoleAPI = console.active.attribute;
-        cell.character_consoleAPI = (console.has_unicode ? console.cpMap[ch] : ch);
-        if (ccount) {
-            buffer_write(console.back_buffer, &cell, console.cursor);
-            if (console.cursor.X == console.width - 1) {
-                if (console.cursor.Y < console.height - 1) {
-                    console.cursor.X = 1;
-                    console.cursor.Y++;
-                }
-            } else {
-                console.cursor.X++;
-            }
-        }
-    }
-    nhassert(console.cursor.X >= 0 && console.cursor.X < console.width);
-    nhassert(console.cursor.Y >= 0 && console.cursor.Y < console.height);
-}
-
-/*
- * Overrides wintty.c function of the same name
- * for win32. It is used for glyphs only, not text.
- */
-#ifdef UTF8_FROM_CORE
- /* See g_pututf8() for a corresponding UTF-8 sequence
-  * version, rather than a single character.
-  */
-#endif
-void
-console_g_putch(int in_ch)
-{
-    unsigned char ch = (unsigned char) in_ch;
-    cell_t cell;
-    boolean inverse = FALSE;
-    /* console.WindowsTerminal */
-    ccount = 0;
-    WCHAR wch[2];
-    boolean usemap = (ch >= 0 && ((int) ch < SIZE(console.cpMap)));
-
-    set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
     if (console.WindowsTerminal) {
-        cell.attr = console.active.attribute;
-        cell.colorseq = esc_seq_colors[console.active.color];
-        cell.bkcolorseq = esc_seq_bkcolors[console.active.bkcolor];
-        cell.color24 = console.color24 ? console.color24 : 0L;
-        cell.color256idx = 0;
-        wch[1] = 0;
-        if (console.has_unicode) {
-            wch[0] = (usemap) ? console.cpMap[ch] : ch;
-#ifdef UTF8_FROM_CORE
-            if (SYMHANDLING(H_UTF8)) {
-                /* we have to convert it to UTF-8 for cell.utf8str */
-                ccount = WideCharToMultiByte(
-                    CP_UTF8, 0, wch, -1, (char *) cell.utf8str,
-                    (int) sizeof cell.utf8str, NULL, NULL);
-            } else {
-#endif
-                /* store the wide version here also, so we don't slow
-                   down back_buffer_flip() with conversions */
-                cell.wcharacter = wch[0];
-#ifdef UTF8_FROM_CORE
-            }
-#endif
-        } else {
-            /* we can just use the UTF-8 utf8str field, since ascii is a
-               single-byte representation of a small subset of unicode */
-            cell.utf8str[0] = ch;
-            cell.utf8str[1] = 0;
-            ccount = 2;
-        }
+        /* do nothing */
     } else {
-        /* old ConsoleAPI */
-        inverse = (console.active.nhattr[ATR_INVERSE] && iflags.wc_inverse);
-        console.active.attribute =
-            (console.active.nhattr[ATR_INVERSE] && iflags.wc_inverse)
-                ? ttycolors_inv[console.active.color]
-                : ttycolors[console.active.color];
-        if (console.active.nhattr[ATR_BOLD])
-            console.active.attribute |=
-                (inverse) ? BACKGROUND_INTENSITY : FOREGROUND_INTENSITY;
-        cell.attribute_consoleAPI = console.active.attribute;
-        cell.character_consoleAPI = (console.has_unicode ? cp437[ch] : ch);
-    }
-    buffer_write(console.back_buffer, &cell, console.cursor);
-}
-
-/*
- * Overrides wintty.c function of the same name
- * for win32. It is used for glyphs only, not text and
- * only when a UTF-8 sequence is involved for the
- * representation. Single character representations
- * use g_putch() instead.
- */
-void
-g_pututf8(uint8 *sequence)
-{
-    if (console.WindowsTerminal) {
-#ifdef UTF8_FROM_CORE
-        set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
-        cell_t cell;
-        cell.attr = console.active.attribute;
-        cell.colorseq = esc_seq_colors[console.active.color];
-        cell.bkcolorseq = esc_seq_bkcolors[console.active.bkcolor];
-        cell.color24 = console.color24 ? console.color24 : 0L;
-        cell.color256idx = console.color256idx ? console.color256idx : 0;
-        Snprintf((char *) cell.utf8str, sizeof cell.utf8str, "%s",
-                 (char *) sequence);
-        buffer_write(console.back_buffer, &cell, console.cursor);
-        if (ttyDisplay->topl_utf8 && (windowprocs.wincap2 & WC2_U_UTF8STR)) {
-            if (console.cursor.X < console.width - 1) {
-                console.cursor.X++;
-                ttyDisplay->curx++;
+        /* console.ConsoleAPI */
+#ifdef PORT_DEBUG
+        char oldtitle[BUFSZ], newtitle[BUFSZ];
+        if (display_cursor_info && wizard) {
+            oldtitle[0] = '\0';
+            if (GetConsoleTitle(oldtitle, BUFSZ)) {
+                oldtitle[39] = '\0';
             }
+            Snprintf(newtitle, sizeof newtitle,
+                     "%-55s tty=(%02d,%02d) consoletty=(%02d,%02d)", oldtitle,
+                     ttyDisplay->curx, ttyDisplay->cury, console.cursor.X,
+                     console.cursor.Y);
+            (void) SetConsoleTitle(newtitle);
         }
-#endif /* UTF8_FROM_CORE */
-    }
-}
-
-const char *
-win32con_topl_fixup(const char *str)
-{
-#ifdef ENHANCED_SYMBOLS
-    if (ttyDisplay->topl_utf8 && (windowprocs.wincap2 & WC2_U_UTF8STR)
-        && SYMHANDLING(H_UTF8)) {
-        int i;
-        uint8 seq[7];
-        const char *c = str;
-
-        for (i = 0; i < sizeof seq - 1 && *c && *c != ' '; ++i) {
-            seq[i] = (uint8) *c;
-            c++;
-            str++;
-        }
-        seq[i] = '\0';
-        g_pututf8(seq);
-    }
 #endif
-    return str;
-}
-
-void
-term_start_extracolor(uint32 nhcolor, uint16 color256idx)
-{
-    if (console.WindowsTerminal) {
-        if ((nhcolor & NH_BASIC_COLOR) == 0) {
-            console.color24 =
-                COLORVAL(nhcolor); /* color 0 has bit 0x1000000 set */
-            console.active.colorflags = 0;
-            console.color256idx = color256idx;
-        }
+        if (ttyDisplay)
+            set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
+        back_buffer_flip_ConsoleAPI();
+        SetConsoleCursorPosition(console.hConOut, console.cursor);
     }
-    /* NH_BASIC_COLOR */
-    console.active.color = COLORVAL(nhcolor);
-    console.active.colorflags = NH_BASIC_COLOR;
-    term_start_color(console.active.color);
 }
 
-void term_start_256color(int idx UNUSED)
+static void
+buffer_write_wt(uint8_t *buffer, size_t sz)
 {
-}
+    DWORD unused;
 
-void
-term_end_extracolor(void)
-{
-    if (console.WindowsTerminal) {
-        console.color24 = 0L;
-        console.color256idx = 0;
-    }
-    console.active.color = NO_COLOR;
-}
+    if (!console.is_ready)
+        return;
 
-void
-cl_end(void)
-{
-    if (ttyDisplay->curx < console.width
-            && ttyDisplay->cury < console.height) {
-        set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
-        buffer_clear_to_end_of_line(console.back_buffer, console.cursor.X,
-                                    console.cursor.Y);
-        tty_curs(BASE_WINDOW, (int) ttyDisplay->curx + 1,
-                 (int) ttyDisplay->cury);
-    }
+    WriteConsoleA(console.hConOut, (LPCSTR) buffer,
+                  (int) sz, &unused, NULL);
 }
 
 void
 raw_clear_screen(void)
 {
-    if (WINDOWPORT(tty)) {
-        cell_t * back = console.back_buffer;
-        cell_t * front = console.front_buffer;
-        COORD pos;
-        DWORD unused;
+    if (console.WindowsTerminal) {
+        static const char escseq[] = "\x1b[2J\x1b[H";
+        static size_t sz = sizeof escseq - 1;
 
-        if (console.WindowsTerminal) {
-            pos.Y = 0;
-            pos.X = 0;
-            SetConsoleCursorPosition(console.hConOut, pos);
-            emit_return_to_default();
-        }
-        for (pos.Y = 0; pos.Y < console.height; pos.Y++) {
-            for (pos.X = 0; pos.X < console.width; pos.X++) {
-                if (console.WindowsTerminal) {
-                    *back = clear_cell;
-                    if (console.has_unicode)
-                        WriteConsoleW(console.hConOut, &back->wcharacter, 1,
-                                      &unused, NULL);
-                    else
-                        WriteConsoleA(console.hConOut, (LPCSTR) back->utf8str,
-                                      (int) strlen((char *) back->utf8str),
-                                      &unused, NULL);
-                }
-                if (console.ConsoleAPI) {
-                    WriteConsoleOutputAttribute(
-                        console.hConOut, &back->attribute_consoleAPI, 1, pos, &unused);
-                    front->attribute_consoleAPI = back->attribute_consoleAPI;
-                    if (console.has_unicode) {
-                        WriteConsoleOutputCharacterW(console.hConOut,
-                                                     &back->character_consoleAPI, 1, pos,
-                                                     &unused);
-                    } else {
-                        char ch = (char) back->character_consoleAPI;
-                        WriteConsoleOutputCharacterA(console.hConOut, &ch, 1,
-                                                     pos, &unused);
+        buffer_write_wt((uint8_t *) escseq, sz); 
+    } else {
+        /* console.ConsoleAPI */
+        if (WINDOWPORT(tty)) {
+            cell_t *back = console.back_buffer;
+            cell_t *front = console.front_buffer;
+            COORD pos;
+            DWORD unused;
+
+            if (console.WindowsTerminal) {
+                pos.Y = 0;
+                pos.X = 0;
+                SetConsoleCursorPosition(console.hConOut, pos);
+                emit_return_to_default();
+            }
+            if (console.ConsoleAPI) {
+                for (pos.Y = 0; pos.Y < console.height; pos.Y++) {
+                    for (pos.X = 0; pos.X < console.width; pos.X++) {
+                        if (console.WindowsTerminal) {
+                            *back = clear_cell;
+                            if (console.has_unicode)
+                                WriteConsoleW(console.hConOut,
+                                              &back->wcharacter, 1, &unused,
+                                              NULL);
+                            else
+                                WriteConsoleA(
+                                    console.hConOut, (LPCSTR) back->utf8str,
+                                    (int) strlen((char *) back->utf8str),
+                                    &unused, NULL);
+                        }
+                        if (console.ConsoleAPI) {
+                            WriteConsoleOutputAttribute(
+                                console.hConOut, &back->attribute_consoleAPI,
+                                1, pos, &unused);
+                            front->attribute_consoleAPI =
+                                back->attribute_consoleAPI;
+                            if (console.has_unicode) {
+                                WriteConsoleOutputCharacterW(
+                                    console.hConOut,
+                                    &back->character_consoleAPI, 1, pos,
+                                    &unused);
+                            } else {
+                                char ch = (char) back->character_consoleAPI;
+                                WriteConsoleOutputCharacterA(
+                                    console.hConOut, &ch, 1, pos, &unused);
+                            }
+                        }
+                        *front = *back;
+                        back++;
+                        front++;
                     }
                 }
-                *front = *back;
-                back++;
-                front++;
             }
         }
     }
 }
 
-void
-term_clear_screen(void)
-{
-    buffer_fill_to_end(console.back_buffer, &clear_cell, 0, 0);
-    home();
-}
-
-void
-term_curs_set(int visibility)
-{
-    static int vis = -1;
-
-    if (vis == visibility)
-        return;
-
-    static CONSOLE_CURSOR_INFO cursorinfo = { 0, 0 };
-
-    if (!cursorinfo.dwSize) {
-        GetConsoleCursorInfo(console.hConOut, &cursorinfo);
-        vis = cursorinfo.bVisible ? 1 : 0;
-    }
-    cursorinfo.bVisible = visibility ? (BOOL) TRUE : (BOOL) FALSE;
-    SetConsoleCursorInfo(console.hConOut, &cursorinfo);
-    vis = visibility;
-}
-
-void
-home(void)
-{
-    ttyDisplay->curx = ttyDisplay->cury = 0;
-    set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
-}
-
-void
-backsp(void)
-{
-    set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
-    if (console.WindowsTerminal)
-        xputc_core('\b');
-    else
-        xputc_core_ConsoleAPI('\b');
-}
-
-void
-cl_eos(void)
-{
-    buffer_fill_to_end(console.back_buffer, &clear_cell, ttyDisplay->curx,
-                        ttyDisplay->cury);
-    tty_curs(BASE_WINDOW, (int) ttyDisplay->curx + 1, (int) ttyDisplay->cury);
-}
-
-void
-tty_nhbell(void)
-{
-    if (flags.silent || iflags.debug_fuzzer)
-        return;
-    Beep(8000, 500);
-}
-
-volatile int junk; /* prevent optimizer from eliminating loop below */
-
-void
-tty_delay_output(void)
-{
-    /* delay 50 ms - uses ANSI C clock() function now */
-    clock_t goal;
-    int k;
-
-    goal = 50 + clock();
-    if (console.WindowsTerminal)
-        back_buffer_flip();
-    else
-        back_buffer_flip_ConsoleAPI();
-    if (iflags.debug_fuzzer)
-        return;
-
-    while (goal > clock()) {
-        k = junk; /* Do nothing */
-    }
-    nhUse(k);
-}
 
 /*
  * CLR_BLACK             0
@@ -2053,118 +2654,7 @@ init_ttycolor(void)
     init_ttycolor_completed = TRUE;
 }
 
-int
-term_attr_fixup(int attrmask)
-{
-    return attrmask;
-}
 
-void
-term_start_attr(int attrib)
-{
-    if (console.WindowsTerminal) {
-        switch (attrib) {
-        case ATR_INVERSE:
-            console.active.attribute |= atr_inverse;
-            break;
-        case ATR_ULINE:
-            console.active.attribute |= atr_uline;
-            break;
-        case ATR_BLINK:
-            console.active.attribute |= atr_blink;
-            break;
-        case ATR_BOLD:
-            console.active.attribute |= atr_bold;
-            break;
-        }
-    }
-    console.active.nhattr[attrib] = TRUE;
-    if (attrib) console.active.nhattr[ATR_NONE] = FALSE;
-}
-
-void
-term_end_attr(int attrib)
-{
-    int k;
-
-    switch (attrib) {
-    case ATR_INVERSE:
-        console.active.attribute &= ~atr_inverse;
-        break;
-    case ATR_ULINE:
-        console.active.attribute &= ~atr_uline;
-        break;
-    case ATR_BLINK:
-        console.active.attribute &= ~atr_blink;
-        break;
-    case ATR_BOLD:
-        console.active.attribute &= ~atr_bold;
-        break;
-    }
-    console.active.nhattr[attrib] = FALSE;
-    console.active.nhattr[ATR_NONE] = TRUE;
-    /* re-evaluate all attr now for performance at output time */
-    for (k=ATR_NONE; k <= ATR_INVERSE; ++k) {
-        if (console.active.nhattr[k])
-            console.active.nhattr[ATR_NONE] = FALSE;
-    }
-}
-
-void
-term_end_raw_bold(void)
-{
-    term_end_attr(ATR_BOLD);
-}
-
-void
-term_start_raw_bold(void)
-{
-    term_start_attr(ATR_BOLD);
-}
-
-void
-term_start_color(int color)
-{
-    if (color == NO_COLOR) {
-        term_end_color();
-    } else if (color >= 0 && color < CLR_MAX) {
-        console.active.color = color;
-    } else {
-       console.active.color = NO_COLOR;
-    }
-}
-
-void
-term_start_bgcolor(int color)
-{
-    if (color != NO_COLOR && (color >= 0 && color < CLR_MAX)) {
-        console.active.bkcolor = color;
-    } else {
-        console.active.bkcolor = NO_COLOR;
-    }
-}
-
-void
-term_end_color(void)
-{
-    console.foreground = DEFTEXTCOLOR;
-    if (console.ConsoleAPI)
-        console.active.attribute = (console.foreground | console.background);
-    console.active.color = NO_COLOR;
-    console.active.bkcolor = NO_COLOR;
-}
-
-void
-standoutbeg(void)
-{
-    term_start_attr(ATR_BOLD);
-}
-
-void
-standoutend(void)
-{
-    term_end_attr(ATR_BOLD);
-}
 
 #ifndef NO_MOUSE_ALLOWED
 void
@@ -4021,5 +4511,4 @@ wincon_WindowsTerminalActive(void)
 {
     return console.WindowsTerminal;
 }
-
 #endif /* WIN32 */

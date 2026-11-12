@@ -63,8 +63,10 @@
                              Allow paths to be specified for HACKDIR,       \
                              LEVELDIR, SAVEDIR, BONESDIR, DATADIR,          \
                              SCOREDIR, LOCKDIR, CONFIGDIR, and TROUBLEDIR */
+#ifdef WIN32CON
 #define NO_TERMS
 #define ASCIIGRAPH
+#endif
 
 #ifdef OPTIONS_USED
 #undef OPTIONS_USED
