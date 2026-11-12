@@ -14,10 +14,6 @@
  *
  */
 
-#ifndef NO_VT
-#define UTF8_FROM_CORE
-#endif
-
 #ifdef WIN32
 #define NEED_VARARGS /* Uses ... */
 #include "win32api.h"
@@ -424,52 +420,37 @@ static boolean HE_resets_AS; /* see termcap.c */
 void
 emit_hide_cursor(void)
 {
-    //    DWORD unused;
     static const char escseq[] = "\x1b[?25l";
     static size_t sz = sizeof escseq - 1;
 
     buffer_write_wt((uint8_t *) escseq, sz);
-    //    WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int)
-    //    strlen(escseq),
-    //                  &unused, NULL);
 }
 
 void
 emit_show_cursor(void)
 {
-    //   DWORD unused;
     static const char escseq[] = "\x1b[?25h";
     static size_t sz = sizeof escseq - 1;
 
     buffer_write_wt((uint8_t *) escseq, sz);
-    //    WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int)
-    //    strlen(escseq),
-    //                  &unused, NULL);
 }
 
 void
 emit_start_bold(void)
 {
-    //    DWORD unused;
     static const char escseq[] = "\x1b[1m";
     static size_t sz = sizeof escseq - 1;
 
     buffer_write_wt((uint8_t *) escseq, sz);
-    //   WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
-    //                 &unused, NULL);
 }
 
 void
 emit_stop_bold(void)
 {
-    //   DWORD unused;
     static const char escseq[] = "\x1b[24m";
     static size_t sz = sizeof escseq - 1;
 
     buffer_write_wt((uint8_t *) escseq, sz);
-    //    WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int)
-    //    strlen(escseq),
-    //                  &unused, NULL);
 }
 
 void
@@ -493,95 +474,69 @@ emit_stop_dim(void)
 void
 emit_start_blink(void)
 {
-    //    DWORD unused;
     static const char escseq[] = "\x1b[5m";
     static size_t sz = sizeof escseq - 1;
 
     buffer_write_wt((uint8_t *) escseq, sz);
-    //    WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int)
-    //    strlen(escseq),
-    //                  &unused, NULL);
 }
 
 void
 emit_stop_blink(void)
 {
-    //    DWORD unused;
     static const char escseq[] = "\x1b[25m";
     static size_t sz = sizeof escseq - 1;
 
     buffer_write_wt((uint8_t *) escseq, sz);
-    //   WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
-    //                 &unused, NULL);
 }
 
 void
 emit_start_underline(void)
 {
-    //    DWORD unused;
     static const char escseq[] = "\x1b[4m";
     static size_t sz = sizeof escseq - 1;
 
     buffer_write_wt((uint8_t *) escseq, sz);
-    //   WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
-    //                 &unused, NULL);
 }
 
 void
 emit_stop_underline(void)
 {
-    //    DWORD unused;
     static const char escseq[] = "\x1b[24m";
     static size_t sz = sizeof escseq - 1;
 
     buffer_write_wt((uint8_t *) escseq, sz);
-    //    WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int)
-    //    strlen(escseq),
-    //                  &unused, NULL);
 }
 void
 emit_start_inverse(void)
 {
-    //    DWORD unused;
     static const char escseq[] = "\x1b[7m";
     static size_t sz = sizeof escseq - 1;
 
     buffer_write_wt((uint8_t *) escseq, sz);
-    //    WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int)
-    //    strlen(escseq),
-    //                  &unused, NULL);
 }
 
 void
 emit_stop_inverse(void)
 {
-    //    DWORD unused;
     static const char escseq[] = "\x1b[27m";
     static size_t sz = sizeof escseq - 1;
 
     buffer_write_wt((uint8_t *) escseq, sz);
-    //    WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int)
-    //    strlen(escseq),
-    //                  &unused, NULL);
 }
 
 void
 emit_start_256color(int u256coloridx)
 {
-    //    DWORD unused;
     static char tcolorbuf[QBUFSZ];
     Snprintf(tcolorbuf, sizeof tcolorbuf, tcfmtstr256, (long) u256coloridx);
     size_t sz = strlen(tcolorbuf);
 
     buffer_write_wt((uint8_t *) tcolorbuf, sz);
-    //    WriteConsoleA(console.hConOut, (LPCSTR) tcolorbuf,
-    //                  (int) strlen(tcolorbuf), &unused, NULL);
 }
 
 void
 emit_start_24bitcolor(long color24bit)
 {
-    //    DWORD unused;
     static char tcolorbuf[QBUFSZ];
     uint32 mcolor = COLORVAL(color24bit);
     size_t sz;
@@ -593,31 +548,23 @@ emit_start_24bitcolor(long color24bit)
     sz = strlen(tcolorbuf);
 
     buffer_write_wt((uint8_t *) tcolorbuf, sz);
-    //   WriteConsoleA(console.hConOut, (LPCSTR) tcolorbuf,
-    //                 (int) strlen(tcolorbuf), &unused, NULL);
 }
 
 void
 emit_default_color(void)
 {
-    //    DWORD unused;
     static char escseq[] = "\x1b[39m";
     static size_t sz = sizeof escseq - 1;
 
     buffer_write_wt((uint8_t *) escseq, sz);
-    //   WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
-    //                 &unused, NULL);
 }
 void
 emit_return_to_default(void)
 {
-    //    DWORD unused;
     static char escseq[] = "\x1b[0m";
     static size_t sz = sizeof escseq - 1;
 
     buffer_write_wt((uint8_t *) escseq, sz);
-    //   WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
-    //                 &unused, NULL);
 }
 
 DISABLE_WARNING_FORMAT_NONLITERAL
@@ -883,12 +830,9 @@ term_start_screen(void)
         /* console.ConsoleAPI */
         if (iflags.num_pad)
             tty_number_pad(1); /* make keypad send digits */
-                               //   if (console.WindowsTerminal) {
         ibmgraphics_mode_callback = tty_ibmgraphics_fixup;
 #ifdef ENHANCED_SYMBOLS
-#ifdef UTF8_FROM_CORE
         utf8graphics_mode_callback = tty_utf8graphics_fixup;
-#endif
 #endif
     }
 }
@@ -1121,11 +1065,9 @@ xputc_core_ConsoleAPI(char ch)
  * Overrides wintty.c function of the same name
  * for win32. It is used for glyphs only, not text.
  */
-#ifdef UTF8_FROM_CORE
 /* See g_pututf8() for a corresponding UTF-8 sequence
  * version, rather than a single character.
  */
-#endif
 
 void
 console_g_putch(int in_ch)
@@ -1208,7 +1150,6 @@ g_pututf8(uint8 *sequence)
     static uint8 utf8str[MAX_UTF8_SEQUENCE];
 
     if (console.WindowsTerminal) {
-#ifdef UTF8_FROM_CORE
         ccount = snprintf((char *) utf8str, sizeof utf8str, "%s",
                           (char *) sequence);
 
@@ -1216,7 +1157,6 @@ g_pututf8(uint8 *sequence)
             ttyDisplay->curx++;
         }
         buffer_write_wt(utf8str, ccount);
-#endif /* UTF8_FROM_CORE */
     }
 }
 
@@ -2672,23 +2612,19 @@ consoletty_preference_update(const char *pref)
 #endif
     }
     if (stricmp(pref, "symset") == 0) {
-#ifdef UTF8_FROM_CORE
         if ((tty_procs.wincap2 & WC2_U_UTF8STR) && SYMHANDLING(H_UTF8)) {
 #ifdef ENHANCED_SYMBOLS
             tty_utf8graphics_fixup();
 #endif
-        } else if ((tty_procs.wincap2 & WC2_U_UTF8STR) && SYMHANDLING(H_IBM)) {
-#else
-        if (SYMHANDLING(H_IBM)) {
-#endif
+        } else if ((tty_procs.wincap2 & WC2_U_UTF8STR)
+                   && SYMHANDLING(H_IBM)) {
             tty_ibmgraphics_fixup();
+            check_and_set_font();
         }
-        check_and_set_font();
     }
     return;
 }
 
-#ifdef UTF8_FROM_CORE
 /*
  * This is called when making the switch to a symset
  * with a UTF8 handler to allow any operating system
@@ -2765,7 +2701,6 @@ tty_utf8graphics_fixup(void)
     }
     GetConsoleMode(console.hConOut, &console.active.out_cmode);
 }
-#endif /* UTF8_FROM_CORE */
 
 /*
  * This is called when making the switch to a symset
