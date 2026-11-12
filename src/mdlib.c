@@ -559,6 +559,9 @@ static const char *const build_opts[] = {
     "screen control via WIN32 console I/O",
 #endif
 #endif /* NO_TERMS */
+#ifdef WIN32CON
+    "WindowsTerminal",
+#endif
 #ifdef SHELL
     "shell command",
 #endif

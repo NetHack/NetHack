@@ -569,15 +569,6 @@ free_nhuuid(void)
 }
 
 #ifdef WIN32CON
-#undef kbhit
-#include <conio.h>
-
-int
-windows_console_custom_nhgetch(void)
-{
-    return _getch();
-}
-
 extern int windows_console_custom_nhgetch(void);
 
 void
@@ -599,6 +590,17 @@ getreturn(const char *str)
     return;
 }
 #endif
+
+boolean
+WindowsTerminalActive(void)
+{
+#ifdef WIN32CON
+    return wincon_WindowsTerminalActive();
+#else
+    return FALSE;
+#endif
+}
+
 
 /* nethack_enter_windows() is called from main immediately after
    initializing the window port */

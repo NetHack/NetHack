@@ -14,7 +14,7 @@
 
 /* might display need graphics code? */
 #if !defined(AMIGA) && !defined(TOS) && !defined(MAC68K)
-#if defined(TERMLIB) || defined(OS2) || defined(MSDOS)
+#if defined(TERMLIB) || defined(OS2) || defined(MSDOS) || defined(WIN32CON)
 #define ASCIIGRAPH
 #endif
 #endif

@@ -129,6 +129,7 @@ staticfn void mcmd_addmenu(winid, int, const char *);
 staticfn int there_cmd_menu_self(winid, coordxy, coordxy, int *);
 staticfn int there_cmd_menu_next2u(winid, coordxy, coordxy, int, int *);
 staticfn int there_cmd_menu_far(winid, coordxy, coordxy, int);
+staticfn boolean mousebtn_has_lookat(void);
 staticfn int there_cmd_menu_common(winid, coordxy, coordxy, int, int *);
 staticfn void act_on_act(int, coordxy, coordxy);
 staticfn char there_cmd_menu(coordxy, coordxy, int);
@@ -4356,12 +4357,11 @@ dotherecmdmenu(void)
     coordxy x = gc.clicklook_cc.x;
     coordxy y = gc.clicklook_cc.y;
 
-    if (isok(x, y)) {
+    if (isok(x, y) && iflags.getdir_click) {
         if (x == u.ux && y == u.uy)
             ch = here_cmd_menu();
         else
             ch = there_cmd_menu(x, y, iflags.getdir_click);
-        gc.clicklook_cc.x = gc.clicklook_cc.y = -1;
         iflags.getdir_click = 0;
         return (ch && ch != '\033') ? ECMD_TIME : ECMD_OK;
     }
@@ -4370,6 +4370,7 @@ dotherecmdmenu(void)
     dir = getdir((const char *) 0);
     click = iflags.getdir_click;
     iflags.getdir_click = 0;
+    gc.clicklook_cc.x = gc.clicklook_cc.y = -1;
 
     if (!dir || !isok(u.ux + u.dx, u.uy + u.dy))
         return ECMD_CANCEL;
@@ -4544,7 +4545,7 @@ staticfn int
 there_cmd_menu_next2u(
     winid win,
     coordxy x, coordxy y,
-    int mod,
+    int mod UNUSED,
     int *act)
 {
     int K = 0;
@@ -4577,7 +4578,7 @@ there_cmd_menu_next2u(
                          "Search the door for a trap"), ++K;
             /* [what about #force?] */
             mcmd_addmenu(win, MCMD_KICK_DOOR, "Kick the door"), ++K;
-        } else if ((dm & D_ISOPEN) && (mod == CLICK_2)) {
+        } else if ((dm & D_ISOPEN)) {
             mcmd_addmenu(win, MCMD_CLOSE_DOOR, "Close the door"), ++K;
         }
     }
@@ -4634,25 +4635,42 @@ there_cmd_menu_next2u(
         mcmd_addmenu(win, MCMD_ATTACK_NEXT2U, buf), ++K;
         /* attacking overrides any other automatic action */
         *act = MCMD_ATTACK_NEXT2U;
-    } else {
-        /* "Move %s", direction - handled below */
+    } else if (test_move(u.ux, u.uy, x-u.ux, y-u.uy, TEST_MOVE)) {
+        mcmd_addmenu(win, MCMD_MOVE_DIR, "Move here"); ++K;
+        *act = MCMD_MOVE_DIR;
     }
     return K;
 }
 
 staticfn int
-there_cmd_menu_far(winid win, coordxy x, coordxy y, int mod)
+there_cmd_menu_far(winid win,
+                   coordxy x, coordxy y,
+                   int mod UNUSED)
 {
     int K = 0;
 
-    if (mod == CLICK_1) {
-        if (linedup(u.ux, u.uy, x, y, 1)
-            && dist2(u.ux, u.uy, x, y) < 18*18)
-            mcmd_addmenu(win, MCMD_THROW_OBJ, "Throw something"), ++K;
+    if (linedup(u.ux, u.uy, x, y, 1)
+        && dist2(u.ux, u.uy, x, y) < 18*18)
+        mcmd_addmenu(win, MCMD_THROW_OBJ, "Throw something"), ++K;
 
+    if (dist2(u.ux, u.uy, x,y) > 2)
         mcmd_addmenu(win, MCMD_TRAVEL, "Travel here"), ++K;
-    }
+
     return K;
+}
+
+/* return TRUE iff at least one of the mouse buttons has
+   the clicklook command bound to it */
+staticfn boolean
+mousebtn_has_lookat(void)
+{
+    int i;
+
+    for (i = 0; i < NUM_MOUSE_BUTTONS; i++)
+        if (gc.Cmd.mousebtn[i] && gc.Cmd.mousebtn[i]->ef_funct == doclicklook)
+            return TRUE;
+
+    return FALSE;
 }
 
 staticfn int
@@ -4667,7 +4685,8 @@ there_cmd_menu_common(
     if (mod == CLICK_1 || mod == CLICK_2) { /* ignore iflags.clicklook here */
         /* for self, only include "look at map symbol" if it isn't the
            ordinary hero symbol (steed, invisible w/o see invisible, ?) */
-        if (!u_at(x, y) || Upolyd || glyph_at(x, y) != hero_glyph)
+        if (!mousebtn_has_lookat()
+            && (!u_at(x, y) || Upolyd || glyph_at(x, y) != hero_glyph))
             mcmd_addmenu(win, MCMD_LOOK_AT, "Look at map symbol"), ++K;
     }
     return K;
@@ -5422,6 +5441,7 @@ doclicklook(void)
 
     svc.context.move = FALSE;
     auto_describe(gc.clicklook_cc.x, gc.clicklook_cc.y);
+    gc.clicklook_cc.x = gc.clicklook_cc.y = -1;
 
     return ECMD_OK;
 }

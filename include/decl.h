@@ -698,6 +698,9 @@ struct instance_globals_n {
     short nocreate3;
     short nocreate4;
 
+    /* new */
+    boolean no_terms; /* runtime differentiation of NO_TERMS */
+
     boolean havestate;
 };
 
