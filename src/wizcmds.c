@@ -246,7 +246,6 @@ wiz_throwranges(void)
     winid win;
     int i;
     struct obj o, *obj = &o;
-    struct objclass *oc;
     int range, urange;
     char buf[BUFSZ], buf2[BUFSZ];
 
@@ -263,7 +262,6 @@ wiz_throwranges(void)
         o.quan = 1L;
         o.owt = weight(obj);
         o.oclass = objects[i].oc_class;
-        oc = &objects[i];
         if (i == SLIME_MOLD)
             continue;
         if (obj->oclass == ILLOBJ_CLASS)
