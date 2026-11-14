@@ -878,6 +878,13 @@ enum stoning_checks {
     st_all = (st_gloves | st_corpse | st_petrifies | st_resists)
 };
 
+enum toss_types {
+    no_toss,
+    hand_tossed_obj,
+    hand_tossed_ammo,
+    launcher_fired_ammo,
+};
+
 struct throw_and_return_weapon {
     short otyp;
     int range;

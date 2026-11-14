@@ -871,6 +871,9 @@ extern int breakobj(struct obj *, coordxy, coordxy, boolean, boolean) NONNULLARG
 extern boolean breaktest(struct obj *) NONNULLARG1;
 extern boolean walk_path(coord *, coord *,
                          boolean(*)(void *, coordxy, coordxy), genericptr_t) NONNULLARG12;
+extern void calc_othrow_ranges(struct obj *, enum toss_types,
+                                       const struct throw_and_return_weapon *,
+                                       boolean, int *, int *);
 
 /* ### drawing.c ### */
 
@@ -3929,6 +3932,7 @@ extern int wiz_show_wmodes(void);
 extern int wiz_smell(void);
 extern int wiz_telekinesis(void);
 extern int wiz_where(void);
+extern int wiz_throwranges(void);
 extern int wiz_wish(void);
 extern void makemap_remove_mons(void);
 extern void wiz_levltyp_legend(void);

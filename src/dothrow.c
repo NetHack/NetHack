@@ -1506,6 +1506,89 @@ throwit_mon_hit(struct obj *obj, struct monst *mon)
     return FALSE;
 }
 
+void
+calc_othrow_ranges(struct obj *obj, enum toss_types toss_type,
+                  const struct throw_and_return_weapon *arw,
+                  boolean tethered_weapon,
+                  int *range, int *urange)
+{
+    int throw_units;
+    boolean crossbowing =
+        (toss_type == launcher_fired_ammo && weapon_type(uwep) == P_CROSSBOW);
+
+    /* crossbow range is independent of strength */
+    throw_units = (crossbowing ? 18 : (int) ACURRSTR) / 2;
+    if (toss_type == launcher_fired_ammo) {
+        if (crossbowing)
+            throw_units = BOLT_LIM;
+        else
+            throw_units++;
+    } else if (toss_type == hand_tossed_ammo && obj->oclass != GEM_CLASS) {
+        throw_units /= 2;
+    }
+
+    /* balls are easy to throw or at least roll;
+     * also, this insures the maximum range of a ball is greater
+     * than 1, so the effects from throwing attached balls are
+     * actually possible
+     */
+
+    if (obj->otyp == HEAVY_IRON_BALL)
+        *range = throw_units - (int) (obj->owt / 100);
+    else
+        *range = throw_units - (int) (obj->owt / 40);
+    if (obj == uball) {
+        if (u.ustuck)
+            *range = 1;
+        else if (*range >= 5)
+            *range = 5;
+    }
+    if (toss_type == launcher_fired_ammo) {
+        if (crossbowing)
+            *range = BOLT_LIM;
+        else
+            *range += 1;
+    }
+    if (*range < 1)
+        *range = 1;
+
+    if (Is_airlevel(&u.uz) || Levitation) {
+        *urange = throw_units;
+        /* action, reaction... */
+        *urange -= *range;
+        if (*urange < 1)
+            *urange = 1;
+        *range -= *urange;
+
+        if (*range < 1)
+            *range = 1;
+    }
+
+    if (obj->otyp == BOULDER) {
+        throw_units = 20;
+        *range = 20;  /* you must be giant */
+        if (Is_airlevel(&u.uz) || Levitation)
+            *range /= 2;
+    } else if (is_art(obj, ART_MJOLLNIR)) {
+        *range = (*range + 1) / 2; /* it's heavy */
+    } else if (tethered_weapon) {  /* primary weapon is aklys */
+        /* range of a tethered_weapon is limited by the
+           length of the attached cord [implicit aspect of item] */
+        *range = min(*range, isqrt(arw->range));
+    } else if (obj == uball && u.utrap && u.utraptype == TT_INFLOOR) {
+        *range = 1;
+    }
+    *urange = throw_units - *range;
+
+    if (Underwater) {
+        *range = 1;
+    }
+    if (*range < 1)
+        *range = 1;
+    if (*urange < 1)
+        *urange = 1;
+}
+
 /* throw an object, NB: obj may be consumed in the process */
 void
 throwit(
@@ -1516,19 +1599,23 @@ throwit(
     struct obj *oldslot) /* for thrown-and-return used with !fixinv */
 {
     struct monst *mon;
-    int range, urange;
+    int range = 0, urange = 0;
     const struct throw_and_return_weapon *arw = autoreturn_weapon(obj);
-    boolean crossbowing,
-            impaired = (Confusion || Stunned || Blind
+    boolean impaired = (Confusion || Stunned || Blind
                         || Hallucination || Fumbling),
             tethered_weapon = (arw && arw->tethered && (wep_mask & W_WEP) != 0),
             tether_released_msg = FALSE;
+    enum toss_types toss_type =
+        (!is_ammo(obj)                    ? hand_tossed_obj
+         : (ammo_and_launcher(obj, uwep)) ? launcher_fired_ammo
+                                          : hand_tossed_ammo);
 
     gn.notonhead = FALSE; /* reset potentially stale value */
+
     if ((obj->cursed || obj->greased) && (u.dx || u.dy) && !rn2(7)) {
         boolean slipok = TRUE;
 
-        if (ammo_and_launcher(obj, uwep)) {
+        if (toss_type == launcher_fired_ammo) {
             pline("%s!", Tobjnam(obj, "misfire"));
         } else {
             /* only slip if it's greased or meant to be thrown */
@@ -1612,66 +1699,16 @@ throwit(
             return;
         }
     } else {
-        /* crossbow range is independent of strength */
-        crossbowing = (ammo_and_launcher(obj, uwep)
-                       && weapon_type(uwep) == P_CROSSBOW);
-        urange = (crossbowing ? 18 : (int) ACURRSTR) / 2;
-        /* balls are easy to throw or at least roll;
-         * also, this insures the maximum range of a ball is greater
-         * than 1, so the effects from throwing attached balls are
-         * actually possible
-         */
-        if (obj->otyp == HEAVY_IRON_BALL)
-            range = urange - (int) (obj->owt / 100);
-        else
-            range = urange - (int) (obj->owt / 40);
-        if (obj == uball) {
-            if (u.ustuck)
-                range = 1;
-            else if (range >= 5)
-                range = 5;
-        }
-        if (range < 1)
-            range = 1;
-
-        if (is_ammo(obj)) {
-            if (ammo_and_launcher(obj, uwep)) {
-                if (crossbowing)
-                    range = BOLT_LIM;
-                else
-                    range++;
-            } else if (obj->oclass != GEM_CLASS) {
-                range /= 2;
+        if (toss_type == hand_tossed_ammo) {
+            if (obj->oclass != GEM_CLASS) {
                 pline("You aren't wielding %s, so you throw your %s by %s.",
-                      an(skill_name(weapon_type(obj))),
-                      weapon_descr(obj),
+                      an(skill_name(weapon_type(obj))), weapon_descr(obj),
                       body_part(HAND));
             }
         }
-
-        if (Is_airlevel(&u.uz) || Levitation) {
-            /* action, reaction... */
-            urange -= range;
-            if (urange < 1)
-                urange = 1;
-            range -= urange;
-            if (range < 1)
-                range = 1;
-        }
-
-        if (obj->otyp == BOULDER)
-            range = 20; /* you must be giant */
-        else if (is_art(obj, ART_MJOLLNIR))
-            range = (range + 1) / 2; /* it's heavy */
-        else if (tethered_weapon) /* primary weapon is aklys */
-            /* range of a tethered_weapon is limited by the
-               length of the attached cord [implicit aspect of item] */
-            range = min(range, isqrt(arw->range));
-        else if (obj == uball && u.utrap && u.utraptype == TT_INFLOOR)
-            range = 1;
-
-        if (Underwater)
-            range = 1;
+        calc_othrow_ranges(obj, toss_type,
+                          arw, tethered_weapon,
+                          &range, &urange);
 
         mon = bhit(u.dx, u.dy, range,
                    tethered_weapon ? THROWN_TETHERED_WEAPON : THROWN_WEAPON,
@@ -1681,7 +1718,7 @@ throwit(
 
         /* have to do this after bhit() so u.ux & u.uy are correct */
         if (Is_airlevel(&u.uz) || Levitation)
-            hurtle(-u.dx, -u.dy, min(urange, range), TRUE);
+            hurtle(-u.dx, -u.dy, urange, TRUE);
 
         if (!obj) {
             /* bhit display cleanup was left with this caller
