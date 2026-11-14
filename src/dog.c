@@ -457,14 +457,16 @@ mon_arrive(struct monst *mtmp, int when)
     fromdlev.dnum = mtmp->mtrack[2].x;
     fromdlev.dlevel = mtmp->mtrack[2].y;
     mon_track_clear(mtmp);
-    /* in case Protection_from_shape_changers is different now from when
-       'mtmp' went onto the migrating monsters list; that's handled in
-       getlev() when returning to a previously visited level and by the
-       special level code for monsters specified in the level, but needed
-       here for monsters migrating to a newly created level */
-    restore_cham(mtmp);
+    /* restore_cham() below: in case Protection_from_shape_changers is
+       different now from when 'mtmp' went onto the migrating monsters
+       list; that's handled in getlev() when returning to a previously
+       visited level and by the special level code for monsters specified
+       in the level, but needed here for monsters migrating to a newly
+       created level; it waits until 'mtmp' is on the map because
+       reverting to normal shape redisplays it at <mx,my> */
 
     if (mtmp == u.usteed) {
+        restore_cham(mtmp); /* steed is already at the hero's spot */
         mtmp->mstate &= ~MON_STILL_ARRIVING;
         return; /* don't place steed on the map */
     }
@@ -479,6 +481,8 @@ mon_arrive(struct monst *mtmp, int when)
             rloc_to(mtmp, u.ux, u.uy);
         else
             mnexto(mtmp, RLOC_NOMSG);
+        if (mtmp->mx) /* mnexto() might have put it in limbo */
+            restore_cham(mtmp);
         mtmp->mstate &= ~MON_STILL_ARRIVING;
         return;
     } else if (when == Wiz_arrive) {
@@ -621,6 +625,8 @@ mon_arrive(struct monst *mtmp, int when)
             relmon(mtmp, &failed_arrivals);
         else /* when==Wiz_arrive => not being called by losedogs() */
             m_into_limbo(mtmp);
+    } else {
+        restore_cham(mtmp);
     }
     mtmp->mstate &= ~MON_STILL_ARRIVING;
 }
