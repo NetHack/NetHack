@@ -955,6 +955,7 @@ m_dowear_type(
         } /* can see it */
         m_delay += objects[best->otyp].oc_delay;
         mon->mfrozen = m_delay;
+        mon->mtimed_sleep = 0;
         if (mon->mfrozen)
             mon->mcanmove = 0;
     }

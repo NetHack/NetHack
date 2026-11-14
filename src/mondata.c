@@ -252,9 +252,7 @@ resists_blnd(struct monst *mon)
 
     if (is_you ? (Blind || Unaware)
                : (mon->mblinded || !mon->mcansee || !haseyes(ptr)
-                  /* BUG: temporary sleep sets mfrozen, but since
-                          paralysis does too, we can't check it */
-                  || mon->msleeping))
+                  || mon->msleeping || timed_sleep(mon)))
         return TRUE;
     /* yellow light, Archon; !dust vortex, !cobra, !raven */
     if (dmgtype_fromattack(ptr, AD_BLND, AT_EXPL)
