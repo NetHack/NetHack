@@ -252,8 +252,9 @@ wiz_throwranges(void)
     win = create_nhwindow(NHW_TEXT);
     Sprintf(buf, "throw/hurtle range calculations:");
     putstr(win, 0, buf);
-    Snprintf(buf2, sizeof buf2, "%-35s %-4s %-10s %-7s %-6s  %-5s",
-             "name", "owt", "wielded", "t-units", "urange", "range");
+    Snprintf(buf2, sizeof buf2, "%-35s %-4s %-1s %-10s %-7s %-6s  %-5s",
+             "name", "owt", (Is_airlevel(&u.uz) || Levitation) ? "^" : " ",
+             "wielded", "t-units", "urange", "range");
     putstr(win, 0, buf2);
     putstr(win, 0, "");
     for (i = 1; i < SIZE(objects); ++i) {
@@ -296,8 +297,9 @@ wiz_throwranges(void)
             calc_othrow_ranges(obj, toss_type, arw, tethered_weapon,
                               &range, &urange);
             Snprintf(
-                buf2, sizeof buf2, "%-35s %4d   %-10s %4d  %4d   %4d %-15s",
+                buf2, sizeof buf2, "%-35s %4d %-1s %-10s %4d  %4d   %4d %-15s",
                 xname(obj), obj->owt,
+                " ",
                 (toss_type == launcher_fired_ammo && uwep)
                     ? simpleonames(uwep)
                     : "",
