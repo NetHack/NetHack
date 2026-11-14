@@ -1544,10 +1544,7 @@ calc_othrow_ranges(struct obj *obj, enum toss_types toss_type,
             *range = 5;
     }
     if (toss_type == launcher_fired_ammo) {
-        if (crossbowing)
-            *range = BOLT_LIM;
-        else
-            *range += 1;
+        *range = throw_units;
     }
     if (*range < 1)
         *range = 1;
