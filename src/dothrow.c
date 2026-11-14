@@ -1681,7 +1681,7 @@ throwit(
 
         /* have to do this after bhit() so u.ux & u.uy are correct */
         if (Is_airlevel(&u.uz) || Levitation)
-            hurtle(-u.dx, -u.dy, urange, TRUE);
+            hurtle(-u.dx, -u.dy, min(urange, range), TRUE);
 
         if (!obj) {
             /* bhit display cleanup was left with this caller
