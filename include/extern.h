@@ -3057,6 +3057,7 @@ extern const char *maybe_gasp(struct monst *) NONNULLARG1;
 extern const char *cry_sound(struct monst *) NONNULLARG1;
 extern int domonnoise(struct monst *) NONNULLARG1;
 extern int dotalk(void);
+extern const char *walltalkmsg(void);
 extern int tiphat(void);
 #ifdef USER_SOUNDS
 extern int add_sound_mapping(const char *) NONNULLARG1;
