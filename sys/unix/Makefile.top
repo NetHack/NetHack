@@ -173,7 +173,7 @@ $(LUAC_BIN):
 
 .PHONY: check-lua-syntax
 check-lua-syntax: $(PRECHECK) $(LUAC_DEP)
-	@set -e; find dat test sys -name '*.lua' -exec "$(LUAC)" -p {} +
+	find dat test sys -name '*.lua' -exec "$(LUAC)" -p {} +
 	@echo "Lua scripts syntax check: OK"
 
 # hints file could set LUATESTTARGET to this if GITSUBMODULES is defined
