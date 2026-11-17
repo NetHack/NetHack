@@ -30,13 +30,17 @@ staticfn int armor_to_dragon(int);
 staticfn void newman(void);
 staticfn void polysense(void);
 staticfn void uasmon_light(int);
+staticfn void note_uasmon_install(void);
+
 /* uasmon_generation moved to decl.h, decl.c
  * as gu.uasmon_generation for potential play_again initialization
  * support.
  */
 //static unsigned long gu.uasmon_generation;
+#ifdef UASMON_COUNTING_PER_MOVELOOP
 static unsigned long uasmon_generation_delta,
     largest_uasmon_generation_delta = 0UL;
+#endif
 
 /* Every completed semantic hero-form installation gets a distinct serial.
    Overflow must not make a new generation look like an old one. */

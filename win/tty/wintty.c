@@ -3722,11 +3722,17 @@ tty_wait_synch(void)
     }
 }
 
+#ifdef TTY_PERM_INVENT
+#define TTYPERMINVENT_UNUSED
+#else
+#define TTYPERMINVENT_UNUSED UNUSED
+#endif
+
 void
 docorner(
     int xmin, int ymax,
     int ystart_between_menu_pages,
-    struct WinDesc *impacted_cw)
+    struct WinDesc *impacted_cw TTYPERMINVENT_UNUSED)
 {
     int y;
     struct WinDesc *cw = wins[WIN_MAP];
