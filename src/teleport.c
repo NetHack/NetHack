@@ -1751,7 +1751,7 @@ rloc_to_core(
        a for-sale item is ordinary here--shk won't notice it leaving; if
        mtmp teleports from one shop into another, no_charge status sticks
        and an item on the first shk's bill stays there */
-    if (mtmp->minvent && !costly_spot(x, y)) {
+    if (!gi.in_mklev && mtmp->minvent && !costly_spot(x, y)) {
         struct obj *otmp;
         struct monst *shkp = find_objowner(mtmp->minvent, oldx, oldy);
         boolean peaceful = !shkp || shkp->mpeaceful;

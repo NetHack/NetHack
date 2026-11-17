@@ -3118,7 +3118,7 @@ display_pickinv(
     Loot *sortedinvent, *srtinv;
     int8_t prevorderclass;
     boolean (*filter)(struct obj *) = (boolean (*)(OBJ_P)) 0;
-    boolean wizid = (wizard && iflags.override_ID), gotsomething = FALSE;
+    boolean wizid = (wizard && iflags.override_ID && !program_state.in_docrt), gotsomething = FALSE;
     int clr = NO_COLOR, menu_behavior = MENU_BEHAVE_STANDARD;
     boolean show_gold = TRUE, inuse_only = FALSE, skipped_gold = FALSE,
             doing_perm_invent = FALSE, save_flags_sortpack,

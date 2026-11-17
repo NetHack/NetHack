@@ -1332,9 +1332,10 @@ cl_eos(void)
 static char nulstr[] = "";
 static char ZH[] = "\x1b[3m", ZR[] = "\x1b[23m", MB[] = "\x1b[5m",
             reset_MB[] = "\x1b[25m", nh_US[] = "\x1b[4m", UE[] = "\x1b[24m",
-            MD[] = "\x1b[1m", HE[] = "\x1b[21m", MR[] = "\x1b[7m",
+            MD[] = "\x1b[1m", HE[] = "\x1b[0m", MR[] = "\x1b[7m",
             reset_MR[] = "\x1b[27m", MH[] = "\x1b[2m",
             reset_MH[] = "\x1b[22m", ME[] = "\x1b[0m";
+/* double underline is [21m */
 
 struct atr_s {
     char *escseq;

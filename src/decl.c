@@ -786,6 +786,9 @@ static const struct instance_globals_u g_init_u = {
     FALSE, /* update_all */
     /* decl.c */
     FALSE, /* unweapon */
+    /* polyself.c */
+    0UL,   /* uasmon_generation */
+    0UL,   /* uasmon_top_of_moveloop */
     /* revision.c */
     0, /* uplift_needed_rev0_to_rev1 */
     /* role.c */

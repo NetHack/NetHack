@@ -906,6 +906,10 @@ pickup(int what) /* should be a long */
  pickupdone:
     gp.pickup_encumbrance = 0;
     add_valid_menu_class(0); /* reset */
+#ifdef TTY_PERM_INVENT
+    if (WINDOWPORT(tty))
+        docrt();
+#endif
     return (n_tried > 0);
 }
 

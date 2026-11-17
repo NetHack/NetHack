@@ -239,6 +239,89 @@ wiz_detect(void)
 
 RESTORE_WARNING_FORMAT_NONLITERAL
 
+
+int
+wiz_throwranges(void)
+{
+    winid win;
+    int i;
+    struct obj o, *obj = &o;
+    int range, urange;
+    char buf[BUFSZ], buf2[BUFSZ];
+
+    win = create_nhwindow(NHW_TEXT);
+    Sprintf(buf, "throw/hurtle range calculations:");
+    putstr(win, 0, buf);
+    Snprintf(buf2, sizeof buf2, "%-35s %-4s %-1s %-10s %-7s %-6s  %-5s",
+             "name", "owt", (Is_airlevel(&u.uz) || Levitation) ? "^" : " ",
+             "wielded", "t-units", "urange", "range");
+    putstr(win, 0, buf2);
+    putstr(win, 0, "");
+    for (i = 1; i < SIZE(objects); ++i) {
+        o = cg.zeroobj;
+        o.otyp = i;
+        o.quan = 1L;
+        o.owt = weight(obj);
+        o.oclass = objects[i].oc_class;
+        if (i == SLIME_MOLD)
+            continue;
+        if (obj->oclass == ILLOBJ_CLASS)
+            continue;
+        {
+            int throw_units;
+            long wep_mask = 0L;
+            const struct throw_and_return_weapon *arw =
+                autoreturn_weapon(obj);
+            enum toss_types toss_type =
+                (!is_ammo(obj)                    ? hand_tossed_obj
+                 : (ammo_and_launcher(obj, uwep)) ? launcher_fired_ammo
+                                                  : hand_tossed_ammo);
+            boolean crossbowing = (toss_type == launcher_fired_ammo
+                                   && weapon_type(uwep) == P_CROSSBOW),
+                    tethered_weapon =
+                        (arw && arw->tethered && (wep_mask & W_WEP) != 0);
+
+            /* crossbow range is independent of strength */
+            urange = (crossbowing ? 18 : (int) ACURRSTR) / 2;
+            if (toss_type == launcher_fired_ammo) {
+                if (crossbowing)
+                    urange = BOLT_LIM;
+                else
+                    urange++;
+            } else if (toss_type == hand_tossed_ammo
+                       && obj->oclass != GEM_CLASS) {
+                urange = (urange + (2 / 2)) / 2;
+            }
+            throw_units = (obj->otyp == BOULDER) ? 20 : urange;
+
+            calc_othrow_ranges(obj, toss_type, arw, tethered_weapon,
+                              &range, &urange);
+            Snprintf(
+                buf2, sizeof buf2, "%-35s %4d %-1s %-10s %4d  %4d   %4d %-15s",
+                xname(obj), obj->owt,
+                " ",
+                (toss_type == launcher_fired_ammo && uwep)
+                    ? simpleonames(uwep)
+                    : "",
+                throw_units, urange, range,
+                ((range > throw_units) && (obj->otyp == BOULDER))
+                    ? " ok (boulder special case)"
+                : ((range < throw_units - 1) && (obj->owt >= 100))
+                    ? " ok (heavy)"
+                : ((range < throw_units - 1) && (obj->owt >= 60))
+                    ? " ok (medium-heavy)"
+                : ((range < throw_units - 1) && (obj->owt >= 20))
+                    ? " ok (slightly-heavy)"
+                : ((range < throw_units - 1) && (urange - range) > 1) ? " <-"
+                                                                      : "");
+            putstr(win, 0, buf2);
+        }
+    }
+    display_nhwindow(win, TRUE);
+    destroy_nhwindow(win);
+    return ECMD_OK;
+}
+
 /* the #wizkill command - pick targets and reduce them to 0HP;
    by default, the hero is credited/blamed; use 'm' prefix to avoid that */
 int

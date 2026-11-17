@@ -174,6 +174,8 @@ moveloop_core(void)
 {
     boolean monscanmove = FALSE;
 
+    gu.uasmon_top_of_moveloop = gu.uasmon_generation;
+
 #ifdef SAFERHANGUP
     if (program_state.done_hup)
         end_of_input();
