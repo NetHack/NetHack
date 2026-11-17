@@ -222,7 +222,7 @@ extern void putsyms(const char *);
 #ifdef CLIPPING
 extern void setclipped(void);
 #endif
-extern void docorner(int, int, int);
+extern void docorner(int, int, int, struct WinDesc *);
 extern void end_glyphout(void);
 extern void g_putch(int);
 #ifdef ENHANCED_SYMBOLS
@@ -300,6 +300,7 @@ extern win_request_info *tty_ctrl_nhwindow(winid, int, win_request_info *);
 
 #ifdef TTY_PERM_INVENT
 extern void tty_refresh_inventory(int start, int stop, int y);
+extern boolean perminvent_on_right_side(void);
 #endif
 
 /* termcap is implied if NO_TERMS is not defined */
