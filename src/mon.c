@@ -1410,20 +1410,20 @@ m_consume_obj(struct monst *mtmp, struct obj *otmp)
     } else if (otmp == uchain) {
         unpunish(); /* frees uchain */
     } else {
-        boolean deadmimic, slimer, pyroegg;
-        int poly, grow, heal, eyes, mstone, vis = canseemon(mtmp);
-        int corpsenm = (otmp->otyp == CORPSE ? otmp->corpsenm : NON_PM);
-
-        deadmimic = (otmp->otyp == CORPSE && (corpsenm == PM_SMALL_MIMIC
-                                              || corpsenm == PM_LARGE_MIMIC
-                                              || corpsenm == PM_GIANT_MIMIC));
-        slimer = (otmp->otyp == GLOB_OF_GREEN_SLIME);
-        /* not 'corpsenm', which is only set for corpses */
-        pyroegg = (otmp->otyp == EGG && otmp->corpsenm == PM_PYROLISK);
+        short otyp = otmp->otyp;
+        int poly, grow, heal, eyes, mstone, vis = canseemon(mtmp),
+            corpsenm = ((otyp == CORPSE || otyp == EGG)
+                        ? otmp->corpsenm : NON_PM);
+        boolean deadmimic = (otyp == CORPSE
+                             && (corpsenm == PM_SMALL_MIMIC
+                                 || corpsenm == PM_LARGE_MIMIC
+                                 || corpsenm == PM_GIANT_MIMIC)),
+                slimer = (otyp == GLOB_OF_GREEN_SLIME),
+                pyroegg = (otyp == EGG && corpsenm == PM_PYROLISK);
         poly = polyfood(otmp);
         grow = mlevelgain(otmp);
         heal = mhealup(otmp);
-        eyes = (otmp->otyp == CARROT);
+        eyes = (otyp == CARROT);
         mstone = mstoning(otmp);
         delobj(otmp); /* munch */
         if (poly || slimer) {
