@@ -1454,7 +1454,7 @@ m_consume_obj(struct monst *mtmp, struct obj *otmp)
             quickmimic(mtmp);
         if (pyroegg)
             explode(mtmp->mx, mtmp->my, -11, d(3, 6), 0, EXPL_FIERY);
-        if (corpsenm != NON_PM)
+        if (otyp == CORPSE && corpsenm != NON_PM)
             mon_givit(mtmp, &mons[corpsenm]);
     }
 }
