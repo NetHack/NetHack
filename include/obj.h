@@ -381,6 +381,7 @@ struct obj {
 /* Light sources */
 #define Is_candle(otmp) \
     (otmp->otyp == TALLOW_CANDLE || otmp->otyp == WAX_CANDLE)
+#define candle_max_burn_time(o) (20L * (long) objects[(o)->otyp].oc_cost)
 #define MAX_OIL_IN_FLASK 400 /* maximum amount of oil in a potion of oil */
 
 /* age field of this is relative age rather than absolute; does not include

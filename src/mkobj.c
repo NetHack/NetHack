@@ -989,8 +989,7 @@ mksobj_init(struct obj **obj, boolean artif)
         case TALLOW_CANDLE:
         case WAX_CANDLE:
             otmp->spe = 1;
-            otmp->age = 20L * /* 400 or 200 */
-                        (long) objects[otmp->otyp].oc_cost;
+            otmp->age = candle_max_burn_time(otmp);
             otmp->lamplit = 0;
             otmp->quan = 1L + (long) (rn2(2) ? rn2(7) : 0);
             blessorcurse(otmp, 5);
