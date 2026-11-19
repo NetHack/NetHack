@@ -642,6 +642,8 @@ nethack-501-src.zip: include/nhgitsha.h
 		    --add-file=include/nhgitsha.h \
 		    --prefix=NetHack-5.0.1/ \
 		    NetHack-5.0 >$@
+FORCE:
+
 endif  # GIT_BRANCH
 endif  # GIT_HASH
 endif  # MAKELEVEL
