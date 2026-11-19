@@ -100,3 +100,5 @@ util/*.exp
 submodules/CHKSUMS.tmp
 sys/amiga/regex/
 __pycache__/
+nethack-???-src.tar.gz
+nethack-???-src.zip

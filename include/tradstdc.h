@@ -398,6 +398,12 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
 #endif
 #endif  /* __has_c_attribute(maybe_unused) */
 #endif  /* NH_C >= 202300L */
+/*
+ * __has_include
+ */
+#if defined(__has_include)
+#define HAS_INCLUDE 1
+#endif
 
 /*
  * Compiler-specific
