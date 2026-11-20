@@ -337,7 +337,7 @@ NCURSES_CFLAGS was being ignored when using hints/linux.500 with only
 added a hints file netbsd.500 for NetBSD (pr #1519 by SirWumpus)
 rewrite of the Tourist quest text for more Pratchetty feel
 	(pr #1596 by robindouglasjohnson)
-
+curses: OPTIONS=wraptext support (pr #1576 by avgas3)
 
 
 Code Cleanup and Reorganization
