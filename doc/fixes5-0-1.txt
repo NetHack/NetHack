@@ -317,6 +317,11 @@ X11: remove the limit on the number of widgets managed in winlabel.c; it was
 	(pr #1668 by chasonr)
 Unix: don't complain about MAXPLAYERS with unknown command line param
 Qt: menus and toolbar buttons did not work correctly with ext cmd filtering
+Qt: menu windows in the Qt interface opened far too small — often a few rows
+	of a long inventory — and the inventory window was keeping whatever
+	size it had the first time it was shown, because the core reuses one
+	window for WIN_INVEN and the layout's cached size hint was never
+	invalidated (pr #1671 by crissman)
 
 
 General New Features
