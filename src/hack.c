@@ -1179,9 +1179,7 @@ test_move(
      * Avoid water and lava using the usual running rules.
      * (but not u.ux/u.uy because findtravelpath walks toward u.ux/u.uy) */
     if (svc.context.run == 8 && (mode != DO_MOVE) && !u_at(x, y)) {
-        struct trap *t = t_at(x, y);
-
-        if (t && t->tseen && t->ttyp != VIBRATING_SQUARE)
+        if (avoid_moving_on_trap(x, y, FALSE))
             return (mode == TEST_TRAP);
 
         /* FIXME: should be using lastseentyp[x][y] rather than seen vector
@@ -2448,7 +2446,13 @@ avoid_moving_on_trap(coordxy x, coordxy y, boolean msg)
     if ((trap = t_at(x, y)) && trap->tseen
         /* the vibrating square is implemented as a trap but treated as if
            it were a type of terrain */
-        && trap->ttyp != VIBRATING_SQUARE) {
+        && trap->ttyp != VIBRATING_SQUARE
+        /* Travel can cross known harmless traps.  Keep ordinary running
+           unchanged, and avoid guessing trap types while hallucinating.
+           immune_to_trap() includes the bypass for flying and levitation. */
+        && (svc.context.run != 8 || Hallucination
+            || immune_to_trap(&gy.youmonst, trap->ttyp)
+                   != TRAP_CLEARLY_IMMUNE)) {
         if (msg && flags.mention_walls) {
             set_msg_xy(x, y);
             You("stop in front of %s.",
