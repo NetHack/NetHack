@@ -1200,8 +1200,10 @@ m_calcdistress(struct monst *mtmp)
     /* gradually time out temporary problems */
     if (mtmp->mblinded && !--mtmp->mblinded)
         mtmp->mcansee = 1;
-    if (mtmp->mfrozen && !--mtmp->mfrozen)
+    if (mtmp->mfrozen && !--mtmp->mfrozen) {
         mtmp->mcanmove = 1;
+        mtmp->mtimed_sleep = 0;
+    }
     if (mtmp->mfleetim && !--mtmp->mfleetim)
         mtmp->mflee = 0;
 
