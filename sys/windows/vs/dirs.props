@@ -31,6 +31,7 @@
     <LuaDir>$(RootDir)nhlua\lua\src\</LuaDir>
     <SftagsDir>$(RootDir)\sys\windows\vs\sftags\</SftagsDir>
     <SfctoolDir>$(RootDir)\sys\windows\vs\sfctool\</SfctoolDir>
+    <GitExeSub>$(VSInstallDir)Common7\IDE\CommonExtensions\Microsoft\TeamFoundation\Team Explorer\Git\cmd\</GitExeSub>
     <PackageBin>$(RootDir)binary\$(Configuration)\$(Platform)</PackageBin>
   </PropertyGroup>
   <PropertyGroup Condition="'$(PDCURSESMOD)'=='' AND Exists('$(LibDir)pdcursesmod\curses.h')">
