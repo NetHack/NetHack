@@ -122,6 +122,7 @@ fix possible buffer underrun in nh_snprintf with long item call name
 fix crash when book is destroyed in the middle of studying
 fix monsters eating pyrolisk eggs
 fix destroyed weapon used in attacks
+fix infinite loop on cancel in status_hilite_menu_add (pr #1639 by satokiyon)
 
 
 Platform- and/or Interface-Specific Fixes
