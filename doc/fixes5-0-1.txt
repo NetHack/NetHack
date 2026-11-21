@@ -131,6 +131,7 @@ name the container in loot prompts (pr #1672 by crissman)
 fix zapped wand used after god's bolt destroyed it
 fix zapped wand freed mid-zap
 fix lava death loop reading a used-up amulet
+allow wizgenesis to create long worms of specific length
 
 
 Platform- and/or Interface-Specific Fixes

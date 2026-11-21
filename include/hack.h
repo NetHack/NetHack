@@ -316,6 +316,7 @@ struct _create_particular_data {
     int which;
     int fem;        /* -1, MALE, FEMALE, NEUTRAL */
     int genderconf;    /* conflicting gender */
+    int worm_segs;
     char monclass;
     boolean randmonst;
     boolean maketame, makepeaceful, makehostile;

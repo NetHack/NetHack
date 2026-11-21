@@ -3140,25 +3140,33 @@ create_particular_parse(
     struct _create_particular_data *d)
 {
     int gender_name_var = NEUTRAL;
+    int initquan = 1 + ((gm.multi > 0) ? (int) gm.multi : 0);
     char *bufp = str;
     char *tmpp;
 
-    d->quan = 1 + ((gm.multi > 0) ? (int) gm.multi : 0);
+    d->quan = initquan;
     d->monclass = MAXMCLASSES;
     d->which = gu.urole.mnum; /* an arbitrary index into mons[] */
     d->fem = -1;     /* gender not specified */
     d->genderconf = -1;  /* no confusion on which gender to assign */
+    d->worm_segs = 0;
     d->randmonst = FALSE;
     d->maketame = d->makepeaceful = d->makehostile = FALSE;
     d->sleeping = d->saddled = d->invisible = d->hidden = FALSE;
 
-    /* quantity */
+    /* quantity, or long worm segments */
     if (digit(*bufp)) {
         d->quan = atoi(bufp);
         while (digit(*bufp))
             bufp++;
         while (*bufp == ' ')
             bufp++;
+        if (*bufp == '-') bufp++;
+        if ((tmpp = strstri(bufp, "segment ")) != 0) {
+            (void) memset(tmpp, ' ', sizeof "segment " - 1);
+            d->worm_segs = d->quan;
+            d->quan = initquan;
+        }
     }
 #define QUAN_LIMIT (ROWNO * (COLNO - 1))
     /* maximum possible quantity is one per cell: (0..ROWNO-1) x (1..COLNO-1)
@@ -3166,6 +3174,7 @@ create_particular_parse(
     if (d->quan < 1 || d->quan > QUAN_LIMIT)
         d->quan = QUAN_LIMIT - monster_census(FALSE);
 #undef QUAN_LIMIT
+
     /* gear -- extremely limited number of possibilities supported */
     if ((tmpp = strstri(bufp, "saddled ")) != 0) {
         d->saddled = TRUE;
@@ -3312,6 +3321,8 @@ create_particular_creation(
         }
         if (d->invisible)
             mmflags |= MM_MINVIS;
+        if (d->which == PM_LONG_WORM && d->worm_segs)
+            mmflags |= MM_NOTAIL;
 
         mtmp = makemon(whichpm, u.ux, u.uy, mmflags);
         if (!mtmp) {
@@ -3322,6 +3333,10 @@ create_particular_creation(
             continue;
         }
         mx = mtmp->mx, my = mtmp->my;
+        if (d->which == PM_LONG_WORM && d->worm_segs) {
+            initworm(mtmp, d->worm_segs);
+            place_worm_tail_randomly(mtmp, mx, my);
+        }
         if (d->maketame) {
             (void) tamedog(mtmp, (struct obj *) 0, FALSE);
         } else if (d->makepeaceful || d->makehostile) {
