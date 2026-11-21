@@ -1608,8 +1608,16 @@ do_screen_description(
             if (look_buf[0] != '\0')
                 *firstmatch = look_buf;
             if (*(*firstmatch)) {
-                Sprintf(temp_buf, " (%s", *firstmatch);
+                Snprintf(temp_buf, sizeof temp_buf, " (%s", *firstmatch);
                 (void) add_quoted_engraving(cc.x, cc.y, temp_buf, FALSE);
+                {
+                    /* a long engraving can fill temp_buf; leave room for
+                       ')' within what out_str can still take */
+                    int room = BUFSZ - 2 - (int) strlen(out_str);
+
+                    if ((int) strlen(temp_buf) > room)
+                        temp_buf[max(room, 0)] = '\0';
+                }
                 Strcat(temp_buf, ")");
                 (void) strncat(out_str, temp_buf,
                                BUFSZ - strlen(out_str) - 1);
