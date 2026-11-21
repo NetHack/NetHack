@@ -2082,7 +2082,7 @@ jump(int magic) /* 0=Physical, otherwise skill level */
             case TT_BEARTRAP:
                 side = rn2(3) ? LEFT_SIDE : RIGHT_SIDE;
                 You("rip yourself free of the bear trap!  Ouch!");
-                losehp(Maybe_Adjust_Phys(rnd(10), 0), "jumping out of a bear trap",
+                losehp(Maybe_Adjust_Phys(rnd(10), BEARTRAP), "jumping out of a bear trap",
                        KILLED_BY);
                 set_wounded_legs(side, rn1(1000, 500));
                 break;
@@ -4123,7 +4123,8 @@ do_break_wand(struct obj *obj)
             damage = zapyourself(obj, FALSE);
             if (damage) {
                 Sprintf(buf, "killed %sself by breaking a wand", uhim());
-                losehp(Maybe_Adjust_Phys(damage, 0), buf, NO_KILLER_PREFIX);
+                losehp(Maybe_Adjust_Phys(damage, STRANGE_OBJECT), buf,
+                       NO_KILLER_PREFIX);
             }
             if (disp.botl)
                 bot(); /* blindness */

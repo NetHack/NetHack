@@ -1012,7 +1012,8 @@ drag_down(void)
     if (forward) {
         if (rn2(6)) {
             pline_The("iron ball drags you downstairs!");
-            losehp(Maybe_Adjust_Phys(rnd(6), 0),
+            /* STRANGE_OBJECT because this is not HEAVY_IRON_BALL contact */
+            losehp(Maybe_Adjust_Phys(rnd(6), STRANGE_OBJECT),
                    "dragged downstairs by an iron ball", NO_KILLER_PREFIX);
             litter();
         }
@@ -1027,7 +1028,8 @@ drag_down(void)
         }
         if ((int) dragchance >= rnd(6)) {
             pline_The("iron ball drags you downstairs!");
-            losehp(Maybe_Adjust_Phys(rnd(3), 0),
+            /* STRANGE_OBJECT because this is not HEAVY_IRON_BALL contact */
+            losehp(Maybe_Adjust_Phys(rnd(3), STRANGE_OBJECT),
                    "dragged downstairs by an iron ball", NO_KILLER_PREFIX);
             exercise(A_STR, FALSE);
             litter();

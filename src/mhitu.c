@@ -1559,7 +1559,7 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
             if (tmp < 0)
                 tmp = 1;
         }
-        tmp = Maybe_Adjust_Phys(tmp, 0);
+        tmp = Maybe_Adjust_Phys(tmp, STRANGE_OBJECT);
     }
 
     gm.mswallower = mtmp; /* match gulpmm() */
@@ -2223,7 +2223,8 @@ doseduce(struct monst *mon)
             You_feel("exhausted.");
             exercise(A_STR, FALSE);
             tmp = rn1(10, 6);
-            losehp(Maybe_Adjust_Phys(tmp, 0), "exhaustion", KILLED_BY);
+            losehp(Maybe_Adjust_Phys(tmp, STRANGE_OBJECT), "exhaustion",
+                   KILLED_BY);
             break;
         } /* case 4 */
         } /* switch */

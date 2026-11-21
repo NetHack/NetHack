@@ -631,7 +631,7 @@ explode(
             damu = 0;
             You("are unharmed!");
         } else if (adtyp == AD_PHYS || adtyp == AD_ACID)
-            damu = Maybe_Adjust_Phys(damu, 0);
+            damu = Maybe_Adjust_Phys(damu, STRANGE_OBJECT);
         if (adtyp == AD_FIRE) {
             (void) burnarmor(&gy.youmonst);
             ignite_items(gi.invent);

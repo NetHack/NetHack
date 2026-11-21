@@ -1653,7 +1653,7 @@ trapeffect_rust_trap(
             int dam = u.mhmax;
 
             You("are covered with rust!");
-            losehp(Maybe_Adjust_Phys(dam, 0), "rusting away", KILLED_BY);
+            losehp(Maybe_Adjust_Phys(dam, STRANGE_OBJECT), "rusting away", KILLED_BY);
         } else if (u.umonnum == PM_GREMLIN && rn2(3)) {
             (void) split_mon(&gy.youmonst, (struct monst *) 0);
         }
@@ -1927,7 +1927,8 @@ trapeffect_pit(
             if (relevant_spikes) {
                 int oldumort = u.umortality;
 
-                losehp(Maybe_Adjust_Phys(rnd(conj_pit ? 4 : adj_pit ? 6 : 10), 0),
+                losehp(Maybe_Adjust_Phys(rnd(conj_pit ? 4 : adj_pit ? 6 : 10),
+                                         STRANGE_OBJECT),
                        /* note: these don't need locomotion() handling;
                           if fatal while poly'd and Unchanging, the
                           death reason will be overridden with
@@ -1952,7 +1953,8 @@ trapeffect_pit(
                 /* plunging flyers take spike damage but not pit damage */
                 if (!conj_pit && !deliberate
                     && !(plunged && (Flying || is_clinger(gy.youmonst.data))))
-                    losehp(Maybe_Adjust_Phys(rnd(adj_pit ? 3 : 6), 0),
+                    losehp(Maybe_Adjust_Phys(rnd(adj_pit ? 3 : 6),
+                                             STRANGE_OBJECT),
                            plunged ? "deliberately plunged into a pit"
                            : "fell into a pit",
                            NO_KILLER_PREFIX);
@@ -2602,7 +2604,8 @@ trapeffect_landmine(
            blow_up_landmine() will remove pit afterwards if inappropriate */
         trap->ttyp = PIT;
         trap->madeby_u = FALSE;
-        losehp(Maybe_Adjust_Phys(damage, 0), "land mine", KILLED_BY_AN);
+        losehp(Maybe_Adjust_Phys(damage, STRANGE_OBJECT), "land mine",
+               KILLED_BY_AN);
         blow_up_landmine(trap);
         if (steed_mid && saddle_oid && !u.usteed
             && (saddle = o_on(saddle_oid, fobj)) != 0)
@@ -5107,7 +5110,7 @@ drown(void)
         (void) split_mon(&gy.youmonst, (struct monst *) 0);
     } else if (u.umonnum == PM_IRON_GOLEM) {
         You("rust!");
-        i = Maybe_Adjust_Phys(d(2, 6), 0);
+        i = Maybe_Adjust_Phys(d(2, 6), STRANGE_OBJECT);
         if (u.mhmax > i)
             u.mhmax -= i;
         losehp(i, "rusting away", KILLED_BY);
@@ -6420,7 +6423,8 @@ chest_trap(
                 delobj(otmp);
             }
             wake_nearby(FALSE);
-            losehp(Maybe_Adjust_Phys(d(6, 6), 0), buf, KILLED_BY_AN);
+            losehp(Maybe_Adjust_Phys(d(6, 6), STRANGE_OBJECT), buf,
+                   KILLED_BY_AN);
             exercise(A_STR, FALSE);
             if (costly && loss) {
                 if (insider) {
@@ -6724,7 +6728,7 @@ b_trapped(const char *item, int bodypart)
     Soundeffect(se_kaboom, 80);
     pline("KABOOM!!  %s was booby-trapped!", The(item));
     wake_nearby(FALSE);
-    losehp(Maybe_Adjust_Phys(dmg, 0), "explosion", KILLED_BY_AN);
+    losehp(Maybe_Adjust_Phys(dmg, STRANGE_OBJECT), "explosion", KILLED_BY_AN);
     exercise(A_STR, FALSE);
     if (bodypart != NO_PART)
         exercise(A_CON, FALSE);

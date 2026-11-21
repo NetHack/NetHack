@@ -174,7 +174,8 @@ cursed_book(struct obj *bp)
             pline("As you read the book, it %s in your %s!", explodes,
                   body_part(FACE));
             dmg = 2 * rnd(10) + 5;
-            losehp(Maybe_Adjust_Phys(dmg, 0), "exploding rune", KILLED_BY_AN);
+            losehp(Maybe_Adjust_Phys(dmg, STRANGE_OBJECT), "exploding rune",
+                   KILLED_BY_AN);
         }
         return TRUE;
     default:
@@ -1512,7 +1513,7 @@ spelleffects(int spell_otyp, boolean atme, boolean force)
 
                     Sprintf(buf, "zapped %sself with a spell", uhim());
                     if (physical_damage)
-                        damage = Maybe_Adjust_Phys(damage, 0);
+                        damage = Maybe_Adjust_Phys(damage, STRANGE_OBJECT);
                     losehp(damage, buf, NO_KILLER_PREFIX);
                 }
             } else

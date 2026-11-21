@@ -3767,7 +3767,8 @@ mhitm_ad_poly(
     } else if (mdef == &gy.youmonst) {
         /* mhitu */
         hitmsg(magr, mattk);
-        if (Maybe_Adjust_Phys(mhm->damage, 0) < (Upolyd ? u.mh : u.uhp)) {
+        if (Maybe_Adjust_Phys(mhm->damage, STRANGE_OBJECT)
+            < (Upolyd ? u.mh : u.uhp)) {
             if (negated) {
                 if (magr->mcan)
                     You("aren't transformed.");

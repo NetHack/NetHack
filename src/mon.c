@@ -3226,7 +3226,8 @@ corpse_chance(
                     There("is an explosion in your %s!", body_part(STOMACH));
                     Sprintf(svk.killer.name, "%s explosion",
                             s_suffix(pmname(mdat, Mgender(mon))));
-                    losehp(Maybe_Adjust_Phys(tmp, 0), svk.killer.name,
+                    losehp(Maybe_Adjust_Phys(tmp, STRANGE_OBJECT),
+                           svk.killer.name,
                            KILLED_BY_AN);
                 } else {
                     You_hear("an explosion.");

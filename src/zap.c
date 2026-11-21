@@ -2629,7 +2629,8 @@ backfire(struct obj *otmp)
     otmp->in_use = TRUE; /* in case losehp() is fatal */
     pline("%s suddenly explodes!", The(xname(otmp)));
     dmg = d(otmp->spe + 2, 6);
-    losehp(Maybe_Adjust_Phys(dmg, 0), "exploding wand", KILLED_BY_AN);
+    losehp(Maybe_Adjust_Phys(dmg, STRANGE_OBJECT), "exploding wand",
+           KILLED_BY_AN);
     useupall(otmp);
 }
 
@@ -2685,7 +2686,8 @@ dozap(void)
         obj = gc.current_wand;
         gc.current_wand = 0;
         if (damage)
-            losehp(Maybe_Adjust_Phys(damage, 0), buf, NO_KILLER_PREFIX);
+            losehp(Maybe_Adjust_Phys(damage, STRANGE_OBJECT), buf,
+                   NO_KILLER_PREFIX);
     } else {
         /*      Are we having fun yet?
          * weffects -> buzz(obj->otyp) -> zhitm (temple priest) ->
@@ -3080,7 +3082,7 @@ lightdamage(
         Sprintf(buf, "%s %sself with %s", ordinary ? "zapped" : "blasted",
                 uhim(), how);
         /* might rehumanize(); could be fatal, but only for Unchanging */
-        losehp(Maybe_Adjust_Phys(dmg, 0), buf, NO_KILLER_PREFIX);
+        losehp(Maybe_Adjust_Phys(dmg, STRANGE_OBJECT), buf, NO_KILLER_PREFIX);
     }
     return dmg;
 }
