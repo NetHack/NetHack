@@ -1254,7 +1254,7 @@ typedef uint32_t mmflags_nht;     /* makemon MM_ flags */
  * need to retain the dmg value beyond that call scope.
  * Take care to ensure it doesn't get used more than once in other instances.
  */
-#define Maybe_Half_Phys(dmg) \
+#define Maybe_Adjust_Phys(dmg, otyp) \
     ((Half_physical_damage) ? (((dmg) + 1) / 2) : (dmg))
 
 /* flags for special ggetobj status returns */

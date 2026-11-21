@@ -900,7 +900,7 @@ kick_ouch(coordxy x, coordxy y, const char *kickobjnam)
     if (!rn2(3))
         set_wounded_legs(RIGHT_SIDE, 5 + rnd(5));
     dmg = rnd(ACURR(A_CON) > 15 ? 3 : 5);
-    losehp(Maybe_Half_Phys(dmg), kickstr(buf, kickobjnam), KILLED_BY);
+    losehp(Maybe_Adjust_Phys(dmg, 0), kickstr(buf, kickobjnam), KILLED_BY);
     if (Is_airlevel(&u.uz) || Levitation)
         hurtle(-u.dx, -u.dy, rn1(2, 4), TRUE); /* assume it's heavy */
 }

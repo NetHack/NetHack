@@ -311,7 +311,7 @@ do_pit(coordxy x, coordxy y, unsigned tu_pit)
                not in it even if there was */
             You("fall into a chasm!");
             set_utrap(rn1(6, 2), TT_PIT);
-            losehp(Maybe_Half_Phys(rnd(6)),
+            losehp(Maybe_Adjust_Phys(rnd(6), 0),
                    "fell into a chasm", NO_KILLER_PREFIX);
             selftouch("Falling, you");
         } else if (u.utrap && u.utraptype == TT_PIT) {
@@ -322,7 +322,7 @@ do_pit(coordxy x, coordxy y, unsigned tu_pit)
 
             You("are jostled around violently!");
             set_utrap(rn1(6, 2), TT_PIT);
-            losehp(Maybe_Half_Phys(rnd(keepfooting ? 2 : 4)),
+            losehp(Maybe_Adjust_Phys(rnd(keepfooting ? 2 : 4), 0),
                    "hurt in a chasm", NO_KILLER_PREFIX);
             if (keepfooting)
                 exercise(A_DEX, TRUE);

@@ -735,7 +735,7 @@ peffect_water(struct obj *otmp)
                     you_unwere(FALSE);
                 set_ulycn(NON_PM); /* cure lycanthropy */
             }
-            losehp(Maybe_Half_Phys(d(2, 6)), "potion of holy water",
+            losehp(Maybe_Adjust_Phys(d(2, 6), 0), "potion of holy water",
                    KILLED_BY_AN);
         } else if (otmp->cursed) {
             You_feel("quite proud of yourself.");
@@ -756,7 +756,7 @@ peffect_water(struct obj *otmp)
         } else {
             if (u.ualign.type == A_LAWFUL) {
                 pline("This burns like %s!", hliquid("acid"));
-                losehp(Maybe_Half_Phys(d(2, 6)), "potion of unholy water",
+                losehp(Maybe_Adjust_Phys(d(2, 6), 0), "potion of unholy water",
                        KILLED_BY_AN);
             } else
                 You_feel("full of dread.");
@@ -1201,7 +1201,7 @@ peffect_levitation(struct obj *otmp)
 
             You("hit your %s on the %s.", body_part(HEAD),
                 ceiling(u.ux, u.uy));
-            losehp(Maybe_Half_Phys(dmg), "colliding with the ceiling",
+            losehp(Maybe_Adjust_Phys(dmg, 0), "colliding with the ceiling",
                    KILLED_BY);
             gp.potion_nothing = 0; /* not nothing after all */
         }
@@ -1306,7 +1306,7 @@ peffect_acid(struct obj *otmp)
               otmp->blessed ? " a little" : otmp->cursed ? " a lot"
                                                          : " like acid");
         dmg = d(otmp->cursed ? 2 : 1, otmp->blessed ? 4 : 8);
-        losehp(Maybe_Half_Phys(dmg), "potion of acid", KILLED_BY_AN);
+        losehp(Maybe_Adjust_Phys(dmg, 0), "potion of acid", KILLED_BY_AN);
         exercise(A_CON, FALSE);
     }
     if (Stoned)
@@ -1635,7 +1635,7 @@ potionhit(struct monst *mon, struct obj *obj, int how)
         distance = 0;
         pline_The("%s crashes on your %s and breaks into shards.", botlnam,
                   body_part(HEAD));
-        losehp(Maybe_Half_Phys(rnd(2)),
+        losehp(Maybe_Adjust_Phys(rnd(2), 0),
                (how == POTHIT_OTHER_THROW) ? "propelled potion" /* scatter */
                                            : "thrown potion",
                KILLED_BY_AN);
@@ -1699,7 +1699,7 @@ potionhit(struct monst *mon, struct obj *obj, int how)
                       obj->blessed ? " a little"
                                    : obj->cursed ? " a lot" : "");
                 dmg = d(obj->cursed ? 2 : 1, obj->blessed ? 4 : 8);
-                losehp(Maybe_Half_Phys(dmg), "potion of acid", KILLED_BY_AN);
+                losehp(Maybe_Adjust_Phys(dmg, 0), "potion of acid", KILLED_BY_AN);
             }
             break;
         }

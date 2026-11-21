@@ -2173,7 +2173,7 @@ do_loot_cont(
         You("carefully open %s...", the(xname(cobj)));
         pline("It develops a huge set of teeth and bites you!");
         tmp = rnd(10);
-        losehp(Maybe_Half_Phys(tmp), "carnivorous bag", KILLED_BY_AN);
+        losehp(Maybe_Adjust_Phys(tmp, 0), "carnivorous bag", KILLED_BY_AN);
         makeknown(BAG_OF_TRICKS);
         ga.abort_looting = TRUE;
         return ECMD_TIME;

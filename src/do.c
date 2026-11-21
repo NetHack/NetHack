@@ -136,7 +136,7 @@ boulder_hits_pool(
                     hliquid("lava"), Fire_resistance ? '.' : '!');
                 burn_away_slime();
                 dmg = d((Fire_resistance ? 1 : 3), 6);
-                losehp(Maybe_Half_Phys(dmg), /* lava damage */
+                losehp(Maybe_Adjust_Phys(dmg, 0), /* lava damage */
                        "molten lava", KILLED_BY);
             } else if (!fills_up && flags.verbose
                        && (pushing ? !Blind : cansee(rx, ry))) {
@@ -229,7 +229,7 @@ flooreffects(
                 mtmp->mtrapped = 0;
             } else {
                 if (!Passes_walls && !throws_rocks(gy.youmonst.data)) {
-                    losehp(Maybe_Half_Phys(rnd(15)),
+                    losehp(Maybe_Adjust_Phys(rnd(15), 0),
                            "squished under a boulder", NO_KILLER_PREFIX);
                     goto deletedwithboulder;
                 } else
@@ -1265,7 +1265,7 @@ dodown(void)
             if (y_n(qbuf) == 'y') {
                 if (!rn2(3)) {
                     actn = "manage to squeeze";
-                    losehp(Maybe_Half_Phys(rnd(4)),
+                    losehp(Maybe_Adjust_Phys(rnd(4), 0),
                            "contusion from a small passage", KILLED_BY);
                 } else {
                     You("were unable to fit %s.", down_or_thru);
@@ -1807,7 +1807,7 @@ goto_level(
                 if (u.usteed)
                     dismount_steed(DISMOUNT_FELL);
                 else
-                    losehp(Maybe_Half_Phys(rnd(3)),
+                    losehp(Maybe_Adjust_Phys(rnd(3), 0),
                            ga.at_ladder ? "falling off a ladder"
                                      : "tumbling down a flight of stairs",
                            KILLED_BY);
@@ -2007,7 +2007,7 @@ goto_level(
     if (do_fall_dmg) {
         int dmg = d(max(dist, 1), 6);
 
-        dmg = Maybe_Half_Phys(dmg);
+        dmg = Maybe_Adjust_Phys(dmg, 0);
         losehp(dmg, "falling down a mine shaft", KILLED_BY);
     }
 

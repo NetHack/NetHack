@@ -812,7 +812,7 @@ recharge(struct obj *obj, int curse_bless)
                 Ring_gone(obj);
             s = rnd(3 * abs(obj->spe)); /* amount of damage */
             useup(obj), obj = 0;
-            losehp(Maybe_Half_Phys(s), "exploding ring", KILLED_BY_AN);
+            losehp(Maybe_Adjust_Phys(s, 0), "exploding ring", KILLED_BY_AN);
         } else {
             long mask = is_on ? (obj == uleft ? LEFT_RING : RIGHT_RING) : 0L;
 
@@ -2335,7 +2335,7 @@ drop_boulder_on_player(
         newsym(u.ux, u.uy);
     }
     if (dmg)
-        losehp(Maybe_Half_Phys(dmg), "scroll of earth", KILLED_BY_AN);
+        losehp(Maybe_Adjust_Phys(dmg, 0), "scroll of earth", KILLED_BY_AN);
 }
 
 boolean
@@ -2451,7 +2451,7 @@ wand_explode(struct obj *obj, int chg /* recharging */)
     dmg = d(n, k);
     obj->in_use = TRUE; /* in case losehp() is fatal (or --More--^C) */
     pline("%s %s explodes!", Yname2(obj), expl);
-    losehp(Maybe_Half_Phys(dmg), "exploding wand", KILLED_BY_AN);
+    losehp(Maybe_Adjust_Phys(dmg, 0), "exploding wand", KILLED_BY_AN);
     useup(obj);
     /* obscure side-effect */
     exercise(A_STR, FALSE);

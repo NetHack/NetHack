@@ -2629,7 +2629,7 @@ backfire(struct obj *otmp)
     otmp->in_use = TRUE; /* in case losehp() is fatal */
     pline("%s suddenly explodes!", The(xname(otmp)));
     dmg = d(otmp->spe + 2, 6);
-    losehp(Maybe_Half_Phys(dmg), "exploding wand", KILLED_BY_AN);
+    losehp(Maybe_Adjust_Phys(dmg, 0), "exploding wand", KILLED_BY_AN);
     useupall(otmp);
 }
 
@@ -2685,7 +2685,7 @@ dozap(void)
         obj = gc.current_wand;
         gc.current_wand = 0;
         if (damage)
-            losehp(Maybe_Half_Phys(damage), buf, NO_KILLER_PREFIX);
+            losehp(Maybe_Adjust_Phys(damage, 0), buf, NO_KILLER_PREFIX);
     } else {
         /*      Are we having fun yet?
          * weffects -> buzz(obj->otyp) -> zhitm (temple priest) ->
@@ -3080,7 +3080,7 @@ lightdamage(
         Sprintf(buf, "%s %sself with %s", ordinary ? "zapped" : "blasted",
                 uhim(), how);
         /* might rehumanize(); could be fatal, but only for Unchanging */
-        losehp(Maybe_Half_Phys(dmg), buf, NO_KILLER_PREFIX);
+        losehp(Maybe_Adjust_Phys(dmg, 0), buf, NO_KILLER_PREFIX);
     }
     return dmg;
 }
@@ -3342,7 +3342,7 @@ zap_updown(struct obj *obj) /* wand or spell, nonnull */
             pline("A rock is dislodged from the %s and falls on your %s.",
                   ceiling(x, y), body_part(HEAD));
             dmg = rnd(hard_helmet(uarmh) ? 2 : 6);
-            losehp(Maybe_Half_Phys(dmg), "falling rock", KILLED_BY_AN);
+            losehp(Maybe_Adjust_Phys(dmg, ROCK), "falling rock", KILLED_BY_AN);
             if ((otmp = mksobj_at(ROCK, x, y, FALSE, FALSE)) != 0) {
                 (void) xname(otmp); /* set dknown, maybe bknown */
                 stackobj(otmp);
@@ -4250,7 +4250,7 @@ boomhit(struct obj *obj, int dx, int dy)
                 int dam = dmgval(obj, &gy.youmonst);
 
                 /* we hit ourselves */
-                (void) thitu(10 + obj->spe, Maybe_Half_Phys(dam), &obj,
+                (void) thitu(10 + obj->spe, Maybe_Adjust_Phys(dam, obj->otyp), &obj,
                              "boomerang");
                 endmultishot(TRUE);
                 break;
