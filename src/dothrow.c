@@ -789,6 +789,7 @@ hurtle_step(genericptr_t arg, coordxy x, coordxy y)
     } else if (*range == 0) {
         return FALSE; /* previous step wants to stop now */
     }
+    nhUse(otyp);
     via_jumping = (EWwalking & I_SPECIAL) != 0L;
     stopping_short = (via_jumping && *range < 2);
     lev = &levl[x][y];
