@@ -3925,7 +3925,7 @@ mhitm_ad_halu(
         mhm->damage = 0;
     } else {
         /* mhitm */
-        if (!magr->mcan && haseyes(pd) && mdef->mcansee) {
+        if (!magr->mcan && haseyes(pd) && mdef->mcansee && !defended(mdef, AD_HALU)) {
             if (gv.vis && canseemon(mdef))
                 pline_mon(mdef, "%s looks %sconfused.", Monnam(mdef),
                       mdef->mconf ? "more " : "");
@@ -4917,7 +4917,7 @@ explum(struct monst *mdef, struct attack *mattk)
         }
         break;
     case AD_HALU:
-        if (mdef && haseyes(mdef->data) && mdef->mcansee) {
+        if (mdef && haseyes(mdef->data) && mdef->mcansee && !defended(mdef, AD_HALU)) {
             pline("%s is affected by your flash of light!", Monnam(mdef));
             mdef->mconf = 1;
         }
