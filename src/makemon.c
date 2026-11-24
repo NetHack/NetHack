@@ -999,7 +999,7 @@ monhp_per_lvl(struct monst *mon)
         /* adult dragons; newmonhp() uses In_endgame(&u.uz) ? 8 : 4 + rnd(4)
          */
         hp = 4 + rn2(5); /* 4..8 */
-    } else if (!mon->m_lev) {
+    } else if (mon == &gy.youmonst ? !ptr->mlevel : !mon->m_lev) {
         /* level 0 monsters use 1d4 instead of Nd8 */
         hp = rnd(4);
     }
