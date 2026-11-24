@@ -222,6 +222,13 @@ vpline(const char *line, va_list the_args)
         pbuf[BUFSZ - 1 - 1] = line[ln - 1];
         pbuf[BUFSZ - 1] = '\0';
         line = pbuf;
+    } else if (line != pbuf) {
+        /* 'line' might be gy.you_buf (from You(), pline_The(), &c), which
+           a nested message would overwrite; vision_recalc() below can
+           issue one (notice_all_mons() for the 'spot_monsters' option),
+           so work from a private copy; ln <= BUFSZ - 1 here */
+        Snprintf(pbuf, sizeof pbuf, "%s", line);
+        line = pbuf;
     }
     msgtyp = MSGTYP_NORMAL;
 
