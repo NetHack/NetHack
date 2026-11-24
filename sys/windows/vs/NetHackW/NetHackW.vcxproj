@@ -413,7 +413,7 @@
   </Target>
 	<Target Name="InjectGitHash" BeforeTargets="ClCompile" Condition="Exists('$(VSInstallDir)$(GitExeSub)git.exe') And Exists('$(RootDir).git')">
 		<!-- Run git rev-parse and capture output into a property -->
-		<Exec Command="git rev-parse --verify HEAD" ConsoleToMSBuild="true" IgnoreExitCode="true">
+		<Exec Command="&quot;$(VSInstallDir)$(GitExeSub)git.exe&quot; rev-parse --verify HEAD" ConsoleToMSBuild="true" IgnoreExitCode="true">
 			<Output TaskParameter="ConsoleOutput" PropertyName="GitCommitHash" />
 		</Exec>
 

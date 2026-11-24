@@ -779,7 +779,7 @@ hurtle_step(genericptr_t arg, coordxy x, coordxy y)
     boolean may_pass = TRUE, via_jumping, stopping_short;
     struct trap *ttmp;
     struct rm *lev;
-    int ltyp, dmg = 0;
+    int ltyp, dmg = 0, otyp = 0;
 
     if (!isok(x, y)) {
         You_feel("the spirits holding you back.");
@@ -789,6 +789,7 @@ hurtle_step(genericptr_t arg, coordxy x, coordxy y)
     } else if (*range == 0) {
         return FALSE; /* previous step wants to stop now */
     }
+    nhUse(otyp);
     via_jumping = (EWwalking & I_SPECIAL) != 0L;
     stopping_short = (via_jumping && *range < 2);
     lev = &levl[x][y];
@@ -810,9 +811,11 @@ hurtle_step(genericptr_t arg, coordxy x, coordxy y)
                 You("hit the door frame!");
             pline("Ouch!");
         } else if (ltyp == IRONBARS) {
+            otyp = IRON;
             why = "crashing into iron bars";
             You("crash into some iron bars.  Ouch!");
         } else if ((obj = sobj_at(BOULDER, x, y)) != 0) {
+            otyp = MINERAL;
             why = "bumping into a boulder";
             You("bump into a %s.  Ouch!", xname(obj));
         }  else if (!may_pass) {
@@ -833,7 +836,7 @@ hurtle_step(genericptr_t arg, coordxy x, coordxy y)
         }
         if (why) {
             dmg = rnd(2 + *range);
-            losehp(Maybe_Half_Phys(dmg), why, KILLED_BY);
+            losehp(Maybe_Adjust_Phys(dmg, otyp), why, KILLED_BY);
             wake_nearto(x, y, 10);
             return FALSE;
         }
@@ -1377,7 +1380,7 @@ toss_up(struct obj *obj, boolean hitsroof)
             dmg += u.udaminc;
         if (dmg < 0)
             dmg = 0; /* beware negative rings of increase damage */
-        dmg = Maybe_Half_Phys(dmg);
+        dmg = Maybe_Adjust_Phys(dmg, otyp);
 
         if (uarmh) {
             /* note: 'harmless' and 'petrifier' are mutually exclusive */
@@ -1820,7 +1823,7 @@ throwit(
                         if (obj->oartifact)
                             (void) artifact_hit((struct monst *) 0,
                                                 &gy.youmonst, obj, &dmg, 0);
-                        losehp(Maybe_Half_Phys(dmg), killer_xname(obj),
+                        losehp(Maybe_Adjust_Phys(dmg, obj->otyp), killer_xname(obj),
                                KILLED_BY);
                     }
                     if (!tethered_weapon) {

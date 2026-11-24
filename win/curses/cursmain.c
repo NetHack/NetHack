@@ -75,6 +75,7 @@ struct window_procs curses_procs = {
      | WC2_STATUSLINES | WC2_WINDOWBORDERS | WC2_PETATTR | WC2_GUICOLOR
      | WC2_SUPPRESS_HIST | WC2_URGENT_MESG | WC2_MENU_SHIFT
      | WC2_EXTRASTATUS
+     | WC2_WRAPTEXT
     ),
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, /* color availability */
     curses_init_nhwindows,

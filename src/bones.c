@@ -57,6 +57,10 @@ resetobjs(struct obj *ochain, boolean restore)
         if (otmp->cobj)
             resetobjs(otmp->cobj, restore);
         if (otmp->in_use) {
+            /* a bag of holding that was blowing up when the hero died
+               takes what it still holds with it */
+            if (Has_contents(otmp))
+                delete_contents(otmp);
             obj_extract_self(otmp);
             dealloc_obj(otmp);
             continue;

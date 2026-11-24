@@ -900,7 +900,8 @@ kick_ouch(coordxy x, coordxy y, const char *kickobjnam)
     if (!rn2(3))
         set_wounded_legs(RIGHT_SIDE, 5 + rnd(5));
     dmg = rnd(ACURR(A_CON) > 15 ? 3 : 5);
-    losehp(Maybe_Half_Phys(dmg), kickstr(buf, kickobjnam), KILLED_BY);
+    losehp(Maybe_Adjust_Phys(dmg, STRANGE_OBJECT), kickstr(buf, kickobjnam),
+           KILLED_BY);
     if (Is_airlevel(&u.uz) || Levitation)
         hurtle(-u.dx, -u.dy, rn1(2, 4), TRUE); /* assume it's heavy */
 }
@@ -1565,6 +1566,9 @@ impact_drop(
         /* number of objects in the pile */
         oct += obj->quan;
         if (obj == uball || obj == uchain)
+            continue;
+        /* an object in use, such as a bag of holding blowing up, stays */
+        if (obj->in_use)
             continue;
         /* boulders can fall too, but rarely & never due to rocks */
         if ((isrock && obj->otyp == BOULDER)

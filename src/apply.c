@@ -2082,7 +2082,7 @@ jump(int magic) /* 0=Physical, otherwise skill level */
             case TT_BEARTRAP:
                 side = rn2(3) ? LEFT_SIDE : RIGHT_SIDE;
                 You("rip yourself free of the bear trap!  Ouch!");
-                losehp(Maybe_Half_Phys(rnd(10)), "jumping out of a bear trap",
+                losehp(Maybe_Adjust_Phys(rnd(10), BEARTRAP), "jumping out of a bear trap",
                        KILLED_BY);
                 set_wounded_legs(side, rn1(1000, 500));
                 break;
@@ -3062,7 +3062,7 @@ use_whip(struct obj *obj)
             dam = 1;
         You("hit your %s with your bullwhip.", body_part(FOOT));
         Sprintf(buf, "killed %sself with %s bullwhip", uhim(), uhis());
-        losehp(Maybe_Half_Phys(dam), buf, NO_KILLER_PREFIX);
+        losehp(Maybe_Adjust_Phys(dam, BULLWHIP), buf, NO_KILLER_PREFIX);
         return ECMD_TIME;
 
     } else if ((Fumbling || Glib) && !rn2(5)) {
@@ -3197,7 +3197,7 @@ use_whip(struct obj *obj)
 
                         dam = dmgval(otmp, &gy.youmonst);
                         hitvalu = 8 + otmp->spe;
-                        hitu = thitu(hitvalu, Maybe_Half_Phys(dam),
+                        hitu = thitu(hitvalu, Maybe_Adjust_Phys(dam, otmp->otyp),
                                      &otmp, (char *) 0);
                         if (hitu) {
                             pline_The("%s hits you as you try to snatch it!",
@@ -3863,7 +3863,7 @@ use_grapple(struct obj *obj)
     default: /* Yourself (oops!) */
         if (P_SKILL(typ) <= P_BASIC) {
             You("hook yourself!");
-            losehp(Maybe_Half_Phys(rn1(10, 10)), "a grappling hook",
+            losehp(Maybe_Adjust_Phys(rn1(10, 10), obj->otyp), "a grappling hook",
                    KILLED_BY);
             return ECMD_TIME;
         }
@@ -4123,7 +4123,8 @@ do_break_wand(struct obj *obj)
             damage = zapyourself(obj, FALSE);
             if (damage) {
                 Sprintf(buf, "killed %sself by breaking a wand", uhim());
-                losehp(Maybe_Half_Phys(damage), buf, NO_KILLER_PREFIX);
+                losehp(Maybe_Adjust_Phys(damage, STRANGE_OBJECT), buf,
+                       NO_KILLER_PREFIX);
             }
             if (disp.botl)
                 bot(); /* blindness */

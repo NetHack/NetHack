@@ -1213,7 +1213,8 @@ trapeffect_arrow_trap(
         dam = dmgval(otmp, &gy.youmonst);
         if (u.usteed && !rn2(2) && steedintrap(trap, otmp)) {
             ; /* nothing */
-        } else if (thitu(8, Maybe_Half_Phys(dam), &otmp, "arrow")) {
+        } else if (thitu(8, Maybe_Adjust_Phys(dam, otmp->otyp),
+                                            &otmp, "arrow")) {
             if (otmp)
                 obfree(otmp, (struct obj *) 0);
         } else {
@@ -1278,7 +1279,8 @@ trapeffect_dart_trap(
         dam = dmgval(otmp, &gy.youmonst);
         if (u.usteed && !rn2(2) && steedintrap(trap, otmp)) {
             ; /* nothing */
-        } else if (thitu(7, Maybe_Half_Phys(dam), &otmp, "little dart")) {
+        } else if (thitu(7, Maybe_Adjust_Phys(dam, otmp->otyp),
+                                            &otmp, "little dart")) {
             if (otmp) {
                 if (otmp->opoisoned)
                     poisoned("dart", A_CON, "little dart",
@@ -1371,7 +1373,7 @@ trapeffect_rocktrap(
             newsym(u.ux, u.uy); /* map the rock */
 
             if (!harmless) {
-                losehp(Maybe_Half_Phys(dmg), "falling rock", KILLED_BY_AN);
+                losehp(Maybe_Adjust_Phys(dmg, otmp->otyp), "falling rock", KILLED_BY_AN);
                 exercise(A_STR, FALSE);
             }
         }
@@ -1521,7 +1523,7 @@ trapeffect_bear_trap(
                 pline("%s protects your leg.", Yname2(uarmf));
             else {
                 set_wounded_legs(rn2(2) ? RIGHT_SIDE : LEFT_SIDE, rn1(10, 10));
-                losehp(Maybe_Half_Phys(dmg), "bear trap", KILLED_BY_AN);
+                losehp(Maybe_Adjust_Phys(dmg, BEARTRAP), "bear trap", KILLED_BY_AN);
             }
         }
         exercise(A_DEX, FALSE);
@@ -1651,7 +1653,7 @@ trapeffect_rust_trap(
             int dam = u.mhmax;
 
             You("are covered with rust!");
-            losehp(Maybe_Half_Phys(dam), "rusting away", KILLED_BY);
+            losehp(Maybe_Adjust_Phys(dam, STRANGE_OBJECT), "rusting away", KILLED_BY);
         } else if (u.umonnum == PM_GREMLIN && rn2(3)) {
             (void) split_mon(&gy.youmonst, (struct monst *) 0);
         }
@@ -1925,7 +1927,8 @@ trapeffect_pit(
             if (relevant_spikes) {
                 int oldumort = u.umortality;
 
-                losehp(Maybe_Half_Phys(rnd(conj_pit ? 4 : adj_pit ? 6 : 10)),
+                losehp(Maybe_Adjust_Phys(rnd(conj_pit ? 4 : adj_pit ? 6 : 10),
+                                         STRANGE_OBJECT),
                        /* note: these don't need locomotion() handling;
                           if fatal while poly'd and Unchanging, the
                           death reason will be overridden with
@@ -1950,7 +1953,8 @@ trapeffect_pit(
                 /* plunging flyers take spike damage but not pit damage */
                 if (!conj_pit && !deliberate
                     && !(plunged && (Flying || is_clinger(gy.youmonst.data))))
-                    losehp(Maybe_Half_Phys(rnd(adj_pit ? 3 : 6)),
+                    losehp(Maybe_Adjust_Phys(rnd(adj_pit ? 3 : 6),
+                                             STRANGE_OBJECT),
                            plunged ? "deliberately plunged into a pit"
                            : "fell into a pit",
                            NO_KILLER_PREFIX);
@@ -2553,8 +2557,8 @@ trapeffect_landmine(
         boolean forcetrap = ((trflags & FORCETRAP) != 0
                              || (trflags & FAILEDUNTRAP) != 0);
         boolean forcebungle = (trflags & FORCEBUNGLE) != 0;
-        unsigned steed_mid = 0;
-        struct obj *saddle = 0;
+        unsigned steed_mid = 0, saddle_oid = 0;
+        struct obj *saddle;
 
         if ((Levitation || Flying) && !forcetrap) {
             if (!already_seen && rn2(3))
@@ -2588,7 +2592,10 @@ trapeffect_landmine(
             recursive_mine = TRUE;
             (void) steedintrap(trap, (struct obj *) 0);
             recursive_mine = FALSE;
-            saddle = sobj_at(SADDLE, u.ux, u.uy);
+            /* the blast below can throw the saddle into lava, where it
+               burns up, so remember it by o_id rather than by pointer */
+            if ((saddle = sobj_at(SADDLE, u.ux, u.uy)) != 0)
+                saddle_oid = saddle->o_id;
             set_wounded_legs(LEFT_SIDE, rn1(35, 41));
             set_wounded_legs(RIGHT_SIDE, rn1(35, 41));
             exercise(A_DEX, FALSE);
@@ -2597,9 +2604,11 @@ trapeffect_landmine(
            blow_up_landmine() will remove pit afterwards if inappropriate */
         trap->ttyp = PIT;
         trap->madeby_u = FALSE;
-        losehp(Maybe_Half_Phys(damage), "land mine", KILLED_BY_AN);
+        losehp(Maybe_Adjust_Phys(damage, STRANGE_OBJECT), "land mine",
+               KILLED_BY_AN);
         blow_up_landmine(trap);
-        if (steed_mid && saddle && !u.usteed)
+        if (steed_mid && saddle_oid && !u.usteed
+            && (saddle = o_on(saddle_oid, fobj)) != 0)
             (void) keep_saddle_with_steedcorpse(steed_mid, fobj, saddle);
         newsym(u.ux, u.uy); /* update trap symbol */
         /* fall recursively into the pit... */
@@ -3427,7 +3436,8 @@ launch_obj(
 
             if (gm.multi)
                 nomul(0);
-            if (thitu(9 + singleobj->spe, Maybe_Half_Phys(dam),
+            if (thitu(9 + singleobj->spe,
+                      Maybe_Adjust_Phys(dam, singleobj->otyp),
                       &singleobj, (char *) 0))
                 stop_occupation();
         }
@@ -5100,7 +5110,7 @@ drown(void)
         (void) split_mon(&gy.youmonst, (struct monst *) 0);
     } else if (u.umonnum == PM_IRON_GOLEM) {
         You("rust!");
-        i = Maybe_Half_Phys(d(2, 6));
+        i = Maybe_Adjust_Phys(d(2, 6), STRANGE_OBJECT);
         if (u.mhmax > i)
             u.mhmax -= i;
         losehp(i, "rusting away", KILLED_BY);
@@ -6413,7 +6423,8 @@ chest_trap(
                 delobj(otmp);
             }
             wake_nearby(FALSE);
-            losehp(Maybe_Half_Phys(d(6, 6)), buf, KILLED_BY_AN);
+            losehp(Maybe_Adjust_Phys(d(6, 6), STRANGE_OBJECT), buf,
+                   KILLED_BY_AN);
             exercise(A_STR, FALSE);
             if (costly && loss) {
                 if (insider) {
@@ -6717,7 +6728,7 @@ b_trapped(const char *item, int bodypart)
     Soundeffect(se_kaboom, 80);
     pline("KABOOM!!  %s was booby-trapped!", The(item));
     wake_nearby(FALSE);
-    losehp(Maybe_Half_Phys(dmg), "explosion", KILLED_BY_AN);
+    losehp(Maybe_Adjust_Phys(dmg, STRANGE_OBJECT), "explosion", KILLED_BY_AN);
     exercise(A_STR, FALSE);
     if (bodypart != NO_PART)
         exercise(A_CON, FALSE);
@@ -6921,6 +6932,11 @@ lava_effects(void)
                     pline("%s glows a strange %s, but remains intact.",
                           The(xname(obj)), hcolor("dark red"));
             } else if (obj->in_use) {
+                /* taking off burning gloves while wielding a cockatrice
+                   corpse turns the hero to stone, and life-saving then
+                   uses up the amulet, which might be obj2 */
+                unsigned nextoid = obj2 ? obj2->o_id : 0;
+
                 if (obj->owornmask) {
                     if (usurvive) {
                         pline("%s into flame!", Yobjnam2(obj, "burst"));
@@ -6930,6 +6946,9 @@ lava_effects(void)
                 }
                 useupall(obj);
                 ++burncount;
+                /* if so, start over; whatever was already burned is gone */
+                if (nextoid && !o_on(nextoid, gi.invent))
+                    obj2 = gi.invent;
             }
         }
         if (usurvive && burncount > burnmesgcount)

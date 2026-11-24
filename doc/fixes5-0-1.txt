@@ -4,6 +4,8 @@ NetHack may be freely redistributed.  See license for details.
 	
 General Fixes and Modified Features
 -----------------------------------
+apply normal touch-petrification checks when a blind hero inspects
+	corpses through traditional pickup or container-looting prompts
 fix some cross-compile package filenames that still referenced 370 instead
 	of 500
 Use NHV macro (NHV=500) for filenames in Makefiles and/or hints files to make
@@ -122,6 +124,22 @@ fix possible buffer underrun in nh_snprintf with long item call name
 fix crash when book is destroyed in the middle of studying
 fix monsters eating pyrolisk eggs
 fix destroyed weapon used in attacks
+fix infinite loop on cancel in status_hilite_menu_add (pr #1639 by satokiyon)
+avoid asking for confirmation for unambiguous char combos at start
+	(pr #1667 by aoeixsz4)
+name the container in loot prompts (pr #1672 by crissman)
+fix zapped wand used after god's bolt destroyed it
+fix zapped wand freed mid-zap
+fix lava death loop reading a used-up amulet
+allow wizgenesis to create long worms of specific length
+fix drawbridge stranding long worm's tail
+fix panic when landmine scattered saddle burns in lava
+fix farlook buffer overflow on a long engraving
+fix panic when bag of holding blows up and falls through a trap door
+fix panic when exploding bag causes hero to change position
+fix impossible when shape changer reverted before placed on the map
+fix nested lua calls breaking time limit
+add tutorial texts for #droptype and #showspells
 
 
 Platform- and/or Interface-Specific Fixes
@@ -314,6 +332,11 @@ X11: remove the limit on the number of widgets managed in winlabel.c; it was
 	(pr #1668 by chasonr)
 Unix: don't complain about MAXPLAYERS with unknown command line param
 Qt: menus and toolbar buttons did not work correctly with ext cmd filtering
+Qt: menu windows in the Qt interface opened far too small — often a few rows
+	of a long inventory — and the inventory window was keeping whatever
+	size it had the first time it was shown, because the core reuses one
+	window for WIN_INVEN and the layout's cached size hint was never
+	invalidated (pr #1671 by crissman)
 
 
 General New Features
@@ -337,7 +360,7 @@ NCURSES_CFLAGS was being ignored when using hints/linux.500 with only
 added a hints file netbsd.500 for NetBSD (pr #1519 by SirWumpus)
 rewrite of the Tourist quest text for more Pratchetty feel
 	(pr #1596 by robindouglasjohnson)
-
+curses: OPTIONS=wraptext support (pr #1576 by avgas3)
 
 
 Code Cleanup and Reorganization
