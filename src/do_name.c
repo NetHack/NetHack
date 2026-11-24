@@ -323,6 +323,10 @@ do_oname(struct obj *obj)
               /* any artifact should always pass the has_oname() test
                  but be careful just in case */
               has_oname(obj) ? ONAME(obj) : "The artifact");
+        if (undiscovered_artifact(obj->oartifact)) {
+            fully_identify_obj(obj);
+            update_inventory();
+        }
         return;
     }
 
@@ -469,7 +473,9 @@ name_ok(struct obj *obj)
     if (!obj || obj->oclass == COIN_CLASS)
         return GETOBJ_EXCLUDE;
 
-    if (!obj->dknown || obj->oartifact || obj->otyp == SPE_NOVEL)
+    if (!obj->dknown
+        || (obj->oartifact && !undiscovered_artifact(obj->oartifact))
+        || obj->otyp == SPE_NOVEL)
         return GETOBJ_DOWNPLAY;
 
     return GETOBJ_SUGGEST;
