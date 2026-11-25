@@ -1346,8 +1346,7 @@ ini_inv(const struct trobj *trop)
         /* nudist gets no armor */
         if (u.uroleplay.nudist && obj->oclass == ARMOR_CLASS) {
             dealloc_obj(obj);
-            trop++;
-            continue;
+            goto nxt;
         }
 
         if (ini_inv_adjust_obj(trop, obj))
@@ -1360,6 +1359,7 @@ ini_inv(const struct trobj *trop)
 
         if (--quan)
             continue; /* make a similar object */
+ nxt:
         trop++;
         quan = trquan(trop);
     }
