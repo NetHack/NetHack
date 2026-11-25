@@ -1682,6 +1682,7 @@ extern void free_omailcmd(struct obj *) NONNULLARG1;
 extern struct obj *mkobj_at(char, coordxy, coordxy, boolean);
 extern struct obj *mksobj_at(int, coordxy, coordxy, boolean, boolean);
 extern struct obj *mksobj_migr_to_species(int, unsigned, boolean, boolean);
+extern int mkobj_otyp_from_oclass(int);
 extern struct obj *mkobj(int, boolean) NONNULL;
 extern int rndmonnum_adj(int, int);
 extern int rndmonnum(void);

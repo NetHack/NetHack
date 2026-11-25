@@ -693,10 +693,7 @@ struct instance_globals_n {
     int num_lregions;
 
     /* u_init.c */
-    short nocreate;
-    short nocreate2;
-    short nocreate3;
-    short nocreate4;
+    short nocreate[5];
 
     /* new */
     boolean no_terms; /* runtime differentiation of NO_TERMS */
