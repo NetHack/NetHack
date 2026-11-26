@@ -1165,6 +1165,7 @@ ini_inv_mkobj_filter(int oclass, boolean got_level1_spellbook)
             otyp = PANCAKE;
             break;
         }
+        otyp = mkobj_otyp_from_oclass(oclass);
     }
     return otyp;
 }
