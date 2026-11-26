@@ -14,7 +14,7 @@
 #elif defined(DUMP_MCASTU_ENUM1)
 #define MONSPELL(def, lvl, flags) MCAST_DUMPENUM_##def
 #elif defined(DUMP_MCASTU_ENUM2)
-#define MONSPELL(def, lvl, flags) { MCAST_DUMPENUM_##def, #def }
+#define MONSPELL(def, lvl, flags) { MCAST_DUMPENUM_##def, #def, 0 }
 #endif
 
 MONSPELL(PSI_BOLT,     0, MCF_HOSTILE|MCF_SIGHT),

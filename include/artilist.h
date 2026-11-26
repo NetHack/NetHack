@@ -19,7 +19,7 @@ static const char *const artifact_names[] = {
 #elif defined(DUMP_ARTI_ENUM)
 #define A(nam, typ, s1, s2, mt, atk, dfn, cry, inv, al, cl, rac, \
           gs, gv, cost, clr, bn)                                 \
-    { ART_##bn, "ART_" #bn }
+    { ART_##bn, "ART_" #bn, 0 }
 #else
 /* in artifact.c, set up the actual artifact list structure;
    color field is for an artifact when it glows, not for the item itself */

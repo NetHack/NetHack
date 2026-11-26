@@ -62,7 +62,7 @@
 #define OBJ(name,desc)
 #define OBJECT(obj,bits,prp,sym,prob,dly,wt,        \
                cost,sdam,ldam,oc1,oc2,nut,color,sn) \
-  { sn, #sn }
+  { sn, #sn, 0 }
 #define MARKER(tag,sn) /*empty*/
 
 #else

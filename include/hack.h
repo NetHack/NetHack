@@ -473,6 +473,7 @@ struct entity {
 struct enum_dump {
     int val;
     const char *nm;
+    const char *comment;
 };
 
 /*

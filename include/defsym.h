@@ -429,17 +429,17 @@
 #elif defined(DUMP_ENUMS_OBJCLASS_DEFCHARS)
 /* allmain.c */
 #define OBJCLASS(idx, ch, basename, sym, name, explain) \
-    { basename##_SYM, #basename "_SYM" },
+    { basename##_SYM, #basename "_SYM", 0 },
 
 #elif defined(DUMP_ENUMS_OBJCLASS_CLASSES)
 /* allmain.c */
 #define OBJCLASS(idx, ch, basename, sym, name, explain) \
-    { basename##_CLASS, #basename "_CLASS" },
+    { basename##_CLASS, #basename "_CLASS", 0 },
 
 #elif defined(DUMP_ENUMS_OBJCLASS_SYMS)
 /* allmain.c */
 #define OBJCLASS(idx, ch, basename, sym, name, explain) \
-    { sym , #sym },
+    { sym , #sym, 0 },
 #endif
 
 /* OBJCLASS with extra arg */
@@ -451,13 +451,13 @@
     { sname, name, explain },
 #elif defined(DUMP_ENUMS_OBJCLASS_DEFCHARS)
 #define OBJCLASS2(idx, ch, basename, sname, sym, name, explain) \
-    { sname, #sname },
+    { sname, #sname, 0 },
 #elif defined(DUMP_ENUMS_OBJCLASS_CLASSES)
 #define OBJCLASS2(idx, ch, basename, sname, sym, name, explain) \
-    { basename##_CLASS, #basename "_CLASS" },
+    { basename##_CLASS, #basename "_CLASS", 0 },
 #elif defined(DUMP_ENUMS_OBJCLASS_SYMS)
 #define OBJCLASS2(idx, ch, basename, sname, sym, name, explain) \
-    { sym , #sym },
+    { sym , #sym, 0 },
 #else
 #define OBJCLASS2(idx, ch, basename, sname, sym, name, explain) \
     OBJCLASS(idx, ch, basename, sym, name, explain)

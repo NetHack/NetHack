@@ -9,7 +9,7 @@
 
 #elif defined(DUMP_ENUMS)
 #define MON(nam, sym, lvl, gen, atk, siz, mr1, mr2, flg1, flg2, flg3, d, \
-            col, bn) { PM_##bn, #bn}
+            col, bn) { PM_##bn, #bn, 0}
 
 #elif !defined(MON)
 #error Non-productive inclusion of monsters.h
