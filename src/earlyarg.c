@@ -745,8 +745,12 @@ static struct enum_dump objclass_defchars_dump[] = {
 
 #define DUMP_ENUMS_OBJCLASS_CLASSES
 static struct enum_dump objclass_classes_dump[] = {
+    { RANDOM_CLASS, "RANDOM_CLASS" },
 #include "defsym.h"
     { MAXOCLASSES, "MAXOCLASSES" },
+    { BURNING_OIL, "BURNING_OIL" },   /* (MAXOCLASSES + 1) */
+    { MON_EXPLODE, "MON_EXPLODE" },   /* (MAXOCLASSES + 2) */
+    { TRAP_EXPLODE, "TRAP_EXPLODE" }, /* (MAXOCLASSES + 3) */
 };
 #undef DUMP_ENUMS_OBJCLASS_CLASSES
 

@@ -138,7 +138,10 @@ enum objclass_classes {
 #define OBJCLASS_CLASS_ENUM
 #include "defsym.h"
 #undef OBJCLASS_CLASS_ENUM
-    MAXOCLASSES
+    MAXOCLASSES,
+    BURNING_OIL,  /* MAXOCLASSES + 1 Can be used as input to explode */
+    MON_EXPLODE,  /* MAXOCLASSES + 2 Exploding monster (e.g. gas spore) */
+    TRAP_EXPLODE, /* MAXOCLASSES + 3 */
 };
 
 /* Default characters for object classes */
@@ -150,10 +153,6 @@ enum objclass_syms {
 
 /* for mkobj() use ONLY! odd '-SPBOOK_CLASS' is in case of unsigned enums */
 #define SPBOOK_no_NOVEL (0 - (int) SPBOOK_CLASS)
-
-#define BURNING_OIL (MAXOCLASSES + 1) /* Can be used as input to explode    */
-#define MON_EXPLODE (MAXOCLASSES + 2) /* Exploding monster (e.g. gas spore) */
-#define TRAP_EXPLODE (MAXOCLASSES + 3)
 
 #if 0 /* moved to decl.h so that makedefs.c won't see them */
 extern const struct class_sym
