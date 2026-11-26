@@ -76,9 +76,9 @@
 
 #elif defined(DUMP_ENUMS_PCHAR)
 /* allmain.c */
-#define PCHAR(idx, ch, sym, desc, clr) { sym, #sym },
+#define PCHAR(idx, ch, sym, desc, clr) { sym, #sym, 0 },
 #ifndef PCHAR2
-#define PCHAR2(idx, ch, sym, tilenm, desc, clr) { sym, #sym },
+#define PCHAR2(idx, ch, sym, tilenm, desc, clr) { sym, #sym, 0 },
 #endif
 #endif
 
@@ -284,11 +284,11 @@
 
 /* allmain.c */
 #elif defined(DUMP_ENUMS_MONSYMS)
-#define MONSYM(idx, ch, basename, sym, desc) { sym, #sym },
+#define MONSYM(idx, ch, basename, sym, desc) { sym, #sym, 0 },
 
 #elif defined(DUMP_ENUMS_MONSYMS_DEFCHAR)
 #define MONSYM(idx, ch, basename, sym, desc) \
-    { DEF_##basename, "DEF_" #basename },
+    { DEF_##basename, "DEF_" #basename, 0 },
 
 #endif
 
