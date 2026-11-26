@@ -418,4 +418,6 @@ new tree $TOP/nhlua
 	$TOP/nhlua/lua	    - lua source tree
 	$TOP/nhlua/nhlua-update.sh - script for dealing with a new Lua tarball
 Lua version in $TOP/nhlua is now 5.5.1
+don't create objects during the init decisions around what objects are needed,
+	only to then destroy the objects and try over
 

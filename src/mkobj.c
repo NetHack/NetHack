@@ -10,6 +10,7 @@ staticfn void mkobj_erosions(struct obj *);
 staticfn void mkbox_cnts(struct obj *);
 staticfn unsigned nextoid(struct obj *, struct obj *);
 staticfn void mksobj_init(struct obj **, boolean);
+staticfn struct obj *mandatory_initializations(struct obj *);
 staticfn int item_on_ice(struct obj *);
 staticfn void shrinking_glob_gone(struct obj *);
 staticfn void obj_timer_checks(struct obj *, coordxy, coordxy, int);
@@ -264,10 +265,8 @@ mksobj_migr_to_species(
     return otmp;
 }
 
-/* mkobj(): select a type of item from a class, use mksobj() to create it;
-   result is always non-Null */
-struct obj *
-mkobj(int oclass, boolean artif)
+int
+mkobj_otyp_from_oclass(int oclass)
 {
     int tprob, i, prob;
 
@@ -296,8 +295,16 @@ mkobj(int oclass, boolean artif)
         impossible("probtype error, oclass=%d i=%d", (int) oclass, i);
         i = svb.bases[oclass];
     }
+    return i;
+}
 
-    return mksobj(i, TRUE, artif);
+/* mkobj(): select a type of item from a class using mkobj_otyp_from_oclass(),
+   use mksobj() to create it;
+   result is always non-Null */
+struct obj *
+mkobj(int oclass, boolean artif)
+{
+    return mksobj(mkobj_otyp_from_oclass(oclass), TRUE, artif);
 }
 
 staticfn void
@@ -1173,30 +1180,12 @@ mksobj_init(struct obj **obj, boolean artif)
         otmp->opoisoned = 1;
 }
 
-/* mksobj(): create a specific type of object; result is always non-Null */
-struct obj *
-mksobj(int otyp, boolean init, boolean artif)
+staticfn struct obj *
+mandatory_initializations(struct obj *otmp)
 {
-    struct obj *otmp;
-    char let = objects[otyp].oc_class;
+    /* some things must get done (corpsenm, timers)
+       even if mksobj(,init == 0,) */
 
-    otmp = newobj();
-    *otmp = cg.zeroobj;
-    otmp->age = max(svm.moves, 1L);
-    otmp->o_id = next_ident();
-    otmp->quan = 1L;
-    otmp->oclass = let;
-    otmp->otyp = otyp;
-    otmp->where = OBJ_FREE;
-    unknow_object(otmp); /* set up dknown and known: non-0 for some things */
-    otmp->corpsenm = NON_PM;
-    otmp->lua_ref_cnt = 0;
-    otmp->pickup_prev = 0;
-
-    if (init)
-        mksobj_init(&otmp, artif);
-
-    /* some things must get done (corpsenm, timers) even if init = 0 */
     switch ((otmp->oclass == POTION_CLASS && otmp->otyp != POT_OIL)
             ? POT_WATER
             : otmp->otyp) {
@@ -1249,11 +1238,37 @@ mksobj(int otyp, boolean init, boolean artif)
     }
 
     /* unique objects may have an associated artifact entry */
-    if (objects[otyp].oc_unique && !otmp->oartifact) {
+    if (objects[otmp->otyp].oc_unique && !otmp->oartifact) {
         /* mk_artifact() with otmp and A_NONE will never return NULL */
         otmp = mk_artifact(otmp, (aligntyp) A_NONE, 99, FALSE);
     }
     otmp->owt = weight(otmp);
+    return otmp;
+}
+
+/* mksobj(): create a specific type of object; result is always non-Null */
+struct obj *
+mksobj(int otyp, boolean init, boolean artif)
+{
+    struct obj *otmp;
+    char let = objects[otyp].oc_class;
+
+    otmp = newobj();
+    *otmp = cg.zeroobj;
+    otmp->age = max(svm.moves, 1L);
+    otmp->o_id = next_ident();
+    otmp->quan = 1L;
+    otmp->oclass = let;
+    otmp->otyp = otyp;
+    otmp->where = OBJ_FREE;
+    unknow_object(otmp); /* set up dknown and known: non-0 for some things */
+    otmp->corpsenm = NON_PM;
+    otmp->lua_ref_cnt = 0;
+    otmp->pickup_prev = 0;
+
+    if (init)
+        mksobj_init(&otmp, artif);
+    otmp = mandatory_initializations(otmp);
     return otmp;
 }
 

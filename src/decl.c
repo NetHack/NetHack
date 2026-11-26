@@ -569,10 +569,8 @@ static const struct instance_globals_n g_init_n = {
     /* sp_lev.c */
     0, /* num_lregions */
     /* u_init.c */
-    STRANGE_OBJECT, /* nocreate */
-    STRANGE_OBJECT, /* nocreate2 */
-    STRANGE_OBJECT, /* nocreate3 */
-    STRANGE_OBJECT, /* nocreate4 */
+    { STRANGE_OBJECT, STRANGE_OBJECT, STRANGE_OBJECT, STRANGE_OBJECT,
+      STRANGE_OBJECT }, /* nocreate[5] array */
 #ifdef NO_TERMS
     TRUE,
 #else

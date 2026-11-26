@@ -15,7 +15,7 @@ struct trobj {
 };
 
 staticfn long trquan(const struct trobj *);
-staticfn struct obj *ini_inv_mkobj_filter(int, boolean);
+staticfn int ini_inv_mkobj_filter(int, boolean);
 staticfn short ini_inv_obj_substitution(const struct trobj *,
                                         struct obj *) NONNULLPTRS;
 staticfn boolean ini_inv_adjust_obj(const struct trobj *,
@@ -781,10 +781,9 @@ u_init_role(void)
         break;
     }
 
-    gn.nocreate = STRANGE_OBJECT;
-    gn.nocreate2 = STRANGE_OBJECT;
-    gn.nocreate3 = STRANGE_OBJECT;
-    gn.nocreate4 = STRANGE_OBJECT;
+    for (i = 0; i < SIZE(gn.nocreate); ++i)
+        gn.nocreate[i] = STRANGE_OBJECT;
+    /* gn.nocreate[0] is not used */
 }
 
 /* race-specific initializations, same restrictions as u_init_role */
@@ -1113,11 +1112,10 @@ trquan(const struct trobj *trop)
     return trop->trquan_min + rn2(trop->trquan_max - trop->trquan_min + 1);
 }
 
-/* create random object of certain class, filtering out too powerful items */
-staticfn struct obj *
+/* choose random type of object of certain class, filtering out too powerful items */
+int
 ini_inv_mkobj_filter(int oclass, boolean got_level1_spellbook)
 {
-    struct obj *obj;
     int otyp, trycnt = 0;
 
     /*
@@ -1130,12 +1128,10 @@ ini_inv_mkobj_filter(int oclass, boolean got_level1_spellbook)
      * one will immediately read it and use the iron ball as a
      * weapon.)
      */
-    obj = mkobj(oclass, FALSE);
-    otyp = obj->otyp;
-
-    while (otyp == WAN_WISHING || otyp == gn.nocreate
-           || otyp == gn.nocreate2 || otyp == gn.nocreate3
-           || otyp == gn.nocreate4 || otyp == RIN_LEVITATION
+    otyp = mkobj_otyp_from_oclass(oclass);
+    while (otyp == WAN_WISHING || otyp == gn.nocreate[1]
+           || otyp == gn.nocreate[2] || otyp == gn.nocreate[3]
+           || otyp == gn.nocreate[4] || otyp == RIN_LEVITATION
            /* 'useless' items */
            || otyp == POT_HALLUCINATION
            || otyp == POT_ACID
@@ -1155,11 +1151,10 @@ ini_inv_mkobj_filter(int oclass, boolean got_level1_spellbook)
            /* powerful spells are either useless to
               low level players or unbalancing; also
               spells in restricted skill categories */
-           || (obj->oclass == SPBOOK_CLASS
+           || (objects[otyp].oc_class == SPBOOK_CLASS
                && (objects[otyp].oc_level > (got_level1_spellbook ? 3 : 1)
                    || restricted_spell_discipline(otyp)))
            || otyp == SPE_NOVEL) {
-        dealloc_obj(obj);
         if (++trycnt > 1000) {
             /* This lonely pancake's potential will never be realized.
              * It will exist only as a thought, of something that could have
@@ -1167,13 +1162,12 @@ ini_inv_mkobj_filter(int oclass, boolean got_level1_spellbook)
              * oozing into its nooks, or see the delightful expression on
              * someone's face as they are about to let it dance across their
              * taste buds. */
-            obj = mksobj(PANCAKE, TRUE, FALSE);
+            otyp = PANCAKE;
             break;
         }
-        obj = mkobj(oclass, FALSE);
-        otyp = obj->otyp;
+        otyp = mkobj_otyp_from_oclass(oclass);
     }
-    return obj;
+    return otyp;
 }
 
 /* substitute object with something else based on race.
@@ -1311,11 +1305,8 @@ ini_inv(const struct trobj *trop)
     quan = trquan(trop);
     while (trop->trclass) {
         otyp = (int) trop->trotyp;
-        if (otyp != UNDEF_TYP) {
-            obj = mksobj(otyp, TRUE, FALSE);
-        } else { /* UNDEF_TYP */
-            obj = ini_inv_mkobj_filter(trop->trclass, got_sp1);
-            otyp = obj->otyp;
+        if (otyp == UNDEF_TYP) {
+            otyp = ini_inv_mkobj_filter(trop->trclass, got_sp1);
             /* Heavily relies on the facts that 1) we create wands
              * before rings, that 2) we create rings before
              * spellbooks, and that 3) not more than 1 object of a
@@ -1326,28 +1317,28 @@ ini_inv(const struct trobj *trop)
             case WAN_POLYMORPH:
             case RIN_POLYMORPH:
             case POT_POLYMORPH:
-                gn.nocreate = RIN_POLYMORPH_CONTROL;
+                gn.nocreate[1] = RIN_POLYMORPH_CONTROL;
                 break;
             case RIN_POLYMORPH_CONTROL:
-                gn.nocreate = RIN_POLYMORPH;
-                gn.nocreate2 = SPE_POLYMORPH;
-                gn.nocreate3 = POT_POLYMORPH;
+                gn.nocreate[1] = RIN_POLYMORPH;
+                gn.nocreate[2] = SPE_POLYMORPH;
+                gn.nocreate[3] = POT_POLYMORPH;
             }
             /* Don't have 2 of the same ring or spellbook */
-            if (obj->oclass == RING_CLASS || obj->oclass == SPBOOK_CLASS)
-                gn.nocreate4 = otyp;
+            if (objects[otyp].oc_class == RING_CLASS
+                || objects[otyp].oc_class == SPBOOK_CLASS)
+                gn.nocreate[4] = otyp;
         }
+        /* nudist gets no armor */
+        if (u.uroleplay.nudist && objects[otyp].oc_class == ARMOR_CLASS)
+            goto nxt;
+
+        obj = mksobj(otyp, TRUE, FALSE);
         /* Put post-creation object adjustments that don't depend on whether
          * it was UNDEF_TYP or not after this. */
 
         otyp = ini_inv_obj_substitution(trop, obj);
         nhUse(otyp);
-
-        /* nudist gets no armor */
-        if (u.uroleplay.nudist && obj->oclass == ARMOR_CLASS) {
-            dealloc_obj(obj);
-            goto nxt;
-        }
 
         if (ini_inv_adjust_obj(trop, obj))
             quan = 1;
