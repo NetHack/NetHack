@@ -857,25 +857,25 @@ static const struct enum_dump glyph_offsets_dump[] = {
     };
 #undef dump_go
 
-#define dump_om(om) { om, #om }
+#define dump_om(om, c) { om, #om, c }
     static const struct enum_dump omdump[] = {
-        dump_om(LAST_GENERIC),
-        dump_om(OBJCLASS_HACK),
-        dump_om(FIRST_OBJECT),
-        dump_om(FIRST_AMULET),
-        dump_om(LAST_AMULET),
-        dump_om(FIRST_SPELL),
-        dump_om(LAST_SPELL),
-        dump_om(MAXSPELL),
-        dump_om(FIRST_REAL_GEM),
-        dump_om(LAST_REAL_GEM),
-        dump_om(FIRST_GLASS_GEM),
-        dump_om(LAST_GLASS_GEM),
-        dump_om(NUM_REAL_GEMS),
-        dump_om(NUM_GLASS_GEMS),
-        dump_om(MAXEXPCHARS),
-        dump_om(MAXTCHARS),
-        dump_om(WARNCOUNT),
+        dump_om(LAST_GENERIC, 0),
+        dump_om(OBJCLASS_HACK, 0),
+        dump_om(FIRST_OBJECT, 0),
+        dump_om(FIRST_AMULET, 0),
+        dump_om(LAST_AMULET, 0),
+        dump_om(FIRST_SPELL, 0),
+        dump_om(LAST_SPELL, 0),
+        dump_om(MAXSPELL, 0),
+        dump_om(FIRST_REAL_GEM, 0),
+        dump_om(LAST_REAL_GEM, 0),
+        dump_om(FIRST_GLASS_GEM, 0),
+        dump_om(LAST_GLASS_GEM, 0),
+        dump_om(NUM_REAL_GEMS, 0),
+        dump_om(NUM_GLASS_GEMS, 0),
+        dump_om(MAXEXPCHARS, "number of explosion characters"),
+        dump_om(MAXTCHARS, "trap chars"),
+        dump_om(WARNCOUNT, "number of different warning levels"),
     };
 #undef dump_om
 
