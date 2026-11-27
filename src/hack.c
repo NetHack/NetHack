@@ -3579,7 +3579,32 @@ in_town(coordxy x, coordxy y)
     for (sroom = &svr.rooms[0]; sroom->hx > 0; sroom++) {
         if (sroom->nsubrooms > 0) {
             has_subrooms = TRUE;
+#if 0
+            /*
+             * Since 8e6cf38, a special-level room that gets
+             * subrooms is flagged irregular, and inside_room() then
+             * only matches squares whose roomno is the parent room's.
+             * Shops, temples and houses in a nested des.room Minetown
+             * (Town Square, Alley Town, College Town, Bazaar Town)
+             * have their own roomno, and their walls and doors are
+             * edges, so in_town() returned FALSE on all of them.
+             * is_izchak() therefore failed while Izchak stood in his
+             * shop: #chat gave the generic shoplifter line,
+             * "Always Talk To The Wise Old Man" was never awarded,
+             * and the Devteam Office hint for missing code scrolls
+             * never appeared. The town watch also ignored kicked,
+             * dug or picked building doors and walls there. The
+             * TNNT code checks the town room's bounding box, which
+             * is what inside_room() did for these rooms before they
+             * became irregular.
+             */
             if (inside_room(sroom, x, y))
+#else
+            /* TNNT - not inside_room(): a room with subrooms is flagged
+                irregular, which would leave out the town's buildings */
+            if (x >= sroom->lx - 1 && x <= sroom->hx + 1 && y >= sroom->ly - 1
+                && y <= sroom->hy + 1)
+#endif
                 return TRUE;
         }
     }
