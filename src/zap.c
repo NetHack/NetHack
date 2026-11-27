@@ -6369,7 +6369,6 @@ makewish(void)
     int tries = 0;
     long oldwishconduct[3] = { u.uconduct.wishes, u.uconduct.wisharti,
                                u.uconduct.failed_wishes };
-    boolean tally_this_wish = TRUE;
 
     svc.context.resume_wish = 0;
     gt.tallied_wish = FALSE;
@@ -6427,49 +6426,52 @@ makewish(void)
         /* explicitly wished for "nothing", presumably attempting
            to retain wishless conduct */
         livelog_printf(LL_WISH, "declined to make a wish");
-        tally_this_wish = FALSE;
+        return;
     } else if (otmp == &pseudoobj[pseudo_terrain]) {
-        wish_history_add(bufcpy);
         /* wizard mode terrain wish: skip livelogging, etc */
-        tally_this_wish = FALSE;
+        /* don't return; drop down to tally_wish() */
     } else if (otmp == &pseudoobj[pseudo_failedwish]) {
        /* placeholder: livelog_printf(LL_WISH,
                                       "tried, but failed to make a wish"); */
         /* don't return; drop down to tally_wish() */
     } else if (otmp == &pseudoobj[pseudo_failedterrain]) {
         /* wizard mode terrain wish: skip livelogging, etc */
-        tally_this_wish = FALSE;
-    } else if (Is_pseudoobj(otmp)) {
-        /* it should not be possible to arrive here */
-        tally_this_wish = FALSE;
+        /* don't return; drop down to tally_wish() */
     }
-    if (!tally_this_wish)
-        return;
+
+    wish_history_add(bufcpy);
+
+    if (otmp->oartifact) {  /* won't be true for Is_pseudoobj(otmp) */
+        /* update artifact bookkeeping; doesn't produce a livelog event */
+        artifact_origin(otmp, ONAME_WISH | ONAME_KNOW_ARTI);
+    }
 
     tally_wish(bufcpy, otmp, oldwishconduct);
+    if (Is_pseudoobj(otmp))
+        return;
+
+    /* only real objects beyond this point */
     if (otmp->otyp == CORPSE && !u_safe_from_fatal_corpse(otmp, st_all))
         otmp->wishedfor = 1;
 
-    if (!Is_pseudoobj(otmp)) {
-        const char *verb = ((Is_airlevel(&u.uz) || u.uinwater) ? "slip"
-                            : (otmp->otyp == CORPSE && otmp->wishedfor)
-                                ? "materialize"
-                                : "drop"),
-                   *oops_msg = (u.uswallow ? "Oops!  %s out of your reach!"
-                                : (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz)
-                                   || levl[u.ux][u.uy].typ < IRONBARS
-                                   || levl[u.ux][u.uy].typ >= ICE)
-                                    ? "Oops!  %s away from you!"
-                                : !(otmp->otyp == CORPSE && otmp->wishedfor)
-                                    ? "Oops!  %s to the floor!"
-                                    : "Careful! %s on the floor!");
+    const char *verb = ((Is_airlevel(&u.uz) || u.uinwater) ? "slip"
+                        : (otmp->otyp == CORPSE && otmp->wishedfor)
+                            ? "materialize"
+                            : "drop"),
+               *oops_msg = (u.uswallow ? "Oops!  %s out of your reach!"
+                            : (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz)
+                               || levl[u.ux][u.uy].typ < IRONBARS
+                               || levl[u.ux][u.uy].typ >= ICE)
+                                ? "Oops!  %s away from you!"
+                            : !(otmp->otyp == CORPSE && otmp->wishedfor)
+                                ? "Oops!  %s to the floor!"
+                                : "Careful! %s on the floor!");
+    /* The(aobjnam()) is safe since otmp is unidentified -dlc */
+    (void) hold_another_object(otmp, oops_msg, The(aobjnam(otmp, verb)),
+                                (const char *) 0);
 
-        /* The(aobjnam()) is safe since otmp is unidentified -dlc */
-        (void) hold_another_object(otmp, oops_msg, The(aobjnam(otmp, verb)),
-                                   (const char *) 0);
-    }
     u.ublesscnt += rn1(100, 50); /* the gods take notice */
-}
+ }
 
 void
 tally_wish(char *bufcpy, struct obj *otmp, long oldwishconduct[3])
@@ -6483,12 +6485,6 @@ tally_wish(char *bufcpy, struct obj *otmp, long oldwishconduct[3])
     char wish[BUFSZ];
 
     if (!gt.tallied_wish) {
-        wish_history_add(bufcpy);
-
-        if (!Is_pseudoobj(otmp) && otmp->oartifact) {
-            /* update artifact bookkeeping; doesn't produce a livelog event */
-            artifact_origin(otmp, ONAME_WISH | ONAME_KNOW_ARTI);
-        }
         /* wisharti conduct handled in readobjnam() */
         maybe_LL_arti =
             ((oldwishconduct[1] < u.uconduct.wisharti) ? LL_ARTIFACT : 0L);
