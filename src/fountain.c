@@ -394,14 +394,14 @@ void
 dipfountain(struct obj *obj)
 {
     int er = ER_NOTHING;
-    boolean is_hands = (obj == &hands_obj);
+    boolean is_hands = Is_pseudoobj(obj);
 
     if (Levitation) {
         floating_above("fountain");
         return;
     }
 
-    if (obj->otyp == LONG_SWORD && u.ulevel >= 5
+    if (!Is_pseudoobj(obj) && obj->otyp == LONG_SWORD && u.ulevel >= 5
         && !rn2(Role_if(PM_KNIGHT) ? 6 : 30)
         /* once upon a time it was possible to poly N daggers into N swords */
         && obj->quan == 1L && !obj->oartifact
@@ -457,7 +457,7 @@ dipfountain(struct obj *obj)
 
     switch (rnd(30)) {
     case 16: /* Curse the item */
-        if (!is_hands && obj->oclass != COIN_CLASS && !obj->cursed) {
+        if (!Is_pseudoobj(obj) && obj->oclass != COIN_CLASS && !obj->cursed) {
             curse(obj);
         }
         break;
@@ -465,7 +465,7 @@ dipfountain(struct obj *obj)
     case 18:
     case 19:
     case 20: /* Uncurse the item */
-        if (!is_hands && obj->cursed) {
+        if (!Is_pseudoobj(obj) && obj->cursed) {
             if (!Blind)
                 pline_The("%s glows for a moment.", hliquid("water"));
             uncurse(obj);
@@ -717,7 +717,7 @@ dipsink(struct obj *obj)
 {
     boolean try_call = FALSE,
             not_looted_yet = (levl[u.ux][u.uy].looted & S_LRING) == 0,
-            is_hands = (obj == &hands_obj || (uarmg && obj == uarmg));
+            is_hands = (Is_pseudoobj(obj) || (uarmg && obj == uarmg));
 
     if (!rn2(not_looted_yet ? 25 : 15)) {
         /* can't rely on using sink for unlimited scroll blanking; however,

@@ -2549,7 +2549,7 @@ fopen_wizkit_file(void)
 staticfn void
 wizkit_addinv(struct obj *obj)
 {
-    if (!obj || obj == &hands_obj)
+    if (!obj || Is_pseudoobj(obj))
         return;
 
     /* subset of starting inventory pre-ID */
@@ -2581,7 +2581,7 @@ proc_wizkit_line(char *buf)
     otmp = readobjnam(buf, (struct obj *) 0);
 
     if (otmp) {
-        if (otmp != &hands_obj) {
+        if (!Is_pseudoobj(otmp)) {
             wish_history_add(buf);
             wizkit_addinv(otmp);
         }

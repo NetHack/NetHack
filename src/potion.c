@@ -2287,7 +2287,7 @@ dodip(void)
     if (inaccessible_equipment(obj, "dip", FALSE))
         return ECMD_OK;
 
-    is_hands = (obj == &hands_obj);
+    is_hands = (obj == &pseudoobj[pseudo_hands] || Is_pseudoobj(obj));
     shortestname = (is_hands || is_plural(obj) || pair_of(obj)) ? "them"
                                                                 : "it";
     drink_ok_extra = 0;
@@ -2454,12 +2454,17 @@ potion_dip(struct obj *obj, struct obj *potion)
         pline("That is a potion bottle, not a Klein bottle!");
         return ECMD_OK;
     }
-    if (obj == &hands_obj) {
-        You("can't fit your %s into the mouth of the bottle!",
-            body_part(HAND));
-        return ECMD_OK;
+    if (Is_pseudoobj(obj)) {
+        if (obj == &pseudoobj[pseudo_hands]) {
+            You("can't fit your %s into the mouth of the bottle!",
+                body_part(HAND));
+            return ECMD_OK;
+        } else {
+            impossible("Unexpected non-hands pseudoobj in %s() %d", __func__,
+                       __LINE__);
+            return ECMD_TIME;
+        }
     }
-
     obj->pickup_prev = 0; /* no longer 'recently picked up' */
     potion->in_use = TRUE; /* assume it will be used up */
     if (potion->otyp == POT_WATER) {

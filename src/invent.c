@@ -1739,14 +1739,14 @@ getobj_hands_txt(const char *action, char *qbuf)
  * getobj returns:
  *      struct obj *xxx:        object to do something with.
  *      (struct obj *) 0        error return: no object.
- *      &hands_obj              explicitly no object (as in w-).
+ *      &pseudoobj[pseudo_hands]  explicitly no object (as in w-).
  * The obj_ok callback should not have side effects (apart from
  * abnormal-behavior things like impossible calls); it can be called multiple
  * times on the same object during the execution of this function.
  * Callbacks' argument is either a valid object pointer or a null pointer,
  * which represents the validity of doing that action on HANDS_SYM. getobj
- * won't call it with &hands_obj, so its behavior can be undefined in that
- * case.
+ * won't call it with &pseudoobj[pseudo_hands], so its behavior can be
+ * undefined in that case.
  */
 struct obj *
 getobj(
@@ -1791,7 +1791,7 @@ getobj(
                     /* check whether the hands/self choice is suitable */
                     v = (*obj_ok)((struct obj *) 0);
                     if (v == GETOBJ_SUGGEST || v == GETOBJ_DOWNPLAY)
-                        otmp = &hands_obj;
+                        otmp = &pseudoobj[pseudo_hands];
                 } else {
                     /* there could be more than one match if key is '#';
                        take first one which passes the obj_ok callback */
@@ -1964,7 +1964,7 @@ getobj(
         if (ilet == HANDS_SYM) { /* '-' */
             if (!allownone)
                 mime_action(word);
-            return (allownone ? &hands_obj : (struct obj *) 0);
+            return (allownone ? &pseudoobj[pseudo_hands] : (struct obj *) 0);
         }
  redo_menu:
         /* since gold is now kept in inventory, we need to do processing for
@@ -1998,7 +1998,7 @@ getobj(
                 continue;
             }
             if (ilet == HANDS_SYM)
-                return &hands_obj;
+                return &pseudoobj[pseudo_hands];
             if (ilet == '\033') {
                 if (flags.verbose)
                     pline1(Never_mind);

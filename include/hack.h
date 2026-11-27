@@ -965,6 +965,21 @@ struct autopickup_exception {
     struct autopickup_exception *next;
 };
 
+enum pseudoobj_indices {
+    pseudo_nothing,
+    pseudo_hands,
+    pseudo_terrain,
+    pseudo_failedwish,
+    pseudo_failedterrain,
+    pseudo_max
+};
+#define Is_pseudoobj(o) \
+    ((o) == &pseudoobj[pseudo_nothing]           \
+     || (o) == &pseudoobj[pseudo_hands]          \
+     || (o) == &pseudoobj[pseudo_terrain]        \
+     || (o) == &pseudoobj[pseudo_failedwish]     \
+     || (o) == &pseudoobj[pseudo_failedterrain])
+
 /* at most one of `door' and `box' should be non-null at any given time */
 struct xlock_s {
     struct rm *door;

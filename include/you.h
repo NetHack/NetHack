@@ -163,7 +163,7 @@ struct u_conduct {     /* number of times... */
     long reserved1;
     long reserved2;
     long reserved3;
-    long reserved4;
+    long failed_wishes; /* consumes reserved4 */
 };
 
 struct u_roleplay {

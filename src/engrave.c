@@ -981,12 +981,12 @@ doengrave(void)
      */
 
     de->otmp = getobj("write with", stylus_ok, GETOBJ_PROMPT);
-    if (!de->otmp) {/* otmp == &hands_obj if fingers */
+    if (!de->otmp) { /* de->otmp == &pseudoobj[pseudo_hands] if fingers */
         de->ret = ECMD_CANCEL;
         goto doengr_exit;
     }
 
-    if (de->otmp == &hands_obj) {
+    if (Is_pseudoobj(de->otmp)) {
         Strcat(strcpy(de->fbuf, "your "), body_part(FINGERTIP));
         de->writer = de->fbuf;
     } else {
@@ -1023,7 +1023,8 @@ doengrave(void)
         goto doengr_exit;
     }
     if (IS_GRAVE(levl[u.ux][u.uy].typ)) {
-        if (de->otmp == &hands_obj) { /* using only finger */
+        if (Is_pseudoobj(de->otmp)) {
+            /* using only finger */
             You("would only make a small smudge on the %s.",
                 surface(u.ux, u.uy));
             goto doengr_exit;
@@ -1194,16 +1195,17 @@ doengrave(void)
     doengrave_ctx_verb(de);
 
     /* Tell adventurer what is going on */
-    if (de->otmp != &hands_obj)
+    if (!Is_pseudoobj(de->otmp)) {
         You("%s the %s with %s%s.", de->everb, de->eloc,
             /* since doname() yields "N items" when quantity is more than
-               one, match that by using "1 of" rather than "one of" when
-               informing the player that the stack will be split */
+                one, match that by using "1 of" rather than "one of" when
+                informing the player that the stack will be split */
             (de->type == ENGRAVE && de->otmp->quan > 1L) ? "1 of " : "",
             doname(de->otmp));
-    else
-        You("%s the %s with your %s.",
-            de->everb, de->eloc, body_part(FINGERTIP));
+    } else {
+        You("%s the %s with your %s.", de->everb, de->eloc,
+            body_part(FINGERTIP));
+    }
 
     /* Prompt for engraving! */
     Sprintf(de->qbuf, "What do you want to %s the %s here?",
@@ -1312,7 +1314,8 @@ engrave(void)
     }
     /* Stylus might have been taken out of inventory and destroyed somehow.
      * Not safe to dereference stylus until after this. */
-    if (svc.context.engraving.stylus == &hands_obj) { /* bare finger */
+    if (Is_pseudoobj(svc.context.engraving.stylus)) {
+        /* bare finger */
         stylus = (struct obj *) 0;
     } else {
         for (stylus = gi.invent; stylus; stylus = stylus->nobj) {

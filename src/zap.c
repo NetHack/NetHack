@@ -41,6 +41,8 @@ staticfn boolean destroyable(struct obj *, int);
 
 staticfn void wishcmdassist(int);
 staticfn void wish_history_menu(char *);
+staticfn void tally_wish(char *, struct obj *,
+                         long oldwishconduct[3]) NONNULLARG1;
 
 #define ZT_MAGIC_MISSILE (AD_MAGM - 1)
 #define ZT_FIRE (AD_FIRE - 1)
@@ -6362,15 +6364,19 @@ void
 makewish(void)
 {
     char buf[BUFSZ] = DUMMY;
-    char bufcpy[BUFSZ], wish[BUFSZ], promptbuf[QBUFSZ];
-    struct obj *otmp, nothing;
-    long maybe_LL_arti;
+    char bufcpy[BUFSZ], promptbuf[QBUFSZ];
+    struct obj *otmp;
     int tries = 0;
-    long oldwisharti = u.uconduct.wisharti;
+    long oldwishconduct[3] = { u.uconduct.wishes, u.uconduct.wisharti,
+                               u.uconduct.failed_wishes };
+    boolean tally_this_wish = TRUE;
 
     svc.context.resume_wish = 0;
+    gt.tallied_wish = FALSE;
     promptbuf[0] = '\0';
-    nothing = cg.zeroobj; /* lint suppression; only its address matters */
+    pseudoobj[pseudo_nothing] = pseudoobj[pseudo_hands] =
+        pseudoobj[pseudo_terrain] = pseudoobj[pseudo_failedwish] =
+            pseudoobj[pseudo_failedterrain] = cg.zeroobj;
     if (flags.verbose)
         You("may wish for an object.");
  retry:
@@ -6400,12 +6406,15 @@ makewish(void)
     }
     /*
      *  Note: if they wished for and got a non-object successfully,
-     *  otmp == &hands_obj.  That includes an artifact which has been
-     *  denied. Wishing for "nothing" requires a separate value to remain
-     *  distinct.
+     *  otmp == &pseudoobj[pseudo_hands].
+     *  An attempt to [wizmode] wish for a trap or terrain and fails returns
+     *  &pseudoobj[pseudo_terrainfailed].
+     *  A wish for an artifact which has been denied returns
+     *  &pseudoobj[pseudo_wishfailed].
+     *  Wishing for "nothing" returns &pseudoobj[pseudo_nothing].
      */
     strcpy(bufcpy, buf);
-    otmp = readobjnam(buf, &nothing);
+    otmp = readobjnam(buf, &pseudoobj[pseudo_nothing]);
     if (!otmp) {
         pline("Nothing fitting that description exists in the game.");
         if (++tries < MAXWISHTRY)
@@ -6414,59 +6423,101 @@ makewish(void)
         otmp = readobjnam((char *) 0, (struct obj *) 0);
         if (!otmp)
             return; /* for safety; should never happen */
-    } else if (otmp == &nothing) {
+    } else if (otmp == &pseudoobj[pseudo_nothing]) {
         /* explicitly wished for "nothing", presumably attempting
            to retain wishless conduct */
         livelog_printf(LL_WISH, "declined to make a wish");
-        return;
-    } else if (otmp == &hands_obj) {
+        tally_this_wish = FALSE;
+    } else if (otmp == &pseudoobj[pseudo_terrain]) {
         wish_history_add(bufcpy);
         /* wizard mode terrain wish: skip livelogging, etc */
+        tally_this_wish = FALSE;
+    } else if (otmp == &pseudoobj[pseudo_failedwish]) {
+       /* placeholder: livelog_printf(LL_WISH,
+                                      "tried, but failed to make a wish"); */
+        /* don't return; drop down to tally_wish() */
+    } else if (otmp == &pseudoobj[pseudo_failedterrain]) {
+        /* wizard mode terrain wish: skip livelogging, etc */
+        tally_this_wish = FALSE;
+    } else if (Is_pseudoobj(otmp)) {
+        /* it should not be possible to arrive here */
+        tally_this_wish = FALSE;
+    }
+    if (!tally_this_wish)
         return;
-    }
-    wish_history_add(bufcpy);
 
-    if (otmp->oartifact) {
-        /* update artifact bookkeeping; doesn't produce a livelog event */
-        artifact_origin(otmp, ONAME_WISH | ONAME_KNOW_ARTI);
-    }
-
-    /* wisharti conduct handled in readobjnam() */
-    maybe_LL_arti = ((oldwisharti < u.uconduct.wisharti) ? LL_ARTIFACT : 0L);
-    Snprintf(wish, sizeof wish, "\"%s\", got \"%s\"", bufcpy, doname(otmp));
-    /* KMH, conduct */
-    if (!u.uconduct.wishes++)
-        livelog_printf((LL_CONDUCT | LL_WISH | maybe_LL_arti),
-                       "made %s first wish - %s", uhis(), wish);
-    else if (!oldwisharti && u.uconduct.wisharti)
-        livelog_printf((LL_CONDUCT | LL_WISH | LL_ARTIFACT),
-                       "made %s first artifact wish - %s", uhis(), wish);
-    else
-        livelog_printf((LL_WISH | maybe_LL_arti), "wished for %s", wish);
-    /* TODO? maybe generate a second event describing what was received since
-       these just echo player's request rather than show actual result */
-
+    tally_wish(bufcpy, otmp, oldwishconduct);
     if (otmp->otyp == CORPSE && !u_safe_from_fatal_corpse(otmp, st_all))
         otmp->wishedfor = 1;
 
-    const char *verb = ((Is_airlevel(&u.uz) || u.uinwater)
-                        ? "slip"
-                        : (otmp->otyp == CORPSE && otmp->wishedfor)
-                          ? "materialize" : "drop"),
-               *oops_msg = (u.uswallow
-                            ? "Oops!  %s out of your reach!"
-                            : (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz)
-                               || levl[u.ux][u.uy].typ < IRONBARS
-                               || levl[u.ux][u.uy].typ >= ICE)
-                               ? "Oops!  %s away from you!"
-                               : !(otmp->otyp == CORPSE && otmp->wishedfor)
-                                 ? "Oops!  %s to the floor!"
-                                 : "Careful! %s on the floor!");
+    if (!Is_pseudoobj(otmp)) {
+        const char *verb = ((Is_airlevel(&u.uz) || u.uinwater) ? "slip"
+                            : (otmp->otyp == CORPSE && otmp->wishedfor)
+                                ? "materialize"
+                                : "drop"),
+                   *oops_msg = (u.uswallow ? "Oops!  %s out of your reach!"
+                                : (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz)
+                                   || levl[u.ux][u.uy].typ < IRONBARS
+                                   || levl[u.ux][u.uy].typ >= ICE)
+                                    ? "Oops!  %s away from you!"
+                                : !(otmp->otyp == CORPSE && otmp->wishedfor)
+                                    ? "Oops!  %s to the floor!"
+                                    : "Careful! %s on the floor!");
 
-    /* The(aobjnam()) is safe since otmp is unidentified -dlc */
-    (void) hold_another_object(otmp, oops_msg, The(aobjnam(otmp, verb)),
-                               (const char *) 0);
+        /* The(aobjnam()) is safe since otmp is unidentified -dlc */
+        (void) hold_another_object(otmp, oops_msg, The(aobjnam(otmp, verb)),
+                                   (const char *) 0);
+    }
     u.ublesscnt += rn1(100, 50); /* the gods take notice */
+}
+
+void
+tally_wish(char *bufcpy, struct obj *otmp, long oldwishconduct[3])
+{
+    /*
+     * oldwishconduct[0] = u.uconduct.wishes before wish
+     * oldwishconduct[1] = u.uconduct.wisharti before wish
+     * oldwishconduct[2] = u.uconduct.failed_wishes before wish
+     */
+    long maybe_LL_arti;
+    char wish[BUFSZ];
+
+    if (!gt.tallied_wish) {
+        wish_history_add(bufcpy);
+
+        if (!Is_pseudoobj(otmp) && otmp->oartifact) {
+            /* update artifact bookkeeping; doesn't produce a livelog event */
+            artifact_origin(otmp, ONAME_WISH | ONAME_KNOW_ARTI);
+        }
+        /* wisharti conduct handled in readobjnam() */
+        maybe_LL_arti =
+            ((oldwishconduct[1] < u.uconduct.wisharti) ? LL_ARTIFACT : 0L);
+
+        if (!Is_pseudoobj(otmp)) {
+            Snprintf(wish, sizeof wish, "\"%s\", got \"%s\"", bufcpy,
+                     doname(otmp));
+        } else {
+            Snprintf(wish, sizeof wish, "\"%s\"", bufcpy);
+        }
+
+        if (!u.uconduct.wishes++)
+            livelog_printf((LL_CONDUCT | LL_WISH | maybe_LL_arti),
+                           "made %s first wish - %s", uhis(), wish);
+        else if (oldwishconduct[1] < u.uconduct.wisharti)
+            livelog_printf((LL_CONDUCT | LL_WISH | LL_ARTIFACT),
+                           "made %s%s artifact wish - %s",
+                           !oldwishconduct[1] ? uhis() : "an",
+                           !oldwishconduct[1] ? " first" : "",
+                           wish);
+        if (oldwishconduct[2] < u.uconduct.failed_wishes)
+            livelog_printf((LL_WISH | maybe_LL_arti), "wished failed for %s", wish);
+
+        /* TODO? maybe generate a second event describing what was received
+         * since these just echo player's request rather than show actual
+         * result
+         */
+        gt.tallied_wish = TRUE;
+    }
 }
 
 /* Fills buf with the appropriate string for this ray.

@@ -975,6 +975,8 @@ struct instance_globals_t {
     /* uhitm.c */
     int twohits; /* 0: single hit; 1: first of 2; 2: second of 2 */
 
+    boolean tallied_wish;  /* has wish been tallied yet for this wish? */
+
     boolean havestate;
 };
 
@@ -1315,6 +1317,6 @@ struct const_globals {
 
 extern const struct const_globals cg;
 
-extern struct obj hands_obj;
+extern struct obj pseudoobj[pseudo_max];
 
 #endif /* DECL_H */

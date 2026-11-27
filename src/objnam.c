@@ -3618,8 +3618,9 @@ wizterrainwish(struct _readobjnam_data *d)
                   (trap != MAGIC_PORTAL) ? "" : " to nowhere");
         } else {
             pline("Creation of %s failed.", an(tname));
+            return &pseudoobj[pseudo_failedterrain];
         }
-        return &hands_obj;
+        return &pseudoobj[pseudo_terrain];
     }
 
     /* furniture and terrain (use at your own risk; can clobber stairs
@@ -3950,10 +3951,9 @@ wizterrainwish(struct _readobjnam_data *d)
            while in xorn form and replacing solid stone with furniture) */
         switch_terrain();
     }
-    if (madeterrain || badterrain)
-        return &hands_obj;
-
-    return (struct obj *) 0;
+    return (madeterrain)  ? &pseudoobj[pseudo_terrain]
+           : (badterrain) ? &pseudoobj[pseudo_failedterrain]
+                          : (struct obj *) 0;
 }
 
 /* message common to several wizterrainwish() results */
@@ -4939,13 +4939,16 @@ readobjnam_postparse3(struct _readobjnam_data *d)
     return 0;
 }
 
-
 /*
  * Return something wished for.  Specifying a null pointer for
  * the user request string results in a random object.  Otherwise,
  * if asking explicitly for "nothing" (or "nil") return no_wish;
- * if not an object return &hands_obj; if an error (no matching object),
- * return null.
+ * if not an object return:
+ *     &pseudoobj[pseudo_nothing] if explicit nothing;
+ *     &pseudoobj[pseudo_terrain]  if terrain;
+ *     &pseudoobj[pseudo_failedwish] if failed on wish attempt;
+ *     &pseudoobj[pseudo_failedterrain] if failed on trap attempt;
+ * if an error (no matching object), return null.
  */
 struct obj *
 readobjnam(char *bp, struct obj *no_wish)
@@ -5415,9 +5418,10 @@ readobjnam(char *bp, struct obj *no_wish)
          || (d.otmp->oartifact && rn2(nartifact_exist()) > 1)) && !wizard) {
         artifact_exists(d.otmp, safe_oname(d.otmp), FALSE, ONAME_NO_FLAGS);
         obfree(d.otmp, (struct obj *) 0);
-        d.otmp = &hands_obj;
+        d.otmp = &pseudoobj[pseudo_failedwish];
         pline("For a moment, you feel %s in your %s, but it disappears!",
               something, makeplural(body_part(HAND)));
+        u.uconduct.failed_wishes++;
         return d.otmp;
     }
 
