@@ -36,7 +36,7 @@ static int mon_wizard_spells[] = {
 };
 
 staticfn void cursetxt(struct monst *, boolean);
-staticfn int choose_monster_spell(struct monst *, int);
+staticfn int choose_monster_spell(struct monst *, int, boolean);
 staticfn int m_cure_self(struct monst *, int);
 staticfn void mcast_death_touch(struct monst *);
 staticfn void mcast_clone_wiz(struct monst *);
@@ -84,12 +84,14 @@ cursetxt(struct monst *mtmp, boolean undirected)
     }
 }
 
-/* choose a spell for monster to cast */
+/* choose a spell for monster to cast; an attacking monster looks for
+   the highest one that is of use, one that isn't attacking takes the
+   roll as it comes and leaves castmu() to turn a useless one down */
 staticfn int
-choose_monster_spell(struct monst *mtmp, int adtyp)
+choose_monster_spell(struct monst *mtmp, int adtyp, boolean attacking)
 {
     int *list = NULL;
-    int i, spellval, len = 0;
+    int i, lvl, spellval, len = 0;
     int maxlev;
 
     /* which spell list to use? */
@@ -113,10 +115,15 @@ choose_monster_spell(struct monst *mtmp, int adtyp)
         spellval = rn2(maxlev);
 
     /* find the highest spell in the list we could cast */
-    for (i = len-1; i >= 0; i--)
-        if (mcast_data[list[i]].level <= spellval
-            && !spell_would_be_useless(mtmp, list[i]))
+    for (i = len-1; i >= 0; i--) {
+        lvl = mcast_data[list[i]].level;
+        /* clerics get curse items a level sooner than mages do */
+        if (adtyp == AD_CLRC && list[i] == MCAST_CURSE_ITEMS)
+            lvl--;
+        if (lvl <= spellval
+            && (!attacking || !spell_would_be_useless(mtmp, list[i])))
             return list[i];
+    }
 
     /* or return the first spell in the list */
     return list[0];
@@ -153,7 +160,8 @@ castmu(
         int cnt = 40;
 
         do {
-            spellnum = choose_monster_spell(mtmp, mattk->adtyp);
+            spellnum = choose_monster_spell(mtmp, mattk->adtyp,
+                                            thinks_it_foundyou);
             /* not trying to attack?  don't allow directed spells */
             if (!thinks_it_foundyou) {
                 if (!is_undirected_spell(spellnum)
