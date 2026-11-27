@@ -1221,8 +1221,8 @@ decl_globals_init(void)
 }
 
 /* fields in these pseudoobj variables don't matter, just their distinct addresses
- *  { pseudo_nothing, pseudo_hands, pseudo_terrain, pseudo_wishfailed,
-          pseudo_terrainfailed }
+ *  { pseudo_nothing, pseudo_hands, pseudo_terrain, pseudo_failedwish,
+          pseudo_failedterrain }
  */
 struct obj pseudoobj[pseudo_max] = { DUMMY, DUMMY, DUMMY, DUMMY, DUMMY };
 
