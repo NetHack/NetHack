@@ -1212,6 +1212,13 @@ paralyze_monst(struct monst *mon, int amt)
     if (amt > 127)
         amt = 127;
 
+    /* orange dragon scales confer free action */
+    if (mon != &gy.youmonst && defended(mon, AD_PLYS)) {
+        /* can amt be zero? */
+        if (amt > 0 && canseemon(mon)) pline("%s stiffens momentarily.", Monnam(mon));
+        return;
+    }
+
     mon->mcanmove = 0;
     mon->mfrozen = amt;
     mon->meating = 0; /* terminate any meal-in-progress */
